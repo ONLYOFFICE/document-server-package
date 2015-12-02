@@ -27,7 +27,7 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(VERSION)-$(BUILD_NUMBER).$(RPM_ARCH).
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(VERSION)-$(BUILD_NUMBER)_$(DEB_ARCH).deb
 
 RPM_DOCUMENTSERVER = rpm/Files/documentserver
-DEB_DOCUMENTSERVER = $(PACKAGE_NAME)/Files/documentserver
+DEB_DOCUMENTSERVER = deb/$(PACKAGE_NAME)/Files/documentserver
 
 .PHONY: all clean rpm deb clean-repo deploy deploy-rpm deploy-deb rpm-documentserver deb-documentserver docker
 
@@ -66,10 +66,10 @@ deb-documentserver:
 	chmod u+x $(DEB_DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
 	chmod u+x $(DEB_DOCUMENTSERVER)/Tools/AllFontsGen
 
-	sed 's/{{BUILD_VERSION}}/'$(VERSION)'/'  -i $(PACKAGE_NAME)/debian/changelog
-	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i $(PACKAGE_NAME)/debian/changelog
-	sed 's/{{DATE}}/'$(date +%F)'/'  -i $(PACKAGE_NAME)/Files/nginx/onlyoffice-documentserver
-	sed 's/_dc=0/_dc='$(date +%F)'/'  -i $(PACKAGE_NAME)/Files/documentserver/OfficeWeb/apps/api/documents/api.js
+	sed 's/{{BUILD_VERSION}}/'$(VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed 's/{{DATE}}/'$(date +%F)'/'  -i deb/$(PACKAGE_NAME)/Files/nginx/onlyoffice-documentserver
+	sed 's/_dc=0/_dc='$(date +%F)'/'  -i deb/$(PACKAGE_NAME)/Files/documentserver/OfficeWeb/apps/api/documents/api.js
 
 	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DEB_DOCUMENTSERVER)/OnlineEditorsExample/settings.config
 	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DEB_DOCUMENTSERVER)/OnlineEditorsExample/settings.config
