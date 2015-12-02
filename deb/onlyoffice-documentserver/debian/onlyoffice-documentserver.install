@@ -1,0 +1,4 @@
+Files/nginx/onlyoffice-documentserver etc/nginx/sites-available/
+Files/documentserver/* var/www/onlyoffice/documentserver/
+Files/configs/* etc/onlyoffice/documentserver/
+Files/fonts/* usr/share/fonts/truetype/onlyoffice/documentserver/

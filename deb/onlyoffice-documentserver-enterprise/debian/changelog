@@ -1,0 +1,22 @@
+onlyoffice-documentserver-enterprise ({{BUILD_VERSION}}-{{BUILD_NUMBER}}) stable; urgency=low
+
+  * Initial release.
+  
+  * Free version based on open source code licensed under AGPLv3.
+  
+  * Fixed OnlineEditorsExample page work with HTTPS protocol.
+  
+  * Changed the package dependencies.
+  
+  * Updated OnlineEditorsExample module.
+  
+  * Added the 'X-Forwarded-Host' and 'X-Forwarded-Proto' request headers 
+    handler.
+
+  * Changed use tcp-sockets to unix-sockets.
+  
+  * Changed mono-runtime version in dependencies.
+  
+  * Nodejs back-end.
+
+ -- ONLYOFFICE (Online documents editor) <support@onlyoffice.com>  Tue, 28 Apr 2015 09:50:00 +0000

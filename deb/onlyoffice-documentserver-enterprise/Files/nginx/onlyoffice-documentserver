@@ -1,0 +1,128 @@
+upstream fastcgi_backend {  
+  server localhost:9001;
+  keepalive 32;
+}
+
+upstream doc_service {  
+  server localhost:8000;
+}
+
+upstream spellchecker {  
+  server localhost:8080;
+}
+server {
+  listen 80;
+
+  ## Increase this if you want to upload large attachments
+  client_max_body_size 100m;
+
+  gzip on;
+  gzip_vary on;
+  gzip_types  text/plain
+              text/xml
+              text/css
+              text/csv
+              application/xml
+              application/javascript
+              application/x-javascript
+              application/json
+              application/octet-stream
+              application/x-font-ttf
+              application/pdf
+              application/rtf
+              application/msword
+              application/vnd.ms-excel
+              application/vnd.ms-powerpoint;
+              #application/vnd.oasis.opendocument.text
+              #application/vnd.oasis.opendocument.spreadsheet
+              #application/vnd.oasis.opendocument.presentation
+              #application/vnd.openxmlformats-officedocument.wordprocessingml.document
+              #application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+              #application/vnd.openxmlformats-officedocument.presentationml.presentation;
+
+  access_log off;
+  error_log /var/log/onlyoffice/documentserver/nginx.error.log;
+
+  location /OnlineEditorsExample/ {
+    root /var/www/onlyoffice/documentserver/OnlineEditorsExample/;
+    index index.html index.htm default.aspx Default.aspx;
+    fastcgi_index Default.aspx;
+    fastcgi_keep_conn on;
+    fastcgi_pass fastcgi_backend;
+    include /etc/onlyoffice/documentserver/fastcgi_params;
+  }
+
+  rewrite ^(\/OfficeWeb)(\/apps\/(?!api\/).*)$ $1/{{DATE}}$2 redirect;
+
+  location ~ ^(\/OfficeWeb)(\/{{DATE}})?\/(apps|sdk|vendor)(?!\/Fonts\/)(\/.*)$ {
+    expires 365d;
+    alias /var/www/onlyoffice/documentserver$1/$3$4;
+  }
+
+  location ~ ^(\/OfficeWeb)\/{{DATE}}(\/sdk\/Fonts\/.*) {
+    proxy_pass http://doc_service$1$2;
+  }
+
+  location ~ ^(\/cache\/files.*)(\/.*) {
+    alias /var/lib/onlyoffice/documentserver/App_Data$1;
+    add_header Content-Disposition 'attachment;';
+
+    # set $secret_string onlyoffice;
+    # secure_link $arg_md5,$arg_expires;
+    # secure_link_md5 "$secure_link_expires$uri$secret_string";
+
+    # if ($secure_link = "") {
+    #   return 403;
+    # }
+
+    # if ($secure_link = "0") {
+    #     return 410;
+    # }
+  }
+
+  location / {
+    rewrite ^/$ /OnlineEditorsExample redirect;
+    proxy_pass http://doc_service;
+
+    proxy_set_header Host $host;
+
+    if ($http_x_forwarded_host ~ ''){
+      set $http_x_forwarded_host $server_name;
+    }
+    if ($http_x_forwarded_proto ~ ''){
+      set $http_x_forwarded_proto $scheme;
+    }
+    proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
+    proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+  }
+
+  location /doc/ {
+    proxy_pass http://doc_service;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+
+    proxy_set_header Host $host;
+
+    if ($http_x_forwarded_host ~ ''){
+      set $http_x_forwarded_host $server_name;
+    }
+    if ($http_x_forwarded_proto ~ ''){
+      set $http_x_forwarded_proto $scheme;
+    }
+    proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
+    proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+  }
+
+  # For debug purpose only
+  # location /rabbitmq/ {
+  #   proxy_pass http://localhost:15672/;
+  # }
+
+  location /spellchecker/ {
+    proxy_pass http://spellchecker/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+}
