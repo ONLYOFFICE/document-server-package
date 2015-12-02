@@ -46,6 +46,7 @@ clean:
 
 rpm-documentserver:
 	cp -rf ../deploy/deploy/* $(RPM_DOCUMENTSERVER)/
+	cp -rf ../dev_tools/OnlineEditorsExample/OnlineEditorsExampleNodeJS/ $(RPM_DOCUMENTSERVER)/example
 
 	chmod u+x $(RPM_DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
 	chmod u+x $(RPM_DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
@@ -56,11 +57,12 @@ rpm-documentserver:
 	sed 's/{{DATE}}/'$(date +%F)'/'  -i rpm/Files/nginx/onlyoffice-documentserver.conf
 	sed 's/_dc=0/_dc='$(date +%F)'/'  -i rpm/Files/documentserver/OfficeWeb/apps/api/documents/api.js
 
-	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(RPM_DOCUMENTSERVER)/OnlineEditorsExample/settings.config
-	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(RPM_DOCUMENTSERVER)/OnlineEditorsExample/settings.config
+	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(RPM_DOCUMENTSERVER)/example/config.js
+	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(RPM_DOCUMENTSERVER)/example/config.js
   
 deb-documentserver:
 	cp -rf ../deploy/deploy/* $(DEB_DOCUMENTSERVER)/
+	cp -rf ../dev_tools/OnlineEditorsExample/OnlineEditorsExampleNodeJS/ $(DEB_DOCUMENTSERVER)/example
 
 	chmod u+x $(DEB_DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
 	chmod u+x $(DEB_DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
@@ -71,8 +73,8 @@ deb-documentserver:
 	sed 's/{{DATE}}/'$(date +%F)'/'  -i deb/$(PACKAGE_NAME)/Files/nginx/onlyoffice-documentserver
 	sed 's/_dc=0/_dc='$(date +%F)'/'  -i deb/$(PACKAGE_NAME)/Files/documentserver/OfficeWeb/apps/api/documents/api.js
 
-	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DEB_DOCUMENTSERVER)/OnlineEditorsExample/settings.config
-	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DEB_DOCUMENTSERVER)/OnlineEditorsExample/settings.config
+	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
+	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
 
 $(RPM):
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
