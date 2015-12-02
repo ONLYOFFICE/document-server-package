@@ -79,7 +79,7 @@ $(RPM):
 
 $(DEB):
 	echo $(DEB)
-	cd deb $(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
+	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 deploy-rpm: $(RPM)
 	rm -rfv $(REPO)
