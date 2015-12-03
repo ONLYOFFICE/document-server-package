@@ -95,12 +95,12 @@ deploy-rpm: $(RPM)
 
 deploy-deb: $(DEB)
 	rm -rfv $(REPO)
-	mkdir -p $(REPO)/repo
+	mkdir -p $(REPO)
 
-	cp -rv $(DEB) $(REPO)/repo;
+	cp -rv $(DEB) $(REPO);
 	dpkg-scanpackages -m repo /dev/null | gzip -9c > $(REPO)/Packages.gz
 
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/ --acl public-read --delete
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo --acl public-read --delete
 
 docker:
 ifeq ($(PACKAGE_NAME), onlyoffice-documentserver-enterprise)
