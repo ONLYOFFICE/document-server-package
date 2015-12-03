@@ -79,13 +79,13 @@ deb-documentserver:
 $(RPM):
 	if [ -f $(RPM) ]; then\
 		echo "RPM file exist, why it building again?"\
-	fi
+	fi\
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
 
 $(DEB):
 	if [ -f $(DEB) ]; then\
 		echo "Deb file exist, why it building again?"\
-	fi
+	fi\
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 deploy-rpm: $(RPM)
