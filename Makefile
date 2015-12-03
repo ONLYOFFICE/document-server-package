@@ -103,8 +103,8 @@ deploy-deb: $(DEB)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/ --acl public-read --delete
 
 docker:
-	if [[ $(PACKAGE_NAME) == *"enterprise"* ]]; then \
-	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver-enterp/trigger/bd95e307-6a3f-4082-997e-6cc319157fc8/ \
-	else \
-	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST \ https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver/trigger/3a3e2739-74ac-4acc-ac82-9dcad3be67d7/ \
-	fi
+	ifeq( $(PACKAGE_NAME), "onlyoffice-documentserver-enterprise" )
+		curl -H "Content-Type: application/json" --data '{"build": true}' -X POST https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver-enterp/trigger/bd95e307-6a3f-4082-997e-6cc319157fc8/ \
+	else
+		curl -H "Content-Type: application/json" --data '{"build": true}' -X POST \ https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver/trigger/3a3e2739-74ac-4acc-ac82-9dcad3be67d7/ \
+	endif
