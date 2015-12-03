@@ -77,10 +77,11 @@ deb-documentserver:
 	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
 
 $(RPM):
+	[ -f $(RPM) ] && { echo "RPM file exist, why it building again?"; }
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
 
 $(DEB):
-	echo $(DEB)
+	[ -f $(RPM) ] && { echo "Deb file exist, why it building again?"; }
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 deploy-rpm: $(RPM)
