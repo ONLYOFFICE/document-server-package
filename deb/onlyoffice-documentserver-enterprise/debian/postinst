@@ -100,12 +100,6 @@ case "$1" in
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"
 
-		# import common ssl certificates
-		mozroots --import --sync --machine --quiet
-
-		mkdir -p /etc/mono/registry/LocalMachine
-		mkdir -p /usr/share/.mono/keypairs
-
 		# configure ngninx for onlyoffice
 		rm -f /etc/nginx/sites-enabled/default
 
