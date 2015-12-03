@@ -95,7 +95,7 @@ deploy-rpm: $(RPM)
 
 deploy-deb: $(DEB)
 	rm -rfv $(REPO)
-	mkdir -p $(REPO)
+	mkdir -p $(REPO)/repo
 
 	cp -rv $(DEB) $(REPO)/repo;
 	dpkg-scanpackages -m repo /dev/null | gzip -9c > $(REPO)/Packages.gz
