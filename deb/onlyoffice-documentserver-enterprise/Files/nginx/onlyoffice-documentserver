@@ -48,6 +48,20 @@ server {
   access_log off;
   error_log /var/log/onlyoffice/documentserver/nginx.error.log;
 
+  if ($http_host){
+    set $redirect_host $http_host;
+  }
+  
+  if ($http_x_forwarded_host){
+    set $redirect_host $http_x_forwarded_host;
+  }
+    
+  if ($http_x_forwarded_proto){
+    set $redirect_host $host;
+    
+    rewrite ^(\/OfficeWeb)(\/apps\/(?!api\/).*)$ $http_x_forwarded_proto://$redirect_host$1/{{DATE}}$2 redirect;
+  }
+  
   rewrite ^(\/OfficeWeb)(\/apps\/(?!api\/).*)$ $1/{{DATE}}$2 redirect;
 
   location ~ ^(\/OfficeWeb)(\/{{DATE}})?\/(apps|sdk|vendor)(?!\/Fonts\/)(\/.*)$ {
@@ -82,10 +96,10 @@ server {
 
     proxy_set_header Host $host;
 
-    if ($http_x_forwarded_host ~ ''){
+    if ($http_x_forwarded_host = ''){
       set $http_x_forwarded_host $server_name;
     }
-    if ($http_x_forwarded_proto ~ ''){
+    if ($http_x_forwarded_proto = ''){
       set $http_x_forwarded_proto $scheme;
     }
     proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
@@ -100,10 +114,10 @@ server {
 
     proxy_set_header Host $host;
 
-    if ($http_x_forwarded_host ~ ''){
+    if ($http_x_forwarded_host = ''){
       set $http_x_forwarded_host $server_name;
     }
-    if ($http_x_forwarded_proto ~ ''){
+    if ($http_x_forwarded_proto = ''){
       set $http_x_forwarded_proto $scheme;
     }
     proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
