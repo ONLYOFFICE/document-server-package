@@ -10,6 +10,11 @@ upstream doc_service {
 upstream spellchecker {  
   server localhost:8080;
 }
+
+upstream example {  
+  server localhost:3000;
+}
+
 server {
   listen 80;
 
@@ -43,15 +48,6 @@ server {
   access_log off;
   error_log /var/log/onlyoffice/documentserver/nginx.error.log;
 
-  location /OnlineEditorsExample/ {
-    root /var/www/onlyoffice/documentserver/OnlineEditorsExample/;
-    index index.html index.htm default.aspx Default.aspx;
-    fastcgi_index Default.aspx;
-    fastcgi_keep_conn on;
-    fastcgi_pass fastcgi_backend;
-    include /etc/onlyoffice/documentserver/fastcgi_params;
-  }
-
   rewrite ^(\/OfficeWeb)(\/apps\/(?!api\/).*)$ $1/{{DATE}}$2 redirect;
 
   location ~ ^(\/OfficeWeb)(\/{{DATE}})?\/(apps|sdk|vendor)(?!\/Fonts\/)(\/.*)$ {
@@ -81,7 +77,7 @@ server {
   }
 
   location / {
-    rewrite ^/$ /OnlineEditorsExample redirect;
+    rewrite ^/$ /example redirect;
     proxy_pass http://doc_service;
 
     proxy_set_header Host $host;
@@ -125,4 +121,9 @@ server {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
   }
+
+  location /example/ {
+    proxy_pass http://example/;
+  }  
+
 }
