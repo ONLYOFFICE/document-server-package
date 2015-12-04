@@ -7,7 +7,7 @@ Group: Applications/Internet
 URL: http://onlyoffice.com/
 Vendor: ONLYOFFICE (Online documents editor)
 Packager: ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-Requires: mono >= 3.2.0, xsp, mono-locale-extras, nginx >= 1.3.13, mysql-server, wget, supervisor >= 3.0b2, redis, rabbitmq-server, nodejs >= 0.11, nodejs <= 0.12.8, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-fonts-common, dejavu-fonts-common, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
+Requires: nginx >= 1.3.13, mysql-server, wget, supervisor >= 3.0b2, redis, rabbitmq-server, nodejs >= 0.11, nodejs <= 0.12.8, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-fonts-common, dejavu-fonts-common, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no
@@ -115,12 +115,6 @@ ln -s /etc/onlyoffice/documentserver/SpellCheckerService.conf /etc/supervisord.d
 
 chown onlyoffice:onlyoffice -R "$LOG_DIR"
 chown onlyoffice:onlyoffice -R "$APP_DIR"
-
-# import common ssl certificates
-mozroots --import --sync --machine --quiet
-
-mkdir -p /etc/mono/registry/LocalMachine
-mkdir -p /usr/share/.mono/keypairs
 
 # configure ngninx for onlyoffice
 #rm -f /etc/nginx/sites-enabled/default
