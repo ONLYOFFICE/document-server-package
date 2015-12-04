@@ -60,7 +60,7 @@ install_db(){
 		$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';"
 	fi
 	
-		$MYSQL "$DB_NAME" < "$DIR/documentserver/Schema/MySql.CreateDb.sql"
+	$MYSQL "$DB_NAME" < "$DIR/documentserver/Schema/MySql.CreateDb.sql"
 }
 
 apply_connection_string(){
@@ -76,7 +76,7 @@ case "$1" in
 
 		# add nginx user to onlyoffice group to allow access to used unix socket
 		adduser --quiet www-data onlyoffice
-
+		
 		#install node modules
 		npm install -g json
 
@@ -99,12 +99,6 @@ case "$1" in
 		
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"
-
-		# import common ssl certificates
-		mozroots --import --sync --machine --quiet
-
-		mkdir -p /etc/mono/registry/LocalMachine
-		mkdir -p /usr/share/.mono/keypairs
 
 		# configure ngninx for onlyoffice
 		rm -f /etc/nginx/sites-enabled/default

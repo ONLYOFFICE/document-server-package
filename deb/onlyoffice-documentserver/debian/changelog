@@ -1,4 +1,4 @@
-onlyoffice-documentserver (3.5.0-{{BUILD_NUMBER}}) stable; urgency=low
+onlyoffice-documentserver ({{BUILD_VERSION}}-{{BUILD_NUMBER}}) stable; urgency=low
 
   * Initial release.
   
