@@ -29,6 +29,12 @@ DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(VERSION)-$(BUILD_NUMBER)_$(DEB_ARCH).
 RPM_DOCUMENTSERVER = rpm/Files/documentserver
 DEB_DOCUMENTSERVER = deb/$(PACKAGE_NAME)/Files/documentserver
 
+ifeq ($(PACKAGE_NAME), onlyoffice-documentserver-enterprise)
+DOCKERHUB_TRIGGER=https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver-enterp/trigger/bd95e307-6a3f-4082-997e-6cc319157fc8/
+else
+DOCKERHUB_TRIGGER=https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver/trigger/3a3e2739-74ac-4acc-ac82-9dcad3be67d7/
+endif
+
 .PHONY: all clean rpm deb clean-repo deploy deploy-rpm deploy-deb rpm-documentserver deb-documentserver docker
 
 all: rpm deb
@@ -93,6 +99,10 @@ deploy-rpm: $(RPM)
 
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/ --acl public-read --delete
 
+ifeq ($(SVN_TAG), trunk)
+	aws s3 cp s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/*.rpm s3://repo-doc-onlyoffice-com/archive/$(RPM_REPO_DIR)/ --acl public-read
+endif
+
 deploy-deb: $(DEB)
 	rm -rfv $(REPO)
 	mkdir -p $(REPO)
@@ -102,9 +112,11 @@ deploy-deb: $(DEB)
 
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo --acl public-read --delete
 
+ifeq ($(SVN_TAG), trunk)
+	aws s3 cp s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo/*.deb s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/ --acl public-read
+endif
+
 docker:
-ifeq ($(PACKAGE_NAME), onlyoffice-documentserver-enterprise)
-	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver-enterp/trigger/bd95e307-6a3f-4082-997e-6cc319157fc8/
-else
-	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST \ https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver/trigger/3a3e2739-74ac-4acc-ac82-9dcad3be67d7/
+ifeq ($(SVN_TAG), trunk)
+	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST $(DOCKERHUB_TRIGGER)
 endif
