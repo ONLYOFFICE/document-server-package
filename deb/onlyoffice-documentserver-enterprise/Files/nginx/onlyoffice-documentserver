@@ -136,8 +136,9 @@ server {
     proxy_set_header Connection "upgrade";
   }
 
-  location /example/ {
-    proxy_pass http://example/;
-  }  
+  location ~ ^(\/example)(\/.*)$ {
+    proxy_pass http://example$2$is_args$args;
+    proxy_set_header Host $host$1;
+  }
 
 }
