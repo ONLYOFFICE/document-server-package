@@ -82,7 +82,7 @@ deb-documentserver:
 
 	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
 	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
-  	sed 's/config\.haveExternalIp[[::space:]]=[[::space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
+	sed 's/config\.haveExternalIp[[::space:]]=[[::space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
 
 $(RPM):
 	ls -l $(RPM) || echo "Rpm file not exist"
