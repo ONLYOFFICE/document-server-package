@@ -102,7 +102,7 @@ deploy-rpm: $(RPM)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/ --acl public-read --delete
 
 ifeq ($(SVN_TAG), trunk)
-	aws s3 cp s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG) s3://repo-doc-onlyoffice-com/archive/$(RPM_REPO_DIR)/ --acl public-read --recursive --include '*.rpm' --exclude '*'
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(VERSION)-$(BUILD_NUMBER)/ --acl public-read --delete
 endif
 
 deploy-deb: $(DEB)
@@ -115,7 +115,7 @@ deploy-deb: $(DEB)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo --acl public-read --delete
 
 ifeq ($(SVN_TAG), trunk)
-	aws s3 cp s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/ --acl public-read --recursive --include '*.deb' --exclude '*'
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(VERSION)-$(BUILD_NUMBER)/ --acl public-read --delete
 endif
 
 docker:
