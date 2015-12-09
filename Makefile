@@ -115,7 +115,7 @@ deploy-deb: $(DEB)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo --acl public-read --delete
 
 ifeq ($(SVN_TAG), trunk)
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(VERSION)-$(BUILD_NUMBER)/ --acl public-read --delete
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(VERSION)-$(BUILD_NUMBER)/repo --acl public-read --delete
 endif
 
 docker:
