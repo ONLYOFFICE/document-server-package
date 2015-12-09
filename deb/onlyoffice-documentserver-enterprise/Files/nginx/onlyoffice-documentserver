@@ -135,17 +135,7 @@ server {
     proxy_pass http://example/;
     
     proxy_set_header Host $host/example;
-    
     proxy_set_header X-Real-IP $remote_addr;
-
-    if ($http_x_forwarded_host = ''){
-      set $http_x_forwarded_host $server_name;
-    }
-    if ($http_x_forwarded_proto = ''){
-      set $http_x_forwarded_proto $scheme;
-    }
-    proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
-    proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
   }
 
 }
