@@ -7,7 +7,7 @@ Group: Applications/Internet
 URL: http://onlyoffice.com/
 Vendor: ONLYOFFICE (Online documents editor)
 Packager: ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-Requires: nginx >= 1.3.13, mysql-server, wget, supervisor >= 3.0b2, redis, rabbitmq-server, nodejs >= 4.2.0, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-fonts-common, dejavu-fonts-common, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
+Requires: nginx >= 1.3.13, mysql-server, wget, supervisor >= 3.0b2, redis, rabbitmq-server, nodejs >= 4.2.0, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-mono-fonts, liberation-narrow-fonts, liberation-sans-fonts, liberation-serif-fonts, dejavu-lgc-sans-fonts, dejavu-lgc-sans-mono-fonts, dejavu-lgc-serif-fonts, dejavu-sans-fonts, dejavu-sans-mono-fonts, dejavu-serif-fonts, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no
@@ -37,6 +37,10 @@ cp ../../Files/configs/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
 #install nginx config
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 cp ../../Files/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
+
+#install fonts
+mkdir -p "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
+cp ../../Files/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
 
 # OLD_IFS="$IFS"
 # IFS="
