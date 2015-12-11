@@ -40,7 +40,7 @@ cp ../../Files/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/c
 
 #install fonts
 mkdir -p "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
-cp ../../Files/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
+cp -r ../../Files/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
 
 # OLD_IFS="$IFS"
 # IFS="
