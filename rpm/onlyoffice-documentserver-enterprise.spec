@@ -7,7 +7,7 @@ Group: Applications/Internet
 URL: http://onlyoffice.com/
 Vendor: ONLYOFFICE (Online documents editor)
 Packager: ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-Requires: nginx >= 1.3.13, mysql-server, wget, supervisor >= 3.0b2, redis, rabbitmq-server, nodejs >= 4.2.0, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-mono-fonts, liberation-narrow-fonts, liberation-sans-fonts, liberation-serif-fonts, dejavu-lgc-sans-fonts, dejavu-lgc-sans-mono-fonts, dejavu-lgc-serif-fonts, dejavu-sans-fonts, dejavu-sans-mono-fonts, dejavu-serif-fonts, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
+Requires: nginx >= 1.3.13, mysql, wget, librabbitmq-tools, supervisor >= 3.0b2, nodejs >= 4.2.0, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-mono-fonts, liberation-narrow-fonts, liberation-sans-fonts, liberation-serif-fonts, dejavu-lgc-sans-fonts, dejavu-lgc-sans-mono-fonts, dejavu-lgc-serif-fonts, dejavu-sans-fonts, dejavu-sans-mono-fonts, dejavu-serif-fonts, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no
@@ -28,54 +28,61 @@ mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 cp -r ../../Files/documentserver/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 cp -r ../../Files/onlyoffice/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 
-mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/"
+#install documentserver libs
+mkdir -p "$RPM_BUILD_ROOT/usr/lib64/"
+cp -r ../../Files/documentserver/NodeJsProjects/FileConverter/Bin/*.so* "$RPM_BUILD_ROOT/usr/lib64/" 
+rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/*.so*
 
 #install configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
-cp ../../Files/configs/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
+cp -r ../../Files/documentserver/NodeJsProjects/Common/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
+rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/NodeJsProjects/Common/config/"
+
+#make log dir
+mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/docservice"
+mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/example"
+mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/converter"
+mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/spellchecker"
+
+#make cache dir
+mkdir -p "$RPM_BUILD_ROOT/var/lib/onlyoffice/documentserver/App_Data/cache/files"
+
+#make exchange dir
+mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
+
+#install supervisor configs
+mkdir -p "$RPM_BUILD_ROOT/etc/supervisord.d/"
+cp ../../Files/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
 
 #install nginx config
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 cp ../../Files/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 
+mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
+cp ../../Files/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
+
 #install fonts
 mkdir -p "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
 cp -r ../../Files/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
-
-# OLD_IFS="$IFS"
-# IFS="
-# "
-
-# for FILE in `find "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"`; do
-	# RELFILE="`echo "$FILE" | sed s?"$RPM_BUILD_ROOT"??`"
-	# if [ -d "$FILE" ]; then
-		# echo "%%attr(-, onlyoffice, onlyoffice) %%dir \"$RELFILE\"" >>documentserver.list
-	# else
-		# case "$FILE" in
-# #			*/WebStudio?\(2\)/web.connections.config )
-# #				echo "%%attr(-, onlyoffice, onlyoffice) %%config(noreplace) \"$RELFILE\"" >>documentserver.list
-# #			;;
-
-# #			*/WebStudio?\(2\)/[Ww]eb*.config | */TeamLabSvc.exe.Config | */ASC.Mail.Aggregator.CollectionService.exe.config | */ASC.Mail.Watchdog.Service.exe.config )
-# #				echo "%%attr(-, onlyoffice, onlyoffice) %%config \"$RELFILE\"" >>documentserver.list
-# #			;;
-
-			# * )
-				# echo "%%attr(-, onlyoffice, onlyoffice) \"$RELFILE\"" >>documentserver.list
-			# ;;
-		# esac
-	# fi
-# done
-# IFS="$OLD_IFS"
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver/*
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
+%config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
+%config %attr(-, root, root) /etc/supervisord.d/onlyoffice-*.ini
+%attr(-, onlyoffice, onlyoffice) /usr/share/fonts/truetype/onlyoffice/*
+%attr(-, root, root) /usr/lib64/*.so*
+
+%dir
+%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice
+%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
+%attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
+%attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
+%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
 
 %pre
 #add group and user for onlyoffice app
@@ -84,78 +91,50 @@ getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/only
 exit 0
 
 %post
-DIR="/var/www/onlyoffice"
-LOG_DIR="/var/log/onlyoffice"
-APP_DIR="/var/lib/onlyoffice"
-
-# modify permissions for onlyoffice files and folders
-mkdir -p "$LOG_DIR/documentserver/DocService"
-mkdir -p "$LOG_DIR/documentserver/ExampleService"
-mkdir -p "$LOG_DIR/documentserver/FileConverterService"
-mkdir -p "$LOG_DIR/documentserver/SpellCheckerService"
-
-mkdir -p "$APP_DIR/documentserver/App_Data"
-mkdir -p "$APP_DIR/documentserver/App_Data/cache/files"
-mkdir -p "$DIR/Data"
-chown onlyoffice:onlyoffice -R "$DIR"
-
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libDjVuFile.so /usr/lib64/libDjVuFile.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libdoctrenderer.so /usr/lib64/libdoctrenderer.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libHtmlFile.so /usr/lib64/libHtmlFile.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libHtmlRenderer.so /usr/lib64/libHtmlRenderer.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libPdfReader.so /usr/lib64/libPdfReader.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libPdfWriter.so /usr/lib64/libPdfWriter.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libXpsFile.so /usr/lib64/libXpsFile.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libUnicodeConverter.so /usr/lib64/libUnicodeConverter.so
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libicudata.so.55 /usr/lib64/libicudata.so.55
-ln -s /var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libicuuc.so.55 /usr/lib64/libicuuc.so.55
-ln -s /etc/onlyoffice/documentserver/DocService.conf /etc/supervisord.d/DocService.ini
-ln -s /etc/onlyoffice/documentserver/ExampleService.conf /etc/supervisord.d/ExampleService.ini
-ln -s /etc/onlyoffice/documentserver/FileConverterService.conf /etc/supervisord.d/FileConverterService.ini
-ln -s /etc/onlyoffice/documentserver/SpellCheckerService.conf /etc/supervisord.d/SpellCheckerService.ini
+DIR="/var/www/onlyoffice/documentserver"
 
 # generate allfonts.js and thumbnail
-"$DIR/documentserver/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/documentserver/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/documentserver/OfficeWeb/sdk/Common/Images" "$DIR/documentserver/NodeJsProjects/FileConverter/Bin/font_selection.bin"
-
-chown onlyoffice:onlyoffice -R "$LOG_DIR"
-chown onlyoffice:onlyoffice -R "$APP_DIR"
-
-# configure ngninx for onlyoffice
-#rm -f /etc/nginx/sites-enabled/default
+"$DIR/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/OfficeWeb/sdk/Common/Images" "$DIR/NodeJsProjects/FileConverter/Bin/font_selection.bin"
 
 # restart dependent services
 service supervisord restart >/dev/null 2>&1
 service nginx reload >/dev/null 2>&1
 
 %preun
-supervisorctl stop all
+# uninstall action
+if [ $1 -eq 0 ]; then
+  supervisorctl stop onlyoffice-documentserver:*
+fi
 
 %postun
-DIR="/var/www/onlyoffice"
+DIR="/var/www/onlyoffice/documentserver"
+# uninstall action
+if [ $1 -eq 0 ]; then
+  rm -f $DIR/OfficeWeb/sdk/Common/AllFonts.js
+  rm -f $DIR/OfficeWeb/sdk/Common/Images/fonts_thumbnail*
+  rm -f $DIR/NodeJsProjects/FileConverter/Bin/font_selection.bin
 
-unlink /usr/lib64/libDjVuFile.so
-unlink /usr/lib64/libdoctrenderer.so
-unlink /usr/lib64/libHtmlFile.so
-unlink /usr/lib64/libHtmlRenderer.so
-unlink /usr/lib64/libPdfReader.so
-unlink /usr/lib64/libPdfWriter.so
-unlink /usr/lib64/libXpsFile.so
-unlink /usr/lib64/libUnicodeConverter.so
-unlink /usr/lib64/libicudata.so.55
-unlink /usr/lib64/libicuuc.so.55
-
-unlink /etc/supervisord.d/DocService.ini
-unlink /etc/supervisord.d/ExampleService.ini
-unlink /etc/supervisord.d/FileConverterService.ini
-unlink /etc/supervisord.d/SpellCheckerService.ini
-
-rm -r $DIR/documentserver/OfficeWeb/sdk/Common/AllFonts.js
-rm -r $DIR/documentserver/OfficeWeb/sdk/Common/Images/fonts_thumbnail*
-rm -r $DIR/documentserver/NodeJsProjects/FileConverter/Bin/font_selection.bin
-
-service supervisord restart >/dev/null 2>&1
-service nginx reload >/dev/null 2>&1
+  supervisorctl update >/dev/null 2>&1
+  service nginx reload >/dev/null 2>&1
+fi
 
 %changelog
-* Mon Aug 10 2015 ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-- We have updated ONLYOFFICE Community Server to ver. 8.6.2.
+* Tue Apr 28 2015 ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
+- Initial release.
+  
+- Free version based on open source code licensed under AGPLv3.
+  
+- Fixed OnlineEditorsExample page work with HTTPS protocol.
+  
+- Changed the package dependencies.
+  
+- Updated OnlineEditorsExample module.
+  
+- Added the 'X-Forwarded-Host' and 'X-Forwarded-Proto' request headers 
+    handler.
+
+- Changed use tcp-sockets to unix-sockets.
+  
+- Changed mono-runtime version in dependencies.
+  
+- Nodejs back-end.

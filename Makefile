@@ -54,14 +54,18 @@ rpm-documentserver:
 	cp -rf ../deploy/deploy/* $(RPM_DOCUMENTSERVER)/
 	cp -rf ../dev_tools/OnlineEditorsExample/OnlineEditorsExampleNodeJS/ $(RPM_DOCUMENTSERVER)/example
 
+	bomstrip-files $(RPM_DOCUMENTSERVER)/NodeJsProjects/Common/config/*.json
+	rm -f $(RPM_DOCUMENTSERVER)/NodeJsProjects/Common/config/*.bom
+
 	chmod u+x $(RPM_DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
 	chmod u+x $(RPM_DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
 	chmod u+x $(RPM_DOCUMENTSERVER)/Tools/AllFontsGen
+	chmod u+x rpm/Files/onlyoffice/configure.sh
 
 	sed 's/{{BUILD_VERSION}}/'$(VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
-	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i rpm/Files/nginx/onlyoffice-documentserver.conf
-	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i rpm/Files/documentserver/OfficeWeb/apps/api/documents/api.js
+	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i rpm/Files/nginx/includes/onlyoffice-docservice.conf
+	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(RPM_DOCUMENTSERVER)/OfficeWeb/apps/api/documents/api.js
 
 	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(RPM_DOCUMENTSERVER)/example/config.js
 	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(RPM_DOCUMENTSERVER)/example/config.js
@@ -78,7 +82,7 @@ deb-documentserver:
 	sed 's/{{BUILD_VERSION}}/'$(VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i deb/$(PACKAGE_NAME)/Files/nginx/onlyoffice-documentserver
-	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i deb/$(PACKAGE_NAME)/Files/documentserver/OfficeWeb/apps/api/documents/api.js
+	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DEB_DOCUMENTSERVER)/documentserver/OfficeWeb/apps/api/documents/api.js
 
 	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
 	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
