@@ -103,6 +103,8 @@ case "$1" in
 
 		# configure ngninx for onlyoffice
 		rm -f /etc/nginx/sites-enabled/default
+		mkdir -p /var/cache/nginx/onlyoffice/documentserver
+		chown www-data:www-data /var/cache/nginx/onlyoffice/documentserver
 
 		# call db_stop to prevent installation hang
 		db_stop

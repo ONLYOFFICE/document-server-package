@@ -81,7 +81,7 @@ deb-documentserver:
 
 	sed 's/{{BUILD_VERSION}}/'$(VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
-	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i deb/$(PACKAGE_NAME)/Files/nginx/onlyoffice-documentserver
+	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i deb/$(PACKAGE_NAME)/Files/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DEB_DOCUMENTSERVER)/OfficeWeb/apps/api/documents/api.js
 
 	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DEB_DOCUMENTSERVER)/example/config.js
