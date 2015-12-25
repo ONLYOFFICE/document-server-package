@@ -88,7 +88,7 @@ case "$1" in
 		mkdir -p "$LOG_DIR/documentserver/example"
 		mkdir -p "$LOG_DIR/documentserver/converter"
 		mkdir -p "$LOG_DIR/documentserver/spellchecker"
-    mkdir -p "$LOG_DIR/documentserver/metrics"
+		mkdir -p "$LOG_DIR/documentserver/metrics"
 		
 		mkdir -p "$APP_DIR/documentserver/App_Data"
 		mkdir -p "$APP_DIR/documentserver/App_Data/cache/files"

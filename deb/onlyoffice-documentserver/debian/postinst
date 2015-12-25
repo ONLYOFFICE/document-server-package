@@ -22,7 +22,7 @@ set -e
 DIR="/var/www/onlyoffice"
 LOG_DIR="/var/log/onlyoffice"
 APP_DIR="/var/lib/onlyoffice"
-DEFAULT_CONFIG="$DIR/documentserver/NodeJsProjects/Common/config/default.json"
+DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
 
 OLD_VERSION="$2"
 
@@ -78,16 +78,17 @@ case "$1" in
 		adduser --quiet www-data onlyoffice
 		
 		#install node modules
-		npm install -g json
+		#npm install -g json
 
 		install_db
 		apply_connection_string
 
 		# modify permissions for onlyoffice files and folders
-		mkdir -p "$LOG_DIR/documentserver/DocService"
-		mkdir -p "$LOG_DIR/documentserver/ExampleService"
-		mkdir -p "$LOG_DIR/documentserver/FileConverterService"
-		mkdir -p "$LOG_DIR/documentserver/SpellCheckerService"
+		mkdir -p "$LOG_DIR/documentserver/docservice"
+		mkdir -p "$LOG_DIR/documentserver/example"
+		mkdir -p "$LOG_DIR/documentserver/converter"
+		mkdir -p "$LOG_DIR/documentserver/spellchecker"
+		mkdir -p "$LOG_DIR/documentserver/metrics"
 		
 		mkdir -p "$APP_DIR/documentserver/App_Data"
 		mkdir -p "$APP_DIR/documentserver/App_Data/cache/files"
@@ -102,6 +103,8 @@ case "$1" in
 
 		# configure ngninx for onlyoffice
 		rm -f /etc/nginx/sites-enabled/default
+		mkdir -p /var/cache/nginx/onlyoffice/documentserver
+		chown www-data:www-data /var/cache/nginx/onlyoffice/documentserver
 
 		# call db_stop to prevent installation hang
 		db_stop
