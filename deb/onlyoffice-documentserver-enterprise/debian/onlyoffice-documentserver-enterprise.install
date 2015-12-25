@@ -1,5 +1,6 @@
-Files/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/
-Files/nginx/includes/* etc/nginx/includes/
-Files/documentserver/* var/www/onlyoffice/documentserver/
-Files/configs/* etc/onlyoffice/documentserver/
-Files/fonts/* usr/share/fonts/truetype/onlyoffice/documentserver/
+../../common/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/
+../../common/nginx/includes/* etc/nginx/includes/
+../../common/documentserver/* var/www/onlyoffice/documentserver/
+../../common/config/* etc/onlyoffice/documentserver/
+../../common/supervisor/* etc/supervisor/conf.d/
+../../common/fonts/* usr/share/fonts/truetype/onlyoffice/documentserver/

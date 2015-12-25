@@ -8,8 +8,3 @@ var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libXpsFile.so
 var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libUnicodeConverter.so lib/libUnicodeConverter.so
 var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libicudata.so.55 lib/libicudata.so.55
 var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/libicuuc.so.55 lib/libicuuc.so.55
-etc/onlyoffice/documentserver/DocService.conf etc/supervisor/conf.d/DocService.conf
-etc/onlyoffice/documentserver/ExampleService.conf etc/supervisor/conf.d/ExampleService.conf
-etc/onlyoffice/documentserver/FileConverterService.conf etc/supervisor/conf.d/FileConverterService.conf
-etc/onlyoffice/documentserver/SpellCheckerService.conf etc/supervisor/conf.d/SpellCheckerService.conf
-etc/onlyoffice/documentserver/MetricsService.conf etc/supervisor/conf.d/MetricsService.conf

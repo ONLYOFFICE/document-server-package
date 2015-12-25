@@ -25,17 +25,17 @@ rm -rf "$RPM_BUILD_ROOT"
 
 #install documentserver files
 mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
-cp -r ../../Files/documentserver/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
+cp -r ../../../common/documentserver/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 cp -r ../../Files/onlyoffice/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 
 #install documentserver libs
 mkdir -p "$RPM_BUILD_ROOT/usr/lib64/"
-cp -r ../../Files/documentserver/NodeJsProjects/FileConverter/Bin/*.so* "$RPM_BUILD_ROOT/usr/lib64/" 
+cp -r ../../../common/documentserver/NodeJsProjects/FileConverter/Bin/*.so* "$RPM_BUILD_ROOT/usr/lib64/" 
 rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/*.so*
 
 #install configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
-cp -r ../../Files/documentserver/NodeJsProjects/Common/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
+cp -r ../../../common/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
 rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/NodeJsProjects/Common/config/"
 
 #make log dir
@@ -43,6 +43,7 @@ mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/docservice"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/example"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/converter"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/spellchecker"
+mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/metrics"
 
 #make cache dir
 mkdir -p "$RPM_BUILD_ROOT/var/lib/onlyoffice/documentserver/App_Data/cache/files"
@@ -52,18 +53,24 @@ mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
 
 #install supervisor configs
 mkdir -p "$RPM_BUILD_ROOT/etc/supervisord.d/"
-cp ../../Files/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
+cp ../../../common/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
+for f in "$RPM_BUILD_ROOT"/etc/supervisord.d/*.conf; 
+do
+  mv "$f" "${f%.*}".ini;
+done
 
 #install nginx config
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
-cp ../../Files/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
+cp ../../../common/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
-cp ../../Files/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
+cp ../../../common/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
+
+mkdir -p "$RPM_BUILD_ROOT/var/cache/nginx/onlyoffice/documentserver/"
 
 #install fonts
 mkdir -p "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
-cp -r ../../Files/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
+cp -r ../../../common/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -73,11 +80,12 @@ rm -rf "$RPM_BUILD_ROOT"
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
-%config %attr(-, root, root) /etc/supervisord.d/onlyoffice-*.ini
+%config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
 %attr(-, onlyoffice, onlyoffice) /usr/share/fonts/truetype/onlyoffice/*
 %attr(-, root, root) /usr/lib64/*.so*
 
 %dir
+%attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
