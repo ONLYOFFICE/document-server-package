@@ -67,7 +67,8 @@ documentserver:
 
 	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DOCUMENTSERVER)/example/config.js
 	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DOCUMENTSERVER)/example/config.js
-	sed 's/config\.haveExternalIp[[:space:]]=[[:space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DOCUMENTSERVER)/example/config.js  
+	sed 's/config\.haveExternalIp[[:space:]]=[[:space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DOCUMENTSERVER)/example/config.js
+	sed 's/config\.maxFileSize[[:space:]]=[[:space:]]5242880/'config\.maxFileSize\ =\ 104857600'/'  -i $(DOCUMENTSERVER)/example/config.js
 
 rpm-version:
 	chmod u+x rpm/Files/onlyoffice/configure.sh
