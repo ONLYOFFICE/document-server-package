@@ -76,7 +76,7 @@ cp -r ../../../common/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffi
 rm -rf "$RPM_BUILD_ROOT"
 
 %files
-%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver/*
+%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
