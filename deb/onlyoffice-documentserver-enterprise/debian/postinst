@@ -96,7 +96,7 @@ case "$1" in
 		chown onlyoffice:onlyoffice -R "$DIR"
 		
 		# generate allfonts.js and thumbnail
-		"$DIR/documentserver/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/documentserver/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/documentserver/OfficeWeb/sdk/Common/Images" "$DIR/documentserver/NodeJsProjects/FileConverter/Bin/font_selection.bin"
+		sudo -u onlyoffice "$DIR/documentserver/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/documentserver/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/documentserver/OfficeWeb/sdk/Common/Images" "$DIR/documentserver/NodeJsProjects/FileConverter/Bin/font_selection.bin"
 		
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"

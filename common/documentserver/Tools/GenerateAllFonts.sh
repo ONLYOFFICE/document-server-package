@@ -10,5 +10,5 @@ sudo -u onlyoffice "$DIR/Tools/AllFontsGen"\
  "$DIR/NodeJsProjects/FileConverter/Bin/font_selection.bin"
 
 #Restart web-site and converter
-sudo supervisorctl restart DocService
-sudo supervisorctl restart FileConverterService
+sudo supervisorctl restart onlyoffice-documentserver:docservice
+sudo supervisorctl restart onlyoffice-documentserver:converter
