@@ -1,6 +1,6 @@
 Summary: Online viewers and editors for text, spreadsheet and presentation files
 Name: onlyoffice-documentserver-enterprise
-Version: {{BUILD_VERSION}}
+Version: {{PRODUCT_VERSION}}
 Release: {{BUILD_NUMBER}}
 License: Commercial
 Group: Applications/Internet

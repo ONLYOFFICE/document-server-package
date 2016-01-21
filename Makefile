@@ -1,8 +1,14 @@
 #NODE_MODULES_DIR = node_modules
 #NODE_PROJECTS = sources
 #NODE_PROJECTS_MODULES = $(addsuffix /$(NODE_MODULES_DIR), $(NODE_PROJECTS))
-PACKAGE_NAME = onlyoffice-documentserver-enterprise
-VERSION = 3.6.0
+COMPANY_NAME = onlyoffice
+PRODUCT_NAME = documentserver-enterprise
+PACKAGE_NAME = $(COMPANY_NAME)-$(PRODUCT_NAME)
+PRODUCT_VERSION = 3.6.0
+PACKAGE_VERSION = $(VERSION)-$(BUILD_NUMBER)
+#DOCKER_IMAGE_NAME = $(COMPANY_NAME)/$(PRODUCT_NAME):$(PACKAGE_VERSION)
+DOCKER_IMAGE_NAME = $(COMPANY_NAME)/4testing-documentserver-enterp:$(PACKAGE_VERSION)
+DOCKER_IMAGE_NAME_LATEST = $(COMPANY_NAME)/4testing-documentserver-enterp:$(PACKAGE_VERSION)
 
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
@@ -23,8 +29,8 @@ DEB_REPO_OS_NAME = ubuntu
 DEB_REPO_OS_VER = trusty
 DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
 
-RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(VERSION)-$(BUILD_NUMBER).$(RPM_ARCH).rpm
-DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(VERSION)-$(BUILD_NUMBER)_$(DEB_ARCH).deb
+RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
+DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 
 DOCUMENTSERVER = common/documentserver
 
@@ -34,7 +40,7 @@ else
 DOCKERHUB_TRIGGER=https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver/trigger/3a3e2739-74ac-4acc-ac82-9dcad3be67d7/
 endif
 
-.PHONY: all clean rpm deb clean-repo deploy deploy-rpm deploy-deb documentserver rpm-version rpm-version docker
+.PHONY: all clean rpm deb clean-repo deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker docker-image docker-push
 
 all: rpm deb
 
@@ -73,12 +79,11 @@ documentserver:
 rpm-version:
 	chmod u+x rpm/Files/onlyoffice/configure.sh
 
-	sed 's/{{BUILD_VERSION}}/'$(VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
+	sed 's/{{BUILD_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
 
 deb-version:
-	sed 's/{{BUILD_VERSION}}/'$(VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
-	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 
 $(RPM):
 	ls -l $(RPM) || echo "Rpm file not exist"
@@ -98,7 +103,7 @@ deploy-rpm: $(RPM)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/ --acl public-read --delete
 
 ifeq ($(SVN_TAG), trunk)
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(VERSION)-$(BUILD_NUMBER)/ --acl public-read --delete
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)/ --acl public-read --delete
 endif
 
 deploy-deb: $(DEB)
@@ -111,7 +116,7 @@ deploy-deb: $(DEB)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo --acl public-read --delete
 
 ifeq ($(SVN_TAG), trunk)
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(VERSION)-$(BUILD_NUMBER)/repo --acl public-read --delete
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)/repo --acl public-read --delete
 endif
 
 deploy: deploy-rpm deploy-deb
@@ -120,3 +125,12 @@ docker:
 ifeq ($(SVN_TAG), trunk)
 	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST $(DOCKERHUB_TRIGGER)
 endif
+
+docker-image: docker-push
+	cd docker/$(PACKAGE_NAME)
+	sudo docker build -t $(DOCKER_IMAGE_NAME) .
+	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) .
+
+docker-push:
+	sudo docker push $(DOCKER_IMAGE_NAME)
+	sudo docker push $(DOCKER_IMAGE_NAME_LATEST)
