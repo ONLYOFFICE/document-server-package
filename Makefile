@@ -49,8 +49,8 @@ clean:
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
 		$(REPO)
-	sudo docker rm $$(sudo docker ps -a -q)
-	sudo docker rmi $$(sudo docker images -q $(COMPANY_NAME)/*)
+	sudo docker rm $$(sudo docker ps -a -q) || exit 0
+	sudo docker rmi $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
 	cp -rf ../deploy/deploy/* $(DOCUMENTSERVER)/
