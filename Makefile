@@ -48,10 +48,10 @@ rpm: documentserver rpm-version $(RPM)
 deb: documentserver deb-version $(DEB)
 
 docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
-  
+
 $(DOCKER_IMAGE_FILE):
 	sudo docker build -t $(DOCKER_IMAGE_NAME) . && echo "Done" > $(DOCKER_IMAGE_FILE)
-  
+
 $(DOCKER_IMAGE_FILE_LATEST):
 	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) . && echo "Done" > $(DOCKER_IMAGE_FILE_LATEST)
 
@@ -60,6 +60,8 @@ clean:
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
 		$(REPO)
+		$(DOCKER_IMAGE_FILE)
+		$(DOCKER_IMAGE_FILE_LATEST)
 	sudo docker rm $$(sudo docker ps -a -q) || exit 0
 	sudo docker rmi $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
