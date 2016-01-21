@@ -8,11 +8,13 @@ DOCKER_IMAGE_NAME = $(COMPANY_NAME)/4testing-documentserver-enterp:$(PACKAGE_VER
 DOCKER_IMAGE_FILE := $(DOCKER_IMAGE_NAME)
 DOCKER_IMAGE_FILE := $(substr :, _, $(DOCKER_IMAGE_FILE))
 DOCKER_IMAGE_FILE := $(substr /, _, $(DOCKER_IMAGE_FILE))
+DOCKER_IMAGE_FILE := 4testing-documentserver-enterp
 
 DOCKER_IMAGE_NAME_LATEST = $(COMPANY_NAME)/4testing-documentserver-enterp:latest
 DOCKER_IMAGE_FILE_LATEST := $(DOCKER_IMAGE_NAME_LATEST)
 DOCKER_IMAGE_FILE_LATEST := $(substr :, _, $(DOCKER_IMAGE_FILE_LATEST))
 DOCKER_IMAGE_FILE_LATEST := $(substr /, _, $(DOCKER_IMAGE_FILE_LATEST))
+DOCKER_IMAGE_FILE_LATEST := 4testing-documentserver-enterp-latest
 
 
 RPM_ARCH = x86_64
