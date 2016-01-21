@@ -5,7 +5,15 @@ PRODUCT_VERSION = 3.6.0
 PACKAGE_VERSION = $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 #DOCKER_IMAGE_NAME = $(COMPANY_NAME)/$(PRODUCT_NAME):$(PACKAGE_VERSION)
 DOCKER_IMAGE_NAME = $(COMPANY_NAME)/4testing-documentserver-enterp:$(PACKAGE_VERSION)
+DOCKER_IMAGE_FILE := $(DOCKER_IMAGE_NAME)
+DOCKER_IMAGE_FILE := $(substr :, _, $(DOCKER_IMAGE_FILE))
+DOCKER_IMAGE_FILE := $(substr /, _, $(DOCKER_IMAGE_FILE))
+
 DOCKER_IMAGE_NAME_LATEST = $(COMPANY_NAME)/4testing-documentserver-enterp:latest
+DOCKER_IMAGE_FILE_LAST := $(DOCKER_IMAGE_NAME_LATEST)
+DOCKER_IMAGE_FILE_LAST := $(substr :, _, $(DOCKER_IMAGE_FILE_LAST))
+DOCKER_IMAGE_FILE_LAST := $(substr /, _, $(DOCKER_IMAGE_FILE_LAST))
+
 
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
@@ -39,10 +47,13 @@ rpm: documentserver rpm-version $(RPM)
 
 deb: documentserver deb-version $(DEB)
 
-docker:
-	cd docker/$(PACKAGE_NAME) &&\
-	sudo docker build -t $(DOCKER_IMAGE_NAME) . &&\
-	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) .
+docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
+  
+$(DOCKER_IMAGE_FILE):
+	sudo docker build -t $(DOCKER_IMAGE_NAME) . && echo "Done" > $(DOCKER_IMAGE_FILE)
+  
+$(DOCKER_IMAGE_FILE_LATEST):
+	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) . && echo "Done" > $(DOCKER_IMAGE_FILE_LATEST)
 
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
@@ -116,7 +127,7 @@ ifeq ($(SVN_TAG), trunk)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)/repo --acl public-read --delete
 endif
 
-deploy-docker: docker
+deploy-docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
 ifeq ($(SVN_TAG), trunk)
 	sudo docker push $(DOCKER_IMAGE_NAME)
 	sudo docker push $(DOCKER_IMAGE_NAME_LATEST)
