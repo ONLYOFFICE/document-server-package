@@ -127,9 +127,7 @@ ifeq ($(SVN_TAG), trunk)
 endif
 
 docker-image:
-	cd docker/$(PACKAGE_NAME)
-	sudo docker build -t $(DOCKER_IMAGE_NAME) .
-	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) .
+	cd docker/$(PACKAGE_NAME) && sudo docker build -t $(DOCKER_IMAGE_NAME) . &&	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) .
 
 docker-push: docker-image
 	sudo docker push $(DOCKER_IMAGE_NAME)
