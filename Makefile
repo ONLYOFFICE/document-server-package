@@ -79,7 +79,7 @@ documentserver:
 rpm-version:
 	chmod u+x rpm/Files/onlyoffice/configure.sh
 
-	sed 's/{{BUILD_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
+	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
 
 deb-version:
