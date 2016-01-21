@@ -1,6 +1,3 @@
-#NODE_MODULES_DIR = node_modules
-#NODE_PROJECTS = sources
-#NODE_PROJECTS_MODULES = $(addsuffix /$(NODE_MODULES_DIR), $(NODE_PROJECTS))
 COMPANY_NAME = onlyoffice
 PRODUCT_NAME = documentserver-enterprise
 PACKAGE_NAME = $(COMPANY_NAME)-$(PRODUCT_NAME)
@@ -34,26 +31,25 @@ DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 
 DOCUMENTSERVER = common/documentserver
 
-ifeq ($(PACKAGE_NAME), onlyoffice-documentserver-enterprise)
-DOCKERHUB_TRIGGER=https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver-enterp/trigger/bd95e307-6a3f-4082-997e-6cc319157fc8/
-else
-DOCKERHUB_TRIGGER=https://registry.hub.docker.com/u/onlyoffice/4testing-documentserver/trigger/3a3e2739-74ac-4acc-ac82-9dcad3be67d7/
-endif
+.PHONY: all clean rpm deb deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker deploy-docker
 
-.PHONY: all clean rpm deb clean-repo deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker docker-image docker-push
-
-all: rpm deb
+all: rpm deb docker
 
 rpm: documentserver rpm-version $(RPM)
 
 deb: documentserver deb-version $(DEB)
 
-$(NODE_PROJECTS_MODULES):
-	cd $(@D) && \
-		npm install
+docker:
+	cd docker/$(PACKAGE_NAME) &&\
+	sudo docker build -t $(DOCKER_IMAGE_NAME) . &&\
+	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) .
 
 clean:
-	rm -rf node_modules
+	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
+		$(DEB_PACKAGE_DIR)/*.changes\
+		$(RPM_BUILD_DIR)\
+		$(REPO)
+	sudo docker images -q $(COMPANY_NAME)/*
 
 documentserver:
 	cp -rf ../deploy/deploy/* $(DOCUMENTSERVER)/
@@ -119,16 +115,10 @@ ifeq ($(SVN_TAG), trunk)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)/repo --acl public-read --delete
 endif
 
-deploy: deploy-rpm deploy-deb
-
-docker:
+deploy-docker: docker
 ifeq ($(SVN_TAG), trunk)
-	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST $(DOCKERHUB_TRIGGER)
-endif
-
-docker-image:
-	cd docker/$(PACKAGE_NAME) && sudo docker build -t $(DOCKER_IMAGE_NAME) . &&	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) .
-
-docker-push: docker-image
 	sudo docker push $(DOCKER_IMAGE_NAME)
 	sudo docker push $(DOCKER_IMAGE_NAME_LATEST)
+endif
+
+deploy: deploy-rpm deploy-deb deploy-docker
