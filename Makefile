@@ -126,11 +126,11 @@ ifeq ($(SVN_TAG), trunk)
 	curl -H "Content-Type: application/json" --data '{"build": true}' -X POST $(DOCKERHUB_TRIGGER)
 endif
 
-docker-image: docker-push
+docker-image:
 	cd docker/$(PACKAGE_NAME)
 	sudo docker build -t $(DOCKER_IMAGE_NAME) .
 	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) .
 
-docker-push:
+docker-push: docker-image
 	sudo docker push $(DOCKER_IMAGE_NAME)
 	sudo docker push $(DOCKER_IMAGE_NAME_LATEST)
