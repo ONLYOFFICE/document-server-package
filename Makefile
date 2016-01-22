@@ -49,13 +49,13 @@ rpm: documentserver rpm-version $(RPM)
 
 deb: documentserver deb-version $(DEB)
 
-docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
-
 $(DOCKER_IMAGE_FILE):
 	cd docker/$(PACKAGE_NAME) && sudo docker build -t $(DOCKER_IMAGE_NAME) . && echo "Done" > ../../$(DOCKER_IMAGE_FILE)
 
 $(DOCKER_IMAGE_FILE_LATEST):
 	cd docker/$(PACKAGE_NAME) && sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) . && echo "Done" > ../../$(DOCKER_IMAGE_FILE_LATEST)
+  
+docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
 
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
