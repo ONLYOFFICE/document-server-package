@@ -6,15 +6,13 @@ PACKAGE_VERSION = $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 #DOCKER_IMAGE_NAME = $(COMPANY_NAME)/$(PRODUCT_NAME):$(PACKAGE_VERSION)
 DOCKER_IMAGE_NAME = $(COMPANY_NAME)/4testing-documentserver-enterp:$(PACKAGE_VERSION)
 DOCKER_IMAGE_FILE := $(DOCKER_IMAGE_NAME)
-DOCKER_IMAGE_FILE := $(substr \:, _, $(DOCKER_IMAGE_FILE))
-DOCKER_IMAGE_FILE := $(substr /, _, $(DOCKER_IMAGE_FILE))
-DOCKER_IMAGE_FILE := 4testing-documentserver-enterp
+DOCKER_IMAGE_FILE := $(subst :,-,$(DOCKER_IMAGE_FILE))
+DOCKER_IMAGE_FILE := $(subst /,-,$(DOCKER_IMAGE_FILE))
 
 DOCKER_IMAGE_NAME_LATEST = $(COMPANY_NAME)/4testing-documentserver-enterp:latest
 DOCKER_IMAGE_FILE_LATEST := $(DOCKER_IMAGE_NAME_LATEST)
-DOCKER_IMAGE_FILE_LATEST := $(substr \:, _, $(DOCKER_IMAGE_FILE_LATEST))
-DOCKER_IMAGE_FILE_LATEST := $(substr /, _, $(DOCKER_IMAGE_FILE_LATEST))
-DOCKER_IMAGE_FILE_LATEST := 4testing-documentserver-enterp-latest
+DOCKER_IMAGE_FILE_LATEST := $(subst :,-,$(DOCKER_IMAGE_FILE_LATEST))
+DOCKER_IMAGE_FILE_LATEST := $(subst /,-,$(DOCKER_IMAGE_FILE_LATEST))
 
 
 RPM_ARCH = x86_64
@@ -50,11 +48,15 @@ rpm: documentserver rpm-version $(RPM)
 deb: documentserver deb-version $(DEB)
 
 $(DOCKER_IMAGE_FILE):
-	cd docker/$(PACKAGE_NAME) && sudo docker build -t $(DOCKER_IMAGE_NAME) . && echo "Done" > ../../$(DOCKER_IMAGE_FILE)
+	cd docker/$(PACKAGE_NAME) &&\
+	sudo docker build -t $(DOCKER_IMAGE_NAME) . &&\
+	echo "Done" > ../$(DOCKER_IMAGE_FILE)
 
 $(DOCKER_IMAGE_FILE_LATEST):
-	cd docker/$(PACKAGE_NAME) && sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) . && echo "Done" > ../../$(DOCKER_IMAGE_FILE_LATEST)
-  
+	cd docker/$(PACKAGE_NAME) &&\
+	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) . &&\
+	echo "Done" > ../$(DOCKER_IMAGE_FILE_LATEST)
+
 docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
 
 clean:
