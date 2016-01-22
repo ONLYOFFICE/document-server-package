@@ -6,13 +6,13 @@ PACKAGE_VERSION = $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 #DOCKER_IMAGE_NAME = $(COMPANY_NAME)/$(PRODUCT_NAME):$(PACKAGE_VERSION)
 DOCKER_IMAGE_NAME = $(COMPANY_NAME)/4testing-documentserver-enterp:$(PACKAGE_VERSION)
 DOCKER_IMAGE_FILE := $(DOCKER_IMAGE_NAME)
-DOCKER_IMAGE_FILE := $(substr :, _, $(DOCKER_IMAGE_FILE))
+DOCKER_IMAGE_FILE := $(substr \:, _, $(DOCKER_IMAGE_FILE))
 DOCKER_IMAGE_FILE := $(substr /, _, $(DOCKER_IMAGE_FILE))
 DOCKER_IMAGE_FILE := 4testing-documentserver-enterp
 
 DOCKER_IMAGE_NAME_LATEST = $(COMPANY_NAME)/4testing-documentserver-enterp:latest
 DOCKER_IMAGE_FILE_LATEST := $(DOCKER_IMAGE_NAME_LATEST)
-DOCKER_IMAGE_FILE_LATEST := $(substr :, _, $(DOCKER_IMAGE_FILE_LATEST))
+DOCKER_IMAGE_FILE_LATEST := $(substr \:, _, $(DOCKER_IMAGE_FILE_LATEST))
 DOCKER_IMAGE_FILE_LATEST := $(substr /, _, $(DOCKER_IMAGE_FILE_LATEST))
 DOCKER_IMAGE_FILE_LATEST := 4testing-documentserver-enterp-latest
 
@@ -65,7 +65,7 @@ clean:
 		$(DOCKER_IMAGE_FILE)\
 		$(DOCKER_IMAGE_FILE_LATEST)
 	sudo docker rm $$(sudo docker ps -a -q) || exit 0
-	sudo docker rmi $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
+	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
 	cp -rf ../deploy/deploy/* $(DOCUMENTSERVER)/
