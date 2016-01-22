@@ -61,9 +61,9 @@ clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
-		$(REPO)
-		$(DOCKER_IMAGE_FILE)
-		$(DOCKER_IMAGE_FILE_LATEST)
+		$(REPO)\
+		$(DOCKER_IMAGE_FILE)\
+		$(DOCKER_IMAGE_FILE_LATEST)\
 	sudo docker rm $$(sudo docker ps -a -q) || exit 0
 	sudo docker rmi $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
