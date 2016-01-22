@@ -41,7 +41,7 @@ DOCUMENTSERVER = common/documentserver
 
 .PHONY: all clean rpm deb deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker deploy-docker
 
-all: rpm deb docker
+all: rpm deb
 
 rpm: documentserver rpm-version $(RPM)
 
