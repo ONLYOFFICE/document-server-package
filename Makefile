@@ -48,11 +48,13 @@ rpm: documentserver rpm-version $(RPM)
 deb: documentserver deb-version $(DEB)
 
 $(DOCKER_IMAGE_FILE):
+	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
 	cd docker/$(PACKAGE_NAME) &&\
 	sudo docker build -t $(DOCKER_IMAGE_NAME) . &&\
 	echo "Done" > ../../$(DOCKER_IMAGE_FILE)
 
 $(DOCKER_IMAGE_FILE_LATEST):
+	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
 	cd docker/$(PACKAGE_NAME) &&\
 	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) . &&\
 	echo "Done" > ../../$(DOCKER_IMAGE_FILE_LATEST)
