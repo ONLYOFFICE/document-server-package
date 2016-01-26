@@ -14,7 +14,7 @@ endif
 #DOCKER_REPO = $(COMPANY_NAME)/$(PRODUCT_NAME)
 DOCKER_REPO := $(COMPANY_NAME)/4testing-documentserver-enterp
 
-DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO):$(TAG))
+DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)\:$(TAG))
 
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
