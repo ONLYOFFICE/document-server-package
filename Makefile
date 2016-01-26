@@ -129,4 +129,4 @@ deploy-deb: $(DEB)
 deploy-docker: $(DOCKER_TARGETS)
 	$(foreach TARGET,$(DOCKER_TARGETS,$(sudo docker push $(TARGET))))
 
-deploy: deploy-deb deploy-docker
+deploy: deploy-docker
