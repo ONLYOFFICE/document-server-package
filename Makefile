@@ -48,12 +48,12 @@ rpm: documentserver rpm-version $(RPM)
 
 deb: documentserver deb-version $(DEB)
 
-$(DOCKER_TARGETS):
+$(DOCKER_TARGETS): docker-version
 	cd docker/$(PACKAGE_NAME) &&\
 	sudo docker build -t $(subst $(COLON),:,$@) . &&\
 	echo "Done" > ../../$@
 
-docker: docker-version $(DOCKER_TARGETS)
+docker: $(DOCKER_TARGETS)
 
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
@@ -129,4 +129,4 @@ deploy-deb: $(DEB)
 deploy-docker: $(DOCKER_TARGETS)
 	$(foreach TARGET,$(DOCKER_TARGETS,$(sudo docker push $(subst $(COLON),:,$(TARGET)))))
 
-deploy: deploy-docker
+deploy: deploy-deb deploy-docker
