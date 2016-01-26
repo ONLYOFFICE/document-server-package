@@ -48,12 +48,12 @@ rpm: documentserver rpm-version $(RPM)
 
 deb: documentserver deb-version $(DEB)
 
-$(DOCKER_TARGETS): docker-version
+$(DOCKER_TARGETS):
 	cd docker/$(PACKAGE_NAME) &&\
 	sudo docker build -t $@ . &&\
 	echo "Done" > ../../$@
 
-docker: $(DOCKER_TARGETS)
+docker: docker-version $(DOCKER_TARGETS)
 
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
