@@ -48,13 +48,13 @@ rpm: documentserver rpm-version $(RPM)
 
 deb: documentserver deb-version $(DEB)
 
-$(DOCKER_TARGETS): docker-version
+$(DOCKER_TARGETS):
 	cd docker/$(PACKAGE_NAME) &&\
 	sudo docker build -t $(subst $(COLON),:,$@) . &&\
 	mkdir -p $$(dirname ../../$@) &&\
 	echo "Done" > ../../$@
 
-docker: $(DOCKER_TARGETS)
+docker: docker-version $(DOCKER_TARGETS)
 
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
@@ -127,7 +127,7 @@ deploy-deb: $(DEB)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/repo --acl public-read --delete
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/repo --acl public-read --delete
 
-deploy-docker: $(DOCKER_TARGETS)
-	$(foreach TARGET,$(DOCKER_TARGETS,$(sudo docker push $(subst $(COLON),:,$(TARGET)))))
+deploy-docker: docker
+	$(foreach TARGET,$(DOCKER_TARGETS),sudo docker push $(subst $(COLON),:,$(TARGET));)
 
 deploy: deploy-deb deploy-docker
