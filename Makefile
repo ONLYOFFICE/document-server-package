@@ -51,6 +51,7 @@ deb: documentserver deb-version $(DEB)
 $(DOCKER_TARGETS): docker-version
 	cd docker/$(PACKAGE_NAME) &&\
 	sudo docker build -t $(subst $(COLON),:,$@) . &&\
+	mkdir -p $(dirname ../../$@) &&\
 	echo "Done" > ../../$@
 
 docker: $(DOCKER_TARGETS)
