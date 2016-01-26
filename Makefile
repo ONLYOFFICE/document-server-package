@@ -7,7 +7,7 @@ PACKAGE_VERSION = $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 ifeq ($(SVN_TAG), trunk)
 DOCKER_TAGS += $(PACKAGE_VERSION)
 DOCKER_TAGS += latest
-elseif
+else
 DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(SVN_TAG))
 endif
 
