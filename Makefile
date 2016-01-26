@@ -1,8 +1,8 @@
-COMPANY_NAME = onlyoffice
-PRODUCT_NAME = documentserver-enterprise
-PACKAGE_NAME = $(COMPANY_NAME)-$(PRODUCT_NAME)
-PRODUCT_VERSION = 3.6.0
-PACKAGE_VERSION = $(PRODUCT_VERSION)-$(BUILD_NUMBER)
+COMPANY_NAME := onlyoffice
+PRODUCT_NAME := documentserver-enterprise
+PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
+PRODUCT_VERSION := 3.6.0
+PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
 ifeq ($(SVN_TAG), trunk)
 DOCKER_TAGS += $(PACKAGE_VERSION)
@@ -13,8 +13,8 @@ endif
 
 #DOCKER_REPO = $(COMPANY_NAME)/$(PRODUCT_NAME)
 DOCKER_REPO := $(COMPANY_NAME)/4testing-documentserver-enterp
-
-DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)\:$(TAG))
+COLON := __colon__
+DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)$(COLON)$(TAG))
 
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
@@ -50,7 +50,7 @@ deb: documentserver deb-version $(DEB)
 
 $(DOCKER_TARGETS):
 	cd docker/$(PACKAGE_NAME) &&\
-	sudo docker build -t $@ . &&\
+	sudo docker build -t $(subst $(COLON),:,$@) . &&\
 	echo "Done" > ../../$@
 
 docker: docker-version $(DOCKER_TARGETS)
@@ -127,6 +127,6 @@ deploy-deb: $(DEB)
 	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/repo --acl public-read --delete
 
 deploy-docker: $(DOCKER_TARGETS)
-	$(foreach TARGET,$(DOCKER_TARGETS,$(sudo docker push $(TARGET))))
+	$(foreach TARGET,$(DOCKER_TARGETS,$(sudo docker push $(subst $(COLON),:,$(TARGET)))))
 
 deploy: deploy-docker
