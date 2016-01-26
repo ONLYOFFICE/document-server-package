@@ -53,7 +53,7 @@ $(DOCKER_TARGETS): docker-version
 	sudo docker build -t $@ . &&\
 	echo "Done" > ../../$@
 
-docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
+docker: $(DOCKER_TARGETS)
 
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
