@@ -42,7 +42,7 @@ DOCUMENTSERVER = common/documentserver
 
 .PHONY: all clean rpm deb deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker docker-version deploy-docker
 
-all: deb
+all: rpm deb
 
 rpm: documentserver rpm-version $(RPM)
 
@@ -130,4 +130,4 @@ deploy-deb: $(DEB)
 deploy-docker: docker
 	$(foreach TARGET,$(DOCKER_TARGETS),sudo docker push $(subst $(COLON),:,$(TARGET));)
 
-deploy: deploy-deb deploy-docker
+deploy: deploy-rpm deploy-deb deploy-docker
