@@ -3,17 +3,18 @@ PRODUCT_NAME = documentserver-enterprise
 PACKAGE_NAME = $(COMPANY_NAME)-$(PRODUCT_NAME)
 PRODUCT_VERSION = 3.6.0
 PACKAGE_VERSION = $(PRODUCT_VERSION)-$(BUILD_NUMBER)
-#DOCKER_IMAGE_NAME = $(COMPANY_NAME)/$(PRODUCT_NAME):$(PACKAGE_VERSION)
-DOCKER_IMAGE_NAME = $(COMPANY_NAME)/4testing-documentserver-enterp:$(PACKAGE_VERSION)
-DOCKER_IMAGE_FILE := $(DOCKER_IMAGE_NAME)
-DOCKER_IMAGE_FILE := $(subst :,-,$(DOCKER_IMAGE_FILE))
-DOCKER_IMAGE_FILE := $(subst /,-,$(DOCKER_IMAGE_FILE))
 
-DOCKER_IMAGE_NAME_LATEST = $(COMPANY_NAME)/4testing-documentserver-enterp:latest
-DOCKER_IMAGE_FILE_LATEST := $(DOCKER_IMAGE_NAME_LATEST)
-DOCKER_IMAGE_FILE_LATEST := $(subst :,-,$(DOCKER_IMAGE_FILE_LATEST))
-DOCKER_IMAGE_FILE_LATEST := $(subst /,-,$(DOCKER_IMAGE_FILE_LATEST))
+ifeq ($(SVN_TAG), trunk)
+DOCKER_TAGS += $(PACKAGE_VERSION)
+DOCKER_TAGS += latest
+elseif
+DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(SVN_TAG))
+endif
 
+#DOCKER_REPO = $(COMPANY_NAME)/$(PRODUCT_NAME)
+DOCKER_REPO := $(COMPANY_NAME)/4testing-documentserver-enterp
+
+DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO):$(TAG))
 
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
@@ -39,7 +40,7 @@ DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 
 DOCUMENTSERVER = common/documentserver
 
-.PHONY: all clean rpm deb deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker deploy-docker
+.PHONY: all clean rpm deb deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker docker-version deploy-docker
 
 all: rpm deb
 
@@ -47,17 +48,10 @@ rpm: documentserver rpm-version $(RPM)
 
 deb: documentserver deb-version $(DEB)
 
-$(DOCKER_IMAGE_FILE):
-	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
+$(DOCKER_TARGETS): docker-version
 	cd docker/$(PACKAGE_NAME) &&\
-	sudo docker build -t $(DOCKER_IMAGE_NAME) . &&\
-	echo "Done" > ../../$(DOCKER_IMAGE_FILE)
-
-$(DOCKER_IMAGE_FILE_LATEST):
-	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
-	cd docker/$(PACKAGE_NAME) &&\
-	sudo docker build -t $(DOCKER_IMAGE_NAME_LATEST) . &&\
-	echo "Done" > ../../$(DOCKER_IMAGE_FILE_LATEST)
+	sudo docker build -t $@ . &&\
+	echo "Done" > ../../$@
 
 docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
 
@@ -66,8 +60,7 @@ clean:
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
 		$(REPO)\
-		$(DOCKER_IMAGE_FILE)\
-		$(DOCKER_IMAGE_FILE_LATEST)
+		$(DOCKER_TARGETS)
 	sudo docker rm $$(sudo docker ps -a -q) || exit 0
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
@@ -100,6 +93,10 @@ rpm-version:
 
 deb-version:
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+  
+docker-version:
+	sed 's/{{SVN_TAG}}/'$(SVN_TAG)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
+	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
 
 $(RPM):
 	ls -l $(RPM) || echo "Rpm file not exist"
@@ -116,11 +113,8 @@ deploy-rpm: $(RPM)
 	cp -rv $(RPM) $(REPO);
 	createrepo -v $(REPO);
 
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/ --acl public-read --delete
-
-ifeq ($(SVN_TAG), trunk)
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)/ --acl public-read --delete
-endif
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/ --acl public-read --delete
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/ --acl public-read --delete
 
 deploy-deb: $(DEB)
 	rm -rfv $(REPO)
@@ -129,16 +123,10 @@ deploy-deb: $(DEB)
 	cp -rv $(DEB) $(REPO);
 	dpkg-scanpackages -m repo /dev/null | gzip -9c > $(REPO)/Packages.gz
 
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/repo --acl public-read --delete
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/repo --acl public-read --delete
+	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/repo --acl public-read --delete
 
-ifeq ($(SVN_TAG), trunk)
-	aws s3 sync $(REPO) s3://repo-doc-onlyoffice-com/archive/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)/repo --acl public-read --delete
-endif
-
-deploy-docker: $(DOCKER_IMAGE_FILE) $(DOCKER_IMAGE_FILE_LATEST)
-ifeq ($(SVN_TAG), trunk)
-	sudo docker push $(DOCKER_IMAGE_NAME)
-	sudo docker push $(DOCKER_IMAGE_NAME_LATEST)
-endif
+deploy-docker: $(DOCKER_TARGETS)
+	$(foreach TARGET,$(DOCKER_TARGETS,$(sudo docker push $(TARGET))))
 
 deploy: deploy-rpm deploy-deb deploy-docker
