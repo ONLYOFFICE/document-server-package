@@ -96,7 +96,7 @@ deb-version:
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
   
 docker-version:
-	sed 's/{{SVN_TAG}}/'$(SVN_TAG)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
+	sed "s|{{SVN_TAG}}|$(SVN_TAG)|"  -i docker/$(PACKAGE_NAME)/Dockerfile
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
 
 $(RPM):
