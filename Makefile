@@ -69,10 +69,10 @@ documentserver:
 	cp -rf ../deploy/deploy/* $(DOCUMENTSERVER)/
 	cp -rf ../dev_tools/OnlineEditorsExample/OnlineEditorsExampleNodeJS/ $(DOCUMENTSERVER)/example
 
-	bomstrip-files $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*.json
-	rm -f $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*.bom
+	bomstrip-files $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*/*.json
+	rm -f $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*/*.bom
 	mkdir -p common/config/
-	mv $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*.json common/config/
+	mv $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*/*.json common/config/
 
 	chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
