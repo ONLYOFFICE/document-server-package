@@ -40,7 +40,7 @@ DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 
 DOCUMENTSERVER = common/documentserver
 
-.PHONY: all clean rpm deb deploy deploy-rpm deploy-deb documentserver rpm-version deb-version docker docker-version deploy-docker
+.PHONY: all clean rpm deb deploy deploy-rpm deploy-deb rpm-version deb-version docker docker-version deploy-docker
 
 all: rpm deb
 
@@ -92,6 +92,8 @@ documentserver:
 	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DOCUMENTSERVER)/example/config.js
 	sed 's/config\.haveExternalIp[[:space:]]=[[:space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DOCUMENTSERVER)/example/config.js
 	sed 's/config\.maxFileSize[[:space:]]=[[:space:]]5242880/'config\.maxFileSize\ =\ 104857600'/'  -i $(DOCUMENTSERVER)/example/config.js
+
+	echo "Done" > $@
 
 rpm-version:
 	chmod u+x rpm/Files/onlyoffice/configure.sh
