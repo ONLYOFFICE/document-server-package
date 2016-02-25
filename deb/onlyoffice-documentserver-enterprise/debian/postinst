@@ -41,7 +41,7 @@ install_db(){
 	db_get onlyoffice/db-name || true
 	DB_NAME="$RET"
 
-	MYSQL="mysql -h$DB_HOST -u$DB_USER"
+	MYSQL="mysql -s -h$DB_HOST -u$DB_USER"
 	if [ -n "$DB_PWD" ]; then
 		MYSQL="$MYSQL -p$DB_PWD"
 	fi
@@ -64,10 +64,12 @@ install_db(){
 }
 
 apply_connection_string(){
-	sed 's/"dbHost".*"/"dbHost": "'$DB_HOST'"/' -i $DEFAULT_CONFIG
-	sed 's/"dbName".*"/"dbName": "'$DB_NAME'"/' -i $DEFAULT_CONFIG
-	sed 's/"dbUser".*"/"dbUser": "'$DB_USER'"/' -i $DEFAULT_CONFIG
-	sed 's/"dbPass".*"/"dbPass": "'$DB_PWD'"/' -i $DEFAULT_CONFIG
+  JSON="json -I -q -f $DEFAULT_CONFIG"
+
+  $JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
+  $JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
+  $JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
+  $JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
 }
 
 case "$1" in
@@ -78,7 +80,7 @@ case "$1" in
 		adduser --quiet www-data onlyoffice
 		
 		#install node modules
-		#npm install -g json
+		npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
 		install_db
 		apply_connection_string

@@ -1,7 +1,8 @@
 #!/bin/bash
 
+APP_DIR="/var/www/onlyoffice/documentserver"
 DATA_DIR="/var/www/onlyoffice/Data"
-LOG_DIR="/var/log/onlyoffice"
+LOG_DIR="/var/log/onlyoffice/documentserver"
 
 ONLYOFFICE_HTTPS=${ONLYOFFICE_HTTPS:-false}
 
@@ -17,19 +18,39 @@ SYSCONF_TEMPLATES_DIR="/app/onlyoffice/setup/config"
 
 NGINX_ONLYOFFICE_PATH="/etc/nginx/conf.d/onlyoffice-documentserver.conf";
 
+NGINX_CONFIG_PATH="/etc/nginx/nginx.conf"
+NGINX_WORKER_PROCESSES=${NGINX_WORKER_PROCESSES:-$(grep processor /proc/cpuinfo | wc -l)}
+NGINX_WORKER_CONNECTIONS=${NGINX_WORKER_CONNECTIONS:-$(ulimit -n)}
+
+ONLYOFFICE_DEFAULT_CONFIG=/etc/onlyoffice/documentserver/default.json
+
+MYSQL_SERVER_HOST=${MYSQL_SERVER_HOST:-"localhost"}
+MYSQL_SERVER_PORT=${MYSQL_SERVER_PORT:-"3306"}
+MYSQL_SERVER_DB_NAME=${MYSQL_SERVER_DB_NAME:-"onlyoffice"}
+MYSQL_SERVER_USER=${MYSQL_SERVER_USER:-"root"}
+MYSQL_SERVER_PASS=${MYSQL_SERVER_PASS:-""}
+
+RABBITMQ_SERVER_HOST=${RABBITMQ_SERVER_HOST:-"localhost"}
+RABBITMQ_SERVER_USER=${RABBITMQ_SERVER_USER:-"guest"}
+RABBITMQ_SERVER_PASS=${RABBITMQ_SERVER_PASS:-"guest"}
+
+REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-"localhost"}
+REDIS_SERVER_PORT=${REDIS_SERVER_PORT:-"6379"}
+
 # create base folders
-mkdir -p /var/log/onlyoffice/documentserver/converter/
-mkdir -p /var/log/onlyoffice/documentserver/docservice/
-mkdir -p /var/log/onlyoffice/documentserver/example/
-mkdir -p /var/log/onlyoffice/documentserver/spellchecker/
-mkdir -p /var/log/onlyoffice/documentserver/metrics/
+for i in converter docservice example spellchecker metrics; do
+	mkdir -p "${LOG_DIR}/$i"
+done
+
+# Set up nginx
+sed 's/^worker_processes.*/'"worker_processes ${NGINX_WORKER_PROCESSES};"'/' -i ${NGINX_CONFIG_PATH}
+sed 's/worker_connections.*/'"worker_connections ${NGINX_WORKER_CONNECTIONS};"'/' -i ${NGINX_CONFIG_PATH}
 
 # setup HTTPS
 if [ -f "${SSL_CERTIFICATE_PATH}" -a -f "${SSL_KEY_PATH}" ]; then
         cp ${SYSCONF_TEMPLATES_DIR}/nginx/onlyoffice-ssl ${NGINX_ONLYOFFICE_PATH}
 
         mkdir ${DATA_DIR}
-        mkdir ${LOG_DIR}/nginx
 
         # configure nginx
         sed 's,{{SSL_CERTIFICATE_PATH}},'"${SSL_CERTIFICATE_PATH}"',' -i ${NGINX_ONLYOFFICE_PATH}
@@ -57,11 +78,52 @@ if [ -f "${SSL_CERTIFICATE_PATH}" -a -f "${SSL_KEY_PATH}" ]; then
         fi
 fi
 
-# Regenerate the fonts list and the fonts thumbnails
-/var/www/onlyoffice/documentserver/Tools/GenerateAllFonts.sh
+JSON="json -I -q -f ${ONLYOFFICE_DEFAULT_CONFIG}"
 
-service mysql start
+if [ ${MYSQL_SERVER_HOST} != "localhost" ]; then
+
+  # Change mysql settings
+  ${JSON} -e "this.services.CoAuthoring.sql.dbHost = '${MYSQL_SERVER_HOST}'"
+  ${JSON} -e "this.services.CoAuthoring.sql.dbPort = '${MYSQL_SERVER_PORT}'"
+  ${JSON} -e "this.services.CoAuthoring.sql.dbName = '${MYSQL_SERVER_DB_NAME}'"
+  ${JSON} -e "this.services.CoAuthoring.sql.dbUser = '${MYSQL_SERVER_USER}'"
+  ${JSON} -e "this.services.CoAuthoring.sql.dbPass = '${MYSQL_SERVER_PASS}'"
+
+  MYSQL="mysql -s -h${MYSQL_SERVER_HOST} -u${MYSQL_SERVER_USER}"
+  if [ -n "${MYSQL_SERVER_PASS}" ]; then
+    MYSQL="$MYSQL -p${MYSQL_SERVER_PASS}"
+  fi
+
+  # Create  db on remote server
+  ${MYSQL} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_SERVER_DB_NAME} CHARACTER SET utf8 COLLATE 'utf8_general_ci';"
+  ${MYSQL} "${MYSQL_SERVER_DB_NAME}" < "${APP_DIR}/Schema/MySql.CreateDb.sql"
+else
+  service mysql start
+fi
+
+if [ ${RABBITMQ_SERVER_HOST} != "localhost" ]; then
+
+  # Change rabbitmq settings
+  ${JSON} -e "this.rabbitmq.url = 'amqp://${RABBITMQ_SERVER_HOST}'"
+  ${JSON} -e "this.rabbitmq.login = '${RABBITMQ_SERVER_USER}'"
+  ${JSON} -e "this.rabbitmq.password = '${RABBITMQ_SERVER_PASS}'"
+  
+else
+  service redis-server start
+fi
+
+if [ ${REDIS_SERVER_HOST} != "localhost" ]; then
+
+  # Change redis settings
+  ${JSON} -e "this.services.CoAuthoring.redis.host = '${REDIS_SERVER_HOST}'"
+  ${JSON} -e "this.services.CoAuthoring.redis.port = '${REDIS_SERVER_PORT}'"
+  
+else
+  service rabbitmq-server start
+fi
+
+# Regenerate the fonts list and the fonts thumbnails
+${APP_DIR}/Tools/GenerateAllFonts.sh
+
 service nginx start
-service redis-server start
-service rabbitmq-server start
 service supervisor start
