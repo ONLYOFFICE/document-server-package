@@ -9,6 +9,7 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     apt-get -y update && \
     apt-get --force-yes -yq install apt-transport-https && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D9D0BF019CC8AC0D && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280 && \
     echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list && \
     echo "deb https://deb.nodesource.com/node_4.x trusty main" | tee /etc/apt/sources.list.d/nodesource.list && \
     DEBIAN_FRONTEND=noninteractive  && \
