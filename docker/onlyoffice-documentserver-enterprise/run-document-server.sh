@@ -122,6 +122,9 @@ else
   service rabbitmq-server start
 fi
 
+# Copy modified supervisor config
+cp ${SYSCONF_TEMPLATES_DIR}/supervisor/supervisor /etc/init.d/
+
 # Regenerate the fonts list and the fonts thumbnails
 ${APP_DIR}/Tools/GenerateAllFonts.sh
 
