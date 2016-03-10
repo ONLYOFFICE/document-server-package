@@ -48,7 +48,7 @@ sed 's/worker_connections.*/'"worker_connections ${NGINX_WORKER_CONNECTIONS};"'/
 
 # setup HTTPS
 if [ -f "${SSL_CERTIFICATE_PATH}" -a -f "${SSL_KEY_PATH}" ]; then
-        cp ${SYSCONF_TEMPLATES_DIR}/nginx/onlyoffice-ssl ${NGINX_ONLYOFFICE_PATH}
+        cp ${SYSCONF_TEMPLATES_DIR}/nginx/onlyoffice-documentserver-ssl.conf ${NGINX_ONLYOFFICE_PATH}
 
         mkdir ${DATA_DIR}
 
@@ -76,6 +76,8 @@ if [ -f "${SSL_CERTIFICATE_PATH}" -a -f "${SSL_KEY_PATH}" ]; then
         else
           sed '/{{ONLYOFFICE_HTTPS_HSTS_MAXAGE}}/d' -i ${NGINX_ONLYOFFICE_PATH}
         fi
+else
+        cp ${SYSCONF_TEMPLATES_DIR}/nginx/onlyoffice-documentserver.conf ${NGINX_ONLYOFFICE_PATH}
 fi
 
 JSON="json -I -q -f ${ONLYOFFICE_DEFAULT_CONFIG}"
