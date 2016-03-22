@@ -74,32 +74,32 @@ clean:
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
-	cp -rf ../deploy/deploy/* $(DOCUMENTSERVER)/
-	cp -rf ../dev_tools/OnlineEditorsExample/OnlineEditorsExampleNodeJS/ $(DOCUMENTSERVER)/example
+	cp -rf document-server/bin/* $(DOCUMENTSERVER)/
+	#cp -rf ../dev_tools/OnlineEditorsExample/OnlineEditorsExampleNodeJS/ $(DOCUMENTSERVER)/example
 
-	bomstrip-files $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*.json
-	bomstrip-files $(DOCUMENTSERVER)/NodeJsProjects/Common/config/log4js/*.json
+	bomstrip-files $(DOCUMENTSERVER)/Common/config/*.json
+	bomstrip-files $(DOCUMENTSERVER)/Common/config/log4js/*.json
 
-	rm -f $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*.bom
-	rm -f $(DOCUMENTSERVER)/NodeJsProjects/Common/config/log4js/*.bom
+	rm -f $(DOCUMENTSERVER)/Common/config/*.bom
+	rm -f $(DOCUMENTSERVER)/Common/config/log4js/*.bom
 
 	mkdir -p common/config/
 	mkdir -p common/config/log4js
 
-	mv $(DOCUMENTSERVER)/NodeJsProjects/Common/config/*.json common/config/
-	mv $(DOCUMENTSERVER)/NodeJsProjects/Common/config/log4js/*.json common/config/log4js/
+	mv $(DOCUMENTSERVER)/Common/config/*.json common/config/
+	mv $(DOCUMENTSERVER)/Common/config/log4js/*.json common/config/log4js/
 
-	chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
-	chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
-	chmod u+x $(DOCUMENTSERVER)/Tools/AllFontsGen
+	#chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
+	#chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
+	#chmod u+x $(DOCUMENTSERVER)/Tools/AllFontsGen
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/OfficeWeb/apps/api/documents/api.js
+	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 
-	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DOCUMENTSERVER)/example/config.js
-	sed 's/http:\/\/localhost\/OfficeWeb/'\\/OfficeWeb'/'  -i $(DOCUMENTSERVER)/example/config.js
-	sed 's/config\.haveExternalIp[[:space:]]=[[:space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DOCUMENTSERVER)/example/config.js
-	sed 's/config\.maxFileSize[[:space:]]=[[:space:]]5242880/'config\.maxFileSize\ =\ 104857600'/'  -i $(DOCUMENTSERVER)/example/config.js
+	#sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DOCUMENTSERVER)/example/config.js
+	#sed 's/http:\/\/localhost\/web-apps/'\\/web-apps'/'  -i $(DOCUMENTSERVER)/example/config.js
+	#sed 's/config\.haveExternalIp[[:space:]]=[[:space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DOCUMENTSERVER)/example/config.js
+	#sed 's/config\.maxFileSize[[:space:]]=[[:space:]]5242880/'config\.maxFileSize\ =\ 104857600'/'  -i $(DOCUMENTSERVER)/example/config.js
 
 	echo "Done" > $@
 
