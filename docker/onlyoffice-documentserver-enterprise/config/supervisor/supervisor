@@ -32,7 +32,7 @@ test -x $DAEMON || exit 0
 
 LOGDIR=/var/log/supervisor
 PIDFILE=/var/run/$NAME.pid
-PID=""
+PS_COUNT=0
 DODTIME=5                   # Time to wait for the server to die, in seconds
                             # If this value is set too low you might not
                             # let some servers to die gracefully and
@@ -91,13 +91,13 @@ force_stop() {
 }
 
 get_pid() {
-    PID=$(ps auxf | grep $DAEMON | awk '{print $2}')
+    PS_COUNT=$(pgrep -fc $DAEMON || true)
 }
 
 case "$1" in
   start)
         get_pid
-        if [ -z "$PID" ]; then
+        if [ $PS_COUNT -eq 0 ]; then
             rm -f "$PIDFILE"
         fi
 	echo -n "Starting $DESC: "
