@@ -1,0 +1,8 @@
+deb/*.deb
+deb/*.changes
+document-server
+documentserver
+repo
+repo-rpm
+rpm/builddir
+onlyoffice
