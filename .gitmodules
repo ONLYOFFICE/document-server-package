@@ -1,0 +1,3 @@
+[submodule "document-server"]
+	path = document-server
+	url = https://github.com/ONLYOFFICE/document-server.git
