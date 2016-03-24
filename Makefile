@@ -74,21 +74,22 @@ clean:
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
+	mkdir -p $(DOCUMENTSERVER)/web-apps $(DOCUMENTSERVER)/server $(DOCUMENTSERVER)/example
 	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)/web-apps
 	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
 	cp -rf ../document-server-integration/web/documentserver-example/nodejs/ $(DOCUMENTSERVER)/example
 
-	bomstrip-files $(DOCUMENTSERVER)/Common/config/*.json
-	bomstrip-files $(DOCUMENTSERVER)/Common/config/log4js/*.json
+	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/*.json
+	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/log4js/*.json
 
-	rm -f $(DOCUMENTSERVER)/Common/config/*.bom
-	rm -f $(DOCUMENTSERVER)/Common/config/log4js/*.bom
+	rm -f $(DOCUMENTSERVER)/server/Common/config/*.bom
+	rm -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.bom
 
 	mkdir -p common/config/
 	mkdir -p common/config/log4js
 
-	mv $(DOCUMENTSERVER)/Common/config/*.json common/config/
-	mv $(DOCUMENTSERVER)/Common/config/log4js/*.json common/config/log4js/
+	mv $(DOCUMENTSERVER)/server/Common/config/*.json common/config/
+	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json common/config/log4js/
 
 	#chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
 	#chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
