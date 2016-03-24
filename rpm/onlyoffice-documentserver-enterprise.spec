@@ -30,13 +30,13 @@ cp -r ../../Files/onlyoffice/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserve
 
 #install documentserver libs
 mkdir -p "$RPM_BUILD_ROOT/usr/lib64/"
-cp -r ../../../common/documentserver/NodeJsProjects/FileConverter/Bin/*.so* "$RPM_BUILD_ROOT/usr/lib64/" 
-rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/NodeJsProjects/FileConverter/Bin/*.so*
+#cp -r ../../../common/documentserver/server/FileConverter/Bin/*.so* "$RPM_BUILD_ROOT/usr/lib64/" 
+#rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/server/FileConverter/Bin/*.so*
 
 #install configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
 cp -r ../../../common/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
-rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/NodeJsProjects/Common/config/"
+rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/server/Common/config/"
 
 #make log dir
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/docservice"
@@ -102,7 +102,7 @@ exit 0
 DIR="/var/www/onlyoffice/documentserver"
 
 # generate allfonts.js and thumbnail
-"$DIR/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/OfficeWeb/sdk/Common/Images" "$DIR/NodeJsProjects/FileConverter/Bin/font_selection.bin"
+"$DIR/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/OfficeWeb/sdk/Common/Images" "$DIR/server/FileConverter/Bin/font_selection.bin"
 
 # restart dependent services
 service supervisord restart >/dev/null 2>&1
@@ -120,7 +120,7 @@ DIR="/var/www/onlyoffice/documentserver"
 if [ $1 -eq 0 ]; then
   rm -f $DIR/OfficeWeb/sdk/Common/AllFonts.js
   rm -f $DIR/OfficeWeb/sdk/Common/Images/fonts_thumbnail*
-  rm -f $DIR/NodeJsProjects/FileConverter/Bin/font_selection.bin
+  rm -f $DIR/server/FileConverter/Bin/font_selection.bin
 
   supervisorctl update >/dev/null 2>&1
   service nginx reload >/dev/null 2>&1
