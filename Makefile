@@ -1,7 +1,7 @@
 COMPANY_NAME := onlyoffice
 PRODUCT_NAME := documentserver-enterprise
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
-PRODUCT_VERSION := 3.7.0
+PRODUCT_VERSION := 3.8.0
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
 ifeq ($(SVN_TAG), trunk)
@@ -74,8 +74,9 @@ clean:
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
-	cp -rf document-server/bin/* $(DOCUMENTSERVER)/
-	#cp -rf ../dev_tools/OnlineEditorsExample/OnlineEditorsExampleNodeJS/ $(DOCUMENTSERVER)/example
+	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)/web-apps
+	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
+	cp -rf ../document-server-integration/web/documentserver-example/nodejs/ $(DOCUMENTSERVER)/example
 
 	bomstrip-files $(DOCUMENTSERVER)/Common/config/*.json
 	bomstrip-files $(DOCUMENTSERVER)/Common/config/log4js/*.json
