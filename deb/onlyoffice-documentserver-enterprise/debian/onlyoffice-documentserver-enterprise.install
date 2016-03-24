@@ -3,4 +3,3 @@
 ../../common/documentserver/* var/www/onlyoffice/documentserver/
 ../../common/config/* etc/onlyoffice/documentserver/
 ../../common/supervisor/* etc/supervisor/conf.d/
-../../common/fonts/* usr/share/fonts/truetype/onlyoffice/documentserver/
