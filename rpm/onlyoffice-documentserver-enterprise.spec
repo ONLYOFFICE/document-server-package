@@ -102,7 +102,7 @@ exit 0
 DIR="/var/www/onlyoffice/documentserver"
 
 # generate allfonts.js and thumbnail
-"$DIR/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/OfficeWeb/sdk/Common/Images" "$DIR/server/FileConverter/Bin/font_selection.bin"
+"$DIR/server/tools/AllFontsGen" "/usr/share/fonts" "$DIR/sdkjs/common/AllFonts.js" "$DIR/sdkjs/Common/Images" "$DIR/server/FileConverter/bin/font_selection.bin"
 
 # restart dependent services
 service supervisord restart >/dev/null 2>&1
@@ -118,9 +118,9 @@ fi
 DIR="/var/www/onlyoffice/documentserver"
 # uninstall action
 if [ $1 -eq 0 ]; then
-  rm -f $DIR/OfficeWeb/sdk/Common/AllFonts.js
-  rm -f $DIR/OfficeWeb/sdk/Common/Images/fonts_thumbnail*
-  rm -f $DIR/server/FileConverter/Bin/font_selection.bin
+  rm -f $DIR/sdkjs/Common/AllFonts.js
+  rm -f $DIR/sdkjs/Common/Images/fonts_thumbnail*
+  rm -f $DIR/server/FileConverter/bin/font_selection.bin
 
   supervisorctl update >/dev/null 2>&1
   service nginx reload >/dev/null 2>&1
