@@ -69,7 +69,9 @@ clean:
 		$(RPM_BUILD_DIR)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
-		$(DOCKER_TARGETS)
+		$(DOCKER_TARGETS)\
+		$(DOCUMENTSERVER)\
+		documentserver
 	sudo docker rm $$(sudo docker ps -a -q) || exit 0
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
