@@ -95,7 +95,7 @@ execute_db_scripts(){
 		$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" >/dev/null 2>&1
 	fi
 	
-	$MYSQL "$DB_NAME" < "$DIR/documentserver/Schema/MySql.CreateDb.sql" >/dev/null 2>&1
+	$MYSQL "$DB_NAME" < "$DIR/documentserver/server/schema/createdb.sql" >/dev/null 2>&1
 
 	echo "OK"
 }
