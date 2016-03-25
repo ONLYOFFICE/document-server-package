@@ -4,11 +4,11 @@ PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PRODUCT_VERSION := 3.8.0
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-ifeq ($(SVN_TAG), trunk)
+ifeq ($(GIT_BRANCH), develop)
 DOCKER_TAGS += $(PACKAGE_VERSION)
 DOCKER_TAGS += latest
 else
-DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(SVN_TAG))
+DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(GIT_BRANCH))
 endif
 
 #DOCKER_REPO = $(COMPANY_NAME)/$(PRODUCT_NAME)
@@ -53,7 +53,7 @@ rpm: $(RPM)
 deb: $(DEB)
 
 $(DOCKER_TARGETS): $(DEB_REPO_DATA)
-	sed "s|{{SVN_TAG}}|$(SVN_TAG)|"  -i docker/$(PACKAGE_NAME)/Dockerfile
+	sed "s|{{SVN_TAG}}|$(GIT_BRANCH)|"  -i docker/$(PACKAGE_NAME)/Dockerfile
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
 
 	cd docker/$(PACKAGE_NAME) &&\
@@ -91,9 +91,9 @@ documentserver:
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json common/config/
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json common/config/log4js/
 
-	#chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/x2t
-	#chmod u+x $(DOCUMENTSERVER)/NodeJsProjects/FileConverter/Bin/HtmlFileInternal/HtmlFileInternal
-	#chmod u+x $(DOCUMENTSERVER)/Tools/AllFontsGen
+	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
+	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
+	chmod u+x $(DOCUMENTSERVER)/tools/AllFontsGen
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
@@ -126,12 +126,12 @@ $(RPM_REPO_DATA): $(RPM)
 
 	aws s3 sync \
 		$(RPM_REPO) \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/ \
+		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
 		--acl public-read --delete
 
 	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/ \
+		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
+		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
 		--acl public-read --delete
 
 $(DEB_REPO_DATA): $(DEB)
@@ -143,12 +143,12 @@ $(DEB_REPO_DATA): $(DEB)
 
 	aws s3 sync \
 		$(DEB_REPO) \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/repo \
+		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
 		--acl public-read --delete
 
 	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/repo \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/repo \
+		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
+		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
 		--acl public-read --delete
 
 deploy-docker: $(DOCKER_TARGETS)
