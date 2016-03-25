@@ -77,7 +77,7 @@ documentserver:
 	mkdir -p $(DOCUMENTSERVER)/web-apps $(DOCUMENTSERVER)/server $(DOCUMENTSERVER)/example
 	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)/web-apps
 	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
-	cp -rf ../document-server-integration/web/documentserver-example/nodejs/ $(DOCUMENTSERVER)/example
+	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER)/example
 
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/*.json
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/log4js/*.json
