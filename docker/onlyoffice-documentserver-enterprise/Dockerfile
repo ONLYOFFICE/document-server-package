@@ -21,6 +21,10 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     add-apt-repository ppa:ubuntu-toolchain-r/test && \
     apt-get -y update && \
     apt-get --force-yes -yq install software-properties-common adduser mysql-server redis-server rabbitmq-server nginx-extras nodejs libstdc++6 libcurl3 libxml2 libboost-regex-dev zlib1g supervisor fonts-dejavu fonts-liberation ttf-mscorefonts-installer fonts-crosextra-carlito fonts-takao-gothic fonts-opensymbol libxss1 libgtkglext1 libcairo2 xvfb libxtst6 libgconf2-4 libasound2 bomstrip libnspr4 libnss3 libnss3-nssdb nano htop && \
+    service mysql stop && \
+    service redis-server stop && \
+    service rabbitmq-server stop && \
+    service nginx stop && \
     rm -rf /var/lib/apt/lists/*
 
 RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver-enterprise/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" >> /etc/apt/sources.list && \
