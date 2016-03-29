@@ -77,7 +77,7 @@ clean:
 
 documentserver:
 	mkdir -p $(DOCUMENTSERVER)/web-apps $(DOCUMENTSERVER)/server $(DOCUMENTSERVER)/example
-	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)/web-apps
+	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)
 	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
 	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER)/example
 
