@@ -33,6 +33,7 @@ RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/only
     apt-get -y update && \
     service mysql start && \
     apt-get --force-yes -yq install onlyoffice-documentserver-enterprise && \
+    service mysql stop && \
     rm -rf /var/lib/apt/lists/*
 
 ADD config /app/onlyoffice/setup/config/
