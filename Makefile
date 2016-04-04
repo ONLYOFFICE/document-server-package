@@ -1,7 +1,6 @@
 COMPANY_NAME := onlyoffice
 PRODUCT_NAME := documentserver-enterprise
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
-PRODUCT_VERSION := 3.8.0
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
 ifeq ($(GIT_BRANCH), origin/master)
