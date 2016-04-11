@@ -44,6 +44,7 @@ mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/example"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/converter"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/spellchecker"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/metrics"
+mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/gc"
 
 #make cache dir
 mkdir -p "$RPM_BUILD_ROOT/var/lib/onlyoffice/documentserver/App_Data/cache/files"
