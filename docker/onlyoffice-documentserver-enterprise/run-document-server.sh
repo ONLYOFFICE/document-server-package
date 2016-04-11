@@ -38,7 +38,7 @@ REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-"localhost"}
 REDIS_SERVER_PORT=${REDIS_SERVER_PORT:-"6379"}
 
 # create base folders
-for i in converter docservice example spellchecker metrics; do
+for i in converter docservice example spellchecker metrics gc; do
 	mkdir -p "${LOG_DIR}/$i"
 done
 
