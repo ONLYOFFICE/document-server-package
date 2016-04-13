@@ -88,7 +88,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
-%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example
+%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
@@ -99,7 +99,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example/*
+%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
