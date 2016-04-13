@@ -3,7 +3,7 @@ PRODUCT_NAME := documentserver-enterprise
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-ifeq ($(GIT_BRANCH), origin/master)
+ifeq ($(GIT_BRANCH), origin/develop)
 DOCKER_TAGS += $(PACKAGE_VERSION)
 DOCKER_TAGS += latest
 else
