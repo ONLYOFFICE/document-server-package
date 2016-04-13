@@ -111,7 +111,7 @@ documentserver-example:
 	
 	bomstrip-files $(DOCUMENTSERVER_EXAMPLE)/config/*.json
 
-	rm -f $(DOCUMENTSERVER_EXAMPLE)/config/*.json
+	rm -f $(DOCUMENTSERVER_EXAMPLE)/config/*.bom
 
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
