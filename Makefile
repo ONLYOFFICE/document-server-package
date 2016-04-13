@@ -42,6 +42,10 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 
 DOCUMENTSERVER = common/documentserver
+DOCUMENTSERVER_CONFIG = common/config/documentserver
+
+DOCUMENTSERVER_EXAMPLE = common/documentserver-example
+DOCUMENTSERVER_EXAMPLE_CONFIG = common/config/documentserver-example
 
 .PHONY: all clean rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
 
@@ -70,15 +74,15 @@ clean:
 		$(RPM_REPO)\
 		$(DOCKER_TARGETS)\
 		$(DOCUMENTSERVER)\
-		documentserver
+		documentserver \
+		documentserver-example
 	sudo docker rm $$(sudo docker ps -a -q) || exit 0
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
-	mkdir -p $(DOCUMENTSERVER)/web-apps $(DOCUMENTSERVER)/server $(DOCUMENTSERVER)/example
+	mkdir -p $(DOCUMENTSERVER)/web-apps $(DOCUMENTSERVER)/server
 	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)
 	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
-	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER)/example
 
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/*.json
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/log4js/*.json
@@ -86,11 +90,11 @@ documentserver:
 	rm -f $(DOCUMENTSERVER)/server/Common/config/*.bom
 	rm -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.bom
 
-	mkdir -p common/config/
-	mkdir -p common/config/log4js
+	mkdir -p $(DOCUMENTSERVER_CONFIG)
+	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
 
-	mv $(DOCUMENTSERVER)/server/Common/config/*.json common/config/
-	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json common/config/log4js/
+	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
+	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
@@ -98,22 +102,31 @@ documentserver:
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	
+	echo "Done" > $@
 
-	sed 's/https:\/\/doc\.onlyoffice\.com/'http:\\/\\/localhost'/'  -i $(DOCUMENTSERVER)/example/config.js
-	sed 's/http:\/\/localhost\/OfficeWeb/'\\/web-apps'/'  -i $(DOCUMENTSERVER)/example/config.js
-	sed 's/config\.haveExternalIp[[:space:]]=[[:space:]]false/'config\.haveExternalIp\ =\ true'/'  -i $(DOCUMENTSERVER)/example/config.js
-	sed 's/config\.maxFileSize[[:space:]]=[[:space:]]5242880/'config\.maxFileSize\ =\ 104857600'/'  -i $(DOCUMENTSERVER)/example/config.js
+documentserver-example:
+	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
+	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
+	
+	bomstrip-files $(DOCUMENTSERVER_EXAMPLE)/config/*.json
+
+	rm -f $(DOCUMENTSERVER_EXAMPLE)/config/*.json
+
+	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
+
+	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	echo "Done" > $@
 
-$(RPM):	documentserver
+$(RPM):	documentserver documentserver-example
 	chmod u+x rpm/Files/onlyoffice/configure.sh
 	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
 
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
 
-$(DEB): documentserver
+$(DEB): documentserver documentserver-example
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us

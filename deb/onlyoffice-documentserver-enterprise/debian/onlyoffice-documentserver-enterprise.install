@@ -1,5 +1,7 @@
 ../../common/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/
 ../../common/nginx/includes/* etc/nginx/includes/
 ../../common/documentserver/* var/www/onlyoffice/documentserver/
-../../common/config/* etc/onlyoffice/documentserver/
+../../common/documentserver-example/* var/www/onlyoffice/documentserver-example/
+../../common/config/documentserver/* etc/onlyoffice/documentserver/
+../../common/config/documentserver-example/* etc/onlyoffice/documentserver-example/
 ../../common/supervisor/* etc/supervisor/conf.d/

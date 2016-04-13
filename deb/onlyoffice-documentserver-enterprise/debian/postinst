@@ -87,7 +87,7 @@ case "$1" in
 
 		# modify permissions for onlyoffice files and folders
 		mkdir -p "$LOG_DIR/documentserver/docservice"
-		mkdir -p "$LOG_DIR/documentserver/example"
+		mkdir -p "$LOG_DIR/documentserver-example"
 		mkdir -p "$LOG_DIR/documentserver/converter"
 		mkdir -p "$LOG_DIR/documentserver/spellchecker"
 		mkdir -p "$LOG_DIR/documentserver/metrics"

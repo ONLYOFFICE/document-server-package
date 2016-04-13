@@ -35,12 +35,21 @@ rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/server/FileConverter/bin/
 
 #install configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
-cp -r ../../../common/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
-rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/server/Common/config/"
+cp -r ../../../common/config/documentserver/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
+#rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/server/Common/config/"
+
+#install documentserver example files
+mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
+cp -r ../../../common/documentserver-example/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
+
+#install dcoumentserver example configs
+mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/"
+cp -r ../../../common/config/documentserver-example/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/" 
+#rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/config/"
 
 #make log dir
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/docservice"
-mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/example"
+mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver-example"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/converter"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/spellchecker"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/metrics"
@@ -79,6 +88,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
+%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
@@ -89,6 +99,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
+%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example/*
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
