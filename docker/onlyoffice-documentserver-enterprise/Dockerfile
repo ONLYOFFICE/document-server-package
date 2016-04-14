@@ -28,6 +28,10 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     service nginx stop && \
     rm -rf /var/lib/apt/lists/*
 
+ADD config /app/onlyoffice/setup/config/
+ADD run-document-server.sh /app/onlyoffice/run-document-server.sh
+RUN chmod 755 /app/onlyoffice/*.sh
+
 RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver-enterprise/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" >> /etc/apt/sources.list && \
     DEBIAN_FRONTEND=noninteractive  && \
     apt-get -y update && \
@@ -35,10 +39,6 @@ RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/only
     apt-get --force-yes -yq install onlyoffice-documentserver-enterprise && \
     service mysql stop && \
     rm -rf /var/lib/apt/lists/*
-
-ADD config /app/onlyoffice/setup/config/
-ADD run-document-server.sh /app/onlyoffice/run-document-server.sh
-RUN chmod 755 /app/onlyoffice/*.sh
 
 VOLUME ["/var/log/onlyoffice"]
 VOLUME ["/var/www/onlyoffice/Data"]
