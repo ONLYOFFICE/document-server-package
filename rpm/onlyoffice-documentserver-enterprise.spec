@@ -80,7 +80,7 @@ mkdir -p "$RPM_BUILD_ROOT/var/cache/nginx/onlyoffice/documentserver/"
 
 #install fonts
 mkdir -p "$RPM_BUILD_ROOT/usr/share/fonts/truetype/"
-#cp -r ../../../common/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/"
+cp -r ../../../common/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/"
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
