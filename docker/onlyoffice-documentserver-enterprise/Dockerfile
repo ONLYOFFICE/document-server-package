@@ -30,20 +30,18 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
 
 ADD config /app/onlyoffice/setup/config/
 ADD run-document-server.sh /app/onlyoffice/run-document-server.sh
-RUN chmod 755 /app/onlyoffice/*.sh
 
-RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver-enterprise/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" >> /etc/apt/sources.list && \
-    DEBIAN_FRONTEND=noninteractive  && \
+EXPOSE 80 443
+
+RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver-enterprise/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" | tee /etc/apt/sources.list.d/onlyoffice.list && \
+    DEBIAN_FRONTEND=noninteractive && \
     apt-get -y update && \
     service mysql start && \
     apt-get --force-yes -yq install onlyoffice-documentserver-enterprise && \
     service mysql stop && \
+    chmod 755 /app/onlyoffice/*.sh \
     rm -rf /var/lib/apt/lists/*
 
-VOLUME ["/var/log/onlyoffice"]
-VOLUME ["/var/www/onlyoffice/Data"]
-
-EXPOSE 80
-EXPOSE 443
+VOLUME /etc/onlyoffice /var/log/onlyoffice /var/lib/onlyoffice /var/www/onlyoffice/Data
 
 CMD bash -C '/app/onlyoffice/run-document-server.sh';'bash'
