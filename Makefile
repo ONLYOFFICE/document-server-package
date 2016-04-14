@@ -47,6 +47,8 @@ DOCUMENTSERVER_CONFIG = common/config/documentserver
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/config/documentserver-example
 
+FONTS = common/fonts
+
 .PHONY: all clean rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
 
 all: rpm deb
@@ -102,6 +104,10 @@ documentserver:
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	
+	mkdir -p $(FONTS)/Asana-Math
+	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
+	wget -O $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
 	
 	echo "Done" > $@
 

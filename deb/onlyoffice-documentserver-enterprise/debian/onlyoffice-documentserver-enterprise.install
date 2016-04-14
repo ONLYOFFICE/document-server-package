@@ -5,3 +5,4 @@
 ../../common/config/documentserver/* etc/onlyoffice/documentserver/
 ../../common/config/documentserver-example/* etc/onlyoffice/documentserver-example/
 ../../common/supervisor/* etc/supervisor/conf.d/
+../../common/fonts/* usr/share/fonts/truetype/

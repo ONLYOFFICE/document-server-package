@@ -79,8 +79,8 @@ cp ../../../common/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
 mkdir -p "$RPM_BUILD_ROOT/var/cache/nginx/onlyoffice/documentserver/"
 
 #install fonts
-mkdir -p "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
-#cp -r ../../../common/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/onlyoffice/documentserver/"
+mkdir -p "$RPM_BUILD_ROOT/usr/share/fonts/truetype/"
+#cp -r ../../../common/fonts/* "$RPM_BUILD_ROOT/usr/share/fonts/truetype/"
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -92,7 +92,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
-%attr(-, onlyoffice, onlyoffice) /usr/share/fonts/truetype/onlyoffice/*
+%attr(-, root, root) /usr/share/fonts/truetype/*
 %attr(-, root, root) /usr/lib64/*.so*
 
 %dir
