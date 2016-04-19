@@ -23,29 +23,38 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %install
 
+DOCUMENTSERVER_BIN=../../../common/documentserver/bin
+DOCUMENTSERVER_HOME=../../../common/documentserver/home
+DOCUMENTSERVER_CONFIG=../../../common/documentserver/config
+
+DOCUMENTSERVER_EXAMPLE_HOME=../../../common/documentserver-example/home
+DOCUMENTSERVER_EXAMPLE_CONFIG=../../../common/documentserver-example/config
+
 #install documentserver files
 mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
-cp -r ../../../common/documentserver/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
-cp -r ../../Files/onlyoffice/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
+cp -r $DOCUMENTSERVER_HOME/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 
 #install documentserver libs
 mkdir -p "$RPM_BUILD_ROOT/usr/lib64/"
-cp -r ../../../common/documentserver/server/FileConverter/bin/*.so* "$RPM_BUILD_ROOT/usr/lib64/" 
+cp -r $DOCUMENTSERVER_HOME/server/FileConverter/bin/*.so* "$RPM_BUILD_ROOT/usr/lib64/" 
 rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/server/FileConverter/bin/*.so*
+
+#install documentserver bin
+mkdir -p "$RPM_BUILD_ROOT/usr/bin/"
+cp -r $DOCUMENTSERVER_BIN/* "$RPM_BUILD_ROOT/usr/bin/"
+cp -r ../../bin/* "$RPM_BUILD_ROOT/usr/bin/"
 
 #install configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
-cp -r ../../../common/documentserver/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
-#rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/server/Common/config/"
+cp -r $DOCUMENTSERVER_CONFIG/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
 
 #install documentserver example files
 mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
-cp -r ../../../common/documentserver-example/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
+cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
 
 #install dcoumentserver example configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/"
-cp -r ../../../common/documentserver-example/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/" 
-#rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/config/"
+cp -r $DOCUMENTSERVER_EXAMPLE_CONFIG/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/" 
 
 #make log dir
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/docservice"
