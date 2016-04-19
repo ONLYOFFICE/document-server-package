@@ -4,6 +4,7 @@ MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 ENV LANG en_US.UTF-8  
 ENV LANGUAGE en_US:en  
 ENV LC_ALL en_US.UTF-8 
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     apt-get -y update && \
@@ -12,7 +13,6 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280 && \
     echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list && \
     echo "deb https://deb.nodesource.com/node_4.x trusty main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    DEBIAN_FRONTEND=noninteractive  && \
     locale-gen en_US.UTF-8 && \
     apt-get -y update && \
     echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections && \
@@ -34,7 +34,6 @@ ADD run-document-server.sh /app/onlyoffice/run-document-server.sh
 EXPOSE 80 443
 
 RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver-enterprise/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" | tee /etc/apt/sources.list.d/onlyoffice.list && \
-    DEBIAN_FRONTEND=noninteractive && \
     apt-get -y update && \
     service mysql start && \
     apt-get --force-yes -yq install onlyoffice-documentserver-enterprise && \
