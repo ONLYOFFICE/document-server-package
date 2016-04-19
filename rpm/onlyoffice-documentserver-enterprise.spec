@@ -103,6 +103,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
 %attr(-, root, root) /usr/share/fonts/truetype/*
 %attr(-, root, root) /usr/lib64/*.so*
+%attr(-, root, root) /usr/bin/documentserver-*.sh
 
 %dir
 %attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
