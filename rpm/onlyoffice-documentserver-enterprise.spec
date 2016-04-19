@@ -35,7 +35,7 @@ rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/server/FileConverter/bin/
 
 #install configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
-cp -r ../../../common/config/documentserver/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
+cp -r ../../../common/documentserver/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
 #rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/server/Common/config/"
 
 #install documentserver example files
@@ -44,7 +44,7 @@ cp -r ../../../common/documentserver-example/* "$RPM_BUILD_ROOT/var/www/onlyoffi
 
 #install dcoumentserver example configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/"
-cp -r ../../../common/config/documentserver-example/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/" 
+cp -r ../../../common/documentserver-example/config/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/" 
 #rm -rf "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/config/"
 
 #make log dir

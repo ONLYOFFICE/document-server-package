@@ -41,11 +41,11 @@ DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 
-DOCUMENTSERVER = common/documentserver
-DOCUMENTSERVER_CONFIG = common/config/documentserver
+DOCUMENTSERVER = common/documentserver/home
+DOCUMENTSERVER_CONFIG = common/documentserver/config
 
-DOCUMENTSERVER_EXAMPLE = common/documentserver-example
-DOCUMENTSERVER_EXAMPLE_CONFIG = common/config/documentserver-example
+DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
+DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
 FONTS = common/fonts
 
@@ -101,6 +101,7 @@ documentserver:
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen
+	chmod u+x $(DOCUMENTSERVER)/bin/documentserver-prepare4shutdown.sh
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
