@@ -18,6 +18,6 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
 
 ADD build.sh /app/onlyoffice/build.sh
 
-VOLUME /var/lib/onlyoffice
+VOLUME /var/lib/onlyoffice /home/oleg
 
 CMD bash -C '/app/onlyoffice/build.sh'
