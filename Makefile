@@ -101,7 +101,7 @@ documentserver:
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen
-	chmod u+x $(DOCUMENTSERVER)/bin/documentserver-prepare4shutdown.sh
+	chmod u+x common/documentserver/bin/documentserver-prepare4shutdown.sh
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
