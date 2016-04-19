@@ -128,7 +128,7 @@ documentserver-example:
 	echo "Done" > $@
 
 $(RPM):	documentserver documentserver-example
-	chmod u+x rpm/Files/onlyoffice/configure.sh
+	chmod u+x rpm/bin/documentserver-configure.sh
 	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
 
