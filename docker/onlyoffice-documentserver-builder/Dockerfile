@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:trusty
 MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive
@@ -9,7 +9,7 @@ RUN apt-get -y update && \
     echo "deb https://deb.nodesource.com/node_4.x trusty main" | tee /etc/apt/sources.list.d/nodesource.list && \
     locale-gen en_US.UTF-8 && \
     apt-get -y update && \
-    apt-get install --force-yes -yq build-essential sed dpkg-dev debhelper createrepo bomstrip libxml2-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev libcurl4-gnutls-dev libglib2.0-dev libgdk-pixbuf2.0-dev libgtkglext1-dev libatk1.0-dev libcairo2-dev libxss-dev libgconf2-dev nodejs && \
+    apt-get install --force-yes -yq build-essential sed dpkg-dev debhelper createrepo bomstrip libxml2-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev libcurl4-gnutls-dev libglib2.0-dev libgdk-pixbuf2.0-dev libgtkglext1-dev libatk1.0-dev libcairo2-dev libxss-dev libgconf2-dev default-jre nodejs && \
     npm install -g grunt-cli && \
     npm cache clean && \
     rm -rf /var/lib/apt/lists/*
