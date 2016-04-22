@@ -1,0 +1,32 @@
+FROM centos:latest
+MAINTAINER Ascensio System SIA <support@onlyoffice.com>
+
+RUN yum -y install curl && \
+    curl --silent --location https://rpm.nodesource.com/setup_4.x | bash - && \
+    yum -y groupinstall 'Development Tools' && \
+    yum -y install  \
+        wget \
+        sed \
+        libxml2-devel \
+        boost-regex-devel \
+        boost-system-devel \
+        boost-filesystem-devel \
+        libcurl-devel \
+        glib2-devel \
+        gdk-pixbuf2-devel \
+        gtkglext-devel \
+        atk-devel \
+        cairo-devel \
+        libX11-devel \
+        GConf2-devel \
+        java-1.7.0-openjdk \
+        nodejs && \
+    npm install -g grunt-cli && \
+    npm cache clean && \
+    yum clean all
+
+ADD build.sh /app/onlyoffice/build.sh
+
+VOLUME /var/lib/onlyoffice /home/oleg
+
+CMD bash -C '/app/onlyoffice/build.sh'
