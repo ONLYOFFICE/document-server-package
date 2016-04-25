@@ -4,9 +4,8 @@ MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive QT_SELECT=opt-qt55
 
 RUN apt-get -y update && \
-    apt-get install --force-yes -yq apt-transport-https locales software-properties-common && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280 && \
-    echo "deb https://deb.nodesource.com/node_4.x {{VERSION}} main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get install --force-yes -yq apt-transport-https locales software-properties-common curl && \
+    curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && \
     add-apt-repository ppa:beineri/opt-qt551-trusty && \
     locale-gen en_US.UTF-8 && \
     apt-get -y update && \
