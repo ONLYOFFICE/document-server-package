@@ -7,22 +7,32 @@ RUN yum -y install curl && \
     yum -y install  \
         wget \
         sed \
+        libstdc++-static \
         libxml2-devel \
-        boost-regex-devel \
-        boost-system-devel \
-        boost-filesystem-devel \
+        boost-devel \
         libcurl-devel \
         glib2-devel \
+        gtk2-devel \
         gdk-pixbuf2-devel \
-        gtkglext-devel \
         atk-devel \
         cairo-devel \
         libX11-devel \
         GConf2-devel \
+        libXScrnSaver-devel \
+        libXtst-devel \
+        qt5-qtbase-devel \
+        qt5-qtx11extras-devel \
         java-1.7.0-openjdk \
         nodejs && \
+    yum -y install epel-release && \
+    yum -y updateinfo && \
+    yum -y install \
+        gtkglext-devel \
+        qt5-qtbase-devel \
+        qt5-qtx11extras-devel && \
     npm install -g grunt-cli && \
     npm cache clean && \
+    ln -s /usr/lib64/qt5/bin/qmake /usr/bin/qmake && \
     yum clean all
 
 ADD build.sh /app/onlyoffice/build.sh
