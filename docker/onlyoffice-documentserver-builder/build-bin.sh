@@ -1,5 +1,5 @@
 #!/bin/bash
 
-BUID_DIR=/var/lib/onlyoffice
+BUILD_DIR=/var/lib/onlyoffice
 
-cd $BUID_DIR/core && make clean && make
+cd $BUILD_DIR/core && make clean && make
