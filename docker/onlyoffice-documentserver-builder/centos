@@ -36,6 +36,7 @@ RUN yum -y install curl && \
     yum clean all
 
 ADD build.sh /app/onlyoffice/build.sh
+ADD build-bin.sh /app/onlyoffice/build-bin.sh
 
 VOLUME /var/lib/onlyoffice /home/oleg
 
