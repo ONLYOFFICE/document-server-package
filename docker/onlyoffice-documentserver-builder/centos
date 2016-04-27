@@ -1,4 +1,4 @@
-FROM centos:latest
+FROM {{OS}}:{{VERSION}}
 MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 
 RUN yum -y install curl && \
