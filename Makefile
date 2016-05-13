@@ -50,7 +50,7 @@ DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
 FONTS = common/fonts
 
-.PHONY: all clean rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
+.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
 
 all: rpm deb
 
@@ -79,7 +79,8 @@ clean:
 		$(DOCUMENTSERVER)\
 		documentserver \
 		documentserver-example
-	sudo docker rm $$(sudo docker ps -a -q) || exit 0
+		
+clean-docker:
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
