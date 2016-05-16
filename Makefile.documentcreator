@@ -72,10 +72,10 @@ clean:
 documentcreator:
 	mkdir -p $(DEST)
 	cp -rf -t $(DEST) $(SRC)
-	
+
 	chmod 777 $(DEST)/docbuilder_linux64
-  chmod 777 $(DEST)/x2t
-	
+	chmod 777 $(DEST)/x2t
+
 	echo "Done" > $@
 
 $(RPM):	documentcreator
