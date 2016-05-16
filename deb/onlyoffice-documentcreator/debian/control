@@ -1,0 +1,11 @@
+Source: onlyoffice-documentcreator
+Section: utils
+Priority: optional
+Maintainer: Ascensio System SIA <support@onlyoffice.com>
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: onlyoffice-documentcreator
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, libstdc++6 (>= 4.9.0), libcurl3, libxml2, libboost-regex-dev, zlib1g, libxss1, libgtkglext1, libcairo2, xvfb, libxtst6, libgconf2-4, libasound2
+Description: tool to create documents in office file formats including Office Open XML formats:
+ .docx, .xlsx, .pptx.
