@@ -44,6 +44,9 @@ DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
@@ -76,7 +79,7 @@ clean:
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(DOCKER_TARGETS)\
-		$(DOCUMENTSERVER)\
+		$(DOCUMENTSERVER_FILES)\
 		documentserver \
 		documentserver-example
 		
@@ -84,7 +87,7 @@ clean-docker:
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
-	mkdir -p $(DOCUMENTSERVER)/web-apps $(DOCUMENTSERVER)/server
+	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)
 	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
 
@@ -104,6 +107,7 @@ documentserver:
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen
 	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown.sh
+	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts.sh
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
