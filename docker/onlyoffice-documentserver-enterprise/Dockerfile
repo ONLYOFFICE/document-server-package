@@ -1,10 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8 
-ENV DEBIAN_FRONTEND noninteractive
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive
 
 RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     apt-get -y update && \
