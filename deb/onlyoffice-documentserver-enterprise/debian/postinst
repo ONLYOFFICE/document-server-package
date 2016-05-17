@@ -99,7 +99,7 @@ case "$1" in
 		chown onlyoffice:onlyoffice -R "$DIR"
 		
 		# generate allfonts.js and thumbnail
-		./documentserver-generate-allfonts.sh
+		documentserver-generate-allfonts.sh
 		
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"
