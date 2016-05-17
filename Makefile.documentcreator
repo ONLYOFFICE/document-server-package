@@ -33,7 +33,7 @@ CORE_PATH := ../core
 PLATFORM := linux_64
 LIB_PATH := $(CORE_PATH)/build/lib/$(PLATFORM)
 BIN_PATH := $(CORE_PATH)/build/bin
-JSBUILDER_PATH := $(CORE_PATH)/build/jsbuilder
+JSBUILDER_PATH := $(CORE_PATH)/build/jsbuilder/**
 
 SRC += $(BIN_PATH)/docbuilder/docbuilder_linux64
 SRC += $(BIN_PATH)/linux/x2t
