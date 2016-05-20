@@ -30,6 +30,8 @@ RUN apt-get -y update && \
         libgconf2-dev \
         default-jre \
         qt5-default \
+        libqt5x11extras5-dev \
+        qtbase5-private-dev \
         nodejs && \
     npm install -g grunt-cli && \
     npm cache clean && \
