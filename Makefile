@@ -103,7 +103,7 @@ documentserver:
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 	
-	mv -t $(DOCUMENTSERVER) $(DOCUMENTSERVER)/server/LICENSE.txt $(DOCUMENTSERVER)/server/3rd-Party.txt $(DOCUMENTSERVER)/server/license
+	mv -f -t $(DOCUMENTSERVER) $(DOCUMENTSERVER)/server/LICENSE.txt $(DOCUMENTSERVER)/server/3rd-Party.txt $(DOCUMENTSERVER)/server/license
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
