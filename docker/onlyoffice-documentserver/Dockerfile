@@ -32,7 +32,7 @@ EXPOSE 80 443
 RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" | tee /etc/apt/sources.list.d/onlyoffice.list && \
     apt-get -y update && \
     service mysql start && \
-    apt-get --force-yes -yq install onlyoffice-documentserver-enterprise && \
+    apt-get --force-yes -yq install onlyoffice-documentserver && \
     service mysql stop && \
     chmod 755 /app/onlyoffice/*.sh && \
     rm -rf /var/lib/apt/lists/*
