@@ -48,6 +48,10 @@ DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
 
+LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
+LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
+LICENSE_FILES += $(DOCUMENTSERVER)/server/license
+
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
@@ -103,7 +107,8 @@ documentserver:
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 	
-	mv -f -t $(DOCUMENTSERVER) $(DOCUMENTSERVER)/server/LICENSE.txt $(DOCUMENTSERVER)/server/3rd-Party.txt $(DOCUMENTSERVER)/server/license
+	cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILES)
+	rm -fr $(LICENSE_FILES)
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
