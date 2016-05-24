@@ -1,5 +1,5 @@
 Summary: Online viewers and editors for text, spreadsheet and presentation files
-Name: onlyoffice-documentserver-enterprise
+Name: onlyoffice-documentserver
 Version: {{PRODUCT_VERSION}}
 Release: {{BUILD_NUMBER}}
 License: AGPL
