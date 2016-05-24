@@ -47,6 +47,7 @@ mkdir -p ${LOG_DIR}-example
 # Set up nginx
 sed 's/^worker_processes.*/'"worker_processes ${NGINX_WORKER_PROCESSES};"'/' -i ${NGINX_CONFIG_PATH}
 sed 's/worker_connections.*/'"worker_connections ${NGINX_WORKER_CONNECTIONS};"'/' -i ${NGINX_CONFIG_PATH}
+sed 's/access_log.*/'"access_log off;"'/' -i ${NGINX_CONFIG_PATH}
 
 # setup HTTPS
 if [ -f "${SSL_CERTIFICATE_PATH}" -a -f "${SSL_KEY_PATH}" ]; then
