@@ -8,7 +8,7 @@ DB_HOST=""
 DB_NAME=""
 DB_USER=""
 DB_PWD=""
-DEFAULT_CONFIG="/var/www/onlyoffice/documentserver/NodeJsProjects/Common/config/default.json"
+DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
 
 apply_connection_string(){
 	if [ -d /var/www/onlyoffice/ ]; then

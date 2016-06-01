@@ -1,0 +1,126 @@
+COMPANY_NAME := onlyoffice
+PRODUCT_NAME := documentcreator
+PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
+PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
+
+RPM_ARCH = x86_64
+DEB_ARCH = amd64
+
+RPM_BUILD_DIR = $(PWD)/rpm/builddir
+DEB_BUILD_DIR = $(PWD)/deb
+
+RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
+DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
+
+DEB_REPO := $(PWD)/repo
+DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
+
+RPM_REPO := $(PWD)/repo-rpm
+RPM_REPO_DATA := $(RPM_REPO)/repodata
+
+RPM_REPO_OS_NAME = centos
+RPM_REPO_OS_VER = 7
+RPM_REPO_DIR = $(RPM_REPO_OS_NAME)/$(RPM_REPO_OS_VER)
+
+DEB_REPO_OS_NAME = ubuntu
+DEB_REPO_OS_VER = trusty
+DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
+
+RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
+DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
+
+CORE_PATH := ../core
+PLATFORM := linux_64
+LIB_PATH := $(CORE_PATH)/build/lib/$(PLATFORM)
+BIN_PATH := $(CORE_PATH)/build/bin
+JSBUILDER_PATH := $(CORE_PATH)/build/jsbuilder/**
+
+SRC += $(BIN_PATH)/docbuilder/docbuilder_linux64
+SRC += $(BIN_PATH)/linux/x2t
+SRC += $(BIN_PATH)/linux/icudtl_dat.S
+SRC += $(BIN_PATH)/icu/linux_64/libicudata.so.55
+SRC += $(BIN_PATH)/icu/linux_64/libicuuc.so.55
+SRC += $(JSBUILDER_PATH)
+SRC += $(LIB_PATH)/libDjVuFile.so
+SRC += $(LIB_PATH)/libdoctrenderer.so
+SRC += $(LIB_PATH)/libHtmlFile.so
+SRC += $(LIB_PATH)/libHtmlRenderer.so
+SRC += $(LIB_PATH)/libPdfReader.so
+SRC += $(LIB_PATH)/libPdfWriter.so
+SRC += $(LIB_PATH)/libXpsFile.so
+SRC += $(LIB_PATH)/libUnicodeConverter.so
+SRC += $(LIB_PATH)/libHtmlFile.so
+
+DEST := common/documentcreator/home
+
+.PHONY: all clean deb deploy
+
+all: deb
+
+rpm: $(RPM)
+
+deb: $(DEB)
+
+clean:
+	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
+		$(DEB_PACKAGE_DIR)/*.changes\
+		$(RPM_BUILD_DIR)\
+		$(DEB_REPO)\
+		$(RPM_REPO)\
+		documentcreator
+
+documentcreator:
+	mkdir -p $(DEST)
+	cp -rf -t $(DEST) $(SRC)
+
+	chmod 777 $(DEST)/docbuilder_linux64
+	chmod 777 $(DEST)/x2t
+
+	echo "Done" > $@
+
+$(RPM):	documentcreator
+	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
+	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
+
+	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
+
+$(DEB): documentcreator
+	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+
+	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
+
+$(RPM_REPO_DATA): $(RPM)
+	rm -rfv $(RPM_REPO)
+	mkdir -p $(RPM_REPO)
+
+	cp -rv $(RPM) $(RPM_REPO);
+	createrepo -v $(RPM_REPO);
+
+	aws s3 sync \
+		$(RPM_REPO) \
+		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
+		--acl public-read --delete
+
+	aws s3 sync \
+		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
+		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
+		--acl public-read --delete
+
+$(DEB_REPO_DATA): $(DEB)
+	rm -rfv $(DEB_REPO)
+	mkdir -p $(DEB_REPO)
+
+	cp -rv $(DEB) $(DEB_REPO);
+	dpkg-scanpackages -m repo /dev/null | gzip -9c > $(DEB_REPO_DATA)
+
+	aws s3 sync \
+		$(DEB_REPO) \
+		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
+		--acl public-read --delete
+
+	aws s3 sync \
+		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
+		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
+		--acl public-read --delete
+
+deploy: $(DEB_REPO_DATA)

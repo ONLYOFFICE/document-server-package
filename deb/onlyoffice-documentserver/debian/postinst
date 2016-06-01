@@ -60,7 +60,7 @@ install_db(){
 		$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';"
 	fi
 	
-	$MYSQL "$DB_NAME" < "$DIR/documentserver/Schema/MySql.CreateDb.sql"
+	$MYSQL "$DB_NAME" < "$DIR/documentserver/server/schema/createdb.sql"
 }
 
 apply_connection_string(){
@@ -87,18 +87,19 @@ case "$1" in
 
 		# modify permissions for onlyoffice files and folders
 		mkdir -p "$LOG_DIR/documentserver/docservice"
-		mkdir -p "$LOG_DIR/documentserver/example"
+		mkdir -p "$LOG_DIR/documentserver-example"
 		mkdir -p "$LOG_DIR/documentserver/converter"
 		mkdir -p "$LOG_DIR/documentserver/spellchecker"
 		mkdir -p "$LOG_DIR/documentserver/metrics"
-		
+		mkdir -p "$LOG_DIR/documentserver/gc"
+
 		mkdir -p "$APP_DIR/documentserver/App_Data"
 		mkdir -p "$APP_DIR/documentserver/App_Data/cache/files"
 		mkdir -p "$DIR/Data"
 		chown onlyoffice:onlyoffice -R "$DIR"
 		
 		# generate allfonts.js and thumbnail
-		sudo -u onlyoffice "$DIR/documentserver/Tools/AllFontsGen" "/usr/share/fonts" "$DIR/documentserver/OfficeWeb/sdk/Common/AllFonts.js" "$DIR/documentserver/OfficeWeb/sdk/Common/Images" "$DIR/documentserver/NodeJsProjects/FileConverter/Bin/font_selection.bin"
+		sudo -u onlyoffice "$DIR/documentserver/server/tools/AllFontsGen" "/usr/share/fonts" "$DIR/documentserver/sdkjs/common/AllFonts.js" "$DIR/documentserver/sdkjs/common/Images" "$DIR/documentserver/server/FileConverter/bin/font_selection.bin"
 		
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"

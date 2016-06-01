@@ -3,7 +3,7 @@ PRODUCT_NAME := documentserver-enterprise
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-ifeq ($(GIT_BRANCH), origin/master)
+ifeq ($(GIT_BRANCH), origin/develop)
 DOCKER_TAGS += $(PACKAGE_VERSION)
 DOCKER_TAGS += latest
 else
@@ -41,13 +41,23 @@ DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 
-DOCUMENTSERVER = common/documentserver
-DOCUMENTSERVER_CONFIG = common/config/documentserver
+DOCUMENTSERVER = common/documentserver/home
+DOCUMENTSERVER_BIN = common/documentserver/bin
+DOCUMENTSERVER_CONFIG = common/documentserver/config
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
 
-DOCUMENTSERVER_EXAMPLE = common/documentserver-example
-DOCUMENTSERVER_EXAMPLE_CONFIG = common/config/documentserver-example
+LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
+LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
+LICENSE_FILES += $(DOCUMENTSERVER)/server/license
 
-.PHONY: all clean rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
+DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
+DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
+
+FONTS = common/fonts
+
+.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
 
 all: rpm deb
 
@@ -73,14 +83,15 @@ clean:
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(DOCKER_TARGETS)\
-		$(DOCUMENTSERVER)\
+		$(DOCUMENTSERVER_FILES)\
 		documentserver \
 		documentserver-example
-	sudo docker rm $$(sudo docker ps -a -q) || exit 0
+		
+clean-docker:
 	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
 
 documentserver:
-	mkdir -p $(DOCUMENTSERVER)/web-apps $(DOCUMENTSERVER)/server
+	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)
 	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
 
@@ -95,13 +106,22 @@ documentserver:
 
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
+	
+	cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILES)
+	rm -fr $(LICENSE_FILES)
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen
+	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown.sh
+	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts.sh
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	
+	mkdir -p $(FONTS)/Asana-Math
+	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
+	wget -O $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
 	
 	echo "Done" > $@
 
@@ -120,7 +140,7 @@ documentserver-example:
 	echo "Done" > $@
 
 $(RPM):	documentserver documentserver-example
-	chmod u+x rpm/Files/onlyoffice/configure.sh
+	chmod u+x rpm/bin/documentserver-configure.sh
 	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
 

@@ -1,0 +1,152 @@
+Template: onlyoffice/db-host
+Type: string
+Default: localhost
+Description: MySQL host:
+
+Template: onlyoffice/db-user
+Type: string
+Default: root
+Description: MySQL user:
+
+Template: onlyoffice/db-pwd
+Type: password
+Description: MySQL password:
+
+Template: onlyoffice/db-name
+Type: string
+Default: onlyoffice
+Description: MySQL database name:
+
+Template: onlyoffice/remove-db
+Type: boolean
+Default: false
+Description: Remove database?
+ This operation will remove the database which contain all ONLYOFFICE data. It is recommended to take backup before removing the database.
+
+Template: onlyoffice/present-onlyoffice-license
+Type: note
+Description: ONLYOFFICE Enterprise Edition
+ LICENSE AGREEMENT
+ .
+ .
+ IMPORTANT – READ CAREFULLY: BY CLICKING THE “I ACCEPT” BUTTON OR INSTALLING, DOWNLOADING OR OTHERWISE USING ONLYOFFICE AND ANY RELATED DOCUMENTATION, YOU, ON BEHALF OF YOURSELF OR AS AN AUTHORIZED REPRESENTATIVE ON BEHALF OF AN ENTITY (“LICENSEE”) AGREE TO ALL THE TERMS OF THIS ONLYOFFICE COMMERCIAL LICENSE AGREEMENT (THE “AGREEMENT”) REGARDING YOUR USE OF ONLYOFFICE ENTERPRISE EDITION. YOU REPRESENT AND WARRANT THAT YOU HAVE FULL LEGAL AUTHORITY TO BIND THE LICENSEE TO THIS AGREEMENT. IF YOU DO NOT AGREE WITH ALL OF THESE TERMS, DO NOT PRESS THE “I ACCEPT” BUTTON AND DO NOT INSTALL, DOWNLOAD OR OTHERWISE USE ONLYOFFICE.
+ .
+ 1.Definitions.
+ .
+ “ONLYOFFICE Free Edition” means office server software provided by Ascensio System SIA, its object code, binary codes, compiled object code as well as any related documentation in accordance with the description on the official site www.onlyoffice.com.
+ .
+ “ONLYOFFICE Enterprise Edition” means an advanced version of ONLYOFFICE Free Edition, its compiled object code as well as any related documentation.
+ .
+ "ONLYOFFICE" means ONLYOFFICE Free Edition and ONLYOFFICE Enterprise Edition in accordance with the official site at www.onlyoffice.com.
+ .
+ “Effective date” is the date on which Licensee clicks “I accept” button or otherwise installs, downloads or uses ONLYOFFICE.
+ .
+ “License key” means a computer file containing a unique combination of characters that allows Licensee to upgrade to ONLYOFFICE Enterprise Edition.
+ .
+ “License fee” means a regular payment by Licensee to Ascensio System SIA for the right to use ONLYOFFICE Enterprise Edition.
+ .
+ 2. License Grant.
+ .
+ 2.1. You are hereby granted a non-exclusive, non-transferable, non-sublicensable license to install and use ONLYOFFICE Enterprise Edition in accordance with this Agreement and to provide access to ONLYOFFICE to your clients.
+ .
+ 2.2. We reserve all rights not expressly granted to you under this Agreement.
+ .
+ 2.3. Nothing in this Agreement shall limit our rights to use, license, sublicense or otherwise exploit ONLYOFFICE Enterprise Edition or to permit third parties to do so.
+ .
+ 3. Ownership
+ .
+ Please note that this is a license agreement and not a sales contract. We reserve all intellectual property rights to ONLYOFFICE and its original components including trademarks and related confidential information.
+ .
+ 4. Upgrading from ONLYOFFICE Free Edition to ONLYOFFICE Enterprise Edition.
+ .
+ You have the right to upgrade to ONLYOFFICE Enterprise Edition at any time by paying Ascensio System SIA a License fee. If you make use of this right, the following provisions shall apply. By paying the License Fee you accept these provisions and agree them to be binding upon it. The following provisions are without prejudice to other clauses of this Agreement which shall continue to have full force and effect.
+ .
+ 5. Providing License key(s).
+ .
+ 5.1. You shall pay to Ascensio System SIA a License fee. The License Fee is payable every one or every three years according to the selected plan listed on the official site www.onlyoffice.com since you start using ONLYOFFICE Enterprise Edition on any particular server.
+ .
+ 5.2. Upon receiving the License fee Ascensio System SIA will send you a License key along with instructions on how to activate it. You must use one License key per server. For example, if you want to use ONLYOFFICE Enterprise Edition on two different servers you should purchase two License keys.
+ .
+ 5.3. Any License fees that have already been paid are non-refundable.
+ .
+ 5.4. You should activate your copy of ONLYOFFICE Free Edition by inserting the License key sent in the appropriate field of your copy of ONLYOFFICE Free Edition.
+ .
+ 5.5. After the License key is expired the activated copy of ONLYOFFICE Enterprise Edition reverts to ONLYOFFICE Free Edition for all the functions except of re-branding functionality.
+ .
+ 6. Re-branding.
+ .
+ 6.1. You have a re-branding option available. This option implies that you may use ONLYOFFICE Enterprise Edition under your own brand name and logo provided that you have paid us the License fee.
+ .
+ 6.2. In this case, you may arrange for your own brand name and/or logo for ONLYOFFICE Enterprise Edition in accordance with our technical specifications or request us to develop your logo for you. We agree to provide you technical services with a view to integrate your brand name and/or logo into your version of ONLYOFFICE.
+ .
+ 6.3. Once you have changed the logos in ONLYOFFICE Enterprise Edition using the appropriate function the selected logos are available
+ .
+ 7. Restrictions on Use.
+ .
+ 7.1. You cannot modify the source code, binary codes, object codes and/or resource files comprising ONLYOFFICE in any way including alteration, removing or obscuring copyright, patent, trademark, and attribution notices contained therein.
+ .
+ 7.2. You may not develop a derivative or competitive product or service on the basis of ONLYOFFICE, i.e. a product or service using similar ideas, features, functions or graphic elements as those in ONLYOFFICE or use ONLYOFFICE as a ready SaaS solution.
+ .
+ 7.3. You may not copy functions, features, authentic components and graphic elements of ONLYOFFICE.
+ .
+ 7.4. You may not interfere with or disrupt the integrity or performance of ONLYOFFICE or any data contained therein.
+ .
+ 7.5. You may not remove, obscure or interfere with any logo, copyright, attribution, trademark notice, warning or disclaimer statements annexed to, incorporated in or otherwise applied to ONLYOFFICE.
+ .
+ 7.6. You are not permitted to use trade names, trademarks, service marks, or product names of Ascensio System SIA, except as required for reasonable and customary use of ONLYOFFICE.
+ .
+ 8. Support and services.
+ .
+ 8.1. We will provide you with consulting help and updates for ONLYOFFICE Enterprise Edition once they are available in accordance with the Section 8 of this Agreement.
+ .
+ 8.2. Our services include
+ .
+  • provision of updates for ONLYOFFICE Enterprise Edition once they are available as long as your License key for ONLYOFFICE Enterprise Edition is valid,
+  • technical consulting services.
+ .
+ 8.3. All the Services excluding consulting services are provided via ONLYOFFICE Control Panel.
+ .
+ 8.4. If you need consulting help when using ONLYOFFICE you may file a request by writing a letter to server@onlyoffice.com.
+ .
+ 9. Additional Restrictions.
+ .
+ 9.1. You should not make its License key(s) available to any third persons that do not have access to the you copy of ONLYOFFICE. You should take any reasonable measures with a view to prevent such third persons from receiving your License key(s).
+ .
+ 9.2. You should not try to disassemble, reverse engineer, analyze, decompile or convert your copy of ONLYOFFICE Enterprise Edition or permit third parties to do so.
+ .
+ 10. Term and Termination.
+ .
+ 10.1. Your License for ONLYOFFICE Enterprise Edition is valid for the time of validity of your License key according to the pricing plan selected by you in accordance with our official site at www.onlyoffice.com.
+ .
+ 10.2. You may cease to use ONLYOFFICE Enterprise Edition at any time.
+ .
+ 10.3. Ascensio System SIA may deprive you of the right to use ONLYOFFICE if you do not comply with this Agreement.
+ .
+ 11. Disclaimer of Warranty.
+ .
+ ONLYOFFICE IS PROVIDED “AS IS,” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL ASCENSIO SYSTEM SIA OR THE AUTHORS OR COPYRIGHT HOLDERS IN ONLYOFFICE BE LIABLE FOR ANY CLAIM, DAMAGES (INCLUDING, WITHOUT LIMITATION, DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES) OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH ONLYOFFICE OR THE USE OR OTHER DEALINGS IN ONLYOFFICE. IN ANY CASE, LIABILITY OF ASCENSIO SYSTEM SIA FOR ANY DAMAGE CAUSED TO LICENSEE SHALL BE LIMITED BY LICENSE FEES THAT LICENSEE HAVE PAID UNDER THIS AGREEMENT.
+ .
+ 12. Limitation of Liability.
+ .
+ Ascensio System SIA is not responsible for any problems with ONLYOFFICE which are not directly related to it. These problems include, but are not limited to, its incompatibility or conflicts with any server software, hardware, improper functioning of local network, lack of proper Internet connection, failure to comply with technical specifications for ONLYOFFICE published on www.onlyoffice.com etc.
+ .
+ 13. Miscellaneous
+ .
+ 13.1. If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions of the Agreement will remain in full force and effect.
+ .
+ 13.2. This Agreement constitutes an entire agreement between you and us and govern your use of ONLYOFFICE except and to the extent that you have entered into a separate agreement on the subject.
+ .
+ 13.3. This Agreement supersedes any prior agreements or earlier versions of this Agreement as far as the use of ONLYOFFICE is concerned.
+ .
+ 13.4. This Agreement shall be governed by and construed in accordance with the laws of Latvia.
+
+Template: onlyoffice/accepted-onlyoffice-license
+Type: boolean
+Default: false
+Description: Do you accept the license agreement terms?
+ In order to install ONLYOFFICE Enterprise Edition, you must accept the ONLYOFFICE Enterprise Edition LICENSE AGREEMENT terms. If you decline to accept it, the installation will be canceled.
+
+Template: onlyoffice/error-onlyoffice-license
+Type: error
+Description: Declined ONLYOFFICE Enterprise Edition LICENSE AGREEMENT
+ If you do not agree to the ONLYOFFICE Enterprise Edition LICENSE AGREEMENT terms, you cannot proceed with the installation.

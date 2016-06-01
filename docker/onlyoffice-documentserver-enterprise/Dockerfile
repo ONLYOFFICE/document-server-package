@@ -1,9 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8 
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive
 
 RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     apt-get -y update && \
@@ -12,7 +10,6 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1655A0AB68576280 && \
     echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list && \
     echo "deb https://deb.nodesource.com/node_4.x trusty main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    DEBIAN_FRONTEND=noninteractive  && \
     locale-gen en_US.UTF-8 && \
     apt-get -y update && \
     echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections && \
@@ -28,22 +25,19 @@ RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d && \
     service nginx stop && \
     rm -rf /var/lib/apt/lists/*
 
-RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver-enterprise/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" >> /etc/apt/sources.list && \
-    DEBIAN_FRONTEND=noninteractive  && \
+ADD config /app/onlyoffice/setup/config/
+ADD run-document-server.sh /app/onlyoffice/run-document-server.sh
+
+EXPOSE 80 443
+
+RUN echo "deb http://repo-doc-onlyoffice-com.s3.amazonaws.com/ubuntu/trusty/onlyoffice-documentserver-enterprise/{{SVN_TAG}}/{{PACKAGE_VERSION}}/ repo/" | tee /etc/apt/sources.list.d/onlyoffice.list && \
     apt-get -y update && \
     service mysql start && \
     apt-get --force-yes -yq install onlyoffice-documentserver-enterprise && \
     service mysql stop && \
+    chmod 755 /app/onlyoffice/*.sh && \
     rm -rf /var/lib/apt/lists/*
 
-ADD config /app/onlyoffice/setup/config/
-ADD run-document-server.sh /app/onlyoffice/run-document-server.sh
-RUN chmod 755 /app/onlyoffice/*.sh
-
-VOLUME ["/var/log/onlyoffice"]
-VOLUME ["/var/www/onlyoffice/Data"]
-
-EXPOSE 80
-EXPOSE 443
+VOLUME /etc/onlyoffice /var/log/onlyoffice /var/lib/onlyoffice /var/www/onlyoffice/Data
 
 CMD bash -C '/app/onlyoffice/run-document-server.sh';'bash'

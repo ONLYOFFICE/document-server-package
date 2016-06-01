@@ -1,0 +1,45 @@
+FROM centos:7
+MAINTAINER Ascensio System SIA <support@onlyoffice.com>
+
+RUN yum -y install curl && \
+    curl --silent --location https://rpm.nodesource.com/setup_4.x | bash - && \
+    yum -y groupinstall 'Development Tools' && \
+    yum -y install  \
+        wget \
+        sed \
+        libstdc++-static \
+        libxml2-devel \
+        boost-devel \
+        libcurl-devel \
+        glib2-devel \
+        gtk2-devel \
+        gdk-pixbuf2-devel \
+        atk-devel \
+        cairo-devel \
+        libX11-devel \
+        GConf2-devel \
+        libXScrnSaver-devel \
+        libXtst-devel \
+        qt5-qtbase-devel \
+        qt5-qtx11extras-devel \
+        java-1.7.0-openjdk \
+        nodejs && \
+    yum -y install epel-release && \
+    yum -y updateinfo && \
+    yum -y install \
+        gtkglext-devel \
+        qt5-qtbase-devel \
+        qt5-qtx11extras-devel && \
+    npm install -g grunt-cli && \
+    npm cache clean && \
+    ln -s /usr/lib64/qt5/bin/qmake /usr/bin/qmake && \
+    yum clean all
+
+ADD build.sh /app/onlyoffice/build.sh
+ADD build-bin.sh /app/onlyoffice/build-bin.sh
+ADD build-desktop.sh /app/onlyoffice/build-desktop.sh
+ADD build-desktop-rpm.sh /app/onlyoffice/build-desktop-package.sh
+
+VOLUME /var/lib/onlyoffice /home/oleg
+
+CMD bash -C '/app/onlyoffice/build.sh'
