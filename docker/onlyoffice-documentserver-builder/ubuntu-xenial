@@ -40,7 +40,7 @@ RUN apt-get -y update && \
     rm qt-everywhere-opensource-src-5.6.1.tar.gz && \
     cd qt-everywhere-opensource-src-5.6.1 && \
     ./configure -opensource -confirm-license && \
-    make && \
+    make -j && \
     make install && \
     printf "/usr/local/qt-everywhere-opensource-src-5.6.1/bin\n/usr/local/qt-everywhere-opensource-src-5.6.1/lib" > /etc/xdg/qtchooser/qt56.conf && \
     npm install -g grunt-cli && \
