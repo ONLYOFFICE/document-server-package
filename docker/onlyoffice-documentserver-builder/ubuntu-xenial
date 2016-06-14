@@ -35,15 +35,15 @@ RUN apt-get -y update && \
         libglu1-mesa-dev \
         libxrender-dev \
         nodejs && \
-    wget http://download.qt.io/official_releases/qt/5.6/5.6.1/single/qt-everywhere-opensource-src-5.6.1.tar.gz && \
-    tar -xvzf qt-everywhere-opensource-src-5.6.1.tar.gz && \
-    rm qt-everywhere-opensource-src-5.6.1.tar.gz && \
-    cd qt-everywhere-opensource-src-5.6.1 && \
+    wget http://download.qt.io/official_releases/qt/5.6/5.6.0/single/qt-everywhere-opensource-src-5.6.0.tar.gz && \
+    tar -xvzf qt-everywhere-opensource-src-5.6.0.tar.gz && \
+    rm qt-everywhere-opensource-src-5.6.0.tar.gz && \
+    cd qt-everywhere-opensource-src-5.6.0 && \
     ./configure -opensource -confirm-license && \
     make -j $(grep -c ^processor /proc/cpuinfo) && \
     make install && \
     mkdir -p /etc/xdg/qtchooser && \
-    printf "/usr/local/Qt-5.6.1/bin\n/usr/local/Qt-5.6.1/lib" > /etc/xdg/qtchooser/qt56.conf && \
+    printf "/usr/local/Qt-5.6.0/bin\n/usr/local/Qt-5.6.0/lib" > /etc/xdg/qtchooser/qt56.conf && \
     npm install -g grunt-cli && \
     npm cache clean && \
     rm -rf /var/lib/apt/lists/*
