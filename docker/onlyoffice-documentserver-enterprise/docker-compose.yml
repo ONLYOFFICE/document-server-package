@@ -2,7 +2,7 @@ version: '2'
 services:
   onlyoffice-document:
     container_name: onlyoffice-document
-    image: onlyoffice4enterprise/documentserver-ee:3.8.0.350
+    image: onlyoffice/4testing-documentserver-enterp:3.8.1-6-origin-release-3.8.1
     depends_on:
       - onlyoffice-mysql
       - onlyoffice-redis
@@ -51,7 +51,6 @@ services:
     container_name: onlyoffice-mysql
     image: mysql:5.6
     environment:
-      - MYSQL_ROOT_PASSWORD=i
       - MYSQL_DATABASE=onlyoffice
       - MYSQL_USER=root
       - MYSQL_ALLOW_EMPTY_PASSWORD='true'
