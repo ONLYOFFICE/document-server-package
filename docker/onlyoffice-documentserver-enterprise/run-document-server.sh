@@ -132,8 +132,8 @@ cp ${SYSCONF_TEMPLATES_DIR}/supervisor/supervisor /etc/init.d/
 # Copy modified supervisor config
 cp ${SYSCONF_TEMPLATES_DIR}/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 
-# Regenerate the fonts list and the fonts thumbnails
-documentserver-generate-allfonts.sh
-
 service nginx start
 service supervisor start
+
+# Regenerate the fonts list and the fonts thumbnails
+documentserver-generate-allfonts.sh
