@@ -101,7 +101,7 @@ if [ ${MYSQL_SERVER_HOST} != "localhost" ]; then
 
   # Create  db on remote server
   ${MYSQL} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_SERVER_DB_NAME} CHARACTER SET utf8 COLLATE 'utf8_general_ci';"
-  ${MYSQL} "${MYSQL_SERVER_DB_NAME}" < "${APP_DIR}/Schema/MySql.CreateDb.sql"
+  ${MYSQL} "${MYSQL_SERVER_DB_NAME}" < "${APP_DIR}/server/schema/createdb.sql"
 else
   service mysql start
 fi
