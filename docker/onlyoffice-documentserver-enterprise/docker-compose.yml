@@ -27,6 +27,7 @@ services:
     volumes:
        - document_data:/var/www/onlyoffice/Data
        - document_log:/var/log/onlyoffice
+       - document_files:/var/lib/onlyoffice/documentserver/App_Data/cache/files
 
   onlyoffice-haproxy:
     container_name: onlyoffice-haproxy
@@ -90,3 +91,4 @@ volumes:
   mysql_data:
   document_data:
   document_log:
+  document_files:
