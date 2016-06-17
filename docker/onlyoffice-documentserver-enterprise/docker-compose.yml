@@ -37,6 +37,8 @@ services:
     environment:
       - MODE=tcp
       - TCP_PORTS='80, 443'
+    stdin_open: true
+    tty: true
     links:
      - onlyoffice-document
     volumes:
