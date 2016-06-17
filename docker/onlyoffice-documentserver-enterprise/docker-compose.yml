@@ -1,7 +1,6 @@
 version: '2'
 services:
   onlyoffice-document:
-    container_name: onlyoffice-document
     image: onlyoffice/4testing-documentserver-enterp:3.8.1-6-origin-release-3.8.1
     depends_on:
       - onlyoffice-mysql
