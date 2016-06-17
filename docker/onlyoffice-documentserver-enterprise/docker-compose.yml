@@ -29,6 +29,22 @@ services:
        - document_data:/var/www/onlyoffice/Data
        - document_log:/var/log/onlyoffice
 
+  onlyoffice-haproxy:
+    container_name: onlyoffice-haproxy
+    image: dockercloud/haproxy:1.2.1
+    depends_on:
+      - onlyoffice-document
+    environment:
+      - TCP_PORTS='80, 443'
+    links:
+     - onlyoffice-document
+    restart: always
+    networks:
+     - onlyoffice
+    ports:
+      - '80:80'
+      - '443:443'
+       
   onlyoffice-redis:
     container_name: onlyoffice-redis
     image: redis
