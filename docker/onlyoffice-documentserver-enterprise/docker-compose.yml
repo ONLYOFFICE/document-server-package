@@ -49,7 +49,7 @@ services:
 
   onlyoffice-mysql:
     container_name: onlyoffice-mysql
-    image: mysql:5.6
+    image: mysql:5.5
     environment:
       - MYSQL_DATABASE=onlyoffice
       - MYSQL_USER=root
