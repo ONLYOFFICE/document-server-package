@@ -35,9 +35,12 @@ services:
     depends_on:
       - onlyoffice-document
     environment:
+      - MODE=tcp
       - TCP_PORTS='80, 443'
     links:
      - onlyoffice-document
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     networks:
      - onlyoffice
