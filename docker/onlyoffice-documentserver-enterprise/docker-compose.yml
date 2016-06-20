@@ -16,6 +16,8 @@ services:
       - RABBITMQ_SERVER_PASS=guest
       - REDIS_SERVER_HOST=onlyoffice-redis
       - REDIS_SERVER_PORT=6379
+      - HTTP_CHECK=HEAD /healthcheck
+      - EXTRA_SETTINGS=http-check expect status 200
     stdin_open: true
     tty: true
     restart: always
@@ -50,6 +52,7 @@ services:
     ports:
       - '80:80'
       - '443:443'
+      - '1936:1936'
        
   onlyoffice-redis:
     container_name: onlyoffice-redis
