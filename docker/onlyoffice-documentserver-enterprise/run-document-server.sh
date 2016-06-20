@@ -33,9 +33,17 @@ MYSQL_SERVER_PASS=${MYSQL_SERVER_PASS:-""}
 RABBITMQ_SERVER_HOST=${RABBITMQ_SERVER_HOST:-"localhost"}
 RABBITMQ_SERVER_USER=${RABBITMQ_SERVER_USER:-"guest"}
 RABBITMQ_SERVER_PASS=${RABBITMQ_SERVER_PASS:-"guest"}
+RABBITMQ_SERVER_PORT=${RABBITMQ_SERVER_PORT:-"5672"}
 
 REDIS_SERVER_HOST=${REDIS_SERVER_HOST:-"localhost"}
 REDIS_SERVER_PORT=${REDIS_SERVER_PORT:-"6379"}
+
+waiting_for_connection(){
+  until nc -z -w 3 "$1" "$2"; do
+    >&2 echo "Waiting for connection to the $1 host on port $2"
+    sleep 1
+  done
+}
 
 # create base folders
 for i in converter docservice spellchecker metrics gc; do
@@ -98,6 +106,8 @@ if [ ${MYSQL_SERVER_HOST} != "localhost" ]; then
   if [ -n "${MYSQL_SERVER_PASS}" ]; then
     MYSQL="$MYSQL -p${MYSQL_SERVER_PASS}"
   fi
+  
+  waiting_for_connection ${MYSQL_SERVER_HOST} ${MYSQL_SERVER_PORT}
 
   # Create  db on remote server
   ${MYSQL} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_SERVER_DB_NAME} CHARACTER SET utf8 COLLATE 'utf8_general_ci';"
@@ -108,6 +118,8 @@ fi
 
 if [ ${RABBITMQ_SERVER_HOST} != "localhost" ]; then
 
+  waiting_for_connection ${RABBITMQ_SERVER_HOST} ${RABBITMQ_SERVER_PORT}
+  
   # Change rabbitmq settings
   ${JSON} -e "this.rabbitmq.url = 'amqp://${RABBITMQ_SERVER_HOST}'"
   ${JSON} -e "this.rabbitmq.login = '${RABBITMQ_SERVER_USER}'"
@@ -119,6 +131,8 @@ fi
 
 if [ ${REDIS_SERVER_HOST} != "localhost" ]; then
 
+  waiting_for_connection ${REDIS_SERVER_HOST} ${REDIS_SERVER_PORT}
+  
   # Change redis settings
   ${JSON} -e "this.services.CoAuthoring.redis.host = '${REDIS_SERVER_HOST}'"
   ${JSON} -e "this.services.CoAuthoring.redis.port = '${REDIS_SERVER_PORT}'"
