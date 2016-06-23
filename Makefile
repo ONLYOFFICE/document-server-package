@@ -1,5 +1,3 @@
-COMPANY_NAME := onlyoffice
-PRODUCT_NAME := documentserver-enterprise
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
@@ -10,8 +8,8 @@ else
 DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(GIT_BRANCH))
 endif
 
-#DOCKER_REPO = $(COMPANY_NAME)/$(PRODUCT_NAME)
-DOCKER_REPO := $(COMPANY_NAME)/4testing-documentserver-enterp
+DOCKER_REPO = $(COMPANY_NAME)/4testing-$(PRODUCT_NAME)
+
 COLON := __colon__
 DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)$(COLON)$(TAG))
 
