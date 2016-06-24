@@ -30,7 +30,8 @@ RUN apt-get -y update && \
         libgconf2-dev \
         default-jre \
         qtchooser \
-        nodejs && \
+        nodejs \
+        subversion && \
     npm install -g grunt-cli && \
     npm cache clean && \
     rm -rf /var/lib/apt/lists/*
