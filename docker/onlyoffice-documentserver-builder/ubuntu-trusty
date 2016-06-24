@@ -37,7 +37,7 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/*
     
 RUN cd ~ && \
-    svn export http://source.icu-project.org/repos/icu/icu/tags/release-3-6/ icu && \
+    svn export http://source.icu-project.org/repos/icu/icu/tags/release-55-1 icu && \
     cd icu/source && \
     ./configure && \
     make && \
