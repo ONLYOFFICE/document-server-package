@@ -31,22 +31,18 @@ RUN apt-get -y update && \
         default-jre \
         qtchooser \
         nodejs && \
-    cd /var/lib/onlyoffice && \
-    git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git && \
-    export PATH=`pwd`/depot_tools:"$PATH" && \
-    fetch v8 && \
-    gclient sync -r 4.10.253 && \
-    cd v8 && \
-    CFLAGS="-fPIC" CXXFLAGS="-fPIC" make native && \
-    cd .. &&  \
+    npm install -g grunt-cli && \
+    npm cache clean && \
+    rm -rf /var/lib/apt/lists/*
+    
+RUN cd ~ && \
     svn export http://source.icu-project.org/repos/icu/icu/tags/release-3-6/ icu && \
     cd icu/source && \
     ./configure && \
     make && \
     make install && \
-    npm install -g grunt-cli && \
-    npm cache clean && \
-    rm -rf /var/lib/apt/lists/*
+    cd ~ && \
+    rm -fr icu/
 
 ADD build.sh /app/onlyoffice/build.sh
 ADD build-bin.sh /app/onlyoffice/build-bin.sh
