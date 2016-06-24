@@ -6,7 +6,6 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=nonint
 RUN apt-get -y update && \
     apt-get install --force-yes -yq apt-transport-https locales software-properties-common curl && \
     curl -sL https://deb.nodesource.com/setup_4.x | bash - && \
-    add-apt-repository ppa:beineri/opt-qt551-trusty && \
     locale-gen en_US.UTF-8 && \
     apt-get -y update && \
     apt-get install --force-yes -yq \
@@ -31,8 +30,20 @@ RUN apt-get -y update && \
         libgconf2-dev \
         default-jre \
         qtchooser \
-        qt-latest \
         nodejs && \
+    cd /var/lib/onlyoffice && \
+    git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git && \
+    export PATH=`pwd`/depot_tools:"$PATH" && \
+    fetch v8 && \
+    gclient sync -r 4.10.253 && \
+    cd v8 && \
+    CFLAGS="-fPIC" CXXFLAGS="-fPIC" make native && \
+    cd .. &&  \
+    svn export http://source.icu-project.org/repos/icu/icu/tags/release-3-6/ icu && \
+    cd icu/source && \
+    ./configure && \
+    make && \
+    make install && \
     npm install -g grunt-cli && \
     npm cache clean && \
     rm -rf /var/lib/apt/lists/*
