@@ -1,7 +1,7 @@
 version: '2'
 services:
   onlyoffice-document:
-    image: onlyoffice/4testing-documentserver-enterp:latest
+    image: onlyoffice/4testing-documentserver:latest
     depends_on:
       - onlyoffice-mysql
       - onlyoffice-redis
