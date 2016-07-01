@@ -1,18 +1,6 @@
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-ifeq ($(GIT_BRANCH), origin/develop)
-DOCKER_TAGS += $(PACKAGE_VERSION)
-DOCKER_TAGS += latest
-else
-DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(GIT_BRANCH))
-endif
-
-DOCKER_REPO = $(COMPANY_NAME)/4testing-$(PRODUCT_NAME)
-
-COLON := __colon__
-DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)$(COLON)$(TAG))
-
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
 
@@ -55,7 +43,7 @@ DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
 FONTS = common/fonts
 
-.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
+.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
 
 all: rpm deb
 
@@ -63,31 +51,16 @@ rpm: $(RPM)
 
 deb: $(DEB)
 
-$(DOCKER_TARGETS): $(DEB_REPO_DATA)
-	sed "s|{{SVN_TAG}}|$(GIT_BRANCH)|"  -i docker/$(PACKAGE_NAME)/Dockerfile
-	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
-
-	cd docker/$(PACKAGE_NAME) &&\
-	sudo docker build -t $(subst $(COLON),:,$@) . &&\
-	mkdir -p $$(dirname ../../$@) &&\
-	echo "Done" > ../../$@
-
-docker: $(DOCKER_TARGETS)
-
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
-		$(DOCKER_TARGETS)\
 		$(DOCUMENTSERVER_FILES)\
 		documentserver \
 		documentserver-example
 		
-clean-docker:
-	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
-
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)
@@ -183,7 +156,4 @@ $(DEB_REPO_DATA): $(DEB)
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
 		--acl public-read --delete
 
-deploy-docker: $(DOCKER_TARGETS)
-	$(foreach TARGET,$(DOCKER_TARGETS),sudo docker push $(subst $(COLON),:,$(TARGET));)
-
-deploy: $(RPM_REPO_DATA) $(DEB_REPO_DATA) deploy-docker
+deploy: $(RPM_REPO_DATA) $(DEB_REPO_DATA)
