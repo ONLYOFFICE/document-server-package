@@ -90,8 +90,7 @@ clean-docker:
 
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)
-	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
+	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
 
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/*.json
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/log4js/*.json
