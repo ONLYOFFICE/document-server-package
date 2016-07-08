@@ -1,5 +1,10 @@
 #!/bin/sh
 
+ONLYOFFICE_DATA_CONTAINER=false
+if [ "$1" != "" ]; then
+    ONLYOFFICE_DATA_CONTAINER=$1
+fi
+
 DIR="/var/www/onlyoffice/documentserver"
 
 #Start generate AllFonts.js, font thumbnails and font_selection.bin
@@ -10,5 +15,7 @@ sudo -u onlyoffice "$DIR/server/tools/AllFontsGen"\
  "$DIR/server/FileConverter/bin/font_selection.bin"
 
 #Restart web-site and converter
-sudo supervisorctl restart onlyoffice-documentserver:docservice
-sudo supervisorctl restart onlyoffice-documentserver:converter
+if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
+ sudo supervisorctl restart onlyoffice-documentserver:docservice
+ sudo supervisorctl restart onlyoffice-documentserver:converter
+fi
