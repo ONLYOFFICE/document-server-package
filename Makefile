@@ -46,9 +46,11 @@ DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
 
-LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
-LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
-LICENSE_FILES += $(DOCUMENTSERVER)/server/license
+3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
+3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
+3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/license
+
+LICENSE_FILE = common/documentserver/license/$(PRODUCT_NAME)/LICENSE.txt
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
@@ -104,8 +106,10 @@ documentserver:
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 	
-	cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILES)
-	rm -fr $(LICENSE_FILES)
+	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
+	rm -fr $(3RD_PARTY_LICENSE_FILES)
+	
+	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE)
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
