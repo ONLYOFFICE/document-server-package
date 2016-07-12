@@ -50,7 +50,7 @@ DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/license
 
-LICENSE_FILE = common/documentserver/license/$(PRODUCT_NAME)/LICENSE.txt
+LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
