@@ -1,5 +1,3 @@
-COMPANY_NAME := onlyoffice
-PRODUCT_NAME := documentserver-enterprise
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
@@ -10,8 +8,8 @@ else
 DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(GIT_BRANCH))
 endif
 
-#DOCKER_REPO = $(COMPANY_NAME)/$(PRODUCT_NAME)
-DOCKER_REPO := $(COMPANY_NAME)/4testing-documentserver-enterp
+DOCKER_REPO = $(COMPANY_NAME)/4testing-$(PRODUCT_NAME)
+
 COLON := __colon__
 DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)$(COLON)$(TAG))
 
@@ -48,9 +46,11 @@ DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
 
-LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
-LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
-LICENSE_FILES += $(DOCUMENTSERVER)/server/license
+3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
+3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
+3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/license
+
+LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
@@ -92,8 +92,7 @@ clean-docker:
 
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf ../web-apps/deploy/* $(DOCUMENTSERVER)
-	cp -rf ../server/build/* $(DOCUMENTSERVER)/server
+	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
 
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/*.json
 	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/log4js/*.json
@@ -107,8 +106,10 @@ documentserver:
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 	
-	cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILES)
-	rm -fr $(LICENSE_FILES)
+	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
+	rm -fr $(3RD_PARTY_LICENSE_FILES)
+	
+	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE)
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal

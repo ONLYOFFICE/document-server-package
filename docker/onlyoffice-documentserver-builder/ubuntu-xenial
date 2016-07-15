@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
 MAINTAINER Ascensio System SIA <support@onlyoffice.com>
 
-ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive QT_SELECT=qt5
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 DEBIAN_FRONTEND=noninteractive QT_SELECT=qt56
 
 RUN apt-get -y update && \
     apt-get install --force-yes -yq apt-transport-https locales software-properties-common curl && \
@@ -29,10 +29,20 @@ RUN apt-get -y update && \
         libxss-dev \
         libgconf2-dev \
         default-jre \
-        qt5-default \
-        libqt5x11extras5-dev \
-        qtbase5-private-dev \
+        qtchooser \
+        "^libxcb.*" \
+        libx11-xcb-dev \
+        libglu1-mesa-dev \
+        libxrender-dev \
         nodejs && \
+    wget http://download.qt.io/official_releases/qt/5.6/5.6.1/single/qt-everywhere-opensource-src-5.6.1.tar.gz && \
+    tar -xvzf qt-everywhere-opensource-src-5.6.1.tar.gz && \
+    rm qt-everywhere-opensource-src-5.6.1.tar.gz && \
+    cd qt-everywhere-opensource-src-5.6.1 && \
+    ./configure -opensource -confirm-license && \
+    make -j && \
+    make install && \
+    printf "/usr/local/qt-everywhere-opensource-src-5.6.1/bin\n/usr/local/qt-everywhere-opensource-src-5.6.1/lib" > /etc/xdg/qtchooser/qt56.conf && \
     npm install -g grunt-cli && \
     npm cache clean && \
     rm -rf /var/lib/apt/lists/*
