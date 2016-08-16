@@ -43,7 +43,7 @@ LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
-DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/plugins
+DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/sdkjs-plugins
 
 FONTS = common/fonts
 
