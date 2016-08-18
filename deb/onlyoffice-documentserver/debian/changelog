@@ -1,4 +1,4 @@
-onlyoffice-documentserver ({{PACKAGE_VERSION}}) stable; urgency=low
+{{PACKAGE_NAME}} ({{PACKAGE_VERSION}}) stable; urgency=low
 
   * Initial release.
   
