@@ -43,6 +43,8 @@ LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
+DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/sdkjs-plugins
+
 FONTS = common/fonts
 
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
@@ -102,6 +104,9 @@ documentserver:
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
 	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
+
+	mkdir -p $(DOCUMENTSERVER_PLUGINS)
+	cp -rf ../sdkjs-plugins/** $(DOCUMENTSERVER_PLUGINS)
 	
 	bomstrip-files $(DOCUMENTSERVER_EXAMPLE)/config/*.json
 
