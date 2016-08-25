@@ -1,21 +1,22 @@
 Template: onlyoffice/db-host
 Type: string
 Default: localhost
-Description: MySQL host:
+Description: PostgreSQL host:
 
 Template: onlyoffice/db-user
 Type: string
-Default: root
-Description: MySQL user:
+Default: onlyoffice
+Description: PostgreSQL user:
 
 Template: onlyoffice/db-pwd
 Type: password
-Description: MySQL password:
+Default: onlyoffice
+Description: PostgreSQL password:
 
 Template: onlyoffice/db-name
 Type: string
 Default: onlyoffice
-Description: MySQL database name:
+Description: PostgreSQL database name:
 
 Template: onlyoffice/remove-db
 Type: boolean

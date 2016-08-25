@@ -41,26 +41,29 @@ install_db(){
 	db_get onlyoffice/db-name || true
 	DB_NAME="$RET"
 
-	MYSQL="mysql -s -h$DB_HOST -u$DB_USER"
-	if [ -n "$DB_PWD" ]; then
-		MYSQL="$MYSQL -p$DB_PWD"
-	fi
+        CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
+        if [ -n "$DB_PWD" ]; then
+                export PGPASSWORD=$DB_PWD
+        fi
 
-	# test mysql connection
+        PSQL="psql -q $CONNECTION_PARAMS"
+        CREATEDB="createdb $CONNECTION_PARAMS"
+
+	# test postgresql connection
 	set +e
-	$MYSQL -e ";" &>/dev/null
-	ERRCODE=$?
-	if [ $ERRCODE -ne 0 ]; then
-		service mysql start &>/dev/null
-		$MYSQL -e ";" &>/dev/null || { echo "ERROR: can't connect to mysql database"; exit 1; }
-	fi
+        $PSQL -c ";" &>/dev/null
+        ERRCODE=$?
+        if [ $ERRCODE -ne 0 ]; then
+                service postgresql start &>/dev/null
+                $PSQL -c ";" &>/dev/null || { echo "ERROR: can't connect to postgressql database"; exit 1; }
+        fi
 	set -e
 
-	if [ "$OLD_VERSION" = "" ]; then
-		$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';"
-	fi
-	
-	$MYSQL "$DB_NAME" < "$DIR/documentserver/server/schema/createdb.sql"
+        if $PSQL -lt | cut -d\| -f 1 | grep -qw | grep 0; then
+                $CREATEDB $DB_NAME
+        fi
+
+        $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql"
 }
 
 apply_connection_string(){
@@ -78,7 +81,7 @@ case "$1" in
 
 		# add nginx user to onlyoffice group to allow access to used unix socket
 		adduser --quiet www-data onlyoffice
-		
+
 		#install node modules
 		npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
