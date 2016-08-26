@@ -42,7 +42,7 @@ rm "$RPM_BUILD_ROOT"/var/www/onlyoffice/documentserver/server/FileConverter/bin/
 #install documentserver bin
 mkdir -p "$RPM_BUILD_ROOT/usr/bin/"
 cp -r $DOCUMENTSERVER_BIN/* "$RPM_BUILD_ROOT/usr/bin/"
-cp -r ../../bin/* "$RPM_BUILD_ROOT/usr/bin/"
+cp -r ../../bin/*.sh "$RPM_BUILD_ROOT/usr/bin/"
 
 #install configs
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
