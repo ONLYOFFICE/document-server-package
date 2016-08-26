@@ -112,4 +112,4 @@ Filename: "{#NSSM}"; Parameters: "stop {#SPELLCHECKER_SRV}"
 Filename: "{#NSSM}"; Parameters: "remove {#SPELLCHECKER_SRV} confirm"
 
 [UninstallDelete]
-Type: filesandordirs; Name: {commonappdata}\{#APP_PATH}\*;
+Type: filesandordirs; Name: "{app}\*"
