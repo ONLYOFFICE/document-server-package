@@ -72,7 +72,8 @@ mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
 
 #install supervisor configs
 mkdir -p "$RPM_BUILD_ROOT/etc/supervisord.d/"
-cp ../../../common/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
+cp ../../../common/documentserver/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
+cp ../../../common/documentserver-example/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
 for f in "$RPM_BUILD_ROOT"/etc/supervisord.d/*.conf; 
 do
   mv "$f" "${f%.*}".ini;
@@ -80,10 +81,11 @@ done
 
 #install nginx config
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
-cp ../../../common/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
+cp ../../../common/documentserver/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
-cp ../../../common/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
+cp ../../../common/documentserver/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
+cp ../../../common/documentserver-example/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
 
 mkdir -p "$RPM_BUILD_ROOT/var/cache/nginx/onlyoffice/documentserver/"
 

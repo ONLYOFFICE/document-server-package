@@ -1,9 +1,12 @@
-../../common/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/
-../../common/nginx/includes/* etc/nginx/includes/
 ../../common/documentserver/bin/* usr/bin/
-../../common/documentserver/home/* var/www/onlyoffice/documentserver/
-../../common/documentserver-example/home/* var/www/onlyoffice/documentserver-example/
 ../../common/documentserver/config/* etc/onlyoffice/documentserver/
-../../common/documentserver-example/config/* etc/onlyoffice/documentserver-example/
-../../common/supervisor/* etc/supervisor/conf.d/
+../../common/documentserver/home/* var/www/onlyoffice/documentserver/
+../../common/documentserver/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/
+../../common/documentserver/nginx/includes/* etc/nginx/includes/
+../../common/documentserver/supervisor/* etc/supervisor/conf.d/
 ../../common/fonts/* usr/share/fonts/truetype/
+
+../../common/documentserver-example/config/* etc/onlyoffice/documentserver-example/
+../../common/documentserver-example/home/* var/www/onlyoffice/documentserver-example/
+../../common/documentserver-example/nginx/includes/* etc/nginx/includes/
+../../common/documentserver-example/supervisor/* etc/supervisor/conf.d/

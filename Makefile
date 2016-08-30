@@ -92,7 +92,7 @@ documentserver:
 	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown.sh
 	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts.sh
 
-	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
