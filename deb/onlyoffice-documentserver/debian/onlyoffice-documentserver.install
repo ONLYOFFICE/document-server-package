@@ -5,8 +5,3 @@
 ../../common/documentserver/nginx/includes/* etc/nginx/includes/
 ../../common/documentserver/supervisor/* etc/supervisor/conf.d/
 ../../common/fonts/* usr/share/fonts/truetype/
-
-../../common/documentserver-example/config/* etc/onlyoffice/documentserver-example/
-../../common/documentserver-example/home/* var/www/onlyoffice/documentserver-example/
-../../common/documentserver-example/nginx/includes/* etc/nginx/includes/
-../../common/documentserver-example/supervisor/* etc/supervisor/conf.d/
