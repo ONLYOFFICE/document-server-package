@@ -103,7 +103,7 @@ documentserver:
 	ifeq ($(PRODUCT_NAME), documentserver-integration)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
 	else
-        sed "s|s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
+        sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
 	endif
 	
 	echo "Done" > $@
