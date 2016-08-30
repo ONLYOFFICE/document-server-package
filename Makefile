@@ -33,6 +33,7 @@ DOCUMENTSERVER_CONFIG = common/documentserver/config
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
+LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
@@ -98,6 +99,12 @@ documentserver:
 	mkdir -p $(FONTS)/Asana-Math
 	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
 	wget -O $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
+
+	ifeq ($(PRODUCT_NAME), documentserver-integration)
+	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
+	else
+        sed "s|s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
+	endif
 	
 	echo "Done" > $@
 

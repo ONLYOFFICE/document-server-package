@@ -1,0 +1,7 @@
+../../common/documentserver/bin/* usr/bin/
+../../common/documentserver/config/* etc/onlyoffice/documentserver/
+../../common/documentserver/home/* var/www/onlyoffice/documentserver/
+../../common/documentserver/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/
+../../common/documentserver/nginx/includes/* etc/nginx/includes/
+../../common/documentserver/supervisor/* etc/supervisor/conf.d/
+../../common/fonts/* usr/share/fonts/truetype/
