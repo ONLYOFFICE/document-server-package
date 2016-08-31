@@ -73,7 +73,7 @@ mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
 #install supervisor configs
 mkdir -p "$RPM_BUILD_ROOT/etc/supervisord.d/"
 cp ../../../common/documentserver/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
-cp ../../../common/documentserver-example/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
+cp -f ../../../common/documentserver-example/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
 for f in "$RPM_BUILD_ROOT"/etc/supervisord.d/*.conf; 
 do
   mv "$f" "${f%.*}".ini;
