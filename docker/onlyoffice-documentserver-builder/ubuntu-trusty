@@ -32,6 +32,7 @@ RUN apt-get -y update && \
         qtchooser \
         nodejs \
         subversion && \
+    npm install -g npm && \
     npm install -g grunt-cli && \
     npm cache clean && \
     rm -rf /var/lib/apt/lists/*

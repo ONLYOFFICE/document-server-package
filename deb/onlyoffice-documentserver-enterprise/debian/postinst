@@ -95,12 +95,14 @@ case "$1" in
 
 		mkdir -p "$APP_DIR/documentserver/App_Data"
 		mkdir -p "$APP_DIR/documentserver/App_Data/cache/files"
+
 		mkdir -p "$DIR/Data"
+		mkdir -p "$DIR/documentserver-example/public/files"
 		chown onlyoffice:onlyoffice -R "$DIR"
-		
+
 		# generate allfonts.js and thumbnail
 		documentserver-generate-allfonts.sh
-		
+
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"
 

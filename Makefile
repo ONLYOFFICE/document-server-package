@@ -1,18 +1,6 @@
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-ifeq ($(GIT_BRANCH), origin/develop)
-DOCKER_TAGS += $(PACKAGE_VERSION)
-DOCKER_TAGS += latest
-else
-DOCKER_TAGS += $(PACKAGE_VERSION)-$(subst /,-,$(GIT_BRANCH))
-endif
-
-DOCKER_REPO = $(COMPANY_NAME)/4testing-$(PRODUCT_NAME)
-
-COLON := __colon__
-DOCKER_TARGETS := $(foreach TAG,$(DOCKER_TAGS),$(DOCKER_REPO)$(COLON)$(TAG))
-
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
 
@@ -45,6 +33,7 @@ DOCUMENTSERVER_CONFIG = common/documentserver/config
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
+LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
@@ -55,9 +44,11 @@ LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
+DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/sdkjs-plugins
+
 FONTS = common/fonts
 
-.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb docker docker-version deploy-docker
+.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
 
 all: rpm deb
 
@@ -65,31 +56,16 @@ rpm: $(RPM)
 
 deb: $(DEB)
 
-$(DOCKER_TARGETS): $(DEB_REPO_DATA)
-	sed "s|{{SVN_TAG}}|$(GIT_BRANCH)|"  -i docker/$(PACKAGE_NAME)/Dockerfile
-	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i docker/$(PACKAGE_NAME)/Dockerfile
-
-	cd docker/$(PACKAGE_NAME) &&\
-	sudo docker build -t $(subst $(COLON),:,$@) . &&\
-	mkdir -p $$(dirname ../../$@) &&\
-	echo "Done" > ../../$@
-
-docker: $(DOCKER_TARGETS)
-
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
-		$(DOCKER_TARGETS)\
 		$(DOCUMENTSERVER_FILES)\
 		documentserver \
 		documentserver-example
 		
-clean-docker:
-	sudo docker rmi -f $$(sudo docker images -q $(COMPANY_NAME)/*) || exit 0
-
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
@@ -117,18 +93,27 @@ documentserver:
 	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown.sh
 	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts.sh
 
-	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
 	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
 	wget -O $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
+
+ifeq ($(PRODUCT_NAME), documentserver-integration)
+	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
+else
+	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
+endif
 	
 	echo "Done" > $@
 
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
 	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
+
+	mkdir -p $(DOCUMENTSERVER_PLUGINS)
+	cp -rf ../sdkjs-plugins/** $(DOCUMENTSERVER_PLUGINS)
 	
 	bomstrip-files $(DOCUMENTSERVER_EXAMPLE)/config/*.json
 
@@ -142,12 +127,15 @@ documentserver-example:
 
 $(RPM):	documentserver documentserver-example
 	chmod u+x rpm/bin/documentserver-configure.sh
+	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
 
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
 
 $(DEB): documentserver documentserver-example
+	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i deb/$(PACKAGE_NAME)/debian/control
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
@@ -186,7 +174,4 @@ $(DEB_REPO_DATA): $(DEB)
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
 		--acl public-read --delete
 
-deploy-docker: $(DOCKER_TARGETS)
-	$(foreach TARGET,$(DOCKER_TARGETS),sudo docker push $(subst $(COLON),:,$(TARGET));)
-
-deploy: $(RPM_REPO_DATA) $(DEB_REPO_DATA) deploy-docker
+deploy: $(RPM_REPO_DATA) $(DEB_REPO_DATA)
