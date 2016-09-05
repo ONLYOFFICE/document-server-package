@@ -33,6 +33,7 @@ DOCUMENTSERVER_CONFIG = common/documentserver/config
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
+LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
@@ -92,12 +93,18 @@ documentserver:
 	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown.sh
 	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts.sh
 
-	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
 	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
 	wget -O $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
+
+ifeq ($(PRODUCT_NAME), documentserver-integration)
+	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
+else
+	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
+endif
 	
 	echo "Done" > $@
 

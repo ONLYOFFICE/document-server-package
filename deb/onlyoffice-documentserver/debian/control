@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 8.0.0)
 
 Package: {{PACKAGE_NAME}}
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, mysql-server (>= 5.5), redis-server, rabbitmq-server, nginx-extras (>= 1.3.13), nodejs (>=4.2.0), libstdc++6 (>= 4.9.0), libcurl3, libxml2, libboost-regex-dev, zlib1g, supervisor(>= 3.0b2), fonts-dejavu, fonts-liberation, ttf-mscorefonts-installer, fonts-crosextra-carlito, fonts-takao-gothic, fonts-opensymbol, libxss1, libgtkglext1, libcairo2, xvfb, libxtst6, libgconf2-4, libasound2, bomstrip
+Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, postgresql-client (>= 9.1), redis-tools, nginx-extras (>= 1.3.13), nodejs (>=4.2.0), libstdc++6 (>= 4.9.0), libcurl3, libxml2, libboost-regex-dev, zlib1g, supervisor(>= 3.0b2), fonts-dejavu, fonts-liberation, ttf-mscorefonts-installer, fonts-crosextra-carlito, fonts-takao-gothic, fonts-opensymbol, libxss1, libgtkglext1, libcairo2, xvfb, libxtst6, libgconf2-4, libasound2, bomstrip
 Description: online viewers and editors for text, spreadsheet and presentation files.
  Compatible with most office file formats including Office Open XML formats:
  .docx, .xlsx, .pptx, and offer collaborative editing and commenting.

@@ -4,7 +4,8 @@ DIR="/var/www/onlyoffice"
 DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
 SAVED_DEFAULT_CONFIG="$DEFAULT_CONFIG.rpmsave"
 
-MYSQL=""
+PSQL=""
+CREATEDB=""
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
@@ -66,7 +67,7 @@ read_saved_params(){
 }
 
 input_db_params(){
-	echo "Configuring MySQL access... "
+	echo "Configuring PostgreSQL access... "
 	read -e -p "Host: " -i "$DB_HOST" DB_HOST
 	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
 	read -e -p "User: " -i "$DB_USER" DB_USER 
@@ -89,28 +90,31 @@ input_rabbitmq_params(){
 }
 
 execute_db_scripts(){
-	echo -n "Installing MySQL database... "
+	echo -n "Installing PostgreSQL database... "
 
-	if [ "$OLD_VERSION" = "" ]; then
-		$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" >/dev/null 2>&1
-	fi
+        if $PSQL -lt | cut -d\| -f 1 | grep -qw | grep 0; then
+                $CREATEDB $DB_NAME >/dev/null 2>&1
+        fi
 	
-	$MYSQL "$DB_NAME" < "$DIR/documentserver/server/schema/createdb.sql" >/dev/null 2>&1
+	$PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
 	echo "OK"
 }
 
 establish_db_conn() {
-	echo -n "Trying to establish MySQL connection... "
+	echo -n "Trying to establish PostgreSQL connection... "
 
-	command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
 
-	MYSQL="mysql -h$DB_HOST -u$DB_USER"
-	if [ -n "$DB_PWD" ]; then
-		MYSQL="$MYSQL -p$DB_PWD"
-	fi
+        CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
+        if [ -n "$DB_PWD" ]; then
+                export PGPASSWORD=$DB_PWD
+        fi
 
-	$MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+        PSQL="psql -q $CONNECTION_PARAMS"
+        CREATEDB="createdb $CONNECTION_PARAMS"
+
+	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
 	echo "OK"
 }

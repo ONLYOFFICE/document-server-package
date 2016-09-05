@@ -7,7 +7,7 @@ Group: Applications/Internet
 URL: http://onlyoffice.com/
 Vendor: ONLYOFFICE (Online documents editor)
 Packager: ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-Requires: nginx >= 1.3.13, mysql, wget, librabbitmq-tools, supervisor >= 3.0b2, nodejs >= 4.2.0, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, libXScrnSaver, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-mono-fonts, liberation-narrow-fonts, liberation-sans-fonts, liberation-serif-fonts, dejavu-lgc-sans-fonts, dejavu-lgc-sans-mono-fonts, dejavu-lgc-serif-fonts, dejavu-sans-fonts, dejavu-sans-mono-fonts, dejavu-serif-fonts, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
+Requires: nginx >= 1.3.13, postgresql >= 9.1, wget, librabbitmq-tools, supervisor >= 3.0b2, nodejs >= 4.2.0, libstdc++ >= 4.9.0, libcurl, libxml2, boost-regex, zlib, libXScrnSaver, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, liberation-mono-fonts, liberation-narrow-fonts, liberation-sans-fonts, liberation-serif-fonts, dejavu-lgc-sans-fonts, dejavu-lgc-sans-mono-fonts, dejavu-lgc-serif-fonts, dejavu-sans-fonts, dejavu-sans-mono-fonts, dejavu-serif-fonts, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no
@@ -72,7 +72,8 @@ mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
 
 #install supervisor configs
 mkdir -p "$RPM_BUILD_ROOT/etc/supervisord.d/"
-cp ../../../common/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
+cp ../../../common/documentserver/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
+cp -f ../../../common/documentserver-example/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
 for f in "$RPM_BUILD_ROOT"/etc/supervisord.d/*.conf; 
 do
   mv "$f" "${f%.*}".ini;
@@ -80,10 +81,11 @@ done
 
 #install nginx config
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
-cp ../../../common/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
+cp ../../../common/documentserver/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
-cp ../../../common/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
+cp ../../../common/documentserver/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
+cp ../../../common/documentserver-example/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
 
 mkdir -p "$RPM_BUILD_ROOT/var/cache/nginx/onlyoffice/documentserver/"
 
