@@ -32,6 +32,11 @@
 
 #define PSQL '{pf64}\PostgreSQL\9.5\bin\psql.exe'
 
+#define NPM 'npm'
+#define JSON '{userappdata}\npm\json.cmd'
+
+#define JSON_PARAMS '-I -q -f ""{app}\server\Common\config\default.json""'
+
 [Setup]
 AppName                   ={#sAppName}
 AppVerName                ={#sAppName} {#sAppVerShort}
@@ -76,15 +81,12 @@ Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
 Name: "nl"; MessagesFile: "compiler:Languages\Dutch.isl"
 Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
-[Dirs]
-Name: {commonappdata}\{#APP_PATH}\webdata\cloud; Flags: uninsalwaysuninstall
-
 [Files]
-Source: ..\common\documentserver\home\*;           DestDir: {app}; Flags: ignoreversion recursesubdirs
+;Source: ..\common\documentserver\home\*;           DestDir: {app}; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;           DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 
 [Dirs]
-Name: "{app}\App_Data";               Permissions: users-full
+Name: "{app}\server\App_Data";               Permissions: users-full
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-full
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
@@ -93,7 +95,19 @@ Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-full
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
 
-Filename: "{#PSQL}"; Parameters: "-h localhost -U onlyoffice -d onlyoffice -f ""{app}\server\schema\postgresql\createdb.sql""";
+Filename: "{#NPM}"; Parameters: "install -g json"; Flags: runhidden shellexec waituntilterminated
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden
+
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqHost}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.login = '{code:GetRabbitMqUser}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '{code:GetRabbitMqPwd}'"""; Flags: runhidden
+
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden
+
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} node convertermaster.js"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} Description {#CONVERTER_SRV_DESCR}"; Flags: runhidden
@@ -153,12 +167,146 @@ Type: filesandordirs; Name: "{app}\*"
 #include "scripts\products\nodejs4x.iss"
 
 [Code]
-function InitializeSetup(): boolean;
+function InitializeSetup(): Boolean;
 begin
 	// initialize windows version
 	initwinversion();
 
-  nodejs4x('4.0.0');
+  nodejs4x('4.0.0.0');
 
 	Result := true;
 end;
+
+var
+  DbPage: TInputQueryWizardPage;
+  RabbitMqPage: TInputQueryWizardPage;
+  RedisPage: TInputQueryWizardPage;
+
+function GetDbHost(Param: String): String;
+begin
+  Result := DbPage.Values[0];
+end;
+
+function GetDbPort(Param: String): String;
+begin
+  Result := IntToStr(5432);
+end;
+
+function GetDbUser(Param: String): String;
+begin
+  Result := DbPage.Values[1];
+end;
+
+function GetDbPwd(Param: String): String;
+begin
+  Result := DbPage.Values[2];
+end;
+
+function GetDbName(Param: String): String;
+begin
+  Result := DbPage.Values[3];
+end;
+
+function GetRabbitMqHost(Param: String): String;
+begin
+  Result := RabbitMqPage.Values[0];
+end;
+
+function GetRabbitMqUser(Param: String): String;
+begin
+  Result := RabbitMqPage.Values[1];
+end;
+
+function GetRabbitMqPwd(Param: String): String;
+begin
+  Result := RabbitMqPage.Values[2];
+end;
+
+function GetRedisHost(Param: String): String;
+begin
+  Result := RedisPage.Values[0];
+end;
+
+procedure InitializeWizard;
+begin
+  DbPage := CreateInputQueryPage(wpWelcome,
+    'PostgreSQL Database', 'Configure PostgreSQL Connection...',
+    'Please specify your PostgreSQL connection, then click Next.');
+  DbPage.Add('Host:', False);
+  DbPage.Add('User:', False);
+  DbPage.Add('Password:', True);
+  DbPage.Add('Database:', False);
+
+  DbPage.Values[0] := 'localhost';
+  DbPage.Values[1] := 'onlyoffice';
+  DbPage.Values[2] := 'onlyoffice';
+  DbPage.Values[3] := 'onlyoffice';
+
+  RabbitMqPage := CreateInputQueryPage(DbPage.ID,
+    'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
+    'Please specify your RabbitMQ connection, then click Next.');
+  RabbitMqPage.Add('Host:', False);
+  RabbitMqPage.Add('User:', False);
+  RabbitMqPage.Add('Password:', True);
+
+  RabbitMqPage.Values[0] := 'localhost';
+  RabbitMqPage.Values[1] := 'guest';
+  RabbitMqPage.Values[2] := 'guest';
+
+  RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
+    'Redis In-Memory Database', 'Configure Redis Connection...',
+    'Please specify your Reids connection, then click Next.');
+  RedisPage.Add('Host:', False);
+
+  RedisPage.Values[0] := 'localhost';
+
+end;
+
+function CheckDbConnection(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := true;
+  SaveStringToFile(
+    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbUser('') + ':' + GetDbName('') + ':' + GetDbPwd(''),
+    False);
+
+  Exec(
+    ExpandConstant('{pf64}\PostgreSQL\9.5\bin\psql.exe'),
+    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
+    '', 
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox('Connection to ' + GetDbHost('') + ' failed!' + #13#10 + 'PSQL return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    Result := false;
+  end;
+end;
+
+function CheckRabbitMqConnection(): Boolean;
+begin
+  Result := true;
+end;
+
+function CheckRedisConnection(): Boolean;
+begin
+  Result := true;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  I: Integer;
+begin
+  Result := true;
+  case CurPageID of
+    DbPage.ID: Result := CheckDbConnection();
+    RabbitMqPage.ID: Result := CheckRabbitMqConnection();
+    RedisPage.ID: Result := CheckRedisConnection();
+    wpReady: Result := DownloadDependency();
+  end;
+end;                                                     
+

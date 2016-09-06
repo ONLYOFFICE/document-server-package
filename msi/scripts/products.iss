@@ -248,11 +248,10 @@ begin
 	Result := s
 end;
 
-function NextButtonClick(CurPageID: Integer): boolean;
+function DownloadDependency(): boolean;
 begin
 	Result := true;
 
-	if CurPageID = wpReady then begin
 		if downloadMemo <> '' then begin
 			//change isxdl language only if it is not english because isxdl default language is already english
 			if (ActiveLanguage() <> 'en') then begin
@@ -267,7 +266,6 @@ begin
 				Result := false;
 		end;
 	end;
-end;
 
 function IsX86: boolean;
 begin

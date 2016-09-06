@@ -13,7 +13,7 @@ const
 procedure nodejs4x(minVersion: string);
 begin
 	//check for node 4.x installation
-	if (compareversion(fileversion(ExpandConstant('{pf32}{\}nodejs{\}node.exe')), minVersion) < 4) then
+	if (compareversion(fileversion(ExpandConstant('{pf32}{\}nodejs{\}node.exe')), minVersion) < 0) then
 		AddProduct('nodejs4x.msi',
 			'/qb',
 			CustomMessage('nodejs4x_title'),
