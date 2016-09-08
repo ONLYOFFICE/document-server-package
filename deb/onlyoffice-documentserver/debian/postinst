@@ -63,7 +63,7 @@ install_db(){
                 $CREATEDB $DB_NAME
         fi
 
-        $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql"
+        $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 }
 
 apply_connection_string(){
@@ -104,7 +104,7 @@ case "$1" in
 		chown onlyoffice:onlyoffice -R "$DIR"
 
 		# generate allfonts.js and thumbnail
-		documentserver-generate-allfonts.sh
+		documentserver-generate-allfonts.sh true
 
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"
@@ -120,6 +120,8 @@ case "$1" in
 		# restart dependent services
 		service supervisor restart >/dev/null 2>&1
 		service nginx restart >/dev/null 2>&1
+		
+		echo "Congratulations, the ONLYOFFICE Document Server has been installed successfully!"
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)
