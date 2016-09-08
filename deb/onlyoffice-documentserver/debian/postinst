@@ -59,8 +59,8 @@ install_db(){
         fi
 	set -e
 
-        if $PSQL -lt | cut -d\| -f 1 | grep -qw | grep 0; then
-                $CREATEDB $DB_NAME
+        if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
+                $CREATEDB $DB_NAME >/dev/null 2>&1
         fi
 
         $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
