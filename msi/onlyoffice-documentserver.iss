@@ -31,6 +31,8 @@
 #define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
 
 #define PSQL '{pf64}\PostgreSQL\9.5\bin\psql.exe'
+#define REDISCLI '{pf64}\Redis\redis-cli.exe'
+#define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define NPM 'npm'
 #define JSON '{userappdata}\npm\json.cmd'
@@ -107,6 +109,8 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden
 
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDefaultPort}'"""; Flags: runhidden
+
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} node convertermaster.js"; Flags: runhidden
@@ -165,6 +169,9 @@ Type: filesandordirs; Name: "{app}\*"
 #include "scripts\products\fileversion.iss"
 
 #include "scripts\products\nodejs4x.iss"
+#include "scripts\products\postgresql.iss"
+#include "scripts\products\rabbitmq.iss"
+#include "scripts\products\redis.iss"
 
 [Code]
 function InitializeSetup(): Boolean;
@@ -173,6 +180,9 @@ begin
 	initwinversion();
 
   nodejs4x('4.0.0.0');
+  postgresql('9.5.4.0');
+  rabbitmq('3.6.5');
+  redis('3.2.100');
 
 	Result := true;
 end;
@@ -227,9 +237,14 @@ begin
   Result := RedisPage.Values[0];
 end;
 
+function GetDefaultPort(Param: String): String;
+begin
+  Result := ExpandConstant('{param:DOCSERVICE_PORT|80}');
+end;
+
 procedure InitializeWizard;
 begin
-  DbPage := CreateInputQueryPage(wpWelcome,
+  DbPage := CreateInputQueryPage(wpPreparing,
     'PostgreSQL Database', 'Configure PostgreSQL Connection...',
     'Please specify your PostgreSQL connection, then click Next.');
   DbPage.Add('Host:', False);
@@ -237,10 +252,10 @@ begin
   DbPage.Add('Password:', True);
   DbPage.Add('Database:', False);
 
-  DbPage.Values[0] := 'localhost';
-  DbPage.Values[1] := 'onlyoffice';
-  DbPage.Values[2] := 'onlyoffice';
-  DbPage.Values[3] := 'onlyoffice';
+  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|localhost}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_USER|onlyoffice}');
+  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|onlyoffice}');
+  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|onlyoffice}');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
@@ -249,16 +264,16 @@ begin
   RabbitMqPage.Add('User:', False);
   RabbitMqPage.Add('Password:', True);
 
-  RabbitMqPage.Values[0] := 'localhost';
-  RabbitMqPage.Values[1] := 'guest';
-  RabbitMqPage.Values[2] := 'guest';
+  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|localhost}');
+  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|guest}');
+  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|guest}');
 
   RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
     'Redis In-Memory Database', 'Configure Redis Connection...',
     'Please specify your Reids connection, then click Next.');
   RedisPage.Add('Host:', False);
 
-  RedisPage.Values[0] := 'localhost';
+  RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|localhost}');
 
 end;
 
@@ -273,7 +288,7 @@ begin
     False);
 
   Exec(
-    ExpandConstant('{pf64}\PostgreSQL\9.5\bin\psql.exe'),
+    ExpandConstant('{#PSQL}'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
     '', 
     SW_HIDE,
@@ -288,18 +303,46 @@ begin
 end;
 
 function CheckRabbitMqConnection(): Boolean;
+var
+  ResultCode: Integer;
 begin
   Result := true;
+    Exec(
+    ExpandConstant('{#RABBITMQCTL}'),
+    '-q list_queues',
+    '', 
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'redis-cli return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    Result := false;
+  end;
 end;
 
 function CheckRedisConnection(): Boolean;
+var
+  ResultCode: Integer;
 begin
   Result := true;
+    Exec(
+    ExpandConstant('{#REDISCLI}'),
+    '-h ' + GetRedisHost('') + ' --version',
+    '', 
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'redis-cli return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    Result := false;
+  end;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
-var
-  I: Integer;
 begin
   Result := true;
   case CurPageID of
