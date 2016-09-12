@@ -92,7 +92,7 @@ input_rabbitmq_params(){
 execute_db_scripts(){
 	echo -n "Installing PostgreSQL database... "
 
-        if $PSQL -lt | cut -d\| -f 1 | grep -qw | grep 0; then
+        if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
                 $CREATEDB $DB_NAME >/dev/null 2>&1
         fi
 	

@@ -124,7 +124,7 @@ exit 0
 
 %post
 # generate allfonts.js and thumbnail
-documentserver-generate-allfonts.sh
+documentserver-generate-allfonts.sh true
 
 # restart dependent services
 service supervisord restart >/dev/null 2>&1
