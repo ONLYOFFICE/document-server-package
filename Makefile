@@ -113,8 +113,7 @@ documentserver:
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
-	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown$(SHELL_EXT)
-	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts$(SHELL_EXT)
+	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/' -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/' -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
