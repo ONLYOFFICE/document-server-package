@@ -47,6 +47,7 @@ DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
 FONTS = common/fonts
 
+ISXDL = exe/scripts/isxdl/isxdl.dll
 
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
@@ -147,8 +148,12 @@ $(DEB): documentserver documentserver-example
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
-$(EXE): documentserver
+$(EXE): documentserver $(ISXDL)
+
 	cd exe && compil32 /cc $(PACKAGE_NAME).iss
+
+$(ISXDL):
+		curl -o $(ISXDL) https://github.com/jrsoftware/ispack/raw/master/isxdlfiles/isxdl.dll
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)
