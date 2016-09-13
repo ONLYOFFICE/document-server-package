@@ -4,7 +4,7 @@
 nodejs4x_title=Node.js
 
 en.nodejs4x_size=10.5 MB
-de.nodejs4x_size=10,5 MB
+; de.nodejs4x_size=10,5 MB
 
 [Code]
 const

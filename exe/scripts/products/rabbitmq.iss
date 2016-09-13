@@ -4,7 +4,7 @@
 rabbitmq_title=RabbitMQ
 
 en.rabbitmq_size=5.3 MB
-de.rabbitmq_size=5,3 MB
+; de.rabbitmq_size=5,3 MB
 
 [Code]
 const

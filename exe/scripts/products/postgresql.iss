@@ -4,7 +4,7 @@
 postgresql_title=PostgreSQL
 
 en.postgresql_size=62.0 MB
-de.postgresql_size=62,0 MB
+; de.postgresql_size=62,0 MB
 
 [Code]
 const
