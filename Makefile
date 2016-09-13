@@ -6,6 +6,7 @@ DEB_ARCH = amd64
 
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
 DEB_BUILD_DIR = $(PWD)/deb
+EXE_BUILD_DIR = $(PWD)/exe
 
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
@@ -26,6 +27,7 @@ DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
 
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
+EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME).exe
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -53,6 +55,8 @@ rpm: $(RPM)
 
 deb: $(DEB)
 
+exe: $(EXE)
+
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
@@ -66,9 +70,6 @@ clean:
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
-
-	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/*.json
-	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/log4js/*.json
 
 	rm -f $(DOCUMENTSERVER)/server/Common/config/*.bom
 	rm -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.bom
@@ -102,8 +103,6 @@ documentserver:
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
 	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
-	
-	bomstrip-files $(DOCUMENTSERVER_EXAMPLE)/config/*.json
 
 	rm -f $(DOCUMENTSERVER_EXAMPLE)/config/*.bom
 
@@ -124,6 +123,9 @@ $(DEB): documentserver documentserver-example
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
+
+$(EXE): documentserver
+	cd exe && compil32 /cc $(PACKAGE_NAME).iss
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)

@@ -1,7 +1,7 @@
 #define sAppName            'ONLYOFFICE Document Server'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
 #define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
-#define NAME_EXE_OUT        'DocumentServer.exe'
+#define sPackageName        'onlyoffice-documentserver'
 #define iconsExe            'projicons.exe'
 
 #define sAppVersion         '4.0.4'
@@ -45,6 +45,7 @@ AppName                   ={#sAppName}
 AppVerName                ={#sAppName} {#sAppVerShort}
 AppVersion                ={#sAppVersion}
 VersionInfoVersion        ={#sAppVersion}
+OutputBaseFilename        ={#sPackageName}
 
 AppPublisher            =Ascensio System SIA.
 AppPublisherURL         =http://www.onlyoffice.com/
@@ -69,7 +70,7 @@ ASLRCompatible            = no
 DisableDirPage            = auto
 AllowNoIcons              = yes
 AlwaysShowDirOnReadyPage  = yes
-UninstallDisplayIcon      = {app}\{#NAME_EXE_OUT}
+UninstallDisplayIcon      = {app}\{#sPackageName}
 OutputDir                 =.\
 Compression               =none
 PrivilegesRequired        =admin
