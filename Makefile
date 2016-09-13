@@ -150,11 +150,10 @@ $(DEB): documentserver documentserver-example
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 $(EXE): documentserver $(ISXDL)
-
 	cd exe && iscc /Qp $(PACKAGE_NAME).iss
 
 $(ISXDL):
-		curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
+	curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)
