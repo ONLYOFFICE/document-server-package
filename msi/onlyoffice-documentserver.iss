@@ -31,6 +31,7 @@
 #define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
 
 #define PSQL '{pf64}\PostgreSQL\9.5\bin\psql.exe'
+#define CREATEDB '{pf64}\PostgreSQL\9.5\bin\createdb.exe'                                 
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
@@ -84,7 +85,7 @@ Name: "nl"; MessagesFile: "compiler:Languages\Dutch.isl"
 Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Files]
-;Source: ..\common\documentserver\home\*;           DestDir: {app}; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\home\*;           DestDir: {app}; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;           DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 
 [Dirs]
@@ -111,7 +112,8 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDefaultPort}'"""; Flags: runhidden
 
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
+Filename: "{#CREATEDB}";  Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} {code:GetDbName}"; Check: IsNotDbExist(); Flags: runhidden
+Filename: "{#PSQL}";      Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} node convertermaster.js"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} Description {#CONVERTER_SRV_DESCR}"; Flags: runhidden
@@ -275,6 +277,11 @@ begin
 
   RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|localhost}');
 
+end;
+
+function IsNotDbExist(): Boolean;
+begin
+  Result := False;
 end;
 
 function CheckDbConnection(): Boolean;
