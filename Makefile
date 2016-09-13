@@ -89,6 +89,7 @@ clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
+		$(EXE_BUILD_DIR)/*.exe\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(DOCUMENTSERVER_FILES)\
