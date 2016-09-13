@@ -47,6 +47,34 @@ DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
 FONTS = common/fonts
 
+
+ifeq ($(OS),Windows_NT)
+	PLATFORM := win
+	EXEC_EXT := .exe
+	SHELL_EXT := .bat
+	SHARED_EXT := .dll
+	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+		ARCHITECTURE := 64
+	endif
+	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+		ARCHITECTURE := 32
+	endif
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		PLATFORM := linux
+		SHARED_EXT := .so*
+		SHELL_EXT := .sh
+	endif
+	UNAME_P := $(shell uname -p)
+	ifeq ($(UNAME_P),x86_64)
+		ARCHITECTURE := 64
+	endif
+	ifneq ($(filter %86,$(UNAME_P)),)
+		ARCHITECTURE := 32
+	endif
+endif
+
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
 
 all: rpm deb
@@ -71,9 +99,6 @@ documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
 
-	rm -f $(DOCUMENTSERVER)/server/Common/config/*.bom
-	rm -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.bom
-
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
 
@@ -85,14 +110,14 @@ documentserver:
 	
 	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE)
 
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
-	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen
-	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown.sh
-	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts.sh
+	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown$(SHELL_EXT)
+	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts$(SHELL_EXT)
 
-	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/' -i common/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/' -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
 	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
@@ -103,8 +128,6 @@ documentserver:
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
 	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
-
-	rm -f $(DOCUMENTSERVER_EXAMPLE)/config/*.bom
 
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
