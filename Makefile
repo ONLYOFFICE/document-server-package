@@ -91,6 +91,7 @@ clean:
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
 		$(EXE_BUILD_DIR)/*.exe\
+		$(ISXDL)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(DOCUMENTSERVER_FILES)\
@@ -153,7 +154,7 @@ $(EXE): documentserver $(ISXDL)
 	cd exe && iscc /Qp $(PACKAGE_NAME).iss
 
 $(ISXDL):
-		curl -o $(ISXDL) https://github.com/jrsoftware/ispack/raw/master/isxdlfiles/isxdl.dll
+		curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)
