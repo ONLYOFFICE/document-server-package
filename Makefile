@@ -150,7 +150,7 @@ $(DEB): documentserver documentserver-example
 
 $(EXE): documentserver $(ISXDL)
 
-	cd exe && iscc $(PACKAGE_NAME).iss
+	cd exe && iscc /Qp $(PACKAGE_NAME).iss
 
 $(ISXDL):
 		curl -o $(ISXDL) https://github.com/jrsoftware/ispack/raw/master/isxdlfiles/isxdl.dll
