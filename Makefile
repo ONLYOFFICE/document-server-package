@@ -119,8 +119,8 @@ documentserver:
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/' -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
-	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
-	wget -O $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
+	curl -o $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
+	curl -o $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
 	
 	echo "Done" > $@
 
