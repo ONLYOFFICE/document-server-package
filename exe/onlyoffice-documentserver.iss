@@ -1,4 +1,4 @@
-#define sAppName            'ONLYOFFICE Document Server'
+#define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
 #define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
 #define sPackageName        'onlyoffice-documentserver'
