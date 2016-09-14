@@ -30,21 +30,14 @@ RUN apt-get -y update && \
         libgconf2-dev \
         default-jre \
         qtchooser \
+        qt5-default \
         nodejs \
+        p7zip-full \
         subversion && \
     npm install -g npm && \
     npm install -g grunt-cli && \
     npm cache clean && \
     rm -rf /var/lib/apt/lists/*
-    
-RUN cd ~ && \
-    svn export http://source.icu-project.org/repos/icu/icu/tags/release-55-1 icu && \
-    cd icu/source && \
-    ./configure && \
-    make && \
-    make install && \
-    cd ~ && \
-    rm -fr icu/
 
 ADD build.sh /app/onlyoffice/build.sh
 ADD build-bin.sh /app/onlyoffice/build-bin.sh
