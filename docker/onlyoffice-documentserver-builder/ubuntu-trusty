@@ -33,6 +33,7 @@ RUN apt-get -y update && \
         qt5-default \
         nodejs \
         p7zip-full \
+        git \
         subversion && \
     npm install -g npm && \
     npm install -g grunt-cli && \
