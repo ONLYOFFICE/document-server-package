@@ -44,6 +44,4 @@ ADD build-bin.sh /app/onlyoffice/build-bin.sh
 ADD build-desktop.sh /app/onlyoffice/build-desktop.sh
 ADD build-desktop-deb.sh /app/onlyoffice/build-desktop-package.sh
 
-VOLUME /var/lib/onlyoffice /home/oleg
-
 CMD bash -C '/app/onlyoffice/build.sh'
