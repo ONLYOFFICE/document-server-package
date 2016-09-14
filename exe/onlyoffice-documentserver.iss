@@ -88,6 +88,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: ..\common\documentserver\home\*;           DestDir: {app}; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;           DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+Source: ..\common\fonts\Asana-Math\*.tt*;            DestDir: {fonts}; Flags: ignoreversion recursesubdirs
 
 [Dirs]
 Name: "{app}\server\App_Data";               Permissions: users-full
