@@ -6,6 +6,7 @@ DEB_ARCH = amd64
 
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
 DEB_BUILD_DIR = $(PWD)/deb
+EXE_BUILD_DIR = $(PWD)/exe
 
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
@@ -26,6 +27,7 @@ DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
 
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
+EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME).exe
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -48,6 +50,35 @@ DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/sdkjs-plugins
 
 FONTS = common/fonts
 
+ISXDL = exe/scripts/isxdl/isxdl.dll
+
+ifeq ($(OS),Windows_NT)
+	PLATFORM := win
+	EXEC_EXT := .exe
+	SHELL_EXT := .bat
+	SHARED_EXT := .dll
+	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+		ARCHITECTURE := 64
+	endif
+	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+		ARCHITECTURE := 32
+	endif
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		PLATFORM := linux
+		SHARED_EXT := .so*
+		SHELL_EXT := .sh
+	endif
+	UNAME_P := $(shell uname -p)
+	ifeq ($(UNAME_P),x86_64)
+		ARCHITECTURE := 64
+	endif
+	ifneq ($(filter %86,$(UNAME_P)),)
+		ARCHITECTURE := 32
+	endif
+endif
+
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
 
 all: rpm deb
@@ -56,10 +87,14 @@ rpm: $(RPM)
 
 deb: $(DEB)
 
+exe: $(EXE)
+
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(RPM_BUILD_DIR)\
+		$(EXE_BUILD_DIR)/*.exe\
+		$(ISXDL)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(DOCUMENTSERVER_FILES)\
@@ -69,12 +104,6 @@ clean:
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
-
-	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/*.json
-	bomstrip-files $(DOCUMENTSERVER)/server/Common/config/log4js/*.json
-
-	rm -f $(DOCUMENTSERVER)/server/Common/config/*.bom
-	rm -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.bom
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
@@ -87,18 +116,17 @@ documentserver:
 	
 	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE)
 
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
-	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen
-	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-prepare4shutdown.sh
-	chmod u+x $(DOCUMENTSERVER_BIN)/documentserver-generate-allfonts.sh
+	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
 	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
-	wget -O $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
-	wget -O $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
+	curl -o $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
+	curl -o $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
 
 ifeq ($(PRODUCT_NAME), documentserver-integration)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
@@ -115,10 +143,6 @@ documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_PLUGINS)
 	cp -rf ../sdkjs-plugins/** $(DOCUMENTSERVER_PLUGINS)
 	
-	bomstrip-files $(DOCUMENTSERVER_EXAMPLE)/config/*.json
-
-	rm -f $(DOCUMENTSERVER_EXAMPLE)/config/*.bom
-
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
@@ -139,6 +163,12 @@ $(DEB): documentserver documentserver-example
 	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
+
+$(EXE): documentserver $(ISXDL)
+	cd exe && iscc //Qp $(PACKAGE_NAME).iss
+
+$(ISXDL):
+	curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)

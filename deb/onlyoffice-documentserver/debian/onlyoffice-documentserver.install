@@ -1,4 +1,4 @@
-../../common/documentserver/bin/* usr/bin/
+../../common/documentserver/bin/*.sh usr/bin/
 ../../common/documentserver/config/* etc/onlyoffice/documentserver/
 ../../common/documentserver/home/* var/www/onlyoffice/documentserver/
 ../../common/documentserver/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/
