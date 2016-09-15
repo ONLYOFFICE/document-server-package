@@ -99,6 +99,7 @@ clean:
 		$(RPM_BUILD_DIR)\
 		$(EXE_BUILD_DIR)/*.exe\
 		$(ISXDL)\
+		$(NGINX)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(DOCUMENTSERVER_FILES)\
