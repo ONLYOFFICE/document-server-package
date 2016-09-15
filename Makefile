@@ -52,6 +52,10 @@ FONTS = common/fonts
 
 ISXDL = exe/scripts/isxdl/isxdl.dll
 
+NGINX_VER := nginx-1.11.4
+NGINX_ZIP := $(NGINX_VER).zip
+NGINX := exe/$(NGINX_VER)
+
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
 	EXEC_EXT := .exe
@@ -164,11 +168,16 @@ $(DEB): documentserver documentserver-example
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
-$(EXE): documentserver $(ISXDL)
+$(EXE): documentserver $(ISXDL) $(NGINX)
 	cd exe && iscc //Qp $(PACKAGE_NAME).iss
 
 $(ISXDL):
 	curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
+	
+$(NGINX):
+	cd exe && \
+	curl -o $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
+	7z x $(NGINX_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)
