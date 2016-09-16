@@ -178,8 +178,8 @@ $(ISXDL):
 $(NGINX):
 	cd exe && \
 	curl -o $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
-	7z x $(NGINX_ZIP) && \
-	rm $(NGINX_ZIP)
+	7z x -y $(NGINX_ZIP) && \
+	rm -f $(NGINX_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)
