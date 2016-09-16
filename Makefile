@@ -176,9 +176,8 @@ $(ISXDL):
 	curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 	
 $(NGINX):
-	cd exe && \
 	curl -o $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
-	7z x -y $(NGINX_ZIP) && \
+	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
 	rm -f $(NGINX_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
