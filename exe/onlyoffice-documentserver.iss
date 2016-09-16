@@ -93,7 +93,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*;           DestDir: {#NGINX_SRV_DIR}; Flags: ignoreversion recursesubdirs
+Source: nginx\*;                                    DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
 
 [Dirs]
