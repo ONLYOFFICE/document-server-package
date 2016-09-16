@@ -91,9 +91,10 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 ;Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Files]
-Source: ..\common\documentserver\home\*;           DestDir: {app}; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\bin\*.bat;           DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: ..\common\fonts\Asana-Math\*.tt*;            DestDir: {fonts}; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\*;           DestDir: {#NGINX_SRV_DIR}; Flags: ignoreversion recursesubdirs
+Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-full
@@ -121,7 +122,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDefaultPort}'"""; Flags: runhidden
+;Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDefaultPort}'"""; Flags: runhidden
 
 Filename: "{#CREATEDB}";  Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} {code:GetDbName}"; Check: IsNotDbExist(); Flags: runhidden
 Filename: "{#PSQL}";      Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
