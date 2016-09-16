@@ -169,7 +169,7 @@ $(DEB): documentserver documentserver-example
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
-$(EXE): documentserver $(ISXDL) $(NGINX)
+$(EXE): documentserver documentserver-example $(ISXDL) $(NGINX)
 	cd exe && iscc //Qp $(PACKAGE_NAME).iss
 
 $(ISXDL):

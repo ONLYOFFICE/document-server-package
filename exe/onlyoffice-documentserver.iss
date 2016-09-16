@@ -9,6 +9,7 @@
 
 #define NSSM                  '{app}\server\Winser\node_modules\winser\bin\nssm64.exe'
 #define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'
+#define NODE_EXAMPLE_SRV_ENV  'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\example\config"" NODE_DISABLE_COLORS=1'
 
 #define CONVERTER_SRV        'ds_converter'
 #define CONVERTER_SRV_DESCR  'converter description'
@@ -29,6 +30,11 @@
 #define SPELLCHECKER_SRV_DESCR  'spelchecker description'
 #define SPELLCHECKER_SRV_DIR    '{app}\server\SpellChecker\sources'
 #define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
+
+#define EXAMPLE_SRV        'ds_example'
+#define EXAMPLE_SRV_DESCR  'example description'
+#define EXAMPLE_SRV_DIR    '{app}\example\bin'
+#define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
 #define PSQL '{pf64}\PostgreSQL\9.5\bin\psql.exe'
 #define CREATEDB '{pf64}\PostgreSQL\9.5\bin\createdb.exe'                                 
@@ -93,6 +99,8 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver-example\home\*;    DestDir: {app}\example; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver-example\config\*;  DestDir: {app}\example\config; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\*;                                    DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
@@ -103,6 +111,7 @@ Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-full
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
 Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-full
+Name: "{#EXAMPLE_SRV_LOG_DIR}";       Permissions: users-full
 Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
 Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
@@ -160,6 +169,14 @@ Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECK
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
 
+Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node www"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Description {#EXAMPLE_SRV_DESCR}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppDirectory {#EXAMPLE_SRV_DIR}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppEnvironmentExtra {#NODE_EXAMPLE_SRV_ENV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStdout {#EXAMPLE_SRV_LOG_DIR}\out.log"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStderr {#EXAMPLE_SRV_LOG_DIR}\error.log"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "start {#EXAMPLE_SRV}"; Flags: runhidden
+
 Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} {#NGINX_SRV_DIR}\nginx"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden
@@ -182,6 +199,9 @@ Filename: "{#NSSM}"; Parameters: "remove {#GC_SRV} confirm"; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "stop {#SPELLCHECKER_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#SPELLCHECKER_SRV} confirm"; Flags: runhidden
+
+Filename: "{#NSSM}"; Parameters: "stop {#EXAMPLE_SRV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "remove {#EXAMPLE_SRV} confirm"; Flags: runhidden
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\*"
