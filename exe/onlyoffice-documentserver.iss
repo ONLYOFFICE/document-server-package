@@ -40,6 +40,10 @@
 
 #define JSON_PARAMS '-I -q -f ""{app}\server\Common\config\default.json""'
 
+#define NGINX_SRV  'ds_nginx'
+#define NGINX_SRV_DESCR  'nginx description'
+#define NGINX_SRV_DIR  '{app}\nginx-1.11.4'
+
 [Setup]
 AppName                   ={#sAppName}
 AppVerName                ={#sAppName} {#sAppVerShort}
@@ -149,7 +153,15 @@ Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECK
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
 
+Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} nginx.exe"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden
+
 [UninstallRun]
+Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "remove {#NGINX_SRV} confirm"; Flags: runhidden
+
 Filename: "{#NSSM}"; Parameters: "stop {#CONVERTER_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#CONVERTER_SRV} confirm"; Flags: runhidden
 
