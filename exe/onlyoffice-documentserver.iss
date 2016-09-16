@@ -95,11 +95,12 @@ Source: ..\common\documentserver\bin\*.bat;           DestDir: {app}\bin; Flags:
 Source: ..\common\fonts\Asana-Math\*.tt*;            DestDir: {fonts}; Flags: ignoreversion recursesubdirs
 
 [Dirs]
-Name: "{app}\server\App_Data";               Permissions: users-full
+Name: "{app}\server\App_Data";        Permissions: users-full
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-full
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
 Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-full
+Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
