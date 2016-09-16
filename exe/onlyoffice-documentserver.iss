@@ -102,6 +102,7 @@ Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
 Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-full
 Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
+Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
