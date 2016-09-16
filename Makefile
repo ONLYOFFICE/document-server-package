@@ -54,7 +54,7 @@ ISXDL = exe/scripts/isxdl/isxdl.dll
 
 NGINX_VER := nginx-1.11.4
 NGINX_ZIP := $(NGINX_VER).zip
-NGINX := exe/$(NGINX_VER)
+NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
 
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
@@ -178,7 +178,8 @@ $(ISXDL):
 $(NGINX):
 	cd exe && \
 	curl -o $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
-	7z x $(NGINX_ZIP)
+	7z x $(NGINX_ZIP) && \
+	rm $(NGINX_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)
