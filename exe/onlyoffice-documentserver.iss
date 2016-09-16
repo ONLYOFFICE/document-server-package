@@ -43,6 +43,7 @@
 #define NGINX_SRV  'ds_nginx'
 #define NGINX_SRV_DESCR  'nginx description'
 #define NGINX_SRV_DIR  '{app}\nginx-1.11.4'
+#define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
 
 [Setup]
 AppName                   ={#sAppName}
@@ -101,6 +102,7 @@ Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
 Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-full
 Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
+Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
 
@@ -159,6 +161,8 @@ Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} nginx.exe"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStdout {#NGINX_SRV_LOG_DIR}\out.log"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStderr {#NGINX_SRV_LOG_DIR}\error.log"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden
 
 [UninstallRun]
