@@ -8,7 +8,7 @@
 #define sAppVerShort
 
 #define NSSM                  '{app}\server\Winser\node_modules\winser\bin\nssm64.exe'
-#define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\server\Common\config"" NODE_DISABLE_COLORS=1'
+#define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'
 
 #define CONVERTER_SRV        'ds_converter'
 #define CONVERTER_SRV_DESCR  'converter description'
@@ -38,7 +38,7 @@
 #define NPM 'npm'
 #define JSON '{userappdata}\npm\json.cmd'
 
-#define JSON_PARAMS '-I -q -f ""{app}\server\Common\config\default.json""'
+#define JSON_PARAMS '-I -q -f ""{app}\config\default.json""'
 
 #define NGINX_SRV  'ds_nginx'
 #define NGINX_SRV_DESCR  'nginx description'
@@ -92,6 +92,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\*;                                    DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
