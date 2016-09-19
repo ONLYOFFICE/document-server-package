@@ -46,6 +46,8 @@
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\default.json""'
 
+#define REPLACE 'relace'
+
 #define NGINX_SRV  'ds_nginx'
 #define NGINX_SRV_DESCR  'nginx description'
 #define NGINX_SRV_DIR  '{app}\nginx-1.11.4'
@@ -121,6 +123,7 @@ Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
 
 Filename: "{#NPM}"; Parameters: "install -g json"; Flags: runhidden shellexec waituntilterminated
+Filename: "{#NPM}"; Parameters: "install -g replace"; Flags: runhidden shellexec waituntilterminated
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden
@@ -132,7 +135,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden
 
-;Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDefaultPort}'"""; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "'{{{{DS_PORT}}' '{code:GetDefaultPort}' ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
 
 Filename: "{#CREATEDB}";  Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} {code:GetDbName}"; Check: IsNotDbExist(); Flags: runhidden
 Filename: "{#PSQL}";      Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
@@ -284,7 +287,7 @@ end;
 
 function GetDefaultPort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DOCSERVICE_PORT|80}');
+  Result := ExpandConstant('{param:DS_PORT|80}');
 end;
 
 procedure InitializeWizard;
