@@ -135,7 +135,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden
 
-Filename: "{#REPLACE}"; Parameters: "'{{{{DS_PORT}}' '{code:GetDefaultPort}' ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
 
 Filename: "{#CREATEDB}";  Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} {code:GetDbName}"; Check: IsNotDbExist(); Flags: runhidden
 Filename: "{#PSQL}";      Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
