@@ -45,6 +45,7 @@
 #define JSON '{userappdata}\npm\json.cmd'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\default.json""'
+#define JSON_EXAMPLE_PARAMS '-I -q -f ""{app}\example\config\default.json""'
 
 #define REPLACE '{userappdata}\npm\replace.cmd'
 
@@ -135,7 +136,14 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden
 
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; Flags: runhidden
+
 Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
 
 Filename: "{#CREATEDB}";  Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} {code:GetDbName}"; Check: IsNotDbExist(); Flags: runhidden
 Filename: "{#PSQL}";      Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
@@ -288,6 +296,21 @@ end;
 function GetDefaultPort(Param: String): String;
 begin
   Result := ExpandConstant('{param:DS_PORT|80}');
+end;
+
+function GetDocServicePort(Param: String): String;
+begin
+  Result := ExpandConstant('{param:DOCSERVICE_PORT|8000}');
+end;
+
+function GetSpellCheckerPort(Param: String): String;
+begin
+  Result := ExpandConstant('{param:SPELLCHECKER_PORT|8080}');
+end;
+
+function GetExamplePort(Param: String): String;
+begin
+  Result := ExpandConstant('{param:EXAMPLE_PORT|3000}');
 end;
 
 procedure InitializeWizard;
