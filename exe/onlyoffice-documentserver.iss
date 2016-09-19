@@ -46,7 +46,7 @@
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\default.json""'
 
-#define REPLACE 'relace'
+#define REPLACE '{userappdata}\npm\replace.cmd'
 
 #define NGINX_SRV  'ds_nginx'
 #define NGINX_SRV_DESCR  'nginx description'
