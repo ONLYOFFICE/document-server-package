@@ -4,7 +4,7 @@
 #define sPackageName        'onlyoffice-documentserver'
 #define iconsExe            'projicons.exe'
 
-#define sAppVersion         '4.0.4'
+#define sAppVersion         '{%PRODUCT_VERSION}.{%BUILD_NUMBER}'
 #define sAppVerShort
 
 #define NSSM                  '{app}\server\Winser\node_modules\winser\bin\nssm64.exe'
@@ -58,7 +58,7 @@
 AppName                   ={#sAppName}
 AppVerName                ={#sAppName} {#sAppVerShort}
 AppVersion                ={#sAppVersion}
-VersionInfoVersion        ={#sAppVersion}
+;VersionInfoVersion        ={#sAppVersion}
 OutputBaseFilename        ={#sPackageName}
 
 AppPublisher            =Ascensio System SIA.
