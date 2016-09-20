@@ -58,7 +58,7 @@
 AppName                   ={#sAppName}
 AppVerName                ={#sAppName} {#sAppVerShort}
 AppVersion                ={#sAppVersion}
-;VersionInfoVersion        ={#sAppVersion}
+VersionInfoVersion        ={#sAppVersion}
 OutputBaseFilename        ={#sPackageName}
 
 AppPublisher            =Ascensio System SIA.
