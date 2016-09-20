@@ -101,12 +101,12 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
-;Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver-example\home\*;    DestDir: {app}\example; Flags: ignoreversion recursesubdirs
-;Source: ..\common\documentserver-example\config\*;  DestDir: {app}\example\config; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver-example\config\*;  DestDir: {app}\example\config; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\*;                                    DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-;Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
+Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-full
