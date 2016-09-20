@@ -158,7 +158,7 @@ $(RPM):	documentserver documentserver-example
 	chmod u+x rpm/bin/documentserver-configure.sh
 	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i rpm/$(PACKAGE_NAME).spec
 	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
-	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/'  -i rpm/$(PACKAGE_NAME).spec
+	sed 's/{{BUILD_NUMBER}}/'$(BUILD_NUMBER)'/'  -i rpm/$(PACKAGE_NAME).spec
 
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
 
@@ -171,7 +171,7 @@ $(DEB): documentserver documentserver-example
 
 $(EXE): documentserver documentserver-example $(ISXDL) $(NGINX)
 	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/' -i exe/$(PACKAGE_NAME).iss
-	sed 's/{{BUILD_NUMBER}}/'${BUILD_NUMBER}'/' -i exe/$(PACKAGE_NAME).iss
+	sed 's/{{BUILD_NUMBER}}/'$(BUILD_NUMBER)'/' -i exe/$(PACKAGE_NAME).iss
 	cd exe && iscc //Qp $(PACKAGE_NAME).iss
 
 $(ISXDL):
