@@ -1,10 +1,18 @@
+; Uncomment the line below to be able to compile the script from within the IDE.
+;#define COMPILE_FROM_IDE
+
 #define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
 #define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
 #define sPackageName        'onlyoffice-documentserver'
 #define iconsExe            'projicons.exe'
 
-#define sAppVersion         '{#GetEnv(PRODUCT_VERSION)}.{#GetEnv(BUILD_NUMBER)}'
+#ifndef COMPILE_FROM_IDE
+#define sAppVersion         '{{PRODUCT_VERSION}}.{{BUILD_NUMBER}}'
+#else
+#define sAppVersion         '4.0.0.0'
+#endif
+
 #define sAppVerShort
 
 #define NSSM                  '{app}\server\Winser\node_modules\winser\bin\nssm64.exe'
