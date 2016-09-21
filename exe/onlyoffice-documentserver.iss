@@ -370,7 +370,7 @@ begin
 
 end;
 
-procedure SetupPgPass()
+procedure SetupPgPass();
 begin 
   SaveStringToFile(
     ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
