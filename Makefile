@@ -170,8 +170,8 @@ $(DEB): documentserver documentserver-example
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 $(EXE): documentserver documentserver-example $(ISXDL) $(NGINX)
-	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/' -i exe/$(PACKAGE_NAME).iss
-	sed 's/{{BUILD_NUMBER}}/'$(BUILD_NUMBER)'/' -i exe/$(PACKAGE_NAME).iss
+	sed 's/'{{PRODUCT_VERSION}}'/'$(PRODUCT_VERSION)'/' -i exe/$(PACKAGE_NAME).iss
+	sed 's/'{{BUILD_NUMBER}}'/'$(BUILD_NUMBER)'/' -i exe/$(PACKAGE_NAME).iss
 	cd exe && iscc //Qp $(PACKAGE_NAME).iss
 
 $(ISXDL):
