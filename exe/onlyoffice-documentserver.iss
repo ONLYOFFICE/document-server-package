@@ -67,7 +67,7 @@ AppName                   ={#sAppName}
 AppVerName                ={#sAppName} {#sAppVerShort}
 AppVersion                ={#sAppVersion}
 VersionInfoVersion        ={#sAppVersion}
-OutputBaseFilename        ={#sPackageName}
+OutputBaseFilename        ={#sPackageName}-{#sAppVersion}
 
 AppPublisher            =Ascensio System SIA.
 AppPublisherURL         =http://www.onlyoffice.com/
