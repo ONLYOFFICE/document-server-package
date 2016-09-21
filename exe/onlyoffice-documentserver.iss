@@ -370,9 +370,34 @@ begin
 
 end;
 
+procedure SetupPgPass()
+begin 
+  SaveStringToFile(
+    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbUser('') + ':' + GetDbName('') + ':' + GetDbPwd(''),
+    False);
+end;
+
 function IsNotDbExist(): Boolean;
+var
+  ResultCode: Integer;
 begin
-  Result := False;
+  Result := false;
+
+  SetupPgPass();
+
+  Exec(
+    ExpandConstant('{#PSQL}'),
+    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
+    '', 
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
+    begin
+      Result := true;
+    end;
 end;
 
 function CheckDbConnection(): Boolean;
@@ -380,14 +405,12 @@ var
   ResultCode: Integer;
 begin
   Result := true;
-  SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
-    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbUser('') + ':' + GetDbName('') + ':' + GetDbPwd(''),
-    False);
+
+  SetupPgPass();
 
   Exec(
     ExpandConstant('{#PSQL}'),
-    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
+    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -w -c ";"',
     '', 
     SW_HIDE,
     ewWaitUntilTerminated,
