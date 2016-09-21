@@ -52,7 +52,7 @@ DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/sdkjs-plugins
 
 FONTS = common/fonts
 
-ISXDL = exe/scripts/isxdl/isxdl.dll
+ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
 
 NGINX_VER := nginx-1.11.4
 NGINX_ZIP := $(NGINX_VER).zip
