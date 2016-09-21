@@ -45,7 +45,6 @@
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
 #define PSQL '{pf64}\PostgreSQL\9.5\bin\psql.exe'
-#define CREATEDB '{pf64}\PostgreSQL\9.5\bin\createdb.exe'                                 
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
@@ -153,7 +152,6 @@ Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePo
 Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
 Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
 
-Filename: "{#CREATEDB}";  Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} {code:GetDbName}"; Check: IsNotDbExist(); Flags: runhidden
 Filename: "{#PSQL}";      Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} node convertermaster.js"; Flags: runhidden
@@ -370,47 +368,20 @@ begin
 
 end;
 
-procedure SetupPgPass();
-begin 
-  SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
-    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbUser('') + ':' + GetDbName('') + ':' + GetDbPwd(''),
-    False);
-end;
-
-function IsNotDbExist(): Boolean;
-var
-  ResultCode: Integer;
-begin
-  Result := false;
-
-  SetupPgPass();
-
-  Exec(
-    ExpandConstant('{#PSQL}'),
-    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
-    ResultCode);
-
-  if ResultCode <> 0 then
-    begin
-      Result := true;
-    end;
-end;
-
 function CheckDbConnection(): Boolean;
 var
   ResultCode: Integer;
 begin
   Result := true;
 
-  SetupPgPass();
+  SaveStringToFile(
+    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbUser('') + ':' + GetDbName('') + ':' + GetDbPwd(''),
+    False);
 
   Exec(
     ExpandConstant('{#PSQL}'),
-    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -w -c ";"',
+    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
     '', 
     SW_HIDE,
     ewWaitUntilTerminated,
