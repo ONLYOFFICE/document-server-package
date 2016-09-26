@@ -379,7 +379,7 @@ begin
 
   SaveStringToFile(
     ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
-    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbUser('') + ':' + GetDbName('') + ':' + GetDbPwd(''),
+    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
   Exec(
