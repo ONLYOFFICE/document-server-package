@@ -1,20 +1,16 @@
 ONLYOFFICE Integration Edition License Agreement
 
-
 IMPORTANT – READ CAREFULLY: BY CLICKING THE “I ACCEPT” BUTTON OR
 INSTALLING, DOWNLOADING OR OTHERWISE USING ONLYOFFICE AND ANY RELATED
 DOCUMENTATION, YOU, ON BEHALF OF YOURSELF OR AS AN AUTHORIZED REPRESENTATIVE
 ON BEHALF OF AN ENTITY (“LICENSEE”) AGREE TO ALL THE TERMS OF THIS
 ONLYOFFICE COMMERCIAL LICENSE AGREEMENT (THE “AGREEMENT”) REGARDING YOUR
-USE OF ONLYOFFICE DOCUMENT BUILDER. YOU REPRESENT AND WARRANT THAT YOU HAVE
-FULL LEGAL AUTHORITY TO BIND THE LICENSEE TO THIS AGREEMENT. IF YOU DO NOT
-AGREE WITH ALL OF THESE TERMS, DO NOT CLICK THE “I ACCEPT” BUTTON AND
-DO NOT INSTALL, DOWNLOAD OR OTHERWISE USE ONLYOFFICE.
-
-
+USE OF ONLYOFFICE INTEGRATION EDITION. YOU REPRESENT AND WARRANT THAT YOU
+HAVE FULL LEGAL AUTHORITY TO BIND THE LICENSEE TO THIS AGREEMENT. IF YOU DO
+NOT AGREE WITH ALL OF THESE TERMS, DO NOT CLICK THE “I ACCEPT” BUTTON
+AND DO NOT INSTALL, DOWNLOAD OR OTHERWISE USE ONLYOFFICE.
 
 Definitions.
-
 
 References used in this Agreement are understood as follows:
 “ONLYOFFICE Integration Edition” means office server software (including
@@ -30,12 +26,12 @@ this Agreement. This Agreement shall be effective as of the date of the
 last-executed signature below.
 “End Users” means any individual or entity to whom sub-license to use
 ONLYOFFICE Integration Edition was legitimately granted by you.
-"Developer server" means a server where ONLYOFFICE Integration Edition are
+"Developer server" means a server where ONLYOFFICE Integration Edition is
 installed for the Product developing and testing purposes.
 "Production server" means a server where ONLYOFFICE Integration Edition
-integrated with your Product are accessed by your End Users.
+integrated with your Product is accessed by your End Users.
 "Server Capacity" means the supported configuration of the server where
-ONLYOFFICE Document Builder may be installed and used.
+ONLYOFFICE Integration Edition may be installed and used.
 "Location" means any physical address where a Product is developed or
 presented for End Users.
 "EULA" means "End User License Agreement" the License Agreement between you
@@ -76,7 +72,6 @@ IP address of the corresponding web-server containing data files.
 
 1. Grant of License
 
-
 1.1 We grant you a non-exclusive, worldwide license to use ONLYOFFICE
 Integration Edition for your own purposes for specified Server Capacity on
 limited by the License Type number of Locations and you are herein entitled
@@ -110,7 +105,6 @@ to undertake any activity which is not permitted by this Agreement.
 
 2. Using ONLYOFFICE under you own brand name and/or logo
 
-
 2.1.  You may integrate your own brand name and/or logo into ONLYOFFICE
 Integration Edition according to our technical requirements and instructions
 described on the official web-page at api.onlyoffice.com.
@@ -119,18 +113,24 @@ or misrepresentation about the rightholder of ONLYOFFICE Integration Edition.
 
 3. License Types Description
 
-3.1. Site Small License
-Site Small License permits to create a Product using ONLYOFFICE Integration
-Edition with the Server Capacity specified by the tariff plan selected for
-usage on one Location for Developer Server and one Location for Production
+3.1. Developer Server
+Developer Server License permits you to develop a Product based on ONLYOFFICE
+Integration Edition with the Server Capacity specified by the tariff plan
+selected for usage at one Location as a Developer Server. No distribution,
+public sites and services, extranet or SaaS allowed.
+3.2. Site Small Business Server
+Site Small Business Server license permits you to distribute ONLYOFFICE
+Integration Edition as integrated into a Product with the Server Capacity
+specified by the tariff plan selected for usage at one Location for Production
 Server. Only web-based usage allowed. Public sites and services, extranet
 or SaaS included.
-3.2. Site OEM License
-Site OEM License permits to create a Product using ONLYOFFICE Integration
-Edition with the Server Capacity specified by the tariff plan selected for
-usage on up to three Locations for Developer Server and on unlimited number
-of Locations for Production Server. Distribution, public sites and services,
-extranet or SaaS included.
+3.3. Site OEM Server
+Site OEM License permits you to develop a Product based ONLYOFFICE Integration
+Edition and distribute ONLYOFFICE Integration Edition as integrated into a
+Product with the Server Capacity specified by the tariff plan selected for
+usage at unlimited number of Locations for Production Server. Distribution,
+public sites and services, extranet or SaaS included.
+
 
 4. Trial License Key
 
@@ -190,18 +190,16 @@ System SIA for an appropriate License Type.
 
 7. Terms of payment
 
-
 7.1 License Fee shall be paid in US dollars.
 7.2 License Fee is payable in advance and is not refundable.
 7.3.  The amount and terms of payable License Fee is indicated on our official
 website www.onlyoffice.com.
-7.4.  We have the right to modify the amount of your License Fee for any
+7.4. We have the right to modify the amount of your License Fee for any
 future period.
 
 8. Term and Termination
 
-
-8.1.  The license granted under this Agreement is perpetual.
+8.1. The license granted under this Agreement is perpetual.
 8.2.  This Agreement may be terminated at any time by mutual written consent
 of both Parties.
 8.3.  We are entitled to immediately terminate this Agreement without any
@@ -211,9 +209,8 @@ license is considered revoked and you shall return or destroy License Key.
 
 9. Restrictions on Use.
 
-
 9.1 You may not develop a competitive SDK product or service on the basis of
-ONLYOFFICE Document Builder, i.e. a product or service using similar ideas
+ONLYOFFICE Integration Edition, i.e. a product or service using similar ideas
 as those of components offered for integration in other commercial products;
 9.2 You may not prepare derivative work based on ONLYOFFICE except for the
 reasons indicated in this Agreement;
@@ -232,7 +229,6 @@ incorporated in or otherwise applied to ONLYOFFICE.
 9.7 You may not offer ONLYOFFICE to your End Users for free.
 
 10. Warranties and Limitation of Liability
-
 
 10.1 ONLYOFFICE Integration Edition and all related services are provided “as
 is” without any warranties unless otherwise specified in this Agreement.
@@ -281,7 +277,6 @@ suspected compromise of License Key.
 
 11. Miscellaneous
 
-
 11.1 After this Agreement has been signed all the preliminary agreements,
 discussions and correspondence between the Parties concerning this Agreement
 are to be considered null and void.
@@ -302,4 +297,5 @@ the rest of this Agreement. The remaining provisions of this Agreement will
 continue to be valid and enforceable.
 11.6 Neither Party is entitled to assign or transfer its rights or obligations
 under this Agreement without the other Party’s prior written consent.
+
 
