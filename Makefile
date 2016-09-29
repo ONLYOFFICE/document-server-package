@@ -190,8 +190,8 @@ $(NGINX):
 $(PSQL):
 	curl -o $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
 	7z x -y -o. $(PSQL_ZIP) && \
-	mkdir -p $(DOCUMENTSERVER)/psql/bin && \
-	cp -rf -t $(DOCUMENTSERVER)/psql/bin  psql/bin/psql.exe  psql/bin/*.dll && \
+	mkdir -p $(DOCUMENTSERVER)/pgsql/bin && \
+	cp -rf -t $(DOCUMENTSERVER)/pgsql/bin  pgsql/bin/psql.exe  pgsql/bin/*.dll && \
 	rm -f $(PSQL_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
