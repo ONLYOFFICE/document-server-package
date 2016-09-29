@@ -275,9 +275,9 @@ begin
 
   vcredist2010();
   nodejs4x('4.0.0.0');
-  postgresql('9.5.4.0');
-  rabbitmq('3.6.5');
-  redis('3.2.100');
+  //postgresql('9.5.4.0');
+  //rabbitmq('3.6.5');
+  //redis('3.2.100');
 
   Result := true;
 end;
@@ -459,9 +459,9 @@ begin
   if WizardSilent() = false then
   begin
     case CurPageID of
-      DbPage.ID: Result := CheckDbConnection();
-      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-      RedisPage.ID: Result := CheckRedisConnection();
+//      DbPage.ID: Result := CheckDbConnection();
+//      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
+//      RedisPage.ID: Result := CheckRedisConnection();
       wpReady: Result := DownloadDependency();
     end;
   end;
