@@ -58,6 +58,9 @@ NGINX_VER := nginx-1.11.4
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
 
+PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
+PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
+
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
 	EXEC_EXT := .exe
@@ -171,7 +174,7 @@ $(DEB): documentserver documentserver-example
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
-$(EXE): documentserver documentserver-example $(ISXDL) $(NGINX)
+$(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL)
 	sed 's/'{{PRODUCT_VERSION}}'/'$(PRODUCT_VERSION)'/' -i exe/$(PACKAGE_NAME).iss
 	sed 's/'{{BUILD_NUMBER}}'/'$(BUILD_NUMBER)'/' -i exe/$(PACKAGE_NAME).iss
 	cd exe && iscc //Qp $(PACKAGE_NAME).iss
@@ -183,6 +186,13 @@ $(NGINX):
 	curl -o $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
 	rm -f $(NGINX_ZIP)
+	
+$(PSQL):
+	curl -o $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
+	7z x -y -o. $(PSQL_ZIP) && \
+	mkdir -p $(DOCUMENTSERVER)/psql/bin && \
+	cp -rf -t $(DOCUMENTSERVER)/psql/bin  psql/bin/psql.exe  psql/bin/*.dll && \
+	rm -f $(PSQL_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)
