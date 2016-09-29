@@ -456,11 +456,14 @@ end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
-  case CurPageID of
-    DbPage.ID: Result := CheckDbConnection();
-    RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-    RedisPage.ID: Result := CheckRedisConnection();
-    wpReady: Result := DownloadDependency();
+  if WizardSilent() = false then
+  begin
+    case CurPageID of
+      DbPage.ID: Result := CheckDbConnection();
+      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
+      RedisPage.ID: Result := CheckRedisConnection();
+      wpReady: Result := DownloadDependency();
+    end;
   end;
 end;                                                     
 
