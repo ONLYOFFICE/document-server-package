@@ -49,7 +49,7 @@
 #define EXAMPLE_SRV_DIR    '{app}\example\bin'
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
-#define PSQL '{pf64}\PostgreSQL\9.5\bin\psql.exe'
+#define PSQL '{app}\pgsql\bin\psql.exe'
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
