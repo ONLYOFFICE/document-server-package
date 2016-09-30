@@ -216,6 +216,7 @@ Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden
 Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden
 
 Filename: "http://localhost/example"; Description: "Open the examples"
+Filename: "http://localhost/example"; Description: "Open ONLYOFFICE DocumentServer demo"; Flags: postinstall shellexec skipifsilent
 
 [UninstallRun]
 Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
