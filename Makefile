@@ -177,7 +177,7 @@ $(DEB): documentserver documentserver-example
 $(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL)
 	sed 's/'{{PRODUCT_VERSION}}'/'$(PRODUCT_VERSION)'/' -i exe/$(PACKAGE_NAME).iss
 	sed 's/'{{BUILD_NUMBER}}'/'$(BUILD_NUMBER)'/' -i exe/$(PACKAGE_NAME).iss
-	cd exe && iscc //Qp $(PACKAGE_NAME).iss
+	cd exe && iscc //Qp //S"byparam=signtool.exe sign //v //s My //n Ascensio //t http://timestamp.verisign.com/scripts/timstamp.dll $f" $(PACKAGE_NAME).iss
 
 $(ISXDL):
 	curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll

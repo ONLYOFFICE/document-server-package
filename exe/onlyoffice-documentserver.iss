@@ -103,6 +103,7 @@ Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
+SignTool=byparam $p
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
