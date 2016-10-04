@@ -26,7 +26,7 @@ this Agreement. This Agreement shall be effective as of the date of the
 last-executed signature below.
 “End Users” means any individual or entity to whom sub-license to use
 ONLYOFFICE Integration Edition was legitimately granted by you.
-"Developer server" means a server where ONLYOFFICE Integration Edition is
+"Development server" means a server where ONLYOFFICE Integration Edition is
 installed for the Product developing and testing purposes.
 "Production server" means a server where ONLYOFFICE Integration Edition
 integrated with your Product is accessed by your End Users.
@@ -113,17 +113,16 @@ or misrepresentation about the rightholder of ONLYOFFICE Integration Edition.
 
 3. License Types Description
 
-3.1. Developer Server
-Developer Server License permits you to develop a Product based on ONLYOFFICE
+3.1. Development Server
+Development Server License permits you to develop a Product based on ONLYOFFICE
 Integration Edition with the Server Capacity specified by the tariff plan
-selected for usage at one Location as a Developer Server. No distribution,
+selected for usage at one Location as a Development Server. No distribution,
 public sites and services, extranet or SaaS allowed.
-3.2. Site Small Business Server
-Site Small Business Server license permits you to distribute ONLYOFFICE
-Integration Edition as integrated into a Product with the Server Capacity
-specified by the tariff plan selected for usage at one Location for Production
-Server. Only web-based usage allowed. Public sites and services, extranet
-or SaaS included.
+3.2. SaaS Server
+SaaS Server license permits you to distribute ONLYOFFICE Integration Edition
+as integrated into a Product with the Server Capacity specified by the tariff
+plan selected for usage at one Location for Production Server. Only web-based
+usage allowed. Public sites and services, extranet or SaaS included.
 3.3. Site OEM Server
 Site OEM License permits you to develop a Product based ONLYOFFICE Integration
 Edition and distribute ONLYOFFICE Integration Edition as integrated into a
