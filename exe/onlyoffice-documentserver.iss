@@ -103,6 +103,7 @@ Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
+MinVersion                =6.1.7600
 WizardImageFile           = data\dialogpicture.bmp
 WizardSmallImageFile      = data\dialogicon.bmp
 
