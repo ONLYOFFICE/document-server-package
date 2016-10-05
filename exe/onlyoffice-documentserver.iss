@@ -107,7 +107,9 @@ MinVersion                =6.1.7600
 WizardImageFile           = data\dialogpicture.bmp
 WizardSmallImageFile      = data\dialogicon.bmp
 
+#ifndef COMPILE_FROM_IDE
 SignTool=byparam $p
+#endif
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
