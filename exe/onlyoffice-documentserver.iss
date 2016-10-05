@@ -103,6 +103,9 @@ Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
+WizardImageFile           = data\dialogpicture.bmp
+WizardSmallImageFile      = data\dialogicon.bmp
+
 SignTool=byparam $p
 
 [Languages]
