@@ -124,7 +124,7 @@ documentserver:
 	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 	
-	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE)
+	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE) || true
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal$(EXEC_EXT)
