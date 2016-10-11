@@ -126,7 +126,7 @@ documentserver:
 
 ifeq ($(PLATFORM),win)
 	cp -fr -t $(DOCUMENTSERVER)/license exe/license/*.license
-	cat exe/license/3rd-Party.txt >> $(DOCUMENTSERVER)/3rd-Party.txt
+	echo ; cat exe/license/3rd-Party.txt ; >> $(DOCUMENTSERVER)/3rd-Party.txt
 endif
 
 	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE)
