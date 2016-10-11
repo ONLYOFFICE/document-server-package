@@ -1,0 +1,12 @@
+20. Nginx - Nginx is an HTTP and reverse proxy server, a mail proxy server, and a generic TCP/UDP proxy server.
+
+URL:            http://nginx.org/
+License:        BSD-like license
+License File:   license/nginx.license
+
+
+21. PostgreSql - PostgreSQL Database Management System
+
+URL:            https://www.postgresql.org
+License:        PostgreSQL License, similar to the BSD or MIT licenses.
+License File:   license/postgresql.license
