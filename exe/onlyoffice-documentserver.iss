@@ -147,26 +147,26 @@ Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
 
 Filename: "{#NPM}"; Parameters: "install -g json"; Flags: runhidden shellexec waituntilterminated
 Filename: "{#NPM}"; Parameters: "install -g replace"; Flags: runhidden shellexec waituntilterminated
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqHost}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.login = '{code:GetRabbitMqUser}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '{code:GetRabbitMqPwd}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.login = '{code:GetRabbitMqUser}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '{code:GetRabbitMqPwd}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
 Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
-Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
-Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; 
 
