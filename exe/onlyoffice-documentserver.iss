@@ -53,8 +53,8 @@
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
-#define NODE_PATH '{pf64}\nodejs'
-#define NPM '{pf64}\nodejs\npm'
+#define NODE_PATH '{pf32}\nodejs'
+#define NPM '{pf32}\nodejs\npm'
 #define JSON '{userappdata}\npm\json.cmd'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\default.json""'
@@ -132,6 +132,7 @@ Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ign
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-full
+Name: "{app}\example\public\files";   Permissions: users-full
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-full
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
@@ -204,7 +205,7 @@ Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppDirectory {#SPELLCH
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECKER_SRV_LOG_DIR}\out.log"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden
-;Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node www"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden
@@ -216,7 +217,7 @@ Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStderr {#EXAMPLE_SRV_LOG
 Filename: "{#NSSM}"; Parameters: "start {#EXAMPLE_SRV}"; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} ""{#NGINX_SRV_DIR}\nginx"""; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DISPLAY}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} DisplayName {#NGINX_SRV_DISPLAY}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStdout {#NGINX_SRV_LOG_DIR}\out.log"; Flags: runhidden
