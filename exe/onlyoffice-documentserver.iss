@@ -368,8 +368,12 @@ begin
 end;
 
 function GetLicensePath(Param: String): String;
+var
+  LicensePath: String;
 begin
-  Result := ExpandConstant('{param:LICENSE_PATH|./../../license.lic}');
+  LicensePath := ExpandConstant('{param:LICENSE_PATH|./../../license.lic}');
+  StringChangeEx(LicensePath, '\', '/', True);
+  Result := LicensePath;
 end;
 
 procedure InitializeWizard;
