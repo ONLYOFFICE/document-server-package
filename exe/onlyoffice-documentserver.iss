@@ -145,6 +145,10 @@ Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
 Name: "{#POSTGRESQL_DATA_DIR}";
 
+[Icons]
+Name: "{group}\Uninstall {#sAppName}"; Filename: "{uninstallexe}"
+Name: "{group}\Open {#sAppName} demo"; Filename: "http://localhost/example"
+
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
 
@@ -229,7 +233,7 @@ Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden
 
 Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden
 
-Filename: "http://localhost/example"; Description: "Open ONLYOFFICE DocumentServer demo"; Flags: postinstall shellexec skipifsilent
+Filename: "http://localhost/example"; Description: "Open {#sAppName} demo"; Flags: postinstall shellexec skipifsilent
 
 [UninstallRun]
 Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
