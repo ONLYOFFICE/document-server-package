@@ -50,6 +50,7 @@
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
+#define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
@@ -142,6 +143,7 @@ Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
 Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
+Name: "{#POSTGRESQL_DATA_DIR}";
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
@@ -423,12 +425,12 @@ end;
 
 function CreateDbAuth(): Boolean;
 var
-  ResultCode: Integer;
+  IsSuccess: Boolean;
 begin
   Result := true;
 
-  SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+  IsSuccess := SaveStringToFile(
+    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 end;
