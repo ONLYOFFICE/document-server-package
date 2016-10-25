@@ -46,7 +46,7 @@
 #define EXAMPLE_SRV        'DsExampleSvc'
 #define EXAMPLE_SRV_DISPLAY  'ONLYOFFICE DocumentServer Example'
 #define EXAMPLE_SRV_DESCR  'ONLYOFFICE DocumentServer Example Service'
-#define EXAMPLE_SRV_DIR    '{app}\example\bin'
+#define EXAMPLE_SRV_DIR    '{app}\example'
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
@@ -210,7 +210,7 @@ Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECK
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
 
-Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node www"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node .\bin\www"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Description {#EXAMPLE_SRV_DESCR}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppDirectory {#EXAMPLE_SRV_DIR}"; Flags: runhidden
