@@ -46,10 +46,11 @@
 #define EXAMPLE_SRV        'DsExampleSvc'
 #define EXAMPLE_SRV_DISPLAY  'ONLYOFFICE DocumentServer Example'
 #define EXAMPLE_SRV_DESCR  'ONLYOFFICE DocumentServer Example Service'
-#define EXAMPLE_SRV_DIR    '{app}\example\bin'
+#define EXAMPLE_SRV_DIR    '{app}\example'
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
+#define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
@@ -142,6 +143,7 @@ Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
 Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
+Name: "{#POSTGRESQL_DATA_DIR}";
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
@@ -162,6 +164,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.services.CoAuthoring.utils.utils_common_fontdir = '{code:GetFontsPath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
 Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
@@ -207,7 +210,7 @@ Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECK
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
 
-Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node www"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node .\bin\www"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Description {#EXAMPLE_SRV_DESCR}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppDirectory {#EXAMPLE_SRV_DIR}"; Flags: runhidden
@@ -368,8 +371,21 @@ begin
 end;
 
 function GetLicensePath(Param: String): String;
+var
+  LicensePath: String;
 begin
-  Result := ExpandConstant('{param:LICENSE_PATH|./../../license.lic}');
+  LicensePath := ExpandConstant('{param:LICENSE_PATH|./../../license.lic}');
+  StringChangeEx(LicensePath, '\', '/', True);
+  Result := LicensePath;
+end;
+
+function GetFontsPath(Param: String): String;
+var
+  FontPath: String;
+begin
+  FontPath := ExpandConstant('{param:FONTS_PATH|{fonts}}');
+  StringChangeEx(FontPath, '\', '/', True);
+  Result := FontPath;
 end;
 
 procedure InitializeWizard;
@@ -409,12 +425,12 @@ end;
 
 function CreateDbAuth(): Boolean;
 var
-  ResultCode: Integer;
+  IsSuccess: Boolean;
 begin
   Result := true;
 
-  SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+  IsSuccess := SaveStringToFile(
+    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 end;
