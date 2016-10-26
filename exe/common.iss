@@ -16,7 +16,6 @@
 
 #define NSSM                  '{app}\server\Winser\node_modules\winser\bin\nssm64.exe'
 #define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'
-#define NODE_EXAMPLE_SRV_ENV  'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\example\config"" NODE_DISABLE_COLORS=1'
 
 #define CONVERTER_SRV        'DsConverterSvc'
 #define CONVERTER_SRV_DISPLAY  'ONLYOFFICE DocumentServer Converter'
@@ -42,12 +41,6 @@
 #define SPELLCHECKER_SRV_DIR    '{app}\server\SpellChecker\sources'
 #define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
 
-#define EXAMPLE_SRV        'DsExampleSvc'
-#define EXAMPLE_SRV_DISPLAY  'ONLYOFFICE DocumentServer Example'
-#define EXAMPLE_SRV_DESCR  'ONLYOFFICE DocumentServer Example Service'
-#define EXAMPLE_SRV_DIR    '{app}\example'
-#define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
-
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
@@ -59,7 +52,6 @@
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\default.json""'
 #define JSON_WIN_PARAMS '-I -q -f ""{app}\config\production-windows.json""'
-#define JSON_EXAMPLE_PARAMS '-I -q -f ""{app}\example\config\default.json""'
 
 #define REPLACE '{userappdata}\npm\replace.cmd'
 
@@ -124,20 +116,16 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver-example\home\*;    DestDir: {app}\example; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver-example\config\*;  DestDir: {app}\example\config; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: nginx\*;                                    DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: nginx\nginx.conf;                                    DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-full
-Name: "{app}\example\public\files";   Permissions: users-full
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-full
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
 Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-full
-Name: "{#EXAMPLE_SRV_LOG_DIR}";       Permissions: users-full
 Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
 Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
@@ -146,7 +134,6 @@ Name: "{#POSTGRESQL_DATA_DIR}";
 
 [Icons]
 Name: "{group}\Uninstall {#sAppName}"; Filename: "{uninstallexe}"
-Name: "{group}\Open {#sAppName} demo"; Filename: "http://localhost/example"
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
@@ -168,12 +155,10 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.services.CoAuthoring.utils.utils_common_fontdir = '{code:GetFontsPath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
 Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; 
 
@@ -213,15 +198,6 @@ Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECK
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
 
-Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node .\bin\www"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Description {#EXAMPLE_SRV_DESCR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppDirectory {#EXAMPLE_SRV_DIR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppEnvironmentExtra {#NODE_EXAMPLE_SRV_ENV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStdout {#EXAMPLE_SRV_LOG_DIR}\out.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStderr {#EXAMPLE_SRV_LOG_DIR}\error.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "start {#EXAMPLE_SRV}"; Flags: runhidden
-
 Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} ""{#NGINX_SRV_DIR}\nginx"""; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} DisplayName {#NGINX_SRV_DISPLAY}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden
@@ -231,8 +207,6 @@ Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStderr {#NGINX_SRV_LOG_DIR
 Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden
 
 Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden
-
-Filename: "http://localhost/example"; Description: "Open {#sAppName} demo"; Flags: postinstall shellexec skipifsilent
 
 [UninstallRun]
 Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
@@ -249,9 +223,6 @@ Filename: "{#NSSM}"; Parameters: "remove {#GC_SRV} confirm"; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "stop {#SPELLCHECKER_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#SPELLCHECKER_SRV} confirm"; Flags: runhidden
-
-Filename: "{#NSSM}"; Parameters: "stop {#EXAMPLE_SRV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "remove {#EXAMPLE_SRV} confirm"; Flags: runhidden
 
 Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#NGINX_SRV_DIR}\nginx.exe"""; Flags: runhidden
 
@@ -276,15 +247,7 @@ Type: filesandordirs; Name: "{app}\*"
 #include "scripts\service.iss"
 
 [Code]
-procedure StopDsServices;
-begin
-  StopSrv(ExpandConstant('{#NGINX_SRV}'));
-  StopSrv(ExpandConstant('{#CONVERTER_SRV}'));
-  StopSrv(ExpandConstant('{#DOCSERVICE_SRV}'));
-  StopSrv(ExpandConstant('{#GC_SRV}'));
-  StopSrv(ExpandConstant('{#SPELLCHECKER_SRV}'));
-  StopSrv(ExpandConstant('{#EXAMPLE_SRV}'));
-end;
+procedure StopDsServices(); forward;
 
 function InitializeSetup(): Boolean;
 begin
@@ -366,11 +329,6 @@ end;
 function GetSpellCheckerPort(Param: String): String;
 begin
   Result := ExpandConstant('{param:SPELLCHECKER_PORT|8080}');
-end;
-
-function GetExamplePort(Param: String): String;
-begin
-  Result := ExpandConstant('{param:EXAMPLE_PORT|3000}');
 end;
 
 function GetLicensePath(Param: String): String;
