@@ -93,7 +93,7 @@ ASLRCompatible            = no
 DisableDirPage            = auto
 AllowNoIcons              = yes
 AlwaysShowDirOnReadyPage  = yes
-UninstallDisplayIcon      = {app}\{#sPackageName}
+UninstallDisplayIcon      = {uninstallexe}
 OutputDir                 =.\
 Compression               =zip
 PrivilegesRequired        =admin
@@ -102,6 +102,7 @@ SetupMutex                =ASC
 MinVersion                =6.1.7600
 WizardImageFile           = data\dialogpicture.bmp
 WizardSmallImageFile      = data\dialogicon.bmp
+SetupIconFile             = data\icon.ico
 
 #ifndef COMPILE_FROM_IDE
 SignTool=byparam $p
