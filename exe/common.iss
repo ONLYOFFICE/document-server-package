@@ -61,6 +61,8 @@
 #define NGINX_SRV_DIR  '{app}\nginx-1.11.4'
 #define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
 
+#define LICENSE_PATH '{commonappdata}\ONLYOFFICE\Data'
+
 [Setup]
 AppName                   ={#sAppName}
 AppVerName                ={#sAppName} {#sAppVerShort}
@@ -131,6 +133,7 @@ Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
 Name: "{#POSTGRESQL_DATA_DIR}";
+Name: "{#LICENSE_PATH}";
 
 [Icons]
 Name: "{group}\Uninstall {#sAppName}"; Filename: "{uninstallexe}"
@@ -335,7 +338,7 @@ function GetLicensePath(Param: String): String;
 var
   LicensePath: String;
 begin
-  LicensePath := ExpandConstant('{param:LICENSE_PATH|./../../license.lic}');
+  LicensePath := ExpandConstant('{param:LICENSE_PATH|{#LICENSE_PATH}\license.lic}');
   StringChangeEx(LicensePath, '\', '/', True);
   Result := LicensePath;
 end;
