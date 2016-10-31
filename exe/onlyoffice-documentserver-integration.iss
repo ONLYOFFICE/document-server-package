@@ -2,6 +2,8 @@
 
 #include "common.iss"
 
+#define REG_EXAMPLE_PORT        'ExamplePort'
+
 #define EXAMPLE_SRV        'DsExampleSvc'
 #define EXAMPLE_SRV_DISPLAY  'ONLYOFFICE DocumentServer Example'
 #define EXAMPLE_SRV_DESCR  'ONLYOFFICE DocumentServer Example Service'
@@ -23,6 +25,9 @@ Name: "{#EXAMPLE_SRV_LOG_DIR}";       Permissions: users-full
 
 [Icons]
 Name: "{group}\Open {#sAppName} demo"; Filename: "http://localhost/example"
+
+[Registry]
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_EXAMPLE_PORT}"; ValueData: "{code:GetExamplePort}";
 
 [Run]
 Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
@@ -57,5 +62,5 @@ end;
 
 function GetExamplePort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:EXAMPLE_PORT|3000}');
+  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_EXAMPLE_PORT}|3000}}');
 end;
