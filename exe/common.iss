@@ -4,6 +4,21 @@
 #define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
 #define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
+
+#define REG_LICENSE_PATH      'LicensePath'
+#define REG_DB_HOST           'DbHost'
+#define REG_DB_USER           'DbUser'
+#define REG_DB_PWD            'DbPwd'
+#define REG_DB_NAME           'DbName'
+#define REG_RABBITMQ_HOST     'RabbitMqHost'
+#define REG_RABBITMQ_USER     'RabbitMqUser'
+#define REG_RABBITMQ_PWD      'RabbitMqPwd'
+#define REG_REDIS_HOST        'RedisHost'
+#define REG_DS_PORT           'DsPort'
+#define REG_DOCSERVICE_PORT   'DocServicePort'
+#define REG_SPELLCHECKER_PORT 'SpellCheckerPort'
+#define REG_FONTS_PATH        'FontsPath'
+
 #define iconsExe            'projicons.exe'
 
 #ifndef COMPILE_FROM_IDE
@@ -138,6 +153,21 @@ Name: "{#LICENSE_PATH}";
 
 [Icons]
 Name: "{group}\Uninstall {#sAppName}"; Filename: "{uninstallexe}"
+
+[Registry]
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "dword"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "dword"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "dword"; ValueName: "{#REG_SPELLCHECKER_PORT}"; ValueData: "{code:GetSpellCheckerPort}";
+Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_FONTS_PATH}"; ValueData: "{code:GetFontsPath}";
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
@@ -322,24 +352,24 @@ end;
 
 function GetDefaultPort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DS_PORT|80}');
+  Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_DS_PORT}|80}}');
 end;
 
 function GetDocServicePort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DOCSERVICE_PORT|8000}');
+  Result := ExpandConstant('{param:DOCSERVICE_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_DOCSERVICE_PORT}|8000}}');
 end;
 
 function GetSpellCheckerPort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:SPELLCHECKER_PORT|8080}');
+  Result := ExpandConstant('{param:SPELLCHECKER_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_SPELLCHECKER_PORT}|8080}}');
 end;
 
 function GetLicensePath(Param: String): String;
 var
   LicensePath: String;
 begin
-  LicensePath := ExpandConstant('{param:LICENSE_PATH|{#LICENSE_PATH}\license.lic}');
+  LicensePath := ExpandConstant('{param:LICENSE_PATH|{reg:HKLM\{#APP_REG_PATH},{#REG_LICENSE_PATH}|{#LICENSE_PATH}\license.lic}}');
   StringChangeEx(LicensePath, '\', '/', True);
   Result := LicensePath;
 end;
@@ -348,7 +378,7 @@ function GetFontsPath(Param: String): String;
 var
   FontPath: String;
 begin
-  FontPath := ExpandConstant('{param:FONTS_PATH|{fonts}}');
+  FontPath := ExpandConstant('{param:FONTS_PATH|{reg:HKLM\{#APP_REG_PATH},{#REG_FONTS_PATH}|{fonts}}}');
   StringChangeEx(FontPath, '\', '/', True);
   Result := FontPath;
 end;
@@ -363,10 +393,10 @@ begin
   DbPage.Add('Password:', True);
   DbPage.Add('Database:', False);
 
-  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|localhost}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_USER|onlyoffice}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|onlyoffice}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|onlyoffice}');
+  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_HOST}|localhost}}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_USER}|onlyoffice}}');
+  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_PWD}|onlyoffice}}');
+  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_NAME}|onlyoffice}}');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
@@ -375,16 +405,16 @@ begin
   RabbitMqPage.Add('User:', False);
   RabbitMqPage.Add('Password:', True);
 
-  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|localhost}');
-  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|guest}');
-  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|guest}');
+  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_RABBITMQ_HOST}|localhost}}');
+  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_RABBITMQ_USER}|guest}}');
+  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_RABBITMQ_PWD}|guest}}');
 
   RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
     'Redis In-Memory Database', 'Configure Redis Connection...',
     'Please specify your Reids connection, then click Next.');
   RedisPage.Add('Host:', False);
 
-  RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|localhost}');
+  RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_REDIS_HOST}|localhost}}');
 
 end;
 
