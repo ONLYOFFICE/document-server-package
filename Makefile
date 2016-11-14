@@ -181,8 +181,8 @@ $(DEB): documentserver documentserver-example
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 $(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL)
-	sed 's/'{{PRODUCT_VERSION}}'/'$(PRODUCT_VERSION)'/' -i exe/$(PACKAGE_NAME).iss
-	sed 's/'{{BUILD_NUMBER}}'/'$(BUILD_NUMBER)'/' -i exe/$(PACKAGE_NAME).iss
+	sed 's/'{{PRODUCT_VERSION}}'/'$(PRODUCT_VERSION)'/' -i exe/common.iss
+	sed 's/'{{BUILD_NUMBER}}'/'$(BUILD_NUMBER)'/' -i exe/common.iss
 	cd exe && iscc //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
 
 $(ISXDL):
