@@ -123,6 +123,9 @@ getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/only
 exit 0
 
 %post
+# Make symlink to libcurl-gnutls
+ln -sf /usr/lib64/libcurl.so.4 /usr/lib64/libcurl-gnutls.so.4
+
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
 
