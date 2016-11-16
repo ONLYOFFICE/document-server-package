@@ -27,9 +27,6 @@ DOCUMENTSERVER_BIN=../../../common/documentserver/bin
 DOCUMENTSERVER_HOME=../../../common/documentserver/home
 DOCUMENTSERVER_CONFIG=../../../common/documentserver/config
 
-DOCUMENTSERVER_EXAMPLE_HOME=../../../common/documentserver-example/home
-DOCUMENTSERVER_EXAMPLE_CONFIG=../../../common/documentserver-example/config
-
 #install documentserver files
 mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 cp -r $DOCUMENTSERVER_HOME/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
@@ -48,17 +45,8 @@ cp -r ../../bin/*.sh "$RPM_BUILD_ROOT/usr/bin/"
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
 cp -r $DOCUMENTSERVER_CONFIG/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
 
-#install documentserver example files
-mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
-cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
-
-#install dcoumentserver example configs
-mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/"
-cp -r $DOCUMENTSERVER_EXAMPLE_CONFIG/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/" 
-
 #make log dir
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/docservice"
-mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver-example"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/converter"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/spellchecker"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/metrics"
@@ -73,7 +61,6 @@ mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
 #install supervisor configs
 mkdir -p "$RPM_BUILD_ROOT/etc/supervisord.d/"
 cp ../../../common/documentserver/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
-cp -f ../../../common/documentserver-example/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
 for f in "$RPM_BUILD_ROOT"/etc/supervisord.d/*.conf; 
 do
   mv "$f" "${f%.*}".ini;
@@ -85,7 +72,6 @@ cp ../../../common/documentserver/nginx/onlyoffice-documentserver.conf "$RPM_BUI
 
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
 cp ../../../common/documentserver/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
-cp ../../../common/documentserver-example/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
 
 mkdir -p "$RPM_BUILD_ROOT/var/cache/nginx/onlyoffice/documentserver/"
 
@@ -99,7 +85,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
-%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
@@ -111,7 +96,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
