@@ -235,4 +235,4 @@ $(DEB_REPO_DATA): $(DEB)
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
 		--acl public-read --delete
 
-deploy: $(DEB_REPO_DATA)
+deploy: $(RPM_REPO_DATA) $(DEB_REPO_DATA)
