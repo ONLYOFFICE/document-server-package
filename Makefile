@@ -72,7 +72,7 @@ ifeq ($(OS),Windows_NT)
 	EXEC_EXT := .exe
 	SHELL_EXT := .bat
 	SHARED_EXT := .dll
-	DEPLOY := $(EXE)
+	DEPLOY := $(EXE_REPO_DATA)
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
 	endif
