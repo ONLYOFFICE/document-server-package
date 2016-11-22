@@ -20,7 +20,7 @@ RPM_REPO := $(PWD)/repo-rpm
 RPM_REPO_DATA := $(RPM_REPO)/repodata
 
 EXE_REPO := $(PWD)/repo-exe
-EXE_REPO_DATA := $(RPM_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
+EXE_REPO_DATA := $(EXE_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 
 RPM_REPO_OS_NAME = centos
 RPM_REPO_OS_VER = 7
@@ -247,7 +247,7 @@ $(EXE_REPO_DATA): $(EXE)
 	rm -rfv $(EXE_REPO)
 	mkdir -p $(EXE_REPO)
 
-	cp -rv $(EXE) $(RPM_REPO);
+	cp -rv $(EXE) $(EXE_REPO);
 
 	aws s3 sync \
 		$(EXE_REPO) \
