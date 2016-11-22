@@ -19,7 +19,7 @@ DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
 RPM_REPO := $(PWD)/repo-rpm
 RPM_REPO_DATA := $(RPM_REPO)/repodata
 
-EXE_REPO := $(PWD)/repo-exe
+EXE_REPO := repo-exe
 EXE_REPO_DATA := $(EXE_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 
 RPM_REPO_OS_NAME = centos
