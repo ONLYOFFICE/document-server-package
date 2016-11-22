@@ -259,4 +259,4 @@ $(EXE_REPO_DATA): $(EXE)
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
 		--acl public-read --delete
 
-deploy: $(DEPOY)
+deploy: $(DEPLOY)
