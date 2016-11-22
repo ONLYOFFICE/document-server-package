@@ -19,6 +19,9 @@ DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
 RPM_REPO := $(PWD)/repo-rpm
 RPM_REPO_DATA := $(RPM_REPO)/repodata
 
+EXE_REPO := $(PWD)/repo-exe
+EXE_REPO_DATA := $(RPM_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
+
 RPM_REPO_OS_NAME = centos
 RPM_REPO_OS_VER = 7
 RPM_REPO_DIR = $(RPM_REPO_OS_NAME)/$(RPM_REPO_OS_VER)
@@ -26,6 +29,8 @@ RPM_REPO_DIR = $(RPM_REPO_OS_NAME)/$(RPM_REPO_OS_VER)
 DEB_REPO_OS_NAME = ubuntu
 DEB_REPO_OS_VER = trusty
 DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
+
+EXE_REPO_DIR = windows
 
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
@@ -67,6 +72,7 @@ ifeq ($(OS),Windows_NT)
 	EXEC_EXT := .exe
 	SHELL_EXT := .bat
 	SHARED_EXT := .dll
+	DEPLOY := $(EXE)
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
 	endif
@@ -79,6 +85,7 @@ else
 		PLATFORM := linux
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
+		DEPLOY := $(RPM_REPO_DATA) $(DEB_REPO_DATA)
 	endif
 	UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -108,6 +115,7 @@ clean:
 		$(NGINX)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
+		$(EXE_REPO)\
 		$(DOCUMENTSERVER_FILES)\
 		documentserver \
 		documentserver-example
@@ -235,4 +243,20 @@ $(DEB_REPO_DATA): $(DEB)
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
 		--acl public-read --delete
 
-deploy: $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+$(EXE_REPO_DATA): $(EXE)
+	rm -rfv $(EXE_REPO)
+	mkdir -p $(EXE_REPO)
+
+	cp -rv $(EXE) $(RPM_REPO);
+
+	aws s3 sync \
+		$(EXE_REPO) \
+		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
+		--acl public-read --delete
+
+	aws s3 sync \
+		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
+		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
+		--acl public-read --delete
+
+deploy: $(DEPOY)
