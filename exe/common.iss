@@ -280,7 +280,7 @@ Type: filesandordirs; Name: "{app}\*"
 #include "scripts\products\msiproduct.iss"
 #include "scripts\products\vcredist2010sp1.iss"
 #include "scripts\products\vcredist2013.iss"
-#include "scripts\products\nodejs4x.iss"
+#include "scripts\products\nodejs6x.iss"
 #include "scripts\products\postgresql.iss"
 #include "scripts\products\rabbitmq.iss"
 #include "scripts\products\redis.iss"
@@ -299,7 +299,7 @@ begin
 
   vcredist2010();
   vcredist2013();
-  nodejs4x('4.0.0.0');
+  nodejs6x('6.9.1.0');
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
   //redis('3.2.100');
