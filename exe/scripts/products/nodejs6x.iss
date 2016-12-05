@@ -8,7 +8,7 @@ en.nodejs6x_size=10.9 MB
 
 [Code]
 const
-	nodejs6x_url = 'https://nodejs.org/dist/v6.9.1/node-v6.9.1-x86.msi';
+	nodejs6x_url = 'http://nodejs.org/dist/v6.9.1/node-v6.9.1-x86.msi';
 
 procedure nodejs6x(minVersion: string);
 begin
