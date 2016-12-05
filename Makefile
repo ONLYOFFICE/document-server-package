@@ -19,6 +19,9 @@ DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
 RPM_REPO := $(PWD)/repo-rpm
 RPM_REPO_DATA := $(RPM_REPO)/repodata
 
+EXE_REPO := repo-exe
+EXE_REPO_DATA := $(EXE_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
+
 RPM_REPO_OS_NAME = centos
 RPM_REPO_OS_VER = 7
 RPM_REPO_DIR = $(RPM_REPO_OS_NAME)/$(RPM_REPO_OS_VER)
@@ -26,6 +29,8 @@ RPM_REPO_DIR = $(RPM_REPO_OS_NAME)/$(RPM_REPO_OS_VER)
 DEB_REPO_OS_NAME = ubuntu
 DEB_REPO_OS_VER = trusty
 DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
+
+EXE_REPO_DIR = windows
 
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
@@ -44,6 +49,7 @@ LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/license
 
 LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
+HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
@@ -66,6 +72,7 @@ ifeq ($(OS),Windows_NT)
 	EXEC_EXT := .exe
 	SHELL_EXT := .bat
 	SHARED_EXT := .dll
+	DEPLOY := $(EXE_REPO_DATA)
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
 	endif
@@ -78,6 +85,7 @@ else
 		PLATFORM := linux
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
+		DEPLOY := $(RPM_REPO_DATA) $(DEB_REPO_DATA)
 	endif
 	UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -107,6 +115,7 @@ clean:
 		$(NGINX)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
+		$(EXE_REPO)\
 		$(DOCUMENTSERVER_FILES)\
 		documentserver \
 		documentserver-example
@@ -130,10 +139,10 @@ ifeq ($(PLATFORM),win)
 	cat exe/license/3rd-Party.txt ; >> $(DOCUMENTSERVER)/3rd-Party.txt
 endif
 
-	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE)
+	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE) || true
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal$(EXEC_EXT)
+	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
@@ -234,4 +243,20 @@ $(DEB_REPO_DATA): $(DEB)
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
 		--acl public-read --delete
 
-deploy: $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+$(EXE_REPO_DATA): $(EXE)
+	rm -rfv $(EXE_REPO)
+	mkdir -p $(EXE_REPO)
+
+	cp -rv $(EXE) $(EXE_REPO);
+
+	aws s3 sync \
+		$(EXE_REPO) \
+		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
+		--acl public-read --delete
+
+	aws s3 sync \
+		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
+		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
+		--acl public-read --delete
+
+deploy: $(DEPLOY)

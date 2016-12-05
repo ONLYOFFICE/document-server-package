@@ -1,7 +1,0 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: onlyoffice
-Source: http://onlyoffice.com
-
-Files: *
-Copyright: (c) Copyright Ascensio System SIA, 2010-2015
-License: Commercial
