@@ -67,7 +67,7 @@ NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
 PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
 PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
 
-BUILD_DATE := $(date +%F-%H-%M)
+BUILD_DATE := $(shell date +%F-%H-%M)
 
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
