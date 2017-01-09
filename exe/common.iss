@@ -100,7 +100,7 @@ DefaultGroupName        =ONLYOFFICE
 ;WizardSmallImageFile    = data\dialogicon.bmp
 
 
-UsePreviousAppDir         =no
+UsePreviousAppDir         = yes
 DirExistsWarning          =no
 DefaultDirName            ={pf}\{#APP_PATH}
 DisableProgramGroupPage   = yes
