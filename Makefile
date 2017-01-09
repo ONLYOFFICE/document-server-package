@@ -1,4 +1,5 @@
 PWD := $(shell pwd)
+CURL := curl -L -o
 
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
@@ -151,8 +152,8 @@ endif
 	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
-	curl -L -o $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
-	curl -L -o $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
+	$(CURL) $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
+	$(CURL) $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
 
 ifeq ($(PRODUCT_NAME), documentserver-integration)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
@@ -196,15 +197,15 @@ $(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL)
 	cd exe && iscc //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
 
 $(ISXDL):
-	curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
+	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 	
 $(NGINX):
-	curl -o $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
+	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
 	rm -f $(NGINX_ZIP)
 	
 $(PSQL):
-	curl -o $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
+	$(CURL) $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
 	7z x -y -o. $(PSQL_ZIP) && \
 	mkdir -p $(DOCUMENTSERVER)/pgsql/bin && \
 	cp -rf -t $(DOCUMENTSERVER)/pgsql/bin  pgsql/bin/psql.exe  pgsql/bin/*.dll && \
