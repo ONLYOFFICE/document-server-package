@@ -67,6 +67,8 @@ NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
 PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
 PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
 
+BUILD_DATE := $(shell date +%F-%H-%M)
+
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
 	EXEC_EXT := .exe
@@ -147,8 +149,9 @@ endif
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
-	sed 's/{{DATE}}/'$$(date +%F-%H-%M)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed 's/_dc=0/_dc='$$(date +%F-%H-%M)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
+	sed 's/_dc=0/_dc='$(BUILD_DATE)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
 	curl -L -o $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
