@@ -23,7 +23,7 @@ Type: boolean
 Default: false
 Description: Remove database?
  This operation will remove the database which contain all ONLYOFFICE data. It is recommended to take backup before removing the database.
- 
+
 Template: onlyoffice/cluster-mode
 Type: boolean
 Default: false
