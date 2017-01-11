@@ -1,5 +1,5 @@
 ; Uncomment the line below to be able to compile the script from within the IDE.
-;#define COMPILE_FROM_IDE
+#define COMPILE_FROM_IDE
 
 #define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
@@ -196,6 +196,7 @@ Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGI
 Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode;
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; 
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} node convertermaster.js"; Flags: runhidden
@@ -426,15 +427,26 @@ begin
 end;
 
 function CreateDbAuth(): Boolean;
-var
-  IsSuccess: Boolean;
 begin
   Result := true;
 
-  IsSuccess := SaveStringToFile(
+  SaveStringToFile(
     ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
+end;
+
+function IsNotClusterMode(): Boolean;
+var
+  ClusterMode: Integer;
+begin
+  Result := true;
+  ClusterMode := StrToInt(ExpandConstant('{param:CLUSTER_MODE|0}'));
+  if ClusterMode > 0 then
+  begin
+    Result := false;
+  end;
+  CreateDbAuth();
 end;
 
 function CheckDbConnection(): Boolean;
