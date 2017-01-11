@@ -1,5 +1,5 @@
 ; Uncomment the line below to be able to compile the script from within the IDE.
-#define COMPILE_FROM_IDE
+;#define COMPILE_FROM_IDE
 
 #define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
