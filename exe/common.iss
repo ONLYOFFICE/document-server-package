@@ -15,6 +15,7 @@
 #define REG_RABBITMQ_PWD      'RabbitMqPwd'
 #define REG_REDIS_HOST        'RedisHost'
 #define REG_DS_PORT           'DsPort'
+#define REG_EXAMPLE_PORT      'ExamplePort'
 #define REG_DOCSERVICE_PORT   'DocServicePort'
 #define REG_SPELLCHECKER_PORT 'SpellCheckerPort'
 #define REG_FONTS_PATH        'FontsPath'

@@ -2,8 +2,6 @@
 
 #include "common.iss"
 
-#define REG_EXAMPLE_PORT        'ExamplePort'
-
 #define EXAMPLE_SRV        'DsExampleSvc'
 #define EXAMPLE_SRV_DISPLAY  'ONLYOFFICE DocumentServer Example'
 #define EXAMPLE_SRV_DESCR  'ONLYOFFICE DocumentServer Example Service'
