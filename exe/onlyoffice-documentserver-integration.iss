@@ -17,7 +17,7 @@
 [Files]
 Source: ..\common\documentserver-example\home\*;      DestDir: {app}\example; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver-example\config\*;    DestDir: {app}\example\config; Flags: ignoreversion recursesubdirs
-Source: nginx\onlyoffice-documentserver-example.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver-example\nginx\*;     DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 
 [Dirs]
 Name: "{app}\example\public\files";   Permissions: users-full
@@ -31,8 +31,6 @@ Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_EX
 
 [Run]
 Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-
-Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver-example.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node .\bin\www"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden
@@ -59,9 +57,4 @@ begin
   StopSrv(ExpandConstant('{#GC_SRV}'));
   StopSrv(ExpandConstant('{#SPELLCHECKER_SRV}'));
   StopSrv(ExpandConstant('{#EXAMPLE_SRV}'));
-end;
-
-function GetExamplePort(Param: String): String;
-begin
-  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_EXAMPLE_PORT}|3000}}');
 end;

@@ -76,6 +76,11 @@ ifeq ($(OS),Windows_NT)
 	SHELL_EXT := .bat
 	SHARED_EXT := .dll
 	DEPLOY := $(EXE_REPO_DATA)
+	NGINX_CONF := 
+	NGINX_LOG := logs/
+	NGINX_CASH := temp/
+	DS_ROOT := ../
+	DS_FILES := ../server/
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
 	endif
@@ -89,6 +94,11 @@ else
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
 		DEPLOY := $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+		NGINX_CONF := /etc/nginx/
+		NGINX_LOG := /var/log/onlyoffice/documentserver/
+		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
+		DS_ROOT := /var/www/onlyoffice/documentserver/
+		DS_FILES := /var/lib/onlyoffice/documentserver/
 	endif
 	UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -149,6 +159,12 @@ endif
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
+
+	sed 's/{{NGINX_CONF}}/'$(NGINX_CONF)'/'  -i common/documentserver/nginx/onlyoffice-documentserver.conf
+	sed 's/{{NGINX_LOG}}/'$(NGINX_LOG)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
+	sed 's/{{NGINX_CASH}}/'$(NGINX_CASH)'/'  -i common/documentserver/nginx/includes/onlyoffice-http.conf
+	sed 's/{{DS_ROOT}}/'$(DS_ROOT)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed 's/{{DS_FILES}}/'$(DS_FILES)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 
 	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf

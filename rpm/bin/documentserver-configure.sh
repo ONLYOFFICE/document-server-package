@@ -144,6 +144,16 @@ establish_rabbitmq_conn() {
 	echo "OK"
 }
 
+setup_nginx(){
+  NGINX_CONF_DIR=/etc/nginx
+  DS_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver.conf
+  OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
+  sed 's/{{DS_PORT}}/'80'/'  -i $DS_CONF
+  sed 's/{{DOCSERVICE_PORT}}/'8000'/'  -i $OO_CONF
+  sed 's/{{SPELLCHECKER_PORT}}/'8080'/'  -i $OO_CONF
+  sed 's/{{EXAMPLE_PORT}}/'3000'/'  -i $OO_CONF
+}
+
 read_saved_params
 
 input_db_params
@@ -161,5 +171,7 @@ save_rabbitmq_params
 save_redis_params
 
 delete_saved_params
+
+setup_nginx
 
 restart_services
