@@ -160,15 +160,15 @@ endif
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
-	sed 's|{{NGINX_CONF}}|'$(NGINX_CONF)'|'  -i common/documentserver/nginx/onlyoffice-documentserver.conf
-	sed 's|{{NGINX_LOG}}|'$(NGINX_LOG)'|'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
-	sed 's|{{NGINX_CASH}}|'$(NGINX_CASH)'|'  -i common/documentserver/nginx/includes/onlyoffice-http.conf
-	sed 's|{{DS_ROOT}}|'$(DS_ROOT)'|'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed 's|{{DS_FILES}}|'$(DS_FILES)'|'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf
+	sed "s|{{NGINX_LOG}}|"$(NGINX_LOG)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
+	sed "s|{{NGINX_CASH}}|"$(NGINX_CASH)"|"  -i common/documentserver/nginx/includes/onlyoffice-http.conf
+	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 
-	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-	sed 's/_dc=0/_dc='$(BUILD_DATE)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
+	sed "s/_dc=0/_dc="$(BUILD_DATE)"/"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
 	$(CURL) $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
@@ -197,22 +197,22 @@ documentserver-example:
 
 $(RPM):	documentserver documentserver-example
 	chmod u+x rpm/bin/documentserver-configure.sh
-	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i rpm/$(PACKAGE_NAME).spec
-	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
-	sed 's/{{BUILD_NUMBER}}/'$(BUILD_NUMBER)'/'  -i rpm/$(PACKAGE_NAME).spec
+	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i rpm/$(PACKAGE_NAME).spec
+	sed "s/{{PRODUCT_VERSION}}/"$(PRODUCT_VERSION)"/"  -i rpm/$(PACKAGE_NAME).spec
+	sed "s/{{BUILD_NUMBER}}/"$(BUILD_NUMBER)"/"  -i rpm/$(PACKAGE_NAME).spec
 
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
 
 $(DEB): documentserver documentserver-example
-	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
-	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i deb/$(PACKAGE_NAME)/debian/control
-	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/control
+	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 $(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL)
-	sed 's/'{{PRODUCT_VERSION}}'/'$(PRODUCT_VERSION)'/' -i exe/common.iss
-	sed 's/'{{BUILD_NUMBER}}'/'$(BUILD_NUMBER)'/' -i exe/common.iss
+	sed "s/"{{PRODUCT_VERSION}}"/"$(PRODUCT_VERSION)"/" -i exe/common.iss
+	sed "s/"{{BUILD_NUMBER}}"/"$(BUILD_NUMBER)"/" -i exe/common.iss
 	cd exe && iscc //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
 
 $(ISXDL):
