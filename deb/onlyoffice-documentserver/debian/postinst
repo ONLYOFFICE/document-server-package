@@ -40,6 +40,8 @@ install_db(){
 	DB_PWD="$RET"
 	db_get onlyoffice/db-name || true
 	DB_NAME="$RET"
+	db_get onlyoffice/cluster-mode || true
+	CLUSTER_MODE="$RET"
 
         CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
         if [ -n "$DB_PWD" ]; then
@@ -63,6 +65,9 @@ install_db(){
                 $CREATEDB $DB_NAME >/dev/null 2>&1
         fi
 
+        if [ ! "$CLUSTER_MODE" = true ]; then
+                $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+        fi
         $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 }
 

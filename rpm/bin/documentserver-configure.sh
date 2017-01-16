@@ -95,6 +95,10 @@ execute_db_scripts(){
         if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
                 $CREATEDB $DB_NAME >/dev/null 2>&1
         fi
+
+        if [ ! "$CLUSTER_MODE" = true ]; then
+                $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+        fi
 	
 	$PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
