@@ -20,6 +20,8 @@ apply_connection_string(){
 	fi
 }
 
+db_fset onlyoffice/cluster-mode seen true
+
 db_input medium onlyoffice/db-host || true
 db_input medium onlyoffice/db-name || true
 db_input medium onlyoffice/db-user || true
