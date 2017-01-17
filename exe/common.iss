@@ -144,6 +144,7 @@ Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ign
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-full
+Name: "{app}\server\App_Data\cache\files"; Permissions: users-full
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-full
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
