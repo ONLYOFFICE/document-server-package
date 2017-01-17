@@ -81,6 +81,7 @@ ifeq ($(OS),Windows_NT)
 	NGINX_CASH := temp/
 	DS_ROOT := ../
 	DS_FILES := ../server/
+	DS_EXAMLE := ../example
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
 	endif
@@ -99,6 +100,7 @@ else
 		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
 		DS_ROOT := /var/www/onlyoffice/documentserver/
 		DS_FILES := /var/lib/onlyoffice/documentserver/
+		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
 	endif
 	UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -192,6 +194,8 @@ documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
+	
+	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 
 	echo "Done" > $@
 
