@@ -162,7 +162,8 @@ endif
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
-	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf
+	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf.template
+	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver-ssl.conf.template
 	sed "s|{{NGINX_LOG}}|"$(NGINX_LOG)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
 	sed "s|{{NGINX_CASH}}|"$(NGINX_CASH)"|"  -i common/documentserver/nginx/includes/onlyoffice-http.conf
 	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf

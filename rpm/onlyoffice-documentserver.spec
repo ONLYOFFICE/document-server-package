@@ -68,7 +68,7 @@ done
 
 #install nginx config
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
-cp ../../../common/documentserver/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
+cp ../../../common/documentserver/nginx/onlyoffice-documentserver*.template "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
 cp ../../../common/documentserver/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
@@ -85,7 +85,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
-%config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
+%config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver*.template
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
 %attr(-, root, root) /usr/share/fonts/truetype/*

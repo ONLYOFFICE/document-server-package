@@ -193,7 +193,9 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker
 Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.services.CoAuthoring.utils.utils_common_fontdir = '{code:GetFontsPath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 
-Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf.template"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver-ssl.conf.template"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "COPY"; Parameters: "/Y ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf.template"" ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf"""; WorkingDir: "{#NODE_PATH}" Flags: runhidden shellexec waituntilterminated
 Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
 Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
