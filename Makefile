@@ -1,6 +1,11 @@
 PWD := $(shell pwd)
 CURL := curl -L -o
 
+COMPANY_NAME ?= onlyoffice
+PRODUCT_NAME ?= documentserver
+PRODUCT_VERSION ?= 0.0.0.0
+BUILD_NUMBER ?= 0
+
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
