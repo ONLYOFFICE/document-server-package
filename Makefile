@@ -176,7 +176,7 @@ endif
 
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-	sed "s/_dc=0/_dc="$(BUILD_DATE)"/"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	sed "s|\(_dc=\)0|\1"$(BUILD_DATE)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
 	$(CURL) $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
