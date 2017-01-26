@@ -145,6 +145,7 @@ DIR="/var/www/onlyoffice/documentserver"
 if [ $1 -eq 0 ]; then
   rm -f $DIR/sdkjs/common/AllFonts.js
   rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
+  rm -f $DIR/sdkjs/*/sdk-all.cache
   rm -f $DIR/server/FileConverter/bin/font_selection.bin
 
   supervisorctl update >/dev/null 2>&1

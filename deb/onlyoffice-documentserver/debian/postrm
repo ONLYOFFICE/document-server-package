@@ -22,6 +22,17 @@ if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
 . /usr/share/debconf/confmodule
 fi
 
+clean_ds_files() {
+	DIR="/var/www/onlyoffice/documentserver"
+	rm -f $DIR/sdkjs/common/AllFonts.js
+	rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
+	rm -f $DIR/sdkjs/*/sdk-all.cache
+	rm -f $DIR/server/FileConverter/bin/font_selection.bin
+
+	supervisorctl update >/dev/null 2>&1
+	service nginx reload >/dev/null 2>&1
+}
+
 case "$1" in
 	purge)
 		# purge logs
@@ -51,9 +62,12 @@ case "$1" in
 
 			$DROPDB --if-exists $DB_NAME &>/dev/null || { echo "WARNING: can't delete ONLYOFFICE database" >&2; }
 		fi
+
+		clean_ds_files
 	;;
 
 	remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+		clean_ds_files
 	;;
 
 	*)
