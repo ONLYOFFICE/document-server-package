@@ -153,6 +153,7 @@ Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
 Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
+Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";
 
