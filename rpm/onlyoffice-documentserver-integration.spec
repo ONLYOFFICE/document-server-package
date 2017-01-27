@@ -128,6 +128,7 @@ case "$1" in
     # Upgrade
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
+    echo "Stoping documentserver services..."
     supervisorctl stop onlyoffice-documentserver:*
   ;;
 esac
