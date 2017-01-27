@@ -173,6 +173,8 @@ case "$1" in
     rm -f $DIR/sdkjs/common/AllFonts.js
     rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
+    
+    rm -f /etc/nginx/conf.d/onlyoffice-documentserver.conf
 
     supervisorctl update >/dev/null 2>&1
     service nginx reload >/dev/null 2>&1
