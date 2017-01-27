@@ -98,7 +98,7 @@ case "$1" in
 	configure)
 		adduser --quiet --home "$DIR" --system --group onlyoffice
 
-		# add nginx user to onlyoffice group to allow access to used unix socket
+		# add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
 		adduser --quiet www-data onlyoffice
 
 		#install node modules
