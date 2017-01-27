@@ -20,6 +20,7 @@ set -e
 case "$1" in
     remove|upgrade|deconfigure)
         documentserver-prepare4shutdown.sh
+        echo "Stoping documentserver services..."
         supervisorctl stop onlyoffice-documentserver:*
     ;;
 
