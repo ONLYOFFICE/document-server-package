@@ -94,8 +94,8 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %dir
 %attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
+%attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
+%attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
@@ -107,6 +107,8 @@ case "$1" in
     # add group and user for onlyoffice app
     getent group onlyoffice >/dev/null || groupadd -r onlyoffice
     getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
+    # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
+    usermod -a -G onlyoffice nginx
   ;;
   2)
     # Upgrade
