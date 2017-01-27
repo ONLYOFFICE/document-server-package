@@ -71,12 +71,12 @@ case "$1" in
 		clean_ds_files
 	;;
 
-	remove|upgrade
+	remove|upgrade)
 		clean_ds_files
-  ;;
+	;;
   
-  failed-upgrade|abort-install|abort-upgrade|disappear)
-  :
+	failed-upgrade|abort-install|abort-upgrade|disappear)
+  	:
 	;;
 
 	*)
