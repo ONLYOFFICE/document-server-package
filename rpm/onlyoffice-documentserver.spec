@@ -101,9 +101,20 @@ rm -rf "$RPM_BUILD_ROOT"
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
 
 %pre
-#add group and user for onlyoffice app
-getent group onlyoffice >/dev/null || groupadd -r onlyoffice
-getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
+case "$1" in
+  1)
+    # Initial installation
+    # add group and user for onlyoffice app
+    getent group onlyoffice >/dev/null || groupadd -r onlyoffice
+    getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
+  ;;
+  2)
+    # Upgrade
+    # disconnect all users and stop running services
+    documentserver-prepare4shutdown.sh
+    supervisorctl stop onlyoffice-documentserver:*
+  ;;
+esac
 exit 0
 
 %post
@@ -118,23 +129,40 @@ service supervisord restart >/dev/null 2>&1
 service nginx reload >/dev/null 2>&1
 
 %preun
-# uninstall action
-if [ $1 -eq 0 ]; then
-  supervisorctl stop onlyoffice-documentserver:*
-fi
+case "$1" in
+  0)
+    # Uninstall
+    # disconnect all users and stop running services
+    documentserver-prepare4shutdown.sh
+    supervisorctl stop onlyoffice-documentserver:*
+  ;;
+  1)
+    # Upgrade
+    :
+  ;;
+esac
 
 %postun
 DIR="/var/www/onlyoffice/documentserver"
-# uninstall action
-if [ $1 -eq 0 ]; then
-  rm -f $DIR/sdkjs/common/AllFonts.js
-  rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
-  rm -f $DIR/sdkjs/*/sdk-all.cache
-  rm -f $DIR/server/FileConverter/bin/font_selection.bin
 
-  supervisorctl update >/dev/null 2>&1
-  service nginx reload >/dev/null 2>&1
-fi
+# remove v8 cache
+rm -f $DIR/sdkjs/*/sdk-all.cache
+
+case "$1" in
+  0)
+    # Uninstall
+    rm -f $DIR/sdkjs/common/AllFonts.js
+    rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
+    rm -f $DIR/server/FileConverter/bin/font_selection.bin
+
+    supervisorctl update >/dev/null 2>&1
+    service nginx reload >/dev/null 2>&1
+  ;;
+  1)
+    # Upgrade
+    :
+  ;;
+esac
 
 %changelog
 * Tue Apr 28 2015 ONLYOFFICE (Online documents editor) <support@onlyoffice.com>

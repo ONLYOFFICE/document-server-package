@@ -40,6 +40,11 @@ case "$1" in
 			rm -rf /var/log/onlyoffice/documentserver
 		fi
 
+    # purge files
+		if [ -d /var/lib/onlyoffice ]; then
+			rm -rf /var/lib/onlyoffice/documentserver
+		fi
+    
 		db_input high onlyoffice/remove-db || true
 		db_go
 		db_get onlyoffice/remove-db
@@ -66,8 +71,12 @@ case "$1" in
 		clean_ds_files
 	;;
 
-	remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+	remove|upgrade
 		clean_ds_files
+  ;;
+  
+  failed-upgrade|abort-install|abort-upgrade|disappear)
+  :
 	;;
 
 	*)
