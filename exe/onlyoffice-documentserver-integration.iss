@@ -12,6 +12,10 @@
 
 #define JSON_EXAMPLE_PARAMS '-I -q -f ""{app}\example\config\default.json""'
 
+[CustomMessages]
+OpenDemo=Open {#sAppName} demo
+OpenWelcome=Open {#sAppName} welcome page
+
 [Files]
 Source: ..\common\documentserver-example\home\*;      DestDir: {app}\example; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver-example\config\*;    DestDir: {app}\example\config; Flags: ignoreversion recursesubdirs
@@ -22,7 +26,7 @@ Name: "{app}\example\public\files";   Permissions: users-modify
 Name: "{#EXAMPLE_SRV_LOG_DIR}";       Permissions: users-modify
 
 [Icons]
-Name: "{group}\Open {#sAppName} demo"; Filename: "http://localhost/example"
+Name: "{group}\{cm:OpenDemo}"; Filename: "http://localhost/example"
 
 [Registry]
 Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_EXAMPLE_PORT}"; ValueData: "{code:GetExamplePort}";
@@ -40,7 +44,7 @@ Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStderr {#EXAMPLE_SRV_LOG
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Start SERVICE_DEMAND_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#EXAMPLE_SRV}}"
 
-Filename: "http://localhost/welcome"; Description: "Open {#sAppName} welcome page"; Flags: postinstall shellexec skipifsilent
+Filename: "http://localhost/welcome"; Description: "{cm:OpenWelcome}"; Flags: postinstall shellexec skipifsilent
 
 [UninstallRun]
 Filename: "{#NSSM}"; Parameters: "stop {#EXAMPLE_SRV}"; Flags: runhidden

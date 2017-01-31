@@ -1,5 +1,5 @@
 ; Uncomment the line below to be able to compile the script from within the IDE.
-;#define COMPILE_FROM_IDE
+#define COMPILE_FROM_IDE
 
 #define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
@@ -135,7 +135,10 @@ InstallNpm=Installing npm modules...
 CreateDb=Creating database...
 RemoveDb=Removing database...
 FireWallExt=Adding firewall extention..
+
 CfgDs=Configuring {#sAppName}...
+Uninstall=Uninstall {#sAppName}
+PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -169,7 +172,7 @@ Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";
 
 [Icons]
-Name: "{group}\Uninstall {#sAppName}"; Filename: "{uninstallexe}"
+Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
 
 [Registry]
 Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}";
@@ -326,7 +329,10 @@ begin
 
     if not WizardSilent() then begin
       UninstallerParam := '/SILENT';
-      ConfirmUninstall := MsgBox('The previous version of {#sAppName} detected, please click ''OK'' button to uninstall it, or ''Cancel'' to quit setup.', mbConfirmation, MB_OKCANCEL);
+      ConfirmUninstall := MsgBox(
+                              ExpandConstant('{cm:PrevVer}'),
+                              mbConfirmation,
+                              MB_OKCANCEL);
     end;
 
     if ConfirmUninstall = IDOK then begin
