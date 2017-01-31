@@ -294,15 +294,52 @@ Type: filesandordirs; Name: "{app}\*"
 #include "scripts\service.iss"
 
 [Code]
-procedure StopDsServices(); forward;
+function UninstallPreviosVersion(): Boolean;
+var
+  UninstallerPath: String;
+  UninstallRegKey: String;
+  UninstallerParam: String;
+  ResultCode: Integer;
+  ConfirmUninstall: Integer;
+begin
+  Result := True;
+  UninstallerParam := '/VERYSILENT';
+  UninstallRegKey := '{reg:HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#sAppName}_is1,UninstallString}';
+
+  UninstallerPath := RemoveQuotes(ExpandConstant(UninstallRegKey));
+  if Length(UninstallerPath) > 0 then begin
+    ConfirmUninstall := IDOK;
+
+    if not WizardSilent() then begin
+      UninstallerParam := '/SILENT';
+      ConfirmUninstall := MsgBox('The previous version of {#sAppName} detected, please click ''OK'' button to uninstall it, or ''Cancel'' to quit setup.', mbConfirmation, MB_OKCANCEL);
+    end;
+
+    if ConfirmUninstall = IDOK then begin
+      Exec(
+        UninstallerPath,
+        UninstallerParam,
+        '', 
+        SW_HIDE,
+        ewWaitUntilTerminated,
+        ResultCode);
+
+    end else begin
+      Result := False;
+    end;
+  end;
+end;
 
 function InitializeSetup(): Boolean;
 begin
   // initialize windows version
   initwinversion();
-
-  StopDsServices();
-
+  
+  if not UninstallPreviosVersion() then
+  begin
+    Abort();
+  end;
+ 
   vcredist2010();
   vcredist2013();
   nodejs6x('6.9.1.0');

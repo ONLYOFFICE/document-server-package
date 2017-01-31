@@ -46,13 +46,3 @@ Filename: "http://localhost/welcome"; Description: "Open {#sAppName} welcome pag
 Filename: "{#NSSM}"; Parameters: "stop {#EXAMPLE_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#EXAMPLE_SRV} confirm"; Flags: runhidden
 
-[Code]
-procedure StopDsServices;
-begin
-  StopSrv(ExpandConstant('{#NGINX_SRV}'));
-  StopSrv(ExpandConstant('{#CONVERTER_SRV}'));
-  StopSrv(ExpandConstant('{#DOCSERVICE_SRV}'));
-  StopSrv(ExpandConstant('{#GC_SRV}'));
-  StopSrv(ExpandConstant('{#SPELLCHECKER_SRV}'));
-  StopSrv(ExpandConstant('{#EXAMPLE_SRV}'));
-end;
