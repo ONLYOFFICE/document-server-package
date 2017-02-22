@@ -201,6 +201,7 @@ documentserver-example:
 
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 	
+	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 
