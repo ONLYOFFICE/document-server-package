@@ -42,12 +42,15 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 
+SDKJS_PLUGINS := sdkjs-plugins
+
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/$(SDKJS_PLUGINS)
 LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
@@ -60,7 +63,13 @@ HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/H
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
-DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/sdkjs-plugins
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/h?llowold
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/ch?ss
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/sp?ech
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cb?
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cl?part
 
 FONTS = common/fonts
 
@@ -143,7 +152,8 @@ clean:
 		
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
+	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/* 
+	cp -fr -t $(DOCUMENTSERVER)/$(SDKJS_PLUGINS) $(DOCUMENTSERVER_PLUGINS)
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
@@ -193,9 +203,6 @@ endif
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
 	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
-
-	mkdir -p $(DOCUMENTSERVER_PLUGINS)
-	cp -rf ../sdkjs-plugins/** $(DOCUMENTSERVER_PLUGINS)
 	
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
