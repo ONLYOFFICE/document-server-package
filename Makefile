@@ -146,6 +146,7 @@ clean:
 		$(RPM_REPO)\
 		$(EXE_REPO)\
 		$(DOCUMENTSERVER_FILES)\
+		$(DOCUMENTSERVER_EXAMPLE)\
 		$(FONTS)\
 		documentserver \
 		documentserver-example
