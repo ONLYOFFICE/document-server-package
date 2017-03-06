@@ -205,7 +205,7 @@ endif
 
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
-	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
+	cp -rf -t $(DOCUMENTSERVER_EXAMPLE) ../document-server-integration/web/documentserver-example/nodejs/** welcome/
 	
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
