@@ -29,7 +29,7 @@ Type: boolean
 Default: false
 Description: Use cluster mode?
  Type true if DocumentServer will use in cluster mode.
- 
+
 Template: onlyoffice/ds-port
 Type: string
 Default: 80
