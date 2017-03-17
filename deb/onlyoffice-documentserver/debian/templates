@@ -29,3 +29,23 @@ Type: boolean
 Default: false
 Description: Use cluster mode?
  Type true if DocumentServer will use in cluster mode.
+ 
+Template: onlyoffice/ds-port
+Type: string
+Default: 80
+Description: DocumentServer listening port:
+
+Template: onlyoffice/docservice-port
+Type: string
+Default: 8000
+Description: DocumentServer docservice listening port:
+
+Template: onlyoffice/spellchecker-port
+Type: string
+Default: 8080
+Description: DocumentServer spellchecker listening port:
+
+Template: onlyoffice/example-port
+Type: string
+Default: 3000
+Description: DocumentServer example listening port:
