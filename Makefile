@@ -85,6 +85,7 @@ PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
 PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
 
 NSSM_ZIP := nssm_x64.zip
+NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
@@ -146,6 +147,7 @@ clean:
 		$(EXE_BUILD_DIR)/*.exe\
 		$(ISXDL)\
 		$(NGINX)\
+		$(NSSM)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(EXE_REPO)\
