@@ -10,3 +10,9 @@ License File:   license/nginx.license
 URL:            https://www.postgresql.org
 License:        PostgreSQL License, similar to the BSD or MIT licenses.
 License File:   license/postgresql.license
+
+22. NSSM - NSSM is a service helper program similar to srvany and cygrunsrv.
+
+URL:            http://nssm.cc
+License:        NSSM is public domain.
+License File:   license/nssm.license
