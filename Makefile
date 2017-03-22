@@ -84,6 +84,8 @@ NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
 PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
 PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
 
+NSSM_ZIP := nssm_x64.zip
+
 BUILD_DATE := $(shell date +%F-%H-%M)
 
 ifeq ($(OS),Windows_NT)
@@ -251,6 +253,11 @@ $(PSQL):
 	mkdir -p $(DOCUMENTSERVER)/pgsql/bin && \
 	cp -rf -t $(DOCUMENTSERVER)/pgsql/bin  pgsql/bin/psql.exe  pgsql/bin/*.dll && \
 	rm -f $(PSQL_ZIP)
+	
+$(NSSM):
+	$(CURL) $(NSSM_ZIP) https://github.com/ONLYOFFICE/nssm/releases/download/v2.24/$(NSSM_ZIP) && \
+	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
+	rm -f $(NSSM_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)

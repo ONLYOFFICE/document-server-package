@@ -30,7 +30,7 @@
 
 #define sAppVerShort
 
-#define NSSM                  '{app}\server\Winser\node_modules\winser\bin\nssm64.exe'
+#define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'
 
 #define LOCAL_SERVICE 'Local Service'
