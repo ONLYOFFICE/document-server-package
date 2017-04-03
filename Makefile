@@ -1,4 +1,10 @@
 PWD := $(shell pwd)
+CURL := curl -L -o
+
+COMPANY_NAME ?= onlyoffice
+PRODUCT_NAME ?= documentserver
+PRODUCT_VERSION ?= 0.0.0.0
+BUILD_NUMBER ?= 0
 
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
@@ -36,12 +42,15 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 
+SDKJS_PLUGINS := sdkjs-plugins
+
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/$(SDKJS_PLUGINS)
 LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
@@ -54,7 +63,15 @@ HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/H
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
-DOCUMENTSERVER_PLUGINS := $(DOCUMENTSERVER_EXAMPLE)/sdkjs-plugins
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/h?lloworld
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/ch?ss
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/sp?ech
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cb?
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cl?part
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/pluginBase.js
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/plugins.css
 
 FONTS = common/fonts
 
@@ -67,6 +84,9 @@ NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
 PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
 PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
 
+NSSM_ZIP := nssm_x64.zip
+NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
+
 BUILD_DATE := $(shell date +%F-%H-%M)
 
 ifeq ($(OS),Windows_NT)
@@ -75,6 +95,12 @@ ifeq ($(OS),Windows_NT)
 	SHELL_EXT := .bat
 	SHARED_EXT := .dll
 	DEPLOY := $(EXE_REPO_DATA)
+	NGINX_CONF := 
+	NGINX_LOG := logs/
+	NGINX_CASH := temp/
+	DS_ROOT := ../
+	DS_FILES := ../server/
+	DS_EXAMLE := ../example
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
 	endif
@@ -88,6 +114,12 @@ else
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
 		DEPLOY := $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+		NGINX_CONF := /etc/nginx/
+		NGINX_LOG := /var/log/onlyoffice/documentserver/
+		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
+		DS_ROOT := /var/www/onlyoffice/documentserver/
+		DS_FILES := /var/lib/onlyoffice/documentserver/
+		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
 	endif
 	UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -115,17 +147,20 @@ clean:
 		$(EXE_BUILD_DIR)/*.exe\
 		$(ISXDL)\
 		$(NGINX)\
+		$(NSSM)\
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(EXE_REPO)\
 		$(DOCUMENTSERVER_FILES)\
+		$(DOCUMENTSERVER_EXAMPLE)\
 		$(FONTS)\
 		documentserver \
 		documentserver-example
 		
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/*
+	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/* 
+	cp -fr -t $(DOCUMENTSERVER)/$(SDKJS_PLUGINS) $(DOCUMENTSERVER_PLUGINS)
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
@@ -149,13 +184,20 @@ endif
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
-	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed 's/{{DATE}}/'$(BUILD_DATE)'/'  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-	sed 's/_dc=0/_dc='$(BUILD_DATE)'/'  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf.template
+	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver-ssl.conf.template
+	sed "s|{{NGINX_LOG}}|"$(NGINX_LOG)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
+	sed "s|{{NGINX_CASH}}|"$(NGINX_CASH)"|"  -i common/documentserver/nginx/includes/onlyoffice-http.conf
+	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+
+	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
+	sed "s|\(_dc=\)0|\1"$(BUILD_DATE)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
-	curl -L -o $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
-	curl -L -o $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README
+	$(CURL) $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
+	$(CURL) $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README || true
 
 ifeq ($(PRODUCT_NAME), documentserver-integration)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
@@ -167,51 +209,57 @@ endif
 
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
-	cp -rf ../document-server-integration/web/documentserver-example/nodejs/** $(DOCUMENTSERVER_EXAMPLE)
-
-	mkdir -p $(DOCUMENTSERVER_PLUGINS)
-	cp -rf ../sdkjs-plugins/** $(DOCUMENTSERVER_PLUGINS)
+	cp -rf -t $(DOCUMENTSERVER_EXAMPLE) ../document-server-integration/web/documentserver-example/nodejs/** common/documentserver-example/welcome
 	
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
+	
+	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
+	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
+	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 
 	echo "Done" > $@
 
 $(RPM):	documentserver documentserver-example
 	chmod u+x rpm/bin/documentserver-configure.sh
-	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i rpm/$(PACKAGE_NAME).spec
-	sed 's/{{PRODUCT_VERSION}}/'$(PRODUCT_VERSION)'/'  -i rpm/$(PACKAGE_NAME).spec
-	sed 's/{{BUILD_NUMBER}}/'$(BUILD_NUMBER)'/'  -i rpm/$(PACKAGE_NAME).spec
+	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i rpm/$(PACKAGE_NAME).spec
+	sed "s/{{PRODUCT_VERSION}}/"$(PRODUCT_VERSION)"/"  -i rpm/$(PACKAGE_NAME).spec
+	sed "s/{{BUILD_NUMBER}}/"$(BUILD_NUMBER)"/"  -i rpm/$(PACKAGE_NAME).spec
 
 	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
 
 $(DEB): documentserver documentserver-example
-	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
-	sed 's/{{PACKAGE_NAME}}/'$(PACKAGE_NAME)'/'  -i deb/$(PACKAGE_NAME)/debian/control
-	sed 's/{{PACKAGE_VERSION}}/'$(PACKAGE_VERSION)'/'  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
+	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/control
+	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
 
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
-$(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL)
-	sed 's/'{{PRODUCT_VERSION}}'/'$(PRODUCT_VERSION)'/' -i exe/common.iss
-	sed 's/'{{BUILD_NUMBER}}'/'$(BUILD_NUMBER)'/' -i exe/common.iss
+$(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
+	sed "s/"{{PRODUCT_VERSION}}"/"$(PRODUCT_VERSION)"/" -i exe/common.iss
+	sed "s/"{{BUILD_NUMBER}}"/"$(BUILD_NUMBER)"/" -i exe/common.iss
 	cd exe && iscc //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
 
 $(ISXDL):
-	curl -o $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
+	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 	
 $(NGINX):
-	curl -o $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
+	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
 	rm -f $(NGINX_ZIP)
 	
 $(PSQL):
-	curl -o $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
+	$(CURL) $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
 	7z x -y -o. $(PSQL_ZIP) && \
 	mkdir -p $(DOCUMENTSERVER)/pgsql/bin && \
 	cp -rf -t $(DOCUMENTSERVER)/pgsql/bin  pgsql/bin/psql.exe  pgsql/bin/*.dll && \
 	rm -f $(PSQL_ZIP)
+	
+$(NSSM):
+	$(CURL) $(NSSM_ZIP) https://github.com/ONLYOFFICE/nssm/releases/download/v2.24/$(NSSM_ZIP) && \
+	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
+	rm -f $(NSSM_ZIP)
 
 $(RPM_REPO_DATA): $(RPM)
 	rm -rfv $(RPM_REPO)

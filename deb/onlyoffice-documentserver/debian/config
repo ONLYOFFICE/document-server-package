@@ -21,6 +21,10 @@ apply_connection_string(){
 }
 
 db_fset onlyoffice/cluster-mode seen true
+db_fset onlyoffice/ds-port seen true
+db_fset onlyoffice/docservice-port seen true
+db_fset onlyoffice/spellchecker-port seen true
+db_fset onlyoffice/example-port seen true
 
 db_input medium onlyoffice/db-host || true
 db_input medium onlyoffice/db-name || true

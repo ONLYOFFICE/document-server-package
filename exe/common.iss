@@ -15,6 +15,7 @@
 #define REG_RABBITMQ_PWD      'RabbitMqPwd'
 #define REG_REDIS_HOST        'RedisHost'
 #define REG_DS_PORT           'DsPort'
+#define REG_EXAMPLE_PORT      'ExamplePort'
 #define REG_DOCSERVICE_PORT   'DocServicePort'
 #define REG_SPELLCHECKER_PORT 'SpellCheckerPort'
 #define REG_FONTS_PATH        'FontsPath'
@@ -29,7 +30,7 @@
 
 #define sAppVerShort
 
-#define NSSM                  '{app}\server\Winser\node_modules\winser\bin\nssm64.exe'
+#define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'
 
 #define LOCAL_SERVICE 'Local Service'
@@ -125,6 +126,20 @@ SetupIconFile             = data\icon.ico
 SignTool=byparam $p
 #endif
 
+[CustomMessages]
+GenFonts=Generating AllFonts.js...
+InstallSrv=Installing service %1...
+CfgSrv=Configuring service %1...
+StartSrv=Starting service %1...
+InstallNpm=Installing npm modules...
+CreateDb=Creating database...
+RemoveDb=Removing database...
+FireWallExt=Adding firewall extention..
+
+CfgDs=Configuring {#sAppName}...
+Uninstall=Uninstall {#sAppName}
+PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
+
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 ;Name: "de"; MessagesFile: "compiler:Languages\German.isl"
@@ -137,24 +152,27 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: nginx\nginx.conf;                                    DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\*;           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; Flags: ignoreversion recursesubdirs
 
 [Dirs]
-Name: "{app}\server\App_Data";        Permissions: users-full
-Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-full
-Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-full
-Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-full
-Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-full
-Name: "{#NGINX_SRV_DIR}";             Permissions: users-full
-Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-full
-Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-full
-Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-full
+Name: "{app}\server\App_Data";        Permissions: users-modify
+Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
+Name: "{app}\sdkjs";                  Permissions: users-modify
+Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
+Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
+Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-modify
+Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-modify
+Name: "{#NGINX_SRV_DIR}";             Permissions: users-modify
+Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-modify
+Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-modify
+Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";
 
 [Icons]
-Name: "{group}\Uninstall {#sAppName}"; Filename: "{uninstallexe}"
+Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
 
 [Registry]
 Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}";
@@ -172,85 +190,89 @@ Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_SP
 Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_FONTS_PATH}"; ValueData: "{code:GetFontsPath}";
 
 [Run]
-Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Flags: runhidden
+Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
 
-Filename: "{#NPM}"; Parameters: "install -g json"; Flags: runhidden shellexec waituntilterminated
-Filename: "{#NPM}"; Parameters: "install -g replace"; Flags: runhidden shellexec waituntilterminated
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#NPM}"; Parameters: "install -g json"; Flags: runhidden shellexec waituntilterminated; StatusMsg: "{cm:InstallNpm}"
+Filename: "{#NPM}"; Parameters: "install -g replace"; Flags: runhidden shellexec waituntilterminated; StatusMsg: "{cm:InstallNpm}"
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.login = '{code:GetRabbitMqUser}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.password = '{code:GetRabbitMqPwd}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.services.CoAuthoring.utils.utils_common_fontdir = '{code:GetFontsPath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
-Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\nginx.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.services.CoAuthoring.utils.utils_common_fontdir = '{code:GetFontsPath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode;
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; 
+Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf.template"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver-ssl.conf.template"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf.template"" ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} node convertermaster.js"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} Description {#CONVERTER_SRV_DESCR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppDirectory {#CONVERTER_SRV_DIR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStdout {#CONVERTER_SRV_LOG_DIR}\out.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStderr {#CONVERTER_SRV_LOG_DIR}\error.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "start {#CONVERTER_SRV}"; Flags: runhidden
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
 
-Filename: "{#NSSM}"; Parameters: "install {#DOCSERVICE_SRV} node server.js"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} DisplayName {#DOCSERVICE_SRV_DISPLAY}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} Description {#DOCSERVICE_SRV_DESCR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppDirectory {#DOCSERVICE_SRV_DIR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStdout {#DOCSERVICE_SRV_LOG_DIR}\out.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStderr {#DOCSERVICE_SRV_LOG_DIR}\error.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "start {#DOCSERVICE_SRV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} node convertermaster.js"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} Description {#CONVERTER_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppDirectory {#CONVERTER_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStdout {#CONVERTER_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStderr {#CONVERTER_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "start {#CONVERTER_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
 
-Filename: "{#NSSM}"; Parameters: "install {#GC_SRV} node gc.js"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} DisplayName {#GC_SRV_DISPLAY}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} Description {#GC_SRV_DESCR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppDirectory {#GC_SRV_DIR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppStdout {#GC_SRV_LOG_DIR}\out.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppStderr {#GC_SRV_LOG_DIR}\error.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "start {#GC_SRV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "install {#DOCSERVICE_SRV} node server.js"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} DisplayName {#DOCSERVICE_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} Description {#DOCSERVICE_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppDirectory {#DOCSERVICE_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStdout {#DOCSERVICE_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStderr {#DOCSERVICE_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "start {#DOCSERVICE_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
 
-Filename: "{#NSSM}"; Parameters: "install {#SPELLCHECKER_SRV} node server.js"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} DisplayName {#SPELLCHECKER_SRV_DISPLAY}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} Description {#SPELLCHECKER_SRV_DESCR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppDirectory {#SPELLCHECKER_SRV_DIR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECKER_SRV_LOG_DIR}\out.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "install {#GC_SRV} node gc.js"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} DisplayName {#GC_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} Description {#GC_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppDirectory {#GC_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppStdout {#GC_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppStderr {#GC_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
+Filename: "{#NSSM}"; Parameters: "start {#GC_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#GC_SRV}}"
 
-Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} ""{#NGINX_SRV_DIR}\nginx"""; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} DisplayName {#NGINX_SRV_DISPLAY}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStdout {#NGINX_SRV_LOG_DIR}\out.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStderr {#NGINX_SRV_LOG_DIR}\error.log"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "install {#SPELLCHECKER_SRV} node server.js"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} DisplayName {#SPELLCHECKER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} Description {#SPELLCHECKER_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppDirectory {#SPELLCHECKER_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECKER_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#SPELLCHECKER_SRV}}"
 
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden
+Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} ""{#NGINX_SRV_DIR}\nginx"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} DisplayName {#NGINX_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStdout {#NGINX_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStderr {#NGINX_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#NGINX_SRV}}"
+
+Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallRun]
+Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
+
 Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#NGINX_SRV} confirm"; Flags: runhidden
 
@@ -289,15 +311,55 @@ Type: filesandordirs; Name: "{app}\*"
 #include "scripts\service.iss"
 
 [Code]
-procedure StopDsServices(); forward;
+function UninstallPreviosVersion(): Boolean;
+var
+  UninstallerPath: String;
+  UninstallRegKey: String;
+  UninstallerParam: String;
+  ResultCode: Integer;
+  ConfirmUninstall: Integer;
+begin
+  Result := True;
+  UninstallerParam := '/VERYSILENT';
+  UninstallRegKey := '{reg:HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#sAppName}_is1,UninstallString}';
+
+  UninstallerPath := RemoveQuotes(ExpandConstant(UninstallRegKey));
+  if Length(UninstallerPath) > 0 then begin
+    ConfirmUninstall := IDOK;
+
+    if not WizardSilent() then begin
+      UninstallerParam := '/SILENT';
+      ConfirmUninstall := MsgBox(
+                              ExpandConstant('{cm:PrevVer}'),
+                              mbConfirmation,
+                              MB_OKCANCEL);
+    end;
+
+    if ConfirmUninstall = IDOK then begin
+      Exec(
+        UninstallerPath,
+        UninstallerParam,
+        '', 
+        SW_HIDE,
+        ewWaitUntilTerminated,
+        ResultCode);
+
+    end else begin
+      Result := False;
+    end;
+  end;
+end;
 
 function InitializeSetup(): Boolean;
 begin
   // initialize windows version
   initwinversion();
-
-  StopDsServices();
-
+  
+  if not UninstallPreviosVersion() then
+  begin
+    Abort();
+  end;
+ 
   vcredist2010();
   vcredist2013();
   nodejs6x('6.9.1.0');
@@ -371,6 +433,11 @@ end;
 function GetSpellCheckerPort(Param: String): String;
 begin
   Result := ExpandConstant('{param:SPELLCHECKER_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_SPELLCHECKER_PORT}|8080}}');
+end;
+
+function GetExamplePort(Param: String): String;
+begin
+  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_EXAMPLE_PORT}|3000}}');
 end;
 
 function GetLicensePath(Param: String): String;

@@ -61,12 +61,12 @@
             <br>
             Give a try to our test example which will allow you to upload your own local Office files from your computer for testing. It can be easily run with the following commands:
 
-            <pre>sudo docker exec $(sudo docker ps -q) sudo supervisorctl start onlyoffice-documentserver:example</pre>
+            <pre>sudo supervisorctl start onlyoffice-documentserver:example</pre>
 
             Add the example to the autostart:
-			<pre>sudo docker exec $(sudo docker ps -q) sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/onlyoffice-documentserver-example.conf</pre>
+			<pre>sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/onlyoffice-documentserver-example.conf</pre>
 
-			Once started the example will be available <a href="/example">here</a>.
+			Once started the example will be available <a href="/example/">here</a>.
 			<br>
             Please note, that the example is used for demonstration purposes only and it can be accessed by anyone. Once you finish examining it, we recommend that you disable this example for security reasons.
         </div>

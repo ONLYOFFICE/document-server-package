@@ -68,7 +68,7 @@ done
 
 #install nginx config
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
-cp ../../../common/documentserver/nginx/onlyoffice-documentserver.conf "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
+cp ../../../common/documentserver/nginx/onlyoffice-documentserver*.template "$RPM_BUILD_ROOT/etc/nginx/conf.d/"
 
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
 cp ../../../common/documentserver/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
@@ -85,7 +85,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
-%config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver.conf
+%config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver*.template
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
 %attr(-, root, root) /usr/share/fonts/truetype/*
@@ -94,16 +94,30 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %dir
 %attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
+%attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
+%attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
 
 %pre
-#add group and user for onlyoffice app
-getent group onlyoffice >/dev/null || groupadd -r onlyoffice
-getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
+case "$1" in
+  1)
+    # Initial installation
+    # add group and user for onlyoffice app
+    getent group onlyoffice >/dev/null || groupadd -r onlyoffice
+    getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
+    # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
+    usermod -a -G onlyoffice nginx
+  ;;
+  2)
+    # Upgrade
+    # disconnect all users and stop running services
+    documentserver-prepare4shutdown.sh
+    echo "Stoping documentserver services..."
+    supervisorctl stop onlyoffice-documentserver:*
+  ;;
+esac
 exit 0
 
 %post
@@ -118,22 +132,42 @@ service supervisord restart >/dev/null 2>&1
 service nginx reload >/dev/null 2>&1
 
 %preun
-# uninstall action
-if [ $1 -eq 0 ]; then
-  supervisorctl stop onlyoffice-documentserver:*
-fi
+case "$1" in
+  0)
+    # Uninstall
+    # disconnect all users and stop running services
+    documentserver-prepare4shutdown.sh
+    supervisorctl stop onlyoffice-documentserver:*
+  ;;
+  1)
+    # Upgrade
+    :
+  ;;
+esac
 
 %postun
 DIR="/var/www/onlyoffice/documentserver"
-# uninstall action
-if [ $1 -eq 0 ]; then
-  rm -f $DIR/sdkjs/common/AllFonts.js
-  rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
-  rm -f $DIR/server/FileConverter/bin/font_selection.bin
 
-  supervisorctl update >/dev/null 2>&1
-  service nginx reload >/dev/null 2>&1
-fi
+# remove v8 cache
+rm -f $DIR/sdkjs/*/sdk-all.cache
+
+case "$1" in
+  0)
+    # Uninstall
+    rm -f $DIR/sdkjs/common/AllFonts.js
+    rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
+    rm -f $DIR/server/FileConverter/bin/font_selection.bin
+    
+    rm -f /etc/nginx/conf.d/onlyoffice-documentserver.conf
+
+    supervisorctl update >/dev/null 2>&1
+    service nginx reload >/dev/null 2>&1
+  ;;
+  1)
+    # Upgrade
+    :
+  ;;
+esac
 
 %changelog
 * Tue Apr 28 2015 ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
