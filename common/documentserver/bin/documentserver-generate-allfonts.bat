@@ -4,6 +4,8 @@ SET ONLYOFFICE_DATA_CONTAINER=false
 IF NOT "%1"=="" (
   SET ONLYOFFICE_DATA_CONTAINER=%1
 )
+rem Setup path env to enable to load the dlls
+set PATH=%~dp0\..\server\FileConverter\bin;%PATH%
 
 rem Start generate AllFonts.js, font thumbnails and font_selection.bin
 ECHO | SET /p="Generating AllFonts.js, please wait..."
