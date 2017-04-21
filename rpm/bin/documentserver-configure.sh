@@ -41,9 +41,7 @@ delete_saved_params()
 }
 
 save_rabbitmq_params(){
-	json -I -f $DEFAULT_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_HOST'" >/dev/null 2>&1
-	json -I -f $DEFAULT_CONFIG -e "this.rabbitmq.login = '$RABBITMQ_USER'" >/dev/null 2>&1
-	json -I -f $DEFAULT_CONFIG -e "this.rabbitmq.password = '$RABBITMQ_PWD'" >/dev/null 2>&1
+	json -I -f $DEFAULT_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'" >/dev/null 2>&1
 }
 
 save_redis_params(){
@@ -65,10 +63,50 @@ read_saved_params(){
 
 		REDIS_HOST=$(json -f "$CONFIG_TO_READ" services.CoAuthoring.redis.host)
 
-		RABBITMQ_HOST=$(json -f "$CONFIG_TO_READ" rabbitmq.url | cut -c8-)
-		RABBITMQ_USER=$(json -f "$CONFIG_TO_READ" rabbitmq.login)
-		RABBITMQ_PWD=$(json -f "$CONFIG_TO_READ" rabbitmq.password) 
+		RABBITMQ_URL=$(json -f "$CONFIG_TO_READ" rabbitmq.url)
+		parse_rabbitmq_url
 	fi
+}
+
+parse_rabbitmq_url(){
+  local amqp=${RABBITMQ_URL}
+
+  # extract the protocol
+  local proto="$(echo $amqp | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+  # remove the protocol
+  local url="$(echo ${amqp/$proto/})"
+
+  # extract the user and password (if any)
+  local userpass="`echo $url | grep @ | cut -d@ -f1`"
+  local pass=`echo $userpass | grep : | cut -d: -f2`
+
+  local user
+  if [ -n "$pass" ]; then
+    user=`echo $userpass | grep : | cut -d: -f1`
+  else
+    user=$userpass
+  fi
+  echo $user
+
+  # extract the host
+  local hostport="$(echo ${url/$userpass@/} | cut -d/ -f1)"
+  # by request - try to extract the port
+  local port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+
+  local host
+  if [ -n "$port" ]; then
+    host=`echo $hostport | grep : | cut -d: -f1`
+  else
+    host=$hostport
+    port="5672"
+  fi
+
+  # extract the path (if any)
+  local path="$(echo $url | grep / | cut -d/ -f2-)"
+
+  RABBITMQ_HOST=$hostport$path
+  RABBITMQ_USER=$user
+  RABBITMQ_PWD=$pass
 }
 
 input_db_params(){

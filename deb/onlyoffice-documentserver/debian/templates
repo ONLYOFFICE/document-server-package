@@ -49,3 +49,23 @@ Template: onlyoffice/example-port
 Type: string
 Default: 3000
 Description: DocumentServer example listening port:
+
+Template: onlyoffice/redis-host
+Type: string
+Default: localhost
+Description: Redis host:
+
+Template: onlyoffice/rabbitmq-host
+Type: string
+Default: localhost
+Description: RabbitMQ host:
+
+Template: onlyoffice/rabbitmq-user
+Type: string
+Default: guest
+Description: RabbitMQ user:
+
+Template: onlyoffice/rabbitmq-pwd
+Type: password
+Default: guest
+Description: RabbitMQ password:
