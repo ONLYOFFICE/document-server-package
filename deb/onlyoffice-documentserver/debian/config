@@ -34,6 +34,13 @@ db_go
 db_input critical onlyoffice/db-pwd || true
 db_go
 
+db_input medium onlyoffice/rabbitmq-host || true
+db_input medium onlyoffice/rabbitmq-user || true
+db_input medium onlyoffice/rabbitmq-pwd || true
+
+db_input medium onlyoffice/redis-host || true
+db_go
+
 db_get onlyoffice/db-host
 DB_HOST="$RET"
 
