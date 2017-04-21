@@ -20,8 +20,11 @@ set -e
 case "$1" in
     remove|upgrade|deconfigure)
         documentserver-prepare4shutdown.sh
-        echo "Stoping documentserver services..."
-        supervisorctl stop onlyoffice-documentserver:*
+        DS_COUNT = $(supervisorctl avail | grep onlyoffice-documentserver | wc -l)
+        if [ $DS_COUNT -gt 0 ]; then
+            echo "Stopping documentserver services..."
+            supervisorctl stop onlyoffice-documentserver:*
+        fi
     ;;
 
     failed-upgrade)
