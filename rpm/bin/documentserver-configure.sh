@@ -86,7 +86,6 @@ parse_rabbitmq_url(){
   else
     user=$userpass
   fi
-  echo $user
 
   # extract the host
   local hostport="$(echo ${url/$userpass@/} | cut -d/ -f1)"
