@@ -259,7 +259,7 @@ $(PSQL):
 	rm -f $(PSQL_ZIP)
 	
 $(NSSM):
-	$(CURL) $(NSSM_ZIP) https://github.com/ONLYOFFICE/nssm/releases/download/v2.24/$(NSSM_ZIP) && \
+	$(CURL) $(NSSM_ZIP) https://github.com/ONLYOFFICE/nssm/releases/download/v2.24.1/$(NSSM_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
 	rm -f $(NSSM_ZIP)
 
