@@ -125,7 +125,7 @@ else
 		PLATFORM := linux
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
-		DEPLOY := $(APM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
 		NGINX_CONF := /etc/nginx/
 		NGINX_LOG := /var/log/onlyoffice/documentserver/
 		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
