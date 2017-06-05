@@ -108,7 +108,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %attr(-, root, root) /usr/bin/documentserver-*.sh
 
 %dir
-%attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
+%attr(-, _nginx, _nginx) /var/cache/nginx/onlyoffice/documentserver
 %attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
 %attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example
@@ -123,8 +123,8 @@ case "$1" in
     # add group and user for onlyoffice app
     getent group onlyoffice >/dev/null || groupadd -r onlyoffice
     getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
-    # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
-    usermod -a -G onlyoffice nginx
+    # add _nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
+    usermod -a -G onlyoffice _nginx
   ;;
   2)
     # Upgrade
@@ -144,8 +144,8 @@ ln -sf /usr/lib64/libcurl.so.4 /usr/lib64/libcurl-gnutls.so.4
 documentserver-generate-allfonts.sh true
 
 # restart dependent services
-service supervisord restart >/dev/null 2>&1
-service nginx reload >/dev/null 2>&1
+/sbin/service supervisord restart >/dev/null 2>&1
+/sbin/service nginx reload >/dev/null 2>&1
 
 %preun
 case "$1" in
