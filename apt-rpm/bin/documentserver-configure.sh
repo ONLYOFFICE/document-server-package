@@ -110,24 +110,43 @@ parse_rabbitmq_url(){
 
 input_db_params(){
 	echo "Configuring PostgreSQL access... "
-	read -e -p "Host: " -i "$DB_HOST" DB_HOST
-	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
-	read -e -p "User: " -i "$DB_USER" DB_USER
-	read -e -p "Password: " -s DB_PWD
+
+	read -e -p "Host [${DB_HOST}]: " USER_INPUT
+	DB_HOST=${USER_INPUT:-${DB_HOST}}
+
+	read -e -p "Database name [${DB_NAME}]: " USER_INPUT
+	DB_NAME=${USER_INPUT:-${DB_NAME}}
+
+	read -e -p "User [${DB_USER}]: " USER_INPUT
+	DB_USER=${USER_INPUT:-${DB_USER}}
+
+	read -e -p "Password []: " -s USER_INPUT
+	DB_PWD=${USER_INPUT:-${DB_PWD}}
+
 	echo
 }
 
 input_redis_params(){
 	echo "Configuring redis access... "
-	read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
+
+	read -e -p "Host [${REDIS_HOST}]: " USER_INPUT
+	REDIS_HOST=${USER_INPUT:-${REDIS_HOST}}
+
 	echo
 }
 
 input_rabbitmq_params(){
 	echo "Configuring RabbitMQ access... "
-	read -e -p "Host: " -i "$RABBITMQ_HOST" RABBITMQ_HOST
-	read -e -p "User: " -i "$RABBITMQ_USER" RABBITMQ_USER
-	read -e -p "Password: " -s RABBITMQ_PWD
+
+	read -e -p "Host [${RABBITMQ_HOST}]: " USER_INPUT
+	RABBITMQ_HOST=${USER_INPUT:-${RABBITMQ_HOST}}
+
+	read -e -p "User [${RABBITMQ_USER}]: " USER_INPUT
+	RABBITMQ_USER=${USER_INPUT:-${RABBITMQ_USER}}
+
+	read -e -p "Password []: " -s USER_INPUT
+	RABBITMQ_PWD=${USER_INPUT:-${RABBITMQ_PWD}}
+
 	echo
 }
 
