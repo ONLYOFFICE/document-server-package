@@ -7,7 +7,7 @@ Group: Applications/Internet
 URL: http://onlyoffice.com/
 Vendor: ONLYOFFICE (Online documents editor)
 Packager: ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-Requires: nginx >= 1.3.13, postgresql >= 9.1, wget, librabbitmq-c, supervisor >= 3.0b2, node >= 6.9.1, npm, libstdc++ >= 4.8.4, libcurl, libxml2, libboost_regex1.57.0, zlib, libXScrnSaver, libgtkglext, xorg-xvfb, libXtst, GConf, libalsa, pwgen, fonts-ttf-liberation, fonts-ttf-liberation-narrow, fonts-ttf-dejavu, fonts-ttf-dejavu-lgc, fonts-ttf-google-crosextra-carlito
+Requires: nginx >= 1.3.13, postgresql >= 9.1, wget, librabbitmq-c, supervisor >= 3.0b2, node >= 6.9.1, npm, libstdc++ >= 4.8.4, libcurl, libxml2, libboost_regex1.57.0, zlib, libXScrnSaver, libgtkglext, xorg-xvfb, libXtst, GConf, libalsa, pwgen, fonts-ttf-liberation, fonts-ttf-liberation-narrow, fonts-ttf-dejavu, fonts-ttf-dejavu-lgc, fonts-ttf-google-crosextra-carlito, fonts-ttf-ms
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no
