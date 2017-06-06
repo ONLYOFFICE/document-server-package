@@ -177,7 +177,7 @@ case "$1" in
     rm -f /etc/nginx/conf.d/onlyoffice-documentserver.conf
 
     supervisorctl update >/dev/null 2>&1
-    service nginx reload >/dev/null 2>&1
+    /sbin/service nginx reload >/dev/null 2>&1
   ;;
   1)
     # Upgrade
