@@ -22,7 +22,7 @@ restart_services() {
 	echo -n "Restarting services... "
 	for SVC in supervisord nginx
 	do
-		systemctl stop $SVC 
+		systemctl stop $SVC
 		systemctl start $SVC
 	done
 	echo "OK"
@@ -112,7 +112,7 @@ input_db_params(){
 	echo "Configuring PostgreSQL access... "
 	read -e -p "Host: " -i "$DB_HOST" DB_HOST
 	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
-	read -e -p "User: " -i "$DB_USER" DB_USER 
+	read -e -p "User: " -i "$DB_USER" DB_USER
 	read -e -p "Password: " -s DB_PWD
 	echo
 }
@@ -126,7 +126,7 @@ input_redis_params(){
 input_rabbitmq_params(){
 	echo "Configuring RabbitMQ access... "
 	read -e -p "Host: " -i "$RABBITMQ_HOST" RABBITMQ_HOST
-	read -e -p "User: " -i "$RABBITMQ_USER" RABBITMQ_USER 
+	read -e -p "User: " -i "$RABBITMQ_USER" RABBITMQ_USER
 	read -e -p "Password: " -s RABBITMQ_PWD
 	echo
 }
@@ -141,7 +141,7 @@ execute_db_scripts(){
         if [ ! "$CLUSTER_MODE" = true ]; then
                 $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
         fi
-	
+
 	$PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
 	echo "OK"
@@ -200,7 +200,7 @@ setup_nginx(){
   sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
   sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
   sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
-  
+
   cp -f /etc/nginx/conf.d/onlyoffice-documentserver.conf.template /etc/nginx/sites-enabled.d/onlyoffice-documentserver.conf
 }
 
