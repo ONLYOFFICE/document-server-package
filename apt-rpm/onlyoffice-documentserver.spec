@@ -2,12 +2,12 @@ Summary: Online viewers and editors for text, spreadsheet and presentation files
 Name: {{PACKAGE_NAME}}
 Version: {{PRODUCT_VERSION}}
 Release: {{BUILD_NUMBER}}
-License: Commercial
+License: AGPL
 Group: Applications/Internet
 URL: http://onlyoffice.com/
 Vendor: ONLYOFFICE (Online documents editor)
 Packager: ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-Requires: nginx >= 1.3.13, postgresql >= 9.1, wget, librabbitmq-tools, supervisor >= 3.0b2, nodejs >= 6.9.1, libstdc++ >= 4.8.4, libcurl, libxml2, boost-regex, zlib, libXScrnSaver, gtkglext-libs, xorg-x11-server-Xvfb, libXtst, GConf2, alsa-lib, pwgen, liberation-mono-fonts, liberation-narrow-fonts, liberation-sans-fonts, liberation-serif-fonts, dejavu-lgc-sans-fonts, dejavu-lgc-sans-mono-fonts, dejavu-lgc-serif-fonts, dejavu-sans-fonts, dejavu-sans-mono-fonts, dejavu-serif-fonts, google-crosextra-carlito-fonts, libreoffice-opensymbol-fonts
+Requires: nginx >= 1.3.13, postgresql >= 9.1, wget, librabbitmq-c, supervisor >= 3.0b2, node >= 6.9.1, npm, libstdc++ >= 4.8.4, libcurl, libxml2, libboost_regex1.57.0, zlib, libXScrnSaver, libgtkglext, xorg-xvfb, libXtst, GConf, libalsa, pwgen, fonts-ttf-liberation, fonts-ttf-liberation-narrow, fonts-ttf-dejavu, fonts-ttf-dejavu-lgc, fonts-ttf-google-crosextra-carlito, fonts-ttf-ms
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no
@@ -27,9 +27,6 @@ DOCUMENTSERVER_BIN=../../../common/documentserver/bin
 DOCUMENTSERVER_HOME=../../../common/documentserver/home
 DOCUMENTSERVER_CONFIG=../../../common/documentserver/config
 
-DOCUMENTSERVER_EXAMPLE_HOME=../../../common/documentserver-example/home
-DOCUMENTSERVER_EXAMPLE_CONFIG=../../../common/documentserver-example/config
-
 #install documentserver files
 mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
 cp -r $DOCUMENTSERVER_HOME/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver/"
@@ -48,17 +45,8 @@ cp -r ../../bin/*.sh "$RPM_BUILD_ROOT/usr/bin/"
 mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/"
 cp -r $DOCUMENTSERVER_CONFIG/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver/" 
 
-#install documentserver example files
-mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
-cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "$RPM_BUILD_ROOT/var/www/onlyoffice/documentserver-example/"
-
-#install dcoumentserver example configs
-mkdir -p "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/"
-cp -r $DOCUMENTSERVER_EXAMPLE_CONFIG/* "$RPM_BUILD_ROOT/etc/onlyoffice/documentserver-example/" 
-
 #make log dir
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/docservice"
-mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver-example"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/converter"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/spellchecker"
 mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/metrics"
@@ -73,7 +61,6 @@ mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
 #install supervisor configs
 mkdir -p "$RPM_BUILD_ROOT/etc/supervisord.d/"
 cp ../../../common/documentserver/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
-cp -f ../../../common/documentserver-example/supervisor/* "$RPM_BUILD_ROOT/etc/supervisord.d/"
 for f in "$RPM_BUILD_ROOT"/etc/supervisord.d/*.conf; 
 do
   mv "$f" "${f%.*}".ini;
@@ -85,7 +72,6 @@ cp ../../../common/documentserver/nginx/onlyoffice-documentserver*.template "$RP
 
 mkdir -p "$RPM_BUILD_ROOT/etc/nginx/includes/"
 cp ../../../common/documentserver/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
-cp ../../../common/documentserver-example/nginx/includes/* "$RPM_BUILD_ROOT/etc/nginx/includes/"
 
 mkdir -p "$RPM_BUILD_ROOT/var/cache/nginx/onlyoffice/documentserver/"
 
@@ -99,7 +85,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
-%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
 %config %attr(-, root, root) /etc/nginx/conf.d/onlyoffice-documentserver*.template
 %config %attr(-, root, root) /etc/nginx/includes/onlyoffice-*.conf
 %config %attr(-, root, root) /etc/supervisord.d/onlyoffice-documentserver*.ini
@@ -108,10 +93,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %attr(-, root, root) /usr/bin/documentserver-*.sh
 
 %dir
-%attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
+%attr(-, _nginx, _nginx) /var/cache/nginx/onlyoffice/documentserver
 %attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
 %attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
@@ -123,8 +107,8 @@ case "$1" in
     # add group and user for onlyoffice app
     getent group onlyoffice >/dev/null || groupadd -r onlyoffice
     getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
-    # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
-    usermod -a -G onlyoffice nginx
+    # add _nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
+    usermod -a -G onlyoffice _nginx
   ;;
   2)
     # Upgrade
@@ -144,8 +128,8 @@ ln -sf /usr/lib64/libcurl.so.4 /usr/lib64/libcurl-gnutls.so.4
 documentserver-generate-allfonts.sh true
 
 # restart dependent services
-service supervisord restart >/dev/null 2>&1
-service nginx reload >/dev/null 2>&1
+/sbin/service supervisord restart >/dev/null 2>&1
+/sbin/service nginx reload >/dev/null 2>&1
 
 %preun
 case "$1" in
@@ -177,7 +161,7 @@ case "$1" in
     rm -f /etc/nginx/conf.d/onlyoffice-documentserver.conf
 
     supervisorctl update >/dev/null 2>&1
-    service nginx reload >/dev/null 2>&1
+    /sbin/service nginx reload >/dev/null 2>&1
   ;;
   1)
     # Upgrade

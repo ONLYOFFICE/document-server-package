@@ -23,6 +23,7 @@ DIR="/var/www/onlyoffice"
 LOG_DIR="/var/log/onlyoffice"
 APP_DIR="/var/lib/onlyoffice"
 DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
+JSON="json -I -q -f $DEFAULT_CONFIG"
 
 OLD_VERSION="$2"
 
@@ -31,7 +32,15 @@ DB_USER=""
 DB_PWD=""
 DB_NAME=""
 
-install_db(){
+RABBITMQ_HOST=""
+RABBITMQ_USER=""
+RABBITMQ_PWD=""
+
+REDIS_HOST=""
+
+CLUSTER_MODE=""
+
+read_saved_params(){
 	db_get onlyoffice/db-host || true
 	DB_HOST="$RET"
 	db_get onlyoffice/db-user || true
@@ -40,9 +49,22 @@ install_db(){
 	DB_PWD="$RET"
 	db_get onlyoffice/db-name || true
 	DB_NAME="$RET"
+
+	db_get onlyoffice/rabbitmq-host || true
+	RABBITMQ_HOST="$RET"
+	db_get onlyoffice/rabbitmq-user || true
+	RABBITMQ_USER="$RET"
+	db_get onlyoffice/rabbitmq-pwd || true
+	RABBITMQ_PWD="$RET"
+
+	db_get onlyoffice/redis-host || true
+	REDIS_HOST="$RET"
+
 	db_get onlyoffice/cluster-mode || true
 	CLUSTER_MODE="$RET"
-
+}
+  
+install_db(){
         CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
         if [ -n "$DB_PWD" ]; then
                 export PGPASSWORD=$DB_PWD
@@ -71,13 +93,19 @@ install_db(){
         $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 }
 
-apply_connection_string(){
-  JSON="json -I -q -f $DEFAULT_CONFIG"
-
+save_db_params(){
   $JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
   $JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
   $JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
   $JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
+}
+
+save_rabbitmq_params(){
+  $JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
+}
+
+save_redis_params(){
+  $JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
 setup_nginx(){
@@ -117,8 +145,11 @@ case "$1" in
 		#install node modules
 		npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
+		read_saved_params
 		install_db
-		apply_connection_string
+		save_db_params
+		save_rabbitmq_params
+		save_redis_params
 
 		setup_nginx
 

@@ -17,13 +17,12 @@ EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
 restart_services() {
-	[ -a /etc/nginx/conf.d/default.conf ] && mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.old
+	[ -a /etc/nginx/sites-available.d/default.conf ] && mv /etc/nginx/sites-available.d/default.conf /etc/nginx/sites-available.d/default.conf.old
 
 	echo -n "Restarting services... "
 	for SVC in supervisord nginx
 	do
-		systemctl stop $SVC 
-		systemctl start $SVC
+		/sbin/service $SVC restart
 	done
 	echo "OK"
 }
@@ -110,24 +109,43 @@ parse_rabbitmq_url(){
 
 input_db_params(){
 	echo "Configuring PostgreSQL access... "
-	read -e -p "Host: " -i "$DB_HOST" DB_HOST
-	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
-	read -e -p "User: " -i "$DB_USER" DB_USER 
-	read -e -p "Password: " -s DB_PWD
+
+	read -e -p "Host [${DB_HOST}]: " USER_INPUT
+	DB_HOST=${USER_INPUT:-${DB_HOST}}
+
+	read -e -p "Database name [${DB_NAME}]: " USER_INPUT
+	DB_NAME=${USER_INPUT:-${DB_NAME}}
+
+	read -e -p "User [${DB_USER}]: " USER_INPUT
+	DB_USER=${USER_INPUT:-${DB_USER}}
+
+	read -e -p "Password []: " -s USER_INPUT
+	DB_PWD=${USER_INPUT:-${DB_PWD}}
+
 	echo
 }
 
 input_redis_params(){
 	echo "Configuring redis access... "
-	read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
+
+	read -e -p "Host [${REDIS_HOST}]: " USER_INPUT
+	REDIS_HOST=${USER_INPUT:-${REDIS_HOST}}
+
 	echo
 }
 
 input_rabbitmq_params(){
 	echo "Configuring RabbitMQ access... "
-	read -e -p "Host: " -i "$RABBITMQ_HOST" RABBITMQ_HOST
-	read -e -p "User: " -i "$RABBITMQ_USER" RABBITMQ_USER 
-	read -e -p "Password: " -s RABBITMQ_PWD
+
+	read -e -p "Host [${RABBITMQ_HOST}]: " USER_INPUT
+	RABBITMQ_HOST=${USER_INPUT:-${RABBITMQ_HOST}}
+
+	read -e -p "User [${RABBITMQ_USER}]: " USER_INPUT
+	RABBITMQ_USER=${USER_INPUT:-${RABBITMQ_USER}}
+
+	read -e -p "Password []: " -s USER_INPUT
+	RABBITMQ_PWD=${USER_INPUT:-${RABBITMQ_PWD}}
+
 	echo
 }
 
@@ -141,7 +159,7 @@ execute_db_scripts(){
         if [ ! "$CLUSTER_MODE" = true ]; then
                 $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
         fi
-	
+
 	$PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
 	echo "OK"
@@ -200,8 +218,8 @@ setup_nginx(){
   sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
   sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
   sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
-  
-  cp -f /etc/nginx/conf.d/onlyoffice-documentserver.conf.template /etc/nginx/conf.d/onlyoffice-documentserver.conf
+
+  cp -f /etc/nginx/conf.d/onlyoffice-documentserver.conf.template /etc/nginx/sites-enabled.d/onlyoffice-documentserver.conf
 }
 
 read_saved_params
@@ -211,10 +229,10 @@ establish_db_conn || exit $?
 execute_db_scripts || exit $?
 
 input_redis_params
-establish_redis_conn || exit $?
+# establish_redis_conn || exit $?
 
 input_rabbitmq_params
-establish_rabbitmq_conn || exit $?
+# establish_rabbitmq_conn || exit $?
 
 save_db_params
 save_rabbitmq_params

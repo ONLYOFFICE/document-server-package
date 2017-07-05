@@ -12,21 +12,30 @@ PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 RPM_ARCH = x86_64
 DEB_ARCH = amd64
 
+APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
 DEB_BUILD_DIR = $(PWD)/deb
 EXE_BUILD_DIR = $(PWD)/exe
 
+APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
 
 DEB_REPO := $(PWD)/repo
 DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
 
+APT_RPM_REPO := $(PWD)/repo-apt-rpm
+APT_RPM_REPO_DATA := $(APT_RPM_REPO)/repodata
+
 RPM_REPO := $(PWD)/repo-rpm
 RPM_REPO_DATA := $(RPM_REPO)/repodata
 
 EXE_REPO := repo-exe
 EXE_REPO_DATA := $(EXE_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
+
+APT_RPM_REPO_OS_NAME = ALTLinux
+APT_RPM_REPO_OS_VER = p8
+APT_RPM_REPO_DIR = $(APT_RPM_REPO_OS_NAME)/$(APT_RPM_REPO_OS_VER)
 
 RPM_REPO_OS_NAME = centos
 RPM_REPO_OS_VER = 7
@@ -38,6 +47,7 @@ DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
 
 EXE_REPO_DIR = windows
 
+APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
@@ -115,7 +125,7 @@ else
 		PLATFORM := linux
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
-		DEPLOY := $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
 		NGINX_CONF := /etc/nginx/
 		NGINX_LOG := /var/log/onlyoffice/documentserver/
 		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
@@ -134,7 +144,9 @@ endif
 
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
 
-all: rpm deb
+all: rpm deb apt-rpm
+
+apt-rpm:$(APT_RPM)
 
 rpm: $(RPM)
 
@@ -145,6 +157,7 @@ exe: $(EXE)
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
+		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
 		$(EXE_BUILD_DIR)/*.exe\
 		$(ISXDL)\
@@ -223,6 +236,14 @@ documentserver-example:
 
 	echo "Done" > $@
 
+$(APT_RPM):	documentserver documentserver-example
+	chmod u+x apt-rpm/bin/documentserver-configure.sh
+	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
+	sed "s/{{PRODUCT_VERSION}}/"$(PRODUCT_VERSION)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
+	sed "s/{{BUILD_NUMBER}}/"$(BUILD_NUMBER)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
+
+	cd apt-rpm && rpmbuild -bb --define "_topdir $(APT_RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
+
 $(RPM):	documentserver documentserver-example
 	chmod u+x rpm/bin/documentserver-configure.sh
 	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i rpm/$(PACKAGE_NAME).spec
@@ -278,6 +299,23 @@ $(RPM_REPO_DATA): $(RPM)
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
 		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
+		--acl public-read --delete
+
+$(APT_RPM_REPO_DATA): $(APT_RPM)
+	rm -rfv $(APT_RPM_REPO)
+	mkdir -p $(APT_RPM_REPO)
+
+	cp -rv $(APT_RPM) $(APT_RPM_REPO);
+	#createrepo -v $(APT_RPM_REPO);
+
+	aws s3 sync \
+		$(APT_RPM_REPO) \
+		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
+		--acl public-read --delete
+
+	aws s3 sync \
+		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
+		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
 		--acl public-read --delete
 
 $(DEB_REPO_DATA): $(DEB)

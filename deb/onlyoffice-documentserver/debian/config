@@ -10,16 +10,6 @@ DB_USER=""
 DB_PWD=""
 DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
 
-apply_connection_string(){
-	if [ -d /var/www/onlyoffice/ ]; then
-		bomstrip < $DEFAULT_CONFIG | \
-			json -e "this.services.CoAuthoring.sql.host = \"$DB_HOST\"" | \
-			json -e "this.services.CoAuthoring.sql.database = \"$DB_NAME\"" | \
-			json -e "this.services.CoAuthoring.sql.user = \"$DB_USER\"" | \
-			json -e "this.services.CoAuthoring.sql.pass = \"$DB_PWD\"" > $DEFAULT_CONFIG
-	fi
-}
-
 db_fset onlyoffice/cluster-mode seen true
 db_fset onlyoffice/ds-port seen true
 db_fset onlyoffice/docservice-port seen true
@@ -34,6 +24,13 @@ db_go
 db_input critical onlyoffice/db-pwd || true
 db_go
 
+db_input medium onlyoffice/rabbitmq-host || true
+db_input medium onlyoffice/rabbitmq-user || true
+db_input medium onlyoffice/rabbitmq-pwd || true
+
+db_input medium onlyoffice/redis-host || true
+db_go
+
 db_get onlyoffice/db-host
 DB_HOST="$RET"
 
@@ -45,7 +42,5 @@ DB_USER="$RET"
 
 db_get onlyoffice/db-pwd
 DB_PWD="$RET"
-
-# apply_connection_string
 
 exit 0
