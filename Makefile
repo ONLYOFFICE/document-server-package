@@ -101,6 +101,12 @@ NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
+WEBAPPS_DIR = web-apps
+
+ifeq ($(PRODUCT_NAME),documentserver-integration)
+WEBAPPS_DIR = web-apps-pro
+endif
+
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
 	EXEC_EXT := .exe
@@ -174,7 +180,7 @@ clean:
 		
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/* 
+	cp -rf -t $(DOCUMENTSERVER) ../$(WEBAPPS_DIR)/deploy/* ../server/build/* 
 	cp -fr -t $(DOCUMENTSERVER)/$(SDKJS_PLUGINS) $(DOCUMENTSERVER_PLUGINS)
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
