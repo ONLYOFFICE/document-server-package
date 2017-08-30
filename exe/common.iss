@@ -343,6 +343,10 @@ begin
         SW_HIDE,
         ewWaitUntilTerminated,
         ResultCode);
+      
+      while FileExists( UninstallerPath ) do begin
+        Sleep(500);
+      end
 
     end else begin
       Result := False;
