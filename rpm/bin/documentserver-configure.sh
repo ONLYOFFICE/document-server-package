@@ -54,23 +54,25 @@ save_redis_params(){
 }
 
 save_jwt_params(){
-  if [ "${JWT_ENABLED}" == "true" ]; then
+  if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
     json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.browser = '${JWT_ENABLED}'"
     json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.inbox = '${JWT_ENABLED}'"
     json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.outbox = '${JWT_ENABLED}'"
+  fi
+  
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
 
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
 
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
-
-    if [ -f "${EXAMPLE_CONFIG}" ]; then
+  if [ -f "${EXAMPLE_CONFIG}" ]; then
+    if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
       json -I -f $EXAMPLE_CONFIG -e "this.server.token.enable = '${JWT_ENABLED}'"
-      json -I -f $EXAMPLE_CONFIG -e "this.server.token.secret = '${JWT_SECRET}'"
-      json -I -f $EXAMPLE_CONFIG -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
     fi
+    json -I -f $EXAMPLE_CONFIG -e "this.server.token.secret = '${JWT_SECRET}'"
+    json -I -f $EXAMPLE_CONFIG -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
   fi
 }
 
