@@ -215,9 +215,9 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker
 Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_WIN_PARAMS} -e ""this.services.CoAuthoring.utils.utils_common_fontdir = '{code:GetFontsPath}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.browser = '{code:GetJwtEnabled}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.inbox = '{code:GetJwtEnabled}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.outbox = '{code:GetJwtEnabled}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.browser = {code:GetJwtEnabled}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.inbox = {code:GetJwtEnabled}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.outbox = {code:GetJwtEnabled}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.inbox.string = '{code:GetJwtSecret}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.outbox.string = '{code:GetJwtSecret}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"

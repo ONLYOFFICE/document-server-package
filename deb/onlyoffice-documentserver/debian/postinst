@@ -119,9 +119,9 @@ save_redis_params(){
 
 save_jwt_params(){
   if [ "${JWT_ENABLED}" = "true" -o "${JWT_ENABLED}" = "false" ]; then
-    ${JSON} -I -e "this.services.CoAuthoring.token.enable.browser = '${JWT_ENABLED}'"
-    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.inbox = '${JWT_ENABLED}'"
-    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.outbox = '${JWT_ENABLED}'"
+    ${JSON} -I -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
+    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
+    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
   fi
   
   ${JSON} -I -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
@@ -133,7 +133,7 @@ save_jwt_params(){
 
   if [ -f "${EXAMPLE_CONFIG}" ]; then
     if [ "${JWT_ENABLED}" = "true" -o "${JWT_ENABLED}" = "false" ]; then
-      ${JSON_EXAMPLE} -I -e "this.server.token.enable = '${JWT_ENABLED}'"
+      ${JSON_EXAMPLE} -I -e "this.server.token.enable = ${JWT_ENABLED}"
     fi
     ${JSON_EXAMPLE} -I -e "this.server.token.secret = '${JWT_SECRET}'"
     ${JSON_EXAMPLE} -I -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
