@@ -32,7 +32,11 @@ Name: "{group}\{cm:OpenDemo}"; Filename: "http://localhost/example"
 Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_EXAMPLE_PORT}"; ValueData: "{code:GetExamplePort}";
 
 [Run]
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.server.token.enable = {code:GetJwtEnabled}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.server.token.secret = '{code:GetJwtSecret}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.server.token.authorizationHeader = '{code:GetJwtHeader}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 
 Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node .\bin\www"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"

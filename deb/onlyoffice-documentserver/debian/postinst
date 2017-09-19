@@ -23,7 +23,9 @@ DIR="/var/www/onlyoffice"
 LOG_DIR="/var/log/onlyoffice"
 APP_DIR="/var/lib/onlyoffice"
 DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
+EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/default.json"
 JSON="json -I -q -f $DEFAULT_CONFIG"
+JSON_EXAMPLE="json -q -f ${EXAMPLE_CONFIG}"
 
 OLD_VERSION="$2"
 
@@ -62,6 +64,13 @@ read_saved_params(){
 
 	db_get onlyoffice/cluster-mode || true
 	CLUSTER_MODE="$RET"
+
+	db_get onlyoffice/jwt-enabled || true
+	JWT_ENABLED="$RET"
+	db_get onlyoffice/jwt-secret || true
+	JWT_SECRET="$RET"
+	db_get onlyoffice/jwt-header || true
+	JWT_HEADER="$RET"
 }
   
 install_db(){
@@ -108,6 +117,29 @@ save_redis_params(){
   $JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
+save_jwt_params(){
+  if [ "${JWT_ENABLED}" = "true" -o "${JWT_ENABLED}" = "false" ]; then
+    ${JSON} -I -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
+    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
+    ${JSON} -I -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
+  fi
+  
+  ${JSON} -I -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
+  ${JSON} -I -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
+  ${JSON} -I -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
+
+  ${JSON} -I -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
+  ${JSON} -I -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
+
+  if [ -f "${EXAMPLE_CONFIG}" ]; then
+    if [ "${JWT_ENABLED}" = "true" -o "${JWT_ENABLED}" = "false" ]; then
+      ${JSON_EXAMPLE} -I -e "this.server.token.enable = ${JWT_ENABLED}"
+    fi
+    ${JSON_EXAMPLE} -I -e "this.server.token.secret = '${JWT_SECRET}'"
+    ${JSON_EXAMPLE} -I -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
+  fi
+}
+
 setup_nginx(){
   NGINX_CONF_DIR=/etc/nginx
   DS_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver.conf.template
@@ -150,6 +182,7 @@ case "$1" in
 		save_db_params
 		save_rabbitmq_params
 		save_redis_params
+		save_jwt_params
 
 		setup_nginx
 
