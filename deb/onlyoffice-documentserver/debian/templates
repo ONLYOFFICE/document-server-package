@@ -69,3 +69,18 @@ Template: onlyoffice/rabbitmq-pwd
 Type: password
 Default: guest
 Description: RabbitMQ password:
+
+Template: onlyoffice/jwt-enabled
+Type: boolean
+Default: false
+Description: Enable jwt for DocumentServer?
+
+Template: onlyoffice/jwt-secret
+Type: string
+Default: secret
+Description: Jwt secret:
+
+Template: onlyoffice/jwt-header
+Type: string
+Default: Authorization
+Description: Jwt authorization header:

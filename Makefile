@@ -73,15 +73,13 @@ HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/H
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/h?lloworld
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/ch?ss
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/sp?ech
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cb?
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cl?part
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/ph?toeditor
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/t?mplates
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/sp?ech
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/s?mboltable
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/tr?nslate
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/pluginBase.js
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/plugins.css
 
@@ -100,6 +98,12 @@ NSSM_ZIP := nssm_x64.zip
 NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
+
+WEBAPPS_DIR = web-apps
+
+ifeq ($(PRODUCT_NAME),documentserver-integration)
+WEBAPPS_DIR = web-apps-pro
+endif
 
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
@@ -174,7 +178,7 @@ clean:
 		
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf -t $(DOCUMENTSERVER) ../web-apps/deploy/* ../server/build/* 
+	cp -rf -t $(DOCUMENTSERVER) ../$(WEBAPPS_DIR)/deploy/* ../server/build/* 
 	cp -fr -t $(DOCUMENTSERVER)/$(SDKJS_PLUGINS) $(DOCUMENTSERVER_PLUGINS)
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)

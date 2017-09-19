@@ -2,6 +2,7 @@
 
 DIR="/var/www/onlyoffice"
 DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
+EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/default.json"
 SAVED_DEFAULT_CONFIG="$DEFAULT_CONFIG.rpmsave"
 
 PSQL=""
@@ -11,6 +12,10 @@ DS_PORT=${DS_PORT:-80}
 DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 SPELLCHECKER_PORT=${SPELLCHECKER_PORT:-8080}
 EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
+
+JWT_ENABLED=${JWT_ENABLED:-false}
+JWT_SECRET=${JWT_SECRET:-secret}
+JWT_HEADER=${JWT_HEADER:-Authorization}
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
@@ -46,6 +51,29 @@ save_rabbitmq_params(){
 
 save_redis_params(){
 	json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'" >/dev/null 2>&1
+}
+
+save_jwt_params(){
+  if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
+    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
+    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
+    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
+  fi
+  
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
+
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
+
+  if [ -f "${EXAMPLE_CONFIG}" ]; then
+    if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
+      json -I -f $EXAMPLE_CONFIG -e "this.server.token.enable = ${JWT_ENABLED}"
+    fi
+    json -I -f $EXAMPLE_CONFIG -e "this.server.token.secret = '${JWT_SECRET}'"
+    json -I -f $EXAMPLE_CONFIG -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
+  fi
 }
 
 read_saved_params(){
@@ -219,6 +247,7 @@ establish_rabbitmq_conn || exit $?
 save_db_params
 save_rabbitmq_params
 save_redis_params
+save_jwt_params
 
 delete_saved_params
 
