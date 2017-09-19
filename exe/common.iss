@@ -477,7 +477,7 @@ end;
 
 function GetJwtEnabled(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#APP_REG_PATH},{#REG_JWT_ENABLED}|true}}');
+  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#APP_REG_PATH},{#REG_JWT_ENABLED}|false}}');
 end;
 
 function GetJwtSecret(Param: String): String;
