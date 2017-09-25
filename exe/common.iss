@@ -308,7 +308,9 @@ Filename: "{#NSSM}"; Parameters: "remove {#SPELLCHECKER_SRV} confirm"; Flags: ru
 Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#NGINX_SRV_DIR}\nginx.exe"""; Flags: runhidden
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{app}\*"
+Type: filesandordirs; Name: "{app}\sdkjs"
+Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
+Type: filesandordirs; Name: "{#NGINX_SRV_DIR}\conf"
 
 ; shared code for installing the products
 #include "scripts\products.iss"
