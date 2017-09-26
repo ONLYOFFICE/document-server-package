@@ -81,7 +81,7 @@
 #define NGINX_SRV_DESCR  'ONLYOFFICE DocumentServer Proxy Service'
 #define NGINX_SRV_DIR  '{app}\nginx-1.11.4'
 #define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
-#define NGINX_DS_CONF '{app}\nginx-1.11.4\conf\onlyoffice-documentserver.conf.template'
+#define NGINX_DS_CONF '{app}\nginx-1.11.4\conf\onlyoffice-documentserver.conf'
 #define NGINX_DS_TMPL '{app}\nginx-1.11.4\conf\onlyoffice-documentserver.conf.template'
 #define NGINX_DS_SSL_TMPL '{app}\nginx-1.11.4\conf\onlyoffice-documentserver-ssl.conf.template'
 
