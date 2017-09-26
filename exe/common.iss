@@ -81,6 +81,9 @@
 #define NGINX_SRV_DESCR  'ONLYOFFICE DocumentServer Proxy Service'
 #define NGINX_SRV_DIR  '{app}\nginx-1.11.4'
 #define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
+#define NGINX_DS_CONF '{app}\nginx-1.11.4\conf\onlyoffice-documentserver.conf.template'
+#define NGINX_DS_TMPL '{app}\nginx-1.11.4\conf\onlyoffice-documentserver.conf.template'
+#define NGINX_DS_SSL_TMPL '{app}\nginx-1.11.4\conf\onlyoffice-documentserver-ssl.conf.template'
 
 #define LICENSE_PATH '{commonappdata}\ONLYOFFICE\Data'
 
@@ -226,9 +229,8 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.inbox.header = '{code:GetJwtHeader}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf.template"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#REPLACE}"; Parameters: "{{{{DS_PORT}} {code:GetDefaultPort} ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver-ssl.conf.template"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf.template"" ""{#NGINX_SRV_DIR}\conf\onlyoffice-documentserver.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: """(listen .*:)(80)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_SSL_TMPL}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"

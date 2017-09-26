@@ -2,8 +2,8 @@ include {{NGINX_CONF}}includes/onlyoffice-http.conf;
 
 ## Normal HTTP host
 server {
-  listen 0.0.0.0:{{DS_PORT}};
-  listen [::]:{{DS_PORT}} default_server;
+  listen 0.0.0.0:80;
+  listen [::]:80 default_server;
   server_name _;
   server_tokens off;
 
@@ -14,8 +14,8 @@ server {
 
 #HTTP host for internal services
 server {
-  listen 127.0.0.1:{{DS_PORT}};
-  listen [::1]:{{DS_PORT}};
+  listen 127.0.0.1:80;
+  listen [::1]:80;
   server_name localhost;
   server_tokens off;
   
