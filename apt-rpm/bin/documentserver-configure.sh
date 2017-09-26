@@ -8,9 +8,9 @@ PSQL=""
 CREATEDB=""
 
 DS_PORT=${DS_PORT:-80}
-DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
-SPELLCHECKER_PORT=${SPELLCHECKER_PORT:-8080}
-EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
+# DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
+# SPELLCHECKER_PORT=${SPELLCHECKER_PORT:-8080}
+# EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
@@ -212,12 +212,12 @@ setup_nginx(){
   NGINX_CONF_DIR=/etc/nginx
   DS_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver.conf.template
   DS_SSL_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver-ssl.conf.template
-  OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
+  # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
   sed 's/{{DS_PORT}}/'${DS_PORT}'/' -i $DS_CONF
   sed 's/{{DS_PORT}}/'${DS_PORT}'/' -i $DS_SSL_CONF
-  sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
-  sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
-  sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
+  # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
+  # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
+  # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
   cp -f /etc/nginx/conf.d/onlyoffice-documentserver.conf.template /etc/nginx/sites-enabled.d/onlyoffice-documentserver.conf
 }
