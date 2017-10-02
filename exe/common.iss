@@ -67,8 +67,8 @@
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
-#define NODE_PATH '{pf32}\nodejs'
-#define NPM '{pf32}\nodejs\npm'
+#define NODE_PATH '{pf64}\nodejs'
+#define NPM '{pf64}\nodejs\npm'
 #define JSON '{userappdata}\npm\json.cmd'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\default.json""'
