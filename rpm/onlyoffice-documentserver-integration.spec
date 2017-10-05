@@ -143,6 +143,11 @@ ln -sf /usr/lib64/libcurl.so.4 /usr/lib64/libcurl-gnutls.so.4
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
 
+# add selinux extentions
+for PORT in 3000 8000 8080; do
+  semanage port -a -t http_port_t -p tcp $PORT || semanage port -m -t http_port_t -p tcp $PORT || true
+done
+
 # restart dependent services
 service supervisord restart >/dev/null 2>&1
 service nginx reload >/dev/null 2>&1
