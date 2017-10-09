@@ -2,7 +2,7 @@ Summary: Online viewers and editors for text, spreadsheet and presentation files
 Name: {{PACKAGE_NAME}}
 Version: {{PRODUCT_VERSION}}
 Release: {{BUILD_NUMBER}}
-License: AGPL
+License: Commercial
 Group: Applications/Internet
 URL: http://onlyoffice.com/
 Vendor: ONLYOFFICE (Online documents editor)
