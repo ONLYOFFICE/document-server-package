@@ -196,6 +196,7 @@ case "$1" in
 
 		mkdir -p "$APP_DIR/documentserver/App_Data"
 		mkdir -p "$APP_DIR/documentserver/App_Data/cache/files"
+		mkdir -p "$APP_DIR/documentserver/App_Data/docbuilder"
 
 		mkdir -p "$DIR/Data"
 		mkdir -p "$DIR/documentserver-example/public/files"

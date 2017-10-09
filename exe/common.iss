@@ -166,6 +166,7 @@ Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; FontInstal
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
 Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
+Name: "{app}\server\App_Data\docbuilder"; Permissions: users-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify

@@ -66,6 +66,7 @@ mkdir -p "$RPM_BUILD_ROOT/var/log/onlyoffice/documentserver/gc"
 
 #make cache dir
 mkdir -p "$RPM_BUILD_ROOT/var/lib/onlyoffice/documentserver/App_Data/cache/files"
+mkdir -p "$RPM_BUILD_ROOT/var/lib/onlyoffice/documentserver/App_Data/docbuilder"
 
 #make exchange dir
 mkdir -p "$RPM_BUILD_ROOT/var/www/onlyoffice/Data"
@@ -114,6 +115,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
+%attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/docbuilder
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
 
 %pre
