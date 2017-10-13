@@ -101,7 +101,7 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 
 WEBAPPS_DIR = web-apps
 
-ifeq ($(PRODUCT_NAME),documentserver-integration)
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-integration documentserver-enterprise))
 WEBAPPS_DIR = web-apps-pro
 endif
 
@@ -199,6 +199,7 @@ endif
 	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE) || true
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
