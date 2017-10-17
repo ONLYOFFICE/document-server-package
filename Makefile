@@ -3,7 +3,7 @@ CURL := curl -L -o
 
 COMPANY_NAME ?= onlyoffice
 PRODUCT_NAME ?= documentserver
-PRODUCT_VERSION ?= 0.0.0.0
+PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
@@ -211,9 +211,8 @@ endif
 	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-	sed "s|\(_dc=\)0|\1"$(BUILD_DATE)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	mkdir -p $(FONTS)/Asana-Math
 	$(CURL) $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
@@ -235,7 +234,6 @@ documentserver-example:
 
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 	
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 
