@@ -105,6 +105,14 @@ ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-integration docume
 WEBAPPS_DIR = web-apps-pro
 endif
 
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
+OFFICIAL_PRODUCT_NAME := "Integration Edition"
+endif
+
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de))
+OFFICIAL_PRODUCT_NAME := "Developer Edition"
+endif
+
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
 	EXEC_EXT := .exe
@@ -238,6 +246,8 @@ documentserver-example:
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
+	
+	sed "s|{{OFFICIAL_PRODUCT_NAME}}|"$(OFFICIAL_PRODUCT_NAME)"|"  -i common/documentserver-example/welcome/*.html
 
 	echo "Done" > $@
 
