@@ -106,11 +106,11 @@ WEBAPPS_DIR = web-apps-pro
 endif
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
-OFFICIAL_PRODUCT_NAME := "Integration Edition"
+OFFICIAL_PRODUCT_NAME := 'Integration Edition'
 endif
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de))
-OFFICIAL_PRODUCT_NAME := "Developer Edition"
+OFFICIAL_PRODUCT_NAME := 'Developer Edition'
 endif
 
 ifeq ($(OS),Windows_NT)
