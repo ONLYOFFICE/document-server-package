@@ -128,6 +128,7 @@ WizardImageFile           = data\dialogpicture.bmp
 WizardSmallImageFile      = data\dialogicon.bmp
 SetupIconFile             = data\icon.ico
 LicenseFile               = ../common/documentserver/license/{#sPackageName}/LICENSE.txt
+LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
 
 #ifndef COMPILE_FROM_IDE
 SignTool=byparam $p
