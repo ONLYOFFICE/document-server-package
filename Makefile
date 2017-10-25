@@ -233,11 +233,11 @@ endif
 
 ifeq ($(PRODUCT_NAME), documentserver-de)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_D;|" -i $(LICENSE_JS)
-enif
+endif
 
 ifeq ($(PRODUCT_NAME), documentserver-ie)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
-enif
+endif
 
 	echo "Done" > $@
 
