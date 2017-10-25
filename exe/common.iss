@@ -127,7 +127,6 @@ MinVersion                =6.1.7600
 WizardImageFile           = data\dialogpicture.bmp
 WizardSmallImageFile      = data\dialogicon.bmp
 SetupIconFile             = data\icon.ico
-LicenseFile               = ../common/documentserver/license/{#sPackageName}/LICENSE.txt
 LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
 
 #ifndef COMPILE_FROM_IDE
