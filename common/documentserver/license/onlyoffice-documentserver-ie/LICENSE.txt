@@ -2,28 +2,28 @@ ONLYOFFICE Integration Edition
 LICENSE AGREEMENT 
 IMPORTANT  READ CAREFULLY: BY INSTALLING, DOWNLOADING OR OTHERWISE USING 
 ONLYOFFICE AND ANY RELATED DOCUMENTATION, YOU, ON BEHALF OF YOURSELF OR AS AN 
-AUTHORIZED REPRESENTATIVE ON BEHALF OF AN ENTITY (“LICENSEE”) AGREE TO ALL 
-THE TERMS OF THIS ONLYOFFICE COMMERCIAL LICENSE AGREEMENT (THE “AGREEMENT”) 
+AUTHORIZED REPRESENTATIVE ON BEHALF OF AN ENTITY ("LICENSEE") AGREE TO ALL 
+THE TERMS OF THIS ONLYOFFICE COMMERCIAL LICENSE AGREEMENT (THE "AGREEMENT") 
 REGARDING YOUR USE OF ONLYOFFICE INTEGRATION EDITION. YOU REPRESENT AND WARRANT 
 THAT YOU HAVE FULL LEGAL AUTHORITY TO BIND THE LICENSEE TO THIS AGREEMENT. IF 
 YOU DO NOT AGREE WITH ALL OF THESE TERMS, DO NOT INSTALL, DOWNLOAD OR OTHERWISE 
 USE ONLYOFFICE. 
 Definitions
-“ONLYOFFICE Document Server” means  open-source office server software 
+"ONLYOFFICE Document Server" means  open-source office server software 
 provided by Ascensio System SIA, its object code, binary codes, compiled object 
 code as well as any related documentation. The source codes of ONLYOFFICE 
 Document Server are published at https://github.com/ONLYOFFICE under AGPL v.3 
 license and can be modified at any time without prior notice. 
-“ONLYOFFICE Integration Edition” means an advanced version of  ONLYOFFICE 
+"ONLYOFFICE Integration Edition" means an advanced version of  ONLYOFFICE 
 Document Server for professional functions of document editing in accordance 
 with the description on the official site www.onlyoffice.com.
-“ONLYOFFICE” means all software provided by Ascensio System SIA in 
+"ONLYOFFICE" means all software provided by Ascensio System SIA in 
 accordance with the official site at .
-“Effective Date” is the date on which you click “I accept” button or 
+"Effective Date" is the date on which you click "I accept" button or 
 otherwise installs, downloads or uses ONLYOFFICE.
-“License Key” means a computer file containing a unique combination of 
+"License Key" means a computer file containing a unique combination of 
 characters that allows you to use ONLYOFFICE Integration Edition.
-“License Fee” means a regular payment by you to us for the right to use 
+"License Fee" means a regular payment by you to us for the right to use 
 ONLYOFFICE Integration Edition.
 
 1. License Grant
@@ -144,7 +144,7 @@ www.onlyoffice.com.
 you do not comply with this Agreement. 
 
 9. Disclaimer of Warranty
-ONLYOFFICE IS PROVIDED “AS IS,” WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ONLYOFFICE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
 FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL 
 ASCENSIO SYSTEM SIA OR THE AUTHORS OR COPYRIGHT HOLDERS IN ONLYOFFICE BE LIABLE 

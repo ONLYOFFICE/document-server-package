@@ -1,27 +1,27 @@
 ONLYOFFICE Developer Edition License Agreement
 
-IMPORTANT  READ CAREFULLY: BY CLICKING THE “I ACCEPT” BUTTON OR INSTALLING, 
+IMPORTANT  READ CAREFULLY: BY CLICKING THE "I ACCEPT" BUTTON OR INSTALLING, 
 DOWNLOADING OR OTHERWISE USING ONLYOFFICE AND ANY RELATED DOCUMENTATION, YOU, 
 ON BEHALF OF YOURSELF OR AS AN AUTHORIZED REPRESENTATIVE ON BEHALF OF AN ENTITY 
-(“LICENSEE”) AGREE TO ALL THE TERMS OF THIS ONLYOFFICE COMMERCIAL LICENSE 
-AGREEMENT (THE “AGREEMENT”) REGARDING YOUR USE OF ONLYOFFICE DEVELOPER 
+("LICENSEE") AGREE TO ALL THE TERMS OF THIS ONLYOFFICE COMMERCIAL LICENSE 
+AGREEMENT (THE "AGREEMENT") REGARDING YOUR USE OF ONLYOFFICE DEVELOPER 
 EDITION. YOU REPRESENT AND WARRANT THAT YOU HAVE FULL LEGAL AUTHORITY TO BIND 
 THE LICENSEE TO THIS AGREEMENT. IF YOU DO NOT AGREE WITH ALL OF THESE TERMS, DO 
-NOT CLICK THE “I ACCEPT” BUTTON AND DO NOT INSTALL, DOWNLOAD OR OTHERWISE 
+NOT CLICK THE "I ACCEPT" BUTTON AND DO NOT INSTALL, DOWNLOAD OR OTHERWISE 
 USE ONLYOFFICE. 
 Definitions.
 References used in this Agreement are understood as follows:
-“ONLYOFFICE Developer Edition” means office server software for documents, 
+"ONLYOFFICE Developer Edition" means office server software for documents, 
 spreadsheets and presentations editing (including the Open Source Software 
 incorporated therein) provided by us, its source code, object code, binary 
 codes, compiled object code as well as any related documentation in accordance 
 with the description on the official website www.onlyoffice.com.
-“ONLYOFFICE” means all software provided by us in accordance with the 
+"ONLYOFFICE" means all software provided by us in accordance with the 
 official website at , including ONLYOFFICE Developer Edition.
-“Effective Date” means the date set out on the signatory page of this 
+"Effective Date" means the date set out on the signatory page of this 
 Agreement. This Agreement shall be effective as of the date of the 
 last-executed signature below.
-“End Users” means any individual or entity to whom sub-license to use 
+"End Users" means any individual or entity to whom sub-license to use 
 ONLYOFFICE Developer Edition was legitimately granted by you.
 "Number of concurrent connections" means the number of simultaneous requests 
 sent to ONLYOFFICE Document Server or the number of the documents 
@@ -30,33 +30,33 @@ simultaneously opened for editing on ONLYOFFICE Document Server.
 for End Users.
 "EULA" means "End User License Agreement" the License Agreement between you and 
 your End User.
-“Services” means the consulting and/or other services described in Section 
+"Services" means the consulting and/or other services described in Section 
 5.
-“License Fee” means amount of remuneration that you pay to us for the 
+"License Fee" means amount of remuneration that you pay to us for the 
 Services described in Section and for the right to use ONLYOFFICE Developer 
 Edition and the updates.
 "License Type" means set of technical parameters and rules of usage defined for 
 specific License Fee and selected by you by installing of ONLYOFFICE Developer 
 Edition.
-“Intellectual Property Rights" means all intellectual and industrial property 
+"Intellectual Property Rights" means all intellectual and industrial property 
 rights anywhere in the world, including, without limitation, any invention, 
 patent, design or utility model rights, any copyright and trademarks, service 
 marks, database rights, topography rights, confidential information, know how 
 or trade secrets, and any other rights of a similar nature whether or not any 
 of the same are registered, and the right to apply for any of them.
-“License Key” means a computer file containing a unique combination of 
+"License Key" means a computer file containing a unique combination of 
 characters that allows you to use ONLYOFFICE Developer Edition. 
-“Trial License Key” means a limited free-of-charge License Key that allows 
+"Trial License Key" means a limited free-of-charge License Key that allows 
 to evaluate the full functionality of ONLYOFFICE Developer Edition.
-“Open Source Licenses” means licenses for the Open Source Software as 
+"Open Source Licenses" means licenses for the Open Source Software as 
 defined below.
-“Open Source Software” means the third party open source software 
+"Open Source Software" means the third party open source software 
 components included in ONLYOFFICE.
-“Products” means your software products and associated services.
-“SaaS” means “software as a service” in which software is licensed on a 
+"Products" means your software products and associated services.
+"SaaS" means "software as a service" in which software is licensed on a 
 subscription basis and software application is used by customer as a service on 
 demand and is centrally hosted by the service provider.
-“Specification” means the specification for ONLYOFFICE set out on our 
+"Specification" means the specification for ONLYOFFICE set out on our 
 official website www.onlyoffice.com.
 
 1. Grant of License
@@ -226,7 +226,7 @@ incorporated in or otherwise applied to ONLYOFFICE.
 10. Warranties and Limitation of Liability
 
 10.1	ONLYOFFICE Developer Edition and all related services are provided 
-“as is” without any warranties unless otherwise specified in this Agreement.
+"as is" without any warranties unless otherwise specified in this Agreement.
 10.2	To the maximum extent permitted by law, we exclude all warranties 
 unless otherwise specified in this Agreement.
 10.3	We and/or any of our subsidiaries, employees, agents and affiliates are 
