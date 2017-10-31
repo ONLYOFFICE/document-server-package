@@ -229,6 +229,8 @@ setup_nginx(){
   # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
+  semanage port -a -t http_port_t -p tcp ${DS_PORT} || semanage port -m -t http_port_t -p tcp ${DS_PORT} || true
+  
   cp -f ${DS_CONF} /etc/nginx/conf.d/onlyoffice-documentserver.conf
 }
 
