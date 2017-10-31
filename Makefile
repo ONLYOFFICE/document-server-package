@@ -101,8 +101,16 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 
 WEBAPPS_DIR = web-apps
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-integration documentserver-enterprise))
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
 WEBAPPS_DIR = web-apps-pro
+endif
+
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
+OFFICIAL_PRODUCT_NAME := 'Integration Edition'
+endif
+
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de))
+OFFICIAL_PRODUCT_NAME := 'Developer Edition'
 endif
 
 ifeq ($(OS),Windows_NT)
@@ -219,12 +227,18 @@ endif
 	$(CURL) $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
 	$(CURL) $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README || true
 
-ifeq ($(PRODUCT_NAME), documentserver-integration)
-	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
-else
+ifeq ($(PRODUCT_NAME), documentserver)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
 endif
-	
+
+ifeq ($(PRODUCT_NAME), documentserver-de)
+	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_D;|" -i $(LICENSE_JS)
+endif
+
+ifeq ($(PRODUCT_NAME), documentserver-ie)
+	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
+endif
+
 	echo "Done" > $@
 
 documentserver-example:
@@ -238,6 +252,8 @@ documentserver-example:
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
+	
+	sed "s|{{OFFICIAL_PRODUCT_NAME}}|"$(OFFICIAL_PRODUCT_NAME)"|"  -i $(DOCUMENTSERVER_EXAMPLE)/welcome/*.html
 
 	echo "Done" > $@
 
