@@ -3,7 +3,7 @@ CURL := curl -L -o
 
 COMPANY_NAME ?= onlyoffice
 PRODUCT_NAME ?= documentserver
-PRODUCT_VERSION ?= 0.0.0.0
+PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
@@ -259,19 +259,25 @@ documentserver-example:
 
 $(APT_RPM):	documentserver documentserver-example
 	chmod u+x apt-rpm/bin/documentserver-configure.sh
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
-	sed "s/{{PRODUCT_VERSION}}/"$(PRODUCT_VERSION)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
-	sed "s/{{BUILD_NUMBER}}/"$(BUILD_NUMBER)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
 
-	cd apt-rpm && rpmbuild -bb --define "_topdir $(APT_RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
+	cd apt-rpm && rpmbuild \
+		-bb \
+		--define "_topdir $(APT_RPM_BUILD_DIR)" \
+		--define "_package_name $(PACKAGE_NAME)" \
+		--define "_product_version $(PRODUCT_VERSION)" \
+		--define "_build_number $(BUILD_NUMBER)" \
+		$(PACKAGE_NAME).spec
 
 $(RPM):	documentserver documentserver-example
 	chmod u+x rpm/bin/documentserver-configure.sh
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i rpm/$(PACKAGE_NAME).spec
-	sed "s/{{PRODUCT_VERSION}}/"$(PRODUCT_VERSION)"/"  -i rpm/$(PACKAGE_NAME).spec
-	sed "s/{{BUILD_NUMBER}}/"$(BUILD_NUMBER)"/"  -i rpm/$(PACKAGE_NAME).spec
 
-	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
+	cd rpm && rpmbuild \
+		-bb \
+		--define "_topdir $(RPM_BUILD_DIR)" \
+		--define "_package_name $(PACKAGE_NAME)" \
+		--define "_product_version $(PRODUCT_VERSION)" \
+		--define "_build_number $(BUILD_NUMBER)" \
+		$(PACKAGE_NAME).spec
 
 $(DEB): documentserver documentserver-example
 	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog

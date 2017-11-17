@@ -1,7 +1,7 @@
 Summary: Online viewers and editors for text, spreadsheet and presentation files
-Name: {{PACKAGE_NAME}}
-Version: {{PRODUCT_VERSION}}
-Release: {{BUILD_NUMBER}}
+Name: %{_package_name}
+Version: %{_product_version}
+Release: %{_build_number}
 License: Commercial
 Group: Applications/Internet
 URL: http://onlyoffice.com/
