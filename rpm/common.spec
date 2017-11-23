@@ -186,7 +186,7 @@ find \
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
 
-# add selinux extentions
+# check whethere enabled
 GET_ENFORCE=$(getenforce)
 PORTS=()
 case ${GET_ENFORCE,,} in
@@ -200,7 +200,8 @@ case ${GET_ENFORCE,,} in
   ;;
 esac
 
-for PORT in PORTS; do
+# add selinux extentions
+for PORT in ${PORTS[@]}; do
   semanage port -a -t http_port_t -p tcp $PORT >/dev/null || \
     semanage port -m -t http_port_t -p tcp $PORT >/dev/null || \
     true
