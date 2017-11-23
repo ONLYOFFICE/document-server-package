@@ -110,12 +110,11 @@ cp -r ../../../common/documentserver-example/nginx/includes "$DSE_NGINX_CONF"
 %endif
 
 %clean
-#rm -rf "%{buildroot}"
+rm -rf "%{buildroot}"
 
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver/*
 %config %attr(755, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
-#%config %attr(-, root, root) /etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver*.ini
 %attr(-, root, root) /usr/share/fonts/truetype/*
 %attr(-, root, root) /usr/lib64/*.so*
 %attr(-, root, root) /usr/bin/documentserver-*.sh
@@ -123,17 +122,14 @@ cp -r ../../../common/documentserver-example/nginx/includes "$DSE_NGINX_CONF"
 %if %{defined example}
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver-example/*
 %config %attr(755, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
-#%config %attr(-, root, root) /etc/onlyoffice/documentserver-example/supervisor/onlyoffice-documentserver*.ini
 %endif
 
 %dir
 %attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
 %attr(-, root, root) /etc/nginx/includes
 %attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
-#%attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver/*
+
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
-#%attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/cache/files
-#%attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice/documentserver/App_Data/docbuilder
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
 
 %if %{defined example}
@@ -177,21 +173,37 @@ ln \
 
 # Make symlinks for supervisor configs
 find \
-  /etc/onlyoffice/documentserver*/supervisor/ \
+  /etc/onlyoffice/documentserver/supervisor/ \
   -name *.ini \
   -exec sh -c 'ln -sf {} /etc/supervisord.d/$(basename {})' \;
 
 # Make symlink for example supervisor config
-#if [ -e /etc/onlyoffice/documentserver-example/supervisor/onlyoffice-documentserver.ini ]
-#  ln -sf /etc/onlyoffice/documentserver-example/supervisor/onlyoffice-documentserver.ini \
-#    /etc/supervisord.d/onlyoffice-documentserver.ini
-#fi
+find \
+  /etc/onlyoffice/documentserver-example/supervisor/ \
+  -name *.ini \
+  -exec sh -c 'ln -sf {} /etc/supervisord.d/$(basename {})' \;
+
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
 
 # add selinux extentions
-for PORT in 8000 8080 3000; do
-  semanage port -a -t http_port_t -p tcp $PORT || semanage port -m -t http_port_t -p tcp $PORT || true
+GET_ENFORCE=$(getenforce)
+PORTS=()
+case ${GET_ENFORCE,,} in
+  enforcing|permissive)
+    PORTS+=('8000')
+    PORTS+=('8080')
+    PORTS+=('3000')
+  ;;
+  disabled)
+    :
+  ;;
+esac
+
+for PORT in PORTS; do
+  semanage port -a -t http_port_t -p tcp $PORT >/dev/null || \
+    semanage port -m -t http_port_t -p tcp $PORT >/dev/null || \
+    true
 done
 
 # restart dependent services
@@ -206,6 +218,8 @@ case "$1" in
     documentserver-prepare4shutdown.sh
     supervisorctl stop onlyoffice-documentserver:*
     unlink /etc/supervisord.d/onlyoffice-documentserver*.ini
+    find /etc/supervisord.d/ -name onlyoffice-documentserver*.ini \
+      -exec unlink {} \;
     unlink /etc/nginx/conf.d/onlyoffice-documentserver.conf
   ;;
   1)
