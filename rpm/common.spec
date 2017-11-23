@@ -202,8 +202,8 @@ esac
 
 # add selinux extentions
 for PORT in ${PORTS[@]}; do
-  semanage port -a -t http_port_t -p tcp $PORT >/dev/null || \
-    semanage port -m -t http_port_t -p tcp $PORT >/dev/null || \
+  semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+    semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
     true
 done
 
