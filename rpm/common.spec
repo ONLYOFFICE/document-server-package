@@ -218,7 +218,6 @@ case "$1" in
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
     supervisorctl stop onlyoffice-documentserver:*
-    unlink /etc/supervisord.d/onlyoffice-documentserver*.ini
     find /etc/supervisord.d/ -name onlyoffice-documentserver*.ini \
       -exec unlink {} \;
     unlink /etc/nginx/conf.d/onlyoffice-documentserver.conf
