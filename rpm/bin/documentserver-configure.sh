@@ -219,9 +219,9 @@ establish_rabbitmq_conn() {
 }
 
 setup_nginx(){
-  NGINX_CONF_DIR=/etc/nginx
-  DS_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver.conf.template
-  DS_SSL_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver-ssl.conf.template
+  NGINX_CONF_DIR=/etc/onlyoffice/documentserver/nginx
+  DS_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver.conf.template
+  DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
   # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
   sed 's/\(listen .*:\)\(80\)\(.*\)/\1'${DS_PORT}'\3/' -i $DS_CONF
   sed 's/\(listen .*:\)\(80\)\(.*\)/\1'${DS_PORT}'\3/' -i $DS_SSL_CONF
@@ -230,8 +230,6 @@ setup_nginx(){
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
   semanage port -a -t http_port_t -p tcp ${DS_PORT} || semanage port -m -t http_port_t -p tcp ${DS_PORT} || true
-  
-  cp -f ${DS_CONF} /etc/nginx/conf.d/onlyoffice-documentserver.conf
 }
 
 read_saved_params
