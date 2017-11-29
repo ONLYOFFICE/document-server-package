@@ -3,7 +3,7 @@ etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf.template etc/
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-common.conf etc/nginx/includes/onlyoffice-documentserver-common.conf
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf etc/nginx/includes/onlyoffice-documentserver-docservice.conf
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf etc/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-http.conf etc/nginx/includes/onlyoffice-documentserver-http.conf
+etc/onlyoffice/documentserver/nginx/includes/onlyoffice-http.conf etc/nginx/includes/onlyoffice-http.conf
 
 etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver-converter.conf etc/supervisor/conf.d/onlyoffice-documentserver-converter.conf
 etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver-docservice.conf etc/supervisor/conf.d/onlyoffice-documentserver-docservice.conf
