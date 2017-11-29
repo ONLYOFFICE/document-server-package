@@ -125,7 +125,7 @@ rm -rf "%{buildroot}"
 %endif
 
 %dir
-%attr(-, nginx, nginx) /var/cache/nginx/onlyoffice/documentserver
+%attr(-, %{nginx_user}, %{nginx_user}) /var/cache/nginx/onlyoffice/documentserver
 %attr(-, root, root) /etc/nginx/includes
 %attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
 
@@ -144,7 +144,7 @@ case "$1" in
     getent group onlyoffice >/dev/null || groupadd -r onlyoffice
     getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
     # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
-    usermod -a -G onlyoffice nginx
+    usermod -a -G onlyoffice %{nginx_user}
   ;;
   2)
     # Upgrade
@@ -187,7 +187,7 @@ find \
 documentserver-generate-allfonts.sh true
 
 # check whethere enabled
-GET_ENFORCE=$(getenforce)
+GET_ENFORCE=$(%{getenforce})
 PORTS=()
 case ${GET_ENFORCE,,} in
   enforcing|permissive)
@@ -202,14 +202,14 @@ esac
 
 # add selinux extentions
 for PORT in ${PORTS[@]}; do
-  semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-    semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+  %{semanage} port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+    %{semanage} port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
     true
 done
 
 # restart dependent services
-service supervisord restart >/dev/null 2>&1
-service nginx reload >/dev/null 2>&1
+%{service} supervisord restart >/dev/null 2>&1
+%{service} nginx reload >/dev/null 2>&1
 
 %preun
 case "$1" in
@@ -242,7 +242,7 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
 
     supervisorctl update >/dev/null 2>&1
-    service nginx reload >/dev/null 2>&1
+    %{service} nginx reload >/dev/null 2>&1
   ;;
   1)
     # Upgrade
