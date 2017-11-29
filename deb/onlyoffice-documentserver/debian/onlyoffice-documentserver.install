@@ -1,7 +1,6 @@
 ../../common/documentserver/bin/*.sh usr/bin/
 ../../common/documentserver/config/* etc/onlyoffice/documentserver/
 ../../common/documentserver/home/* var/www/onlyoffice/documentserver/
-../../common/documentserver/nginx/*.template etc/onlyoffice/documentserver/nginx/
-../../common/documentserver/nginx/includes/* etc/onlyoffice/documentserver/nginx/includes/
+../../common/documentserver/nginx/* etc/onlyoffice/documentserver/nginx/
 ../../common/documentserver/supervisor/* etc/onlyoffice/documentserver/supervisor/
 ../../common/fonts/* usr/share/fonts/truetype/
