@@ -169,7 +169,7 @@ find \
 ln \
   -sf \
   /etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf.template \
-  /etc/nginx/conf.d/onlyoffice-documentserver.conf
+  %{nginx_conf_d}/onlyoffice-documentserver.conf
 
 # Make symlinks for supervisor configs
 find \
