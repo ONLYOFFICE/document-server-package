@@ -229,7 +229,26 @@ setup_nginx(){
   # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
-  semanage port -a -t http_port_t -p tcp ${DS_PORT} || semanage port -m -t http_port_t -p tcp ${DS_PORT} || true
+  # check whethere enabled
+  shopt -s nocasematch
+  PORTS=()
+  case $(getenforce) in
+    enforcing|permissive)
+      PORTS+=('8000')
+      PORTS+=('8080')
+      PORTS+=('3000')
+    ;;
+    disabled)
+      :
+    ;;
+  esac
+
+  # add selinux extentions
+  for PORT in ${PORTS[@]}; do
+    semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+      semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+      true
+  done
 }
 
 read_saved_params
