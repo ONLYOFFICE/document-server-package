@@ -187,9 +187,9 @@ find \
 documentserver-generate-allfonts.sh true
 
 # check whethere enabled
-GET_ENFORCE=$(%{getenforce})
+shopt -s nocasematch
 PORTS=()
-case ${GET_ENFORCE,,} in
+case $(%{getenforce}) in
   enforcing|permissive)
     PORTS+=('8000')
     PORTS+=('8080')
