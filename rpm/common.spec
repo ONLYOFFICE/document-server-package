@@ -220,7 +220,7 @@ case "$1" in
     supervisorctl stop onlyoffice-documentserver:*
     find /etc/supervisord.d/ -name onlyoffice-documentserver*.ini \
       -exec unlink {} \;
-    unlink /etc/nginx/conf.d/onlyoffice-documentserver.conf
+    unlink %{nginx_conf_d}/onlyoffice-documentserver.conf
   ;;
   1)
     # Upgrade
