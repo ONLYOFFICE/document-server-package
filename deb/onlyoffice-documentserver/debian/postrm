@@ -28,6 +28,8 @@ clean_ds_files() {
 	rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
 	rm -f $DIR/sdkjs/*/sdk-all.cache
 	rm -f $DIR/server/FileConverter/bin/font_selection.bin
+	rm -f $DIR/server/FileConverter/bin/AllFonts.js
+	rm -fr $DIR/fonts
 
 	supervisorctl update >/dev/null 2>&1
 	service nginx reload >/dev/null 2>&1

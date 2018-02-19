@@ -3,7 +3,6 @@
 ../../common/documentserver/home/* var/www/onlyoffice/documentserver/
 ../../common/documentserver/nginx/* etc/onlyoffice/documentserver/nginx/
 ../../common/documentserver/supervisor/* etc/onlyoffice/documentserver/supervisor/
-../../common/fonts/* usr/share/fonts/truetype/
 
 ../../common/documentserver-example/config/* etc/onlyoffice/documentserver-example/
 ../../common/documentserver-example/home/* var/www/onlyoffice/documentserver-example/

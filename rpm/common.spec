@@ -79,10 +79,6 @@ mkdir -p "%{buildroot}/var/cache/nginx/onlyoffice/documentserver/"
 
 mkdir -p "%{buildroot}/etc/nginx/includes/"
 
-#install fonts
-mkdir -p "%{buildroot}/usr/share/fonts/truetype/"
-cp -r ../../../common/fonts/* "%{buildroot}/usr/share/fonts/truetype/"
-
 %if %{defined example}
 #install documentserver example files
 mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver-example/"
@@ -239,7 +235,10 @@ case "$1" in
     # Uninstall
     rm -f $DIR/sdkjs/common/AllFonts.js
     rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
+    rm -f $DIR/sdkjs/*/sdk-all.cache
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
+    rm -f $DIR/server/FileConverter/bin/AllFonts.js
+    rm -fr $DIR/fonts
 
     supervisorctl update >/dev/null 2>&1
     %{service} nginx reload >/dev/null 2>&1
