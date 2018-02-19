@@ -162,7 +162,6 @@ Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: i
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\*;           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\onlyoffice-documentserver.conf.template; DestDir: {#NGINX_SRV_DIR}\conf; DestName: onlyoffice-documentserver.conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; FontInstall: "Asana"; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
