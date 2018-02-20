@@ -60,6 +60,9 @@ mkdir -p "%{buildroot}/var/lib/onlyoffice/documentserver/App_Data/docbuilder"
 #make exchange dir
 mkdir -p "%{buildroot}/var/www/onlyoffice/Data"
 
+#make exchange dir
+mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver/fonts"
+
 #install supervisor configs
 DS_SUPERVISOR_CONF=%{buildroot}/etc/onlyoffice/documentserver/supervisor/
 mkdir -p "$DS_SUPERVISOR_CONF"
@@ -237,7 +240,7 @@ case "$1" in
     rm -f $DIR/sdkjs/*/sdk-all.cache
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
-    rm -fr $DIR/fonts
+    rm -f $DIR/fonts/*
 
     supervisorctl update >/dev/null 2>&1
     %{service} nginx reload >/dev/null 2>&1

@@ -168,6 +168,7 @@ Name: "{app}\server\App_Data";        Permissions: users-modify
 Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
 Name: "{app}\server\App_Data\docbuilder"; Permissions: users-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
+Name: "{app}\fonts";                  Permissions: users-modify
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-modify
@@ -313,6 +314,7 @@ Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program="
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\sdkjs"
+Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: filesandordirs; Name: "{#NGINX_SRV_DIR}\conf"
 
