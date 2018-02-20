@@ -22,6 +22,9 @@ sudo -u onlyoffice "$DIR/server/tools/AllFontsGen"\
 
 echo Done
 
+#Remove gzipped fonts
+rm -f $DIR/fonts/*.gz $DIR/sdkjs/common/AllFonts.js.gz
+
 #Restart web-site and converter
 if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
  sudo supervisorctl restart onlyoffice-documentserver:docservice
