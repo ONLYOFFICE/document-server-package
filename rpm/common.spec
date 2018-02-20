@@ -111,7 +111,6 @@ rm -rf "%{buildroot}"
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver/*
 %config %attr(755, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
-%attr(-, root, root) /usr/share/fonts/truetype/*
 %attr(-, root, root) /usr/lib64/*.so*
 %attr(-, root, root) /usr/bin/documentserver-*.sh
 
