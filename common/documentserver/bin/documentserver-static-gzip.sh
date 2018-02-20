@@ -8,7 +8,7 @@ cd ${DIR}
 find ./sdkjs ./web-apps ./sdkjs-plugins -type f \( -name *.js* -o -name *.htm* -o -name *.css \) -exec gzip -kf9 {} \;
 
 # Make gziped fonts
-find ./fonts -type f -exec gzip -kf9 {} \;
+find ./fonts -type f ! -name "*.*" -exec gzip -kf9 {} \;
 
 # Turn on static gzip for nginx
 sed '/expires .*;/a   gzip_static on;' \
