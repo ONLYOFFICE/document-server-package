@@ -11,7 +11,7 @@ find ./sdkjs ./web-apps ./sdkjs-plugins -type f \( -name *.js* -o -name *.htm* -
 find ./fonts -type f ! -name "*.*" -exec gzip -kf9 {} \;
 
 # Turn on static gzip for nginx
-sed '/expires .*;/a   gzip_static on;' \
+sed 's/#*\s*\(gzip_static\).*/\1 on;/g' \
   -i ${NGINX_ONLYOFFICE_PATH}/includes/onlyoffice-documentserver-docservice.conf
 
 # Reload nginx config
