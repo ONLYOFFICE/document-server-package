@@ -97,7 +97,7 @@ OutputBaseFilename        ={#sPackageName}-{#sAppVersion}
 AppPublisher            =Ascensio System SIA.
 AppPublisherURL         =http://www.onlyoffice.com/
 AppSupportURL           =http://www.onlyoffice.com/support.aspx
-AppCopyright            =Copyright (C) 2016 Ascensio System SIA.
+AppCopyright            =Copyright (C) 2018 Ascensio System SIA.
 
 ArchitecturesAllowed              =x64
 ArchitecturesInstallIn64BitMode   =x64
