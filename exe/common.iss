@@ -314,6 +314,7 @@ Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program="
 Type: filesandordirs; Name: "{app}\sdkjs"
 Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
+Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 Type: filesandordirs; Name: "{#NGINX_SRV_DIR}\conf"
 
 ; shared code for installing the products
