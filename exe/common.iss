@@ -25,7 +25,7 @@
 
 #define iconsExe            'projicons.exe'
 
-#ifndef COMPILE_FROM_IDE
+#ifdef COMPILE_FROM_IDE
 #define sAppVersion         '4.0.0.0'
 #endif
 
