@@ -1,6 +1,3 @@
-; Uncomment the line below to be able to compile the script from within the IDE.
-;#define COMPILE_FROM_IDE
-
 #define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
 #define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
@@ -25,8 +22,8 @@
 
 #define iconsExe            'projicons.exe'
 
-#ifdef COMPILE_FROM_IDE
-#define sAppVersion         '4.0.0.0'
+#ifndef sAppVersion
+  #define sAppVersion         '4.0.0.0'
 #endif
 
 #define sAppVerShort
@@ -127,7 +124,7 @@ WizardSmallImageFile      = data\dialogicon.bmp
 SetupIconFile             = data\icon.ico
 LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
 
-#ifndef COMPILE_FROM_IDE
+#ifdef ISPPCC_INVOKED
 SignTool=byparam $p
 #endif
 
