@@ -327,6 +327,7 @@ Type: filesandordirs; Name: "{#NGINX_SRV_DIR}\conf"
 #include "scripts\products\msiproduct.iss"
 #include "scripts\products\vcredist2010sp1.iss"
 #include "scripts\products\vcredist2013.iss"
+#include "scripts\products\vcredist2015.iss"
 #include "scripts\products\nodejs6x.iss"
 #include "scripts\products\postgresql.iss"
 #include "scripts\products\rabbitmq.iss"
@@ -390,6 +391,7 @@ begin
  
   vcredist2010();
   vcredist2013();
+  vcredist2015();
   nodejs6x('6.9.1.0');
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
