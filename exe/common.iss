@@ -1,6 +1,3 @@
-; Uncomment the line below to be able to compile the script from within the IDE.
-;#define COMPILE_FROM_IDE
-
 #define sAppName            'ONLYOFFICE DocumentServer'
 #define APP_PATH            'ONLYOFFICE\DocumentServer'
 #define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
@@ -25,10 +22,8 @@
 
 #define iconsExe            'projicons.exe'
 
-#ifndef COMPILE_FROM_IDE
-#define sAppVersion         '{{PRODUCT_VERSION}}.{{BUILD_NUMBER}}'
-#else
-#define sAppVersion         '4.0.0.0'
+#ifndef sAppVersion
+  #define sAppVersion         '4.0.0.0'
 #endif
 
 #define sAppVerShort
@@ -97,7 +92,7 @@ OutputBaseFilename        ={#sPackageName}-{#sAppVersion}
 AppPublisher            =Ascensio System SIA.
 AppPublisherURL         =http://www.onlyoffice.com/
 AppSupportURL           =http://www.onlyoffice.com/support.aspx
-AppCopyright            =Copyright (C) 2016 Ascensio System SIA.
+AppCopyright            =Copyright (C) 2018 Ascensio System SIA.
 
 ArchitecturesAllowed              =x64
 ArchitecturesInstallIn64BitMode   =x64
@@ -129,7 +124,7 @@ WizardSmallImageFile      = data\dialogicon.bmp
 SetupIconFile             = data\icon.ico
 LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
 
-#ifndef COMPILE_FROM_IDE
+#ifdef ISPPCC_INVOKED
 SignTool=byparam $p
 #endif
 
@@ -162,13 +157,13 @@ Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: i
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\*;           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\onlyoffice-documentserver.conf.template; DestDir: {#NGINX_SRV_DIR}\conf; DestName: onlyoffice-documentserver.conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\fonts\Asana-Math\*.tt*;           DestDir: {fonts}; FontInstall: "Asana"; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
 Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
 Name: "{app}\server\App_Data\docbuilder"; Permissions: users-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
+Name: "{app}\fonts";                  Permissions: users-modify
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
 Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-modify
@@ -232,7 +227,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.inbox.header = '{code:GetJwtHeader}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#REPLACE}"; Parameters: """(listen .*:)(80)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5})(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -314,7 +309,9 @@ Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program="
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\sdkjs"
+Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
+Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 Type: filesandordirs; Name: "{#NGINX_SRV_DIR}\conf"
 
 ; shared code for installing the products
@@ -327,6 +324,7 @@ Type: filesandordirs; Name: "{#NGINX_SRV_DIR}\conf"
 #include "scripts\products\msiproduct.iss"
 #include "scripts\products\vcredist2010sp1.iss"
 #include "scripts\products\vcredist2013.iss"
+#include "scripts\products\vcredist2015.iss"
 #include "scripts\products\nodejs6x.iss"
 #include "scripts\products\postgresql.iss"
 #include "scripts\products\rabbitmq.iss"
@@ -390,6 +388,7 @@ begin
  
   vcredist2010();
   vcredist2013();
+  vcredist2015();
   nodejs6x('6.9.1.0');
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');

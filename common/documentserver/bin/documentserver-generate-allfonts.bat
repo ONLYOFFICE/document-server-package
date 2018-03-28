@@ -11,10 +11,13 @@ rem Start generate AllFonts.js, font thumbnails and font_selection.bin
 ECHO | SET /p="Generating AllFonts.js, please wait..."
 
 "%~dp0\..\server\tools\AllFontsGen.exe" ^
-  "%windir%\Fonts" ^
-  "%~dp0\..\sdkjs\common\AllFonts.js" ^
-  "%~dp0\..\sdkjs\common\Images" ^
-  "%~dp0\..\server\FileConverter\bin\font_selection.bin"
+  --input="%~dp0\..\core-fonts" ^
+  --allfonts-web="%~dp0\..\sdkjs\common\AllFonts.js" ^
+  --allfonts="%~dp0\..\server\FileConverter\bin\AllFonts.js" ^
+  --images="%~dp0\..\sdkjs\common\Images" ^
+  --selection="%~dp0\FileConverter\bin\font_selection.bin" ^
+  --output-web="%~dp0\..\fonts" ^
+  --use-system="true"
 
 ECHO Done
 

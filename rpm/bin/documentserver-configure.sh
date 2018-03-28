@@ -55,24 +55,24 @@ save_redis_params(){
 
 save_jwt_params(){
   if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
+    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}" >/dev/null 2>&1
+    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}" >/dev/null 2>&1
+    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}" >/dev/null 2>&1
   fi
   
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'" >/dev/null 2>&1
 
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
+  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
 
   if [ -f "${EXAMPLE_CONFIG}" ]; then
     if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
-      json -I -f $EXAMPLE_CONFIG -e "this.server.token.enable = ${JWT_ENABLED}"
+      json -I -f $EXAMPLE_CONFIG -e "this.server.token.enable = ${JWT_ENABLED}" >/dev/null 2>&1
     fi
-    json -I -f $EXAMPLE_CONFIG -e "this.server.token.secret = '${JWT_SECRET}'"
-    json -I -f $EXAMPLE_CONFIG -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
+    json -I -f $EXAMPLE_CONFIG -e "this.server.token.secret = '${JWT_SECRET}'" >/dev/null 2>&1
+    json -I -f $EXAMPLE_CONFIG -e "this.server.token.authorizationHeader = '${JWT_HEADER}'" >/dev/null 2>&1
   fi
 }
 
@@ -219,19 +219,36 @@ establish_rabbitmq_conn() {
 }
 
 setup_nginx(){
-  NGINX_CONF_DIR=/etc/nginx
-  DS_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver.conf.template
-  DS_SSL_CONF=$NGINX_CONF_DIR/conf.d/onlyoffice-documentserver-ssl.conf.template
+  NGINX_CONF_DIR=/etc/onlyoffice/documentserver/nginx
+  DS_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver.conf.template
+  DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
   # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
-  sed 's/\(listen .*:\)\(80\)\(.*\)/\1'${DS_PORT}'\3/' -i $DS_CONF
-  sed 's/\(listen .*:\)\(80\)\(.*\)/\1'${DS_PORT}'\3/' -i $DS_SSL_CONF
+  sed 's/\(listen .*:\)\([0-9]\{2,5\}\)\(.*\)/\1'${DS_PORT}'\3/' -i $DS_CONF
+
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
   # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
-  semanage port -a -t http_port_t -p tcp ${DS_PORT} || semanage port -m -t http_port_t -p tcp ${DS_PORT} || true
-  
-  cp -f ${DS_CONF} /etc/nginx/conf.d/onlyoffice-documentserver.conf
+  # check whethere enabled
+  shopt -s nocasematch
+  PORTS=()
+  case $(getenforce) in
+    enforcing|permissive)
+      PORTS+=('8000')
+      PORTS+=('8080')
+      PORTS+=('3000')
+    ;;
+    disabled)
+      :
+    ;;
+  esac
+
+  # add selinux extentions
+  for PORT in ${PORTS[@]}; do
+    semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+      semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+      true
+  done
 }
 
 read_saved_params

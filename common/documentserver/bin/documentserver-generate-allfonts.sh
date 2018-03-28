@@ -10,13 +10,20 @@ DIR="/var/www/onlyoffice/documentserver"
 #Start generate AllFonts.js, font thumbnails and font_selection.bin
 echo -n Generating AllFonts.js, please wait...
 
+
 sudo -u onlyoffice "$DIR/server/tools/AllFontsGen"\
- "/usr/share/fonts"\
- "$DIR/sdkjs/common/AllFonts.js"\
- "$DIR/sdkjs/common/Images"\
- "$DIR/server/FileConverter/bin/font_selection.bin"
- 
+  --input="$DIR/core-fonts"\
+  --allfonts-web="$DIR/sdkjs/common/AllFonts.js"\
+  --allfonts="$DIR/server/FileConverter/bin/AllFonts.js"\
+  --images="$DIR/sdkjs/common/Images"\
+  --selection="$DIR/server/FileConverter/bin/font_selection.bin"\
+  --output-web="$DIR/fonts"\
+  --use-system="true"
+
 echo Done
+
+#Remove gzipped fonts
+rm -f $DIR/fonts/*.gz $DIR/sdkjs/common/AllFonts.js.gz
 
 #Restart web-site and converter
 if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then

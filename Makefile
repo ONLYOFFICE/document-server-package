@@ -3,7 +3,7 @@ CURL := curl -L -o
 
 COMPANY_NAME ?= onlyoffice
 PRODUCT_NAME ?= documentserver
-PRODUCT_VERSION ?= 0.0.0.0
+PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
@@ -74,6 +74,7 @@ DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cl?part
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/m?cros
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/ph?toeditor
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/sp?ech
@@ -125,6 +126,7 @@ ifeq ($(OS),Windows_NT)
 	DS_ROOT := ../
 	DS_FILES := ../server/
 	DS_EXAMLE := ../example
+	DEV_NULL := nul
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
 	endif
@@ -144,6 +146,7 @@ else
 		DS_ROOT := /var/www/onlyoffice/documentserver/
 		DS_FILES := /var/lib/onlyoffice/documentserver/
 		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
+		DEV_NULL := /dev/null
 	endif
 	UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
@@ -215,17 +218,14 @@ endif
 	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf.template
 	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver-ssl.conf.template
 	sed "s|{{NGINX_LOG}}|"$(NGINX_LOG)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
-	sed "s|{{NGINX_CASH}}|"$(NGINX_CASH)"|"  -i common/documentserver/nginx/includes/onlyoffice-http.conf
 	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-
+	sed "s|{{DEV_NULL}}|"$(DEV_NULL)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
 	sed "s|\(_dc=\)0|\1"$(BUILD_DATE)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
-	mkdir -p $(FONTS)/Asana-Math
-	$(CURL) $(FONTS)/Asana-Math/ASANA.TTC http://mirrors.ctan.org/fonts/Asana-Math/ASANA.TTC
-	$(CURL) $(FONTS)/Asana-Math/README http://mirrors.ctan.org/fonts/Asana-Math/README || true
 
 ifeq ($(PRODUCT_NAME), documentserver)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
@@ -259,19 +259,25 @@ documentserver-example:
 
 $(APT_RPM):	documentserver documentserver-example
 	chmod u+x apt-rpm/bin/documentserver-configure.sh
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
-	sed "s/{{PRODUCT_VERSION}}/"$(PRODUCT_VERSION)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
-	sed "s/{{BUILD_NUMBER}}/"$(BUILD_NUMBER)"/"  -i apt-rpm/$(PACKAGE_NAME).spec
 
-	cd apt-rpm && rpmbuild -bb --define "_topdir $(APT_RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
+	cd apt-rpm && rpmbuild \
+		-bb \
+		--define "_topdir $(APT_RPM_BUILD_DIR)" \
+		--define "_package_name $(PACKAGE_NAME)" \
+		--define "_product_version $(PRODUCT_VERSION)" \
+		--define "_build_number $(BUILD_NUMBER)" \
+		$(PACKAGE_NAME).spec
 
 $(RPM):	documentserver documentserver-example
 	chmod u+x rpm/bin/documentserver-configure.sh
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i rpm/$(PACKAGE_NAME).spec
-	sed "s/{{PRODUCT_VERSION}}/"$(PRODUCT_VERSION)"/"  -i rpm/$(PACKAGE_NAME).spec
-	sed "s/{{BUILD_NUMBER}}/"$(BUILD_NUMBER)"/"  -i rpm/$(PACKAGE_NAME).spec
 
-	cd rpm && rpmbuild -bb --define "_topdir $(RPM_BUILD_DIR)" $(PACKAGE_NAME).spec
+	cd rpm && rpmbuild \
+		-bb \
+		--define "_topdir $(RPM_BUILD_DIR)" \
+		--define "_package_name $(PACKAGE_NAME)" \
+		--define "_product_version $(PRODUCT_VERSION)" \
+		--define "_build_number $(BUILD_NUMBER)" \
+		$(PACKAGE_NAME).spec
 
 $(DEB): documentserver documentserver-example
 	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
@@ -281,9 +287,7 @@ $(DEB): documentserver documentserver-example
 	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
 
 $(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
-	sed "s/"{{PRODUCT_VERSION}}"/"$(PRODUCT_VERSION)"/" -i exe/common.iss
-	sed "s/"{{BUILD_NUMBER}}"/"$(BUILD_NUMBER)"/" -i exe/common.iss
-	cd exe && iscc //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
+	cd exe && iscc //DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
 
 $(ISXDL):
 	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
