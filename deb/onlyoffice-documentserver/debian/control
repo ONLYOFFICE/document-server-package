@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 8.0.0)
 
 Package: {{PACKAGE_NAME}}
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, postgresql-client (>= 9.1), redis-tools, nginx-extras (>= 1.3.13), nodejs (>=6.9.1), nodejs (<<7.0.0), npm, libstdc++6 (>= 4.8.4), libcurl3, libxml2, libboost-regex-dev, zlib1g, supervisor(>= 3.0b2), pwgen, libxss1, libgtkglext1, libcairo2, xvfb, libxtst6, libgconf2-4, libasound2
+Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, postgresql-client (>= 9.1), redis-tools, nginx-extras (>= 1.3.13), nodejs (>=6.9.1), nodejs (<<7.0.0), libstdc++6 (>= 4.8.4), libcurl3, libxml2, libboost-regex-dev, zlib1g, supervisor(>= 3.0b2), pwgen, libxss1, libgtkglext1, libcairo2, xvfb, libxtst6, libgconf2-4, libasound2
 Description: online viewers and editors for text, spreadsheet and presentation files.
  Compatible with most office file formats including Office Open XML formats:
  .docx, .xlsx, .pptx, and offer collaborative editing and commenting.
