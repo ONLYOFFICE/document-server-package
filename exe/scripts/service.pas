@@ -1,5 +1,3 @@
-[Code]
-
 procedure Nssm(Command: String; SrvName: String; Param: String);
 var
   ResultCode: Integer;
@@ -62,4 +60,3 @@ begin
   StopSrv(SrvName);
   Nssm('remove', SrvName, 'confirm');
 end;
-
