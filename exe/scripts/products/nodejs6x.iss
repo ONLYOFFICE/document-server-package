@@ -3,8 +3,7 @@
 [CustomMessages]
 nodejs6x_title=Node.js
 
-en.nodejs6x_size=12.4 MB
-; de.nodejs6x_size=10,9 MB
+nodejs6x_size=12.4 MB
 
 [Code]
 const

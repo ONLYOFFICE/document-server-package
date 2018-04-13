@@ -123,10 +123,25 @@ WizardImageFile           = data\dialogpicture.bmp
 WizardSmallImageFile      = data\dialogicon.bmp
 SetupIconFile             = data\icon.ico
 LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
+ShowLanguageDialog        = no
 
 #ifdef ISPPCC_INVOKED
 SignTool=byparam $p
 #endif
+
+; supported languages
+#include "scripts\lang\english.iss"
+; #include "scripts\lang\german.iss"
+; #include "scripts\lang\french.iss"
+; #include "scripts\lang\italian.iss"
+; #include "scripts\lang\dutch.iss"
+
+; #ifdef UNICODE
+; #include "scripts\lang\chinese.iss"
+; #include "scripts\lang\polish.iss"
+; #include "scripts\lang\russian.iss"
+; #include "scripts\lang\japanese.iss"
+; #endif
 
 [CustomMessages]
 GenFonts=Generating AllFonts.js...
@@ -141,6 +156,8 @@ FireWallExt=Adding firewall extention..
 CfgDs=Configuring {#sAppName}...
 Uninstall=Uninstall {#sAppName}
 PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
+
+DependenciesDir={#sAppName} Dependencies
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -322,17 +339,18 @@ Type: filesandordirs; Name: "{#NGINX_SRV_DIR}\conf"
 #include "scripts\products\fileversion.iss"
 
 #include "scripts\products\msiproduct.iss"
-#include "scripts\products\vcredist2010sp1.iss"
+#include "scripts\products\vcredist2010.iss"
 #include "scripts\products\vcredist2013.iss"
 #include "scripts\products\vcredist2015.iss"
 #include "scripts\products\nodejs6x.iss"
-#include "scripts\products\postgresql.iss"
-#include "scripts\products\rabbitmq.iss"
-#include "scripts\products\redis.iss"
-
-#include "scripts\service.iss"
+;#include "scripts\products\postgresql.iss"
+;#include "scripts\products\rabbitmq.iss"
+;#include "scripts\products\redis.iss"
 
 [Code]
+
+#include "scripts\service.pas"
+
 function UninstallPreviosVersion(): Boolean;
 var
   UninstallerPath: String;
@@ -386,10 +404,13 @@ begin
     Abort();
   end;
  
-  vcredist2010();
-  vcredist2013();
-  vcredist2015();
-  nodejs6x('6.9.1.0');
+  if WizardSilent() = false then
+  begin
+    vcredist2010('10');
+    vcredist2013('12');
+    vcredist2015('14');
+    nodejs6x('6.9.1.0');
+  end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
   //redis('3.2.100');
@@ -624,17 +645,17 @@ begin
   end;
 end;
 
-function NextButtonClick(CurPageID: Integer): Boolean;
-begin
-  Result := true;
-  if WizardSilent() = false then
-  begin
-    case CurPageID of
-//      DbPage.ID: Result := CheckDbConnection();
-//      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-//      RedisPage.ID: Result := CheckRedisConnection();
-      wpReady: Result := DownloadDependency();
-    end;
-  end;
-end;                                                     
+//function NextButtonClick(CurPageID: Integer): Boolean;
+//begin
+//  Result := true;
+//  if WizardSilent() = false then
+//  begin
+//    case CurPageID of
+////      DbPage.ID: Result := CheckDbConnection();
+////      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
+////      RedisPage.ID: Result := CheckRedisConnection();
+//      wpReady: Result := DownloadDependency();
+//    end;
+//  end;
+//end;                                                     
 
