@@ -113,13 +113,13 @@ rm -rf "%{buildroot}"
 
 %files
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver/*
-%config %attr(755, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
+%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
 %attr(-, root, root) /usr/lib64/*.so*
 %attr(-, root, root) /usr/bin/documentserver-*.sh
 
 %if %{defined example}
 %attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver-example/*
-%config %attr(755, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
+%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
 %endif
 
 %dir

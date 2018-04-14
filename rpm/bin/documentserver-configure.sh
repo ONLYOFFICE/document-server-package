@@ -1,9 +1,8 @@
 #!/bin/bash
 
 DIR="/var/www/onlyoffice"
-DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
-EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/default.json"
-SAVED_DEFAULT_CONFIG="$DEFAULT_CONFIG.rpmsave"
+LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
+EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
 
 PSQL=""
 CREATEDB=""
@@ -21,6 +20,14 @@ JWT_HEADER=${JWT_HEADER:-Authorization}
 
 npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
+create_local_configs(){
+	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
+		if [ ! -f ${i} ]; then
+			echo {} > ${i}
+		fi
+  	done
+}
+
 restart_services() {
 	[ -a /etc/nginx/conf.d/default.conf ] && mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.old
 
@@ -34,38 +41,33 @@ restart_services() {
 }
 
 save_db_params(){
-	json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'" >/dev/null 2>&1
-	json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'" >/dev/null 2>&1
-	json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'" >/dev/null 2>&1
-	json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'" >/dev/null 2>&1
-}
-
-delete_saved_params()
-{
-	rm -f $SAVED_DEFAULT_CONFIG
+	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'" >/dev/null 2>&1
+	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'" >/dev/null 2>&1
+	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'" >/dev/null 2>&1
+	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'" >/dev/null 2>&1
 }
 
 save_rabbitmq_params(){
-	json -I -f $DEFAULT_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'" >/dev/null 2>&1
+	json -I -f $LOCAL_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'" >/dev/null 2>&1
 }
 
 save_redis_params(){
-	json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'" >/dev/null 2>&1
+	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'" >/dev/null 2>&1
 }
 
 save_jwt_params(){
   if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}" >/dev/null 2>&1
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}" >/dev/null 2>&1
-    json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}" >/dev/null 2>&1
+    json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}" >/dev/null 2>&1
+    json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}" >/dev/null 2>&1
+    json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}" >/dev/null 2>&1
   fi
   
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'" >/dev/null 2>&1
+  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
+  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
+  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'" >/dev/null 2>&1
 
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
-  json -I -f $DEFAULT_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
+  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
+  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
 
   if [ -f "${EXAMPLE_CONFIG}" ]; then
     if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
@@ -74,26 +76,6 @@ save_jwt_params(){
     json -I -f $EXAMPLE_CONFIG -e "this.server.token.secret = '${JWT_SECRET}'" >/dev/null 2>&1
     json -I -f $EXAMPLE_CONFIG -e "this.server.token.authorizationHeader = '${JWT_HEADER}'" >/dev/null 2>&1
   fi
-}
-
-read_saved_params(){
-	CONFIG_TO_READ=$SAVED_DEFAULT_CONFIG
-
-	if [ ! -e $CONFIG_TO_READ ]; then
-		CONFIG_TO_READ=$DEFAULT_CONFIG
-	fi
-
-	if [ -e $CONFIG_TO_READ ]; then
-		DB_HOST=$(json -f "$CONFIG_TO_READ" services.CoAuthoring.sql.dbHost)
-		DB_NAME=$(json -f "$CONFIG_TO_READ" services.CoAuthoring.sql.dbName)
-		DB_USER=$(json -f "$CONFIG_TO_READ" services.CoAuthoring.sql.dbUser)
-		DB_PWD=$(json -f "$CONFIG_TO_READ" services.CoAuthoring.sql.dbPass)
-
-		REDIS_HOST=$(json -f "$CONFIG_TO_READ" services.CoAuthoring.redis.host)
-
-		RABBITMQ_URL=$(json -f "$CONFIG_TO_READ" rabbitmq.url)
-		parse_rabbitmq_url
-	fi
 }
 
 parse_rabbitmq_url(){
@@ -251,7 +233,7 @@ setup_nginx(){
   done
 }
 
-read_saved_params
+create_local_configs
 
 input_db_params
 establish_db_conn || exit $?
@@ -267,8 +249,6 @@ save_db_params
 save_rabbitmq_params
 save_redis_params
 save_jwt_params
-
-delete_saved_params
 
 setup_nginx
 

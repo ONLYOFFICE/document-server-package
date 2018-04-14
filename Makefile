@@ -198,6 +198,9 @@ documentserver:
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 	
+	# Prevent for modification original config
+	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
+
 	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 
@@ -248,6 +251,10 @@ documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
+
+	# Prevent for modification original config
+	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
+
 	
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf

@@ -22,9 +22,9 @@ set -e
 DIR="/var/www/onlyoffice"
 LOG_DIR="/var/log/onlyoffice"
 APP_DIR="/var/lib/onlyoffice"
-DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
-EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/default.json"
-JSON="json -I -q -f $DEFAULT_CONFIG"
+LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
+EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
+JSON="json -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="json -q -f ${EXAMPLE_CONFIG}"
 
 OLD_VERSION="$2"
@@ -41,6 +41,14 @@ RABBITMQ_PWD=""
 REDIS_HOST=""
 
 CLUSTER_MODE=""
+
+create_local_configs(){
+	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
+		if [ ! -f ${i} ]; then
+			echo {} > ${i}
+		fi
+  	done
+}
 
 read_saved_params(){
 	db_get onlyoffice/db-host || true
@@ -175,6 +183,7 @@ case "$1" in
 		#install node modules
 		npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
+		create_local_configs
 		read_saved_params
 		install_db
 		save_db_params
