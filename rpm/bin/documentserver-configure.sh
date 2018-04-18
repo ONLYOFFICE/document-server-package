@@ -3,6 +3,8 @@
 DIR="/var/www/onlyoffice"
 LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
 EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
+JSON=json -I -q -f $LOCAL_CONFIG
+JSON_EXAMPLE=json -I -q -f $EXAMPLE_CONFIG
 
 PSQL=""
 CREATEDB=""
@@ -41,40 +43,66 @@ restart_services() {
 }
 
 save_db_params(){
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'" >/dev/null 2>&1
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'" >/dev/null 2>&1
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'" >/dev/null 2>&1
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'" >/dev/null 2>&1
+	$JSON -e "if(this.services===undefined)this.services={};"
+	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+	$JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};"
+	$JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
+	$JSON -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'"
+	$JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
+	$JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
 }
 
 save_rabbitmq_params(){
-	json -I -f $LOCAL_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'" >/dev/null 2>&1
+	$JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
+	$JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
 save_redis_params(){
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'" >/dev/null 2>&1
+	$JSON -e "if(this.services===undefined)this.services={};"
+	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+	$JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
+	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
 save_jwt_params(){
+	${JSON} -e "if(this.services===undefined)this.services={};"
+	${JSON} -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+	${JSON} -e "if(this.services.CoAuthoring.token===undefined)this.services.CoAuthoring.token={};"
+
   if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
-    json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}" >/dev/null 2>&1
-    json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}" >/dev/null 2>&1
-    json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}" >/dev/null 2>&1
+		${JSON} -e "if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={};"
+		${JSON} -e "if(this.services.CoAuthoring.token.enable.request===undefined)this.services.CoAuthoring.token.enable.request={};"
+		${JSON} -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
+		${JSON} -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
+		${JSON} -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
   fi
   
-  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
-  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'" >/dev/null 2>&1
-  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'" >/dev/null 2>&1
+	${JSON} -e "if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={};"
 
-  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
-  json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'" >/dev/null 2>&1
+	${JSON} -e "if(this.services.CoAuthoring.secret.inbox===undefined)this.services.CoAuthoring.secret.inbox={};"
+	${JSON} -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
 
-  if [ -f "${EXAMPLE_CONFIG}" ]; then
-    if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
-      json -I -f $EXAMPLE_CONFIG -e "this.server.token.enable = ${JWT_ENABLED}" >/dev/null 2>&1
-    fi
-    json -I -f $EXAMPLE_CONFIG -e "this.server.token.secret = '${JWT_SECRET}'" >/dev/null 2>&1
-    json -I -f $EXAMPLE_CONFIG -e "this.server.token.authorizationHeader = '${JWT_HEADER}'" >/dev/null 2>&1
+	${JSON} -e "if(this.services.CoAuthoring.secret.outbox===undefined)this.services.CoAuthoring.secret.outbox={};"
+	${JSON} -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
+
+	${JSON} -e "if(this.services.CoAuthoring.secret.session===undefined)this.services.CoAuthoring.secret.session={};"
+	${JSON} -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
+  
+	${JSON} -e "if(this.services.CoAuthoring.token.inbox===undefined)this.services.CoAuthoring.token.inbox={};"
+	${JSON} -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
+
+	${JSON} -e "if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={};"
+	${JSON} -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
+
+	if [ -f "${EXAMPLE_CONFIG}" ]; then
+		${JSON_EXAMPLE} -e "if(this.server===undefined)this.server={};"
+		${JSON_EXAMPLE} -e "if(this.server.token===undefined)this.server.token={};"
+
+		if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
+			${JSON_EXAMPLE} -e "this.server.token.enable = ${JWT_ENABLED}"
+		fi
+		${JSON_EXAMPLE} -e "this.server.token.secret = '${JWT_SECRET}'"
+		${JSON_EXAMPLE} -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
   fi
 }
 

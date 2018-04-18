@@ -2,6 +2,7 @@
 
 DIR="/var/www/onlyoffice"
 LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
+JSON=json -I -q -f $LOCAL_CONFIG
 
 PSQL=""
 CREATEDB=""
@@ -35,18 +36,25 @@ restart_services() {
 }
 
 save_db_params(){
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'" >/dev/null 2>&1
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'" >/dev/null 2>&1
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'" >/dev/null 2>&1
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'" >/dev/null 2>&1
+  $JSON -e "if(this.services===undefined)this.services={};"
+  $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+  $JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};"
+	$JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
+	$JSON -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'"
+	$JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
+	$JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
 }
 
 save_rabbitmq_params(){
-	json -I -f $LOCAL_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'" >/dev/null 2>&1
+  $JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
+	$JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
 save_redis_params(){
-	json -I -f $LOCAL_CONFIG -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'" >/dev/null 2>&1
+  $JSON -e "if(this.services===undefined)this.services={};"
+  $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+  $JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
+	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
 parse_rabbitmq_url(){
