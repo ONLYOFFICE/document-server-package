@@ -90,7 +90,7 @@ ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
 
 NGINX_VER := nginx-1.11.4
 NGINX_ZIP := $(NGINX_VER).zip
-NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
+NGINX := $(DOCUMENTSERVER)/nginx
 
 PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
 PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
@@ -302,6 +302,7 @@ $(ISXDL):
 $(NGINX):
 	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
+	mv $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
 	rm -f $(NGINX_ZIP)
 	
 $(PSQL):
