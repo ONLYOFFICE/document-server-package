@@ -1,4 +1,4 @@
-etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf.template etc/nginx/conf.d/onlyoffice-documentserver.conf
+etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf etc/nginx/conf.d/onlyoffice-documentserver.conf
 
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-common.conf etc/nginx/includes/onlyoffice-documentserver-common.conf
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf etc/nginx/includes/onlyoffice-documentserver-docservice.conf

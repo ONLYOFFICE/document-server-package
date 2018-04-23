@@ -21,12 +21,12 @@ rm -rf "%{buildroot}"
 
 %install
 
-DOCUMENTSERVER_BIN=../../../common/documentserver/bin
-DOCUMENTSERVER_HOME=../../../common/documentserver/home
-DOCUMENTSERVER_CONFIG=../../../common/documentserver/config
+DOCUMENTSERVER_BIN=%{_builddir}/../../../common/documentserver/bin
+DOCUMENTSERVER_HOME=%{_builddir}/../../../common/documentserver/home
+DOCUMENTSERVER_CONFIG=%{_builddir}/../../../common/documentserver/config
 
-DOCUMENTSERVER_EXAMPLE_HOME=../../../common/documentserver-example/home
-DOCUMENTSERVER_EXAMPLE_CONFIG=../../../common/documentserver-example/config
+DOCUMENTSERVER_EXAMPLE_HOME=%{_builddir}/../../../common/documentserver-example/home
+DOCUMENTSERVER_EXAMPLE_CONFIG=%{_builddir}/../../../common/documentserver-example/config
 
 #install documentserver files
 mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver/"
@@ -40,7 +40,7 @@ rm "%{buildroot}"/var/www/onlyoffice/documentserver/server/FileConverter/bin/*.s
 #install documentserver bin
 mkdir -p "%{buildroot}/usr/bin/"
 cp -r $DOCUMENTSERVER_BIN/*.sh "%{buildroot}/usr/bin/"
-cp -r ../../bin/*.sh "%{buildroot}/usr/bin/"
+cp -r %{_builddir}/../../bin/*.sh "%{buildroot}/usr/bin/"
 
 #install configs
 mkdir -p "%{buildroot}/etc/onlyoffice/documentserver/"
@@ -66,7 +66,7 @@ mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver/fonts"
 #install supervisor configs
 DS_SUPERVISOR_CONF=%{buildroot}/etc/onlyoffice/documentserver/supervisor/
 mkdir -p "$DS_SUPERVISOR_CONF"
-cp ../../../common/documentserver/supervisor/* "$DS_SUPERVISOR_CONF"
+cp %{_builddir}/../../../common/documentserver/supervisor/* "$DS_SUPERVISOR_CONF"
 
 # rename extention for supervisor config files
 rename 's/.conf$/.ini/' "$DS_SUPERVISOR_CONF"*
@@ -74,13 +74,13 @@ rename 's/.conf$/.ini/' "$DS_SUPERVISOR_CONF"*
 #install nginx config
 DS_NGINX_CONF=%{buildroot}/etc/onlyoffice/documentserver/nginx/
 mkdir -p "$DS_NGINX_CONF"
-cp ../../../common/documentserver/nginx/onlyoffice-documentserver*.template "$DS_NGINX_CONF"
 
-cp -r ../../../common/documentserver/nginx/includes "$DS_NGINX_CONF"
+cp -r %{_builddir}/../../../common/documentserver/nginx/* "$DS_NGINX_CONF"
 
 mkdir -p "%{buildroot}/var/cache/nginx/onlyoffice/documentserver/"
 
 mkdir -p "%{buildroot}/etc/nginx/includes/"
+mkdir -p "%{buildroot}/etc/nginx/%{nginx_conf_d}/"
 
 %if %{defined example}
 #install documentserver example files
@@ -97,7 +97,7 @@ mkdir -p "%{buildroot}/var/log/onlyoffice/documentserver-example"
 #install example supervisor configs
 DSE_SUPERVISOR_CONF=%{buildroot}/etc/onlyoffice/documentserver-example/supervisor/
 mkdir -p "$DSE_SUPERVISOR_CONF"
-cp ../../../common/documentserver-example/supervisor/* "$DSE_SUPERVISOR_CONF"
+cp %{_builddir}/../../../common/documentserver-example/supervisor/* "$DSE_SUPERVISOR_CONF"
 
 # rename extention for supervisor config files
 rename 's/.conf$/.ini/' "$DSE_SUPERVISOR_CONF"*
@@ -105,26 +105,55 @@ rename 's/.conf$/.ini/' "$DSE_SUPERVISOR_CONF"*
 #install nginx config
 DSE_NGINX_CONF=%{buildroot}/etc/onlyoffice/documentserver-example/nginx/
 mkdir -p "$DSE_NGINX_CONF"
-cp -r ../../../common/documentserver-example/nginx/includes "$DSE_NGINX_CONF"
+cp -r %{_builddir}/../../../common/documentserver-example/nginx/includes "$DSE_NGINX_CONF"
 %endif
+
+# Make symlinks for nginx configs
+find \
+  %{buildroot}/etc/onlyoffice/documentserver*/nginx/includes \
+  -name *.conf \
+  -exec sh -c '%__ln_s {} %{buildroot}/etc/nginx/includes/$(basename {})' \;
+
+%__ln_s \
+  %{buildroot}/etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf \
+  %{buildroot}/etc/nginx/%{nginx_conf_d}/onlyoffice-documentserver.conf
+
+mkdir -p "%{buildroot}/etc/supervisord.d/"
+
+# Make symlinks for supervisor configs
+find \
+  %{buildroot}/etc/onlyoffice/documentserver*/supervisor/ \
+  -name *.ini \
+  -exec sh -c '%__ln_s -sf {} %{buildroot}/etc/supervisord.d/$(basename {})' \;
+
+# Convert absolute links to relative links
+symlinks -c \
+  %{buildroot}/etc/nginx/%{nginx_conf_d} \
+  %{buildroot}/etc/nginx/includes \
+  %{buildroot}/etc/supervisord.d
 
 %clean
 rm -rf "%{buildroot}"
 
 %files
-%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver/*
-%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/*
+%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver*/*
+%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/*.json
+%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/log4js/*.json
+
+%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/nginx/includes/*
+%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/nginx/*.template
+
+%config(noreplace) /etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf
+
+%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/supervisor*/*
+
 %attr(-, root, root) /usr/lib64/*.so*
 %attr(-, root, root) /usr/bin/documentserver-*.sh
-
-%if %{defined example}
-%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver-example/*
-%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver-example/*
-%endif
+%attr(-, root, root) /etc/nginx/*
+%attr(-, root, root) /etc/supervisord.d/*
 
 %dir
 %attr(-, %{nginx_user}, %{nginx_user}) /var/cache/nginx/onlyoffice/documentserver
-%attr(-, root, root) /etc/nginx/includes
 %attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
 
 %attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
@@ -157,29 +186,6 @@ exit 0
 %post
 # Make symlink to libcurl-gnutls
 ln -sf /usr/lib64/libcurl.so.4 /usr/lib64/libcurl-gnutls.so.4
-
-# Make symlinks for nginx configs
-find \
-  /etc/onlyoffice/documentserver*/nginx/ \
-  -name *.conf \
-  -exec sh -c 'ln -sf {} /etc/nginx/includes/$(basename {})' \;
-
-ln \
-  -sf \
-  /etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf.template \
-  %{nginx_conf_d}/onlyoffice-documentserver.conf
-
-# Make symlinks for supervisor configs
-find \
-  /etc/onlyoffice/documentserver/supervisor/ \
-  -name *.ini \
-  -exec sh -c 'ln -sf {} /etc/supervisord.d/$(basename {})' \;
-
-# Make symlink for example supervisor config
-find \
-  /etc/onlyoffice/documentserver-example/supervisor/ \
-  -name *.ini \
-  -exec sh -c 'ln -sf {} /etc/supervisord.d/$(basename {})' \;
 
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
@@ -216,9 +222,6 @@ case "$1" in
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
     supervisorctl stop onlyoffice-documentserver:*
-    find /etc/supervisord.d/ -name onlyoffice-documentserver*.ini \
-      -exec unlink {} \;
-    unlink %{nginx_conf_d}/onlyoffice-documentserver.conf
   ;;
   1)
     # Upgrade

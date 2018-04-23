@@ -229,6 +229,7 @@ endif
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
 	sed "s|\(_dc=\)0|\1"$(BUILD_DATE)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
+	cp common/documentserver/nginx/onlyoffice-documentserver.conf.template common/documentserver/nginx/onlyoffice-documentserver.conf
 
 ifeq ($(PRODUCT_NAME), documentserver)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
