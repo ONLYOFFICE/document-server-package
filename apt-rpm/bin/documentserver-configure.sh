@@ -39,22 +39,22 @@ save_db_params(){
   $JSON -e "if(this.services===undefined)this.services={};"
   $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
   $JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};"
-	$JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
-	$JSON -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'"
-	$JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
-	$JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
+  $JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
+  $JSON -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'"
+  $JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
+  $JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
 }
 
 save_rabbitmq_params(){
   $JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-	$JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
+  $JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
 save_redis_params(){
   $JSON -e "if(this.services===undefined)this.services={};"
   $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
   $JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
-	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
+  $JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
 parse_rabbitmq_url(){

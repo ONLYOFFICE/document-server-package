@@ -87,7 +87,7 @@ save_jwt_params(){
 
 	${JSON} -e "if(this.services.CoAuthoring.secret.session===undefined)this.services.CoAuthoring.secret.session={};"
 	${JSON} -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
-  
+
 	${JSON} -e "if(this.services.CoAuthoring.token.inbox===undefined)this.services.CoAuthoring.token.inbox={};"
 	${JSON} -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
 

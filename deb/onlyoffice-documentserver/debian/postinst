@@ -139,7 +139,7 @@ save_jwt_params(){
 
   if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
     ${JSON} -e "if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={};"
-	${JSON} -e "if(this.services.CoAuthoring.token.enable.request===undefined)this.services.CoAuthoring.token.enable.request={};"
+    ${JSON} -e "if(this.services.CoAuthoring.token.enable.request===undefined)this.services.CoAuthoring.token.enable.request={};"
     ${JSON} -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
     ${JSON} -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
     ${JSON} -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
@@ -164,7 +164,7 @@ save_jwt_params(){
 
   if [ -f "${EXAMPLE_CONFIG}" ]; then
     ${JSON_EXAMPLE} -e "if(this.server===undefined)this.server={};"
-	${JSON_EXAMPLE} -e "if(this.server.token===undefined)this.server.token={};"
+    ${JSON_EXAMPLE} -e "if(this.server.token===undefined)this.server.token={};"
 
     if [ "${JWT_ENABLED}" == "true" -o "${JWT_ENABLED}" == "false" ]; then
       ${JSON_EXAMPLE} -e "this.server.token.enable = ${JWT_ENABLED}"
