@@ -8,7 +8,6 @@ DB_HOST=""
 DB_NAME=""
 DB_USER=""
 DB_PWD=""
-DEFAULT_CONFIG="/etc/onlyoffice/documentserver/default.json"
 
 db_fset onlyoffice/cluster-mode seen true
 db_fset onlyoffice/ds-port seen true
