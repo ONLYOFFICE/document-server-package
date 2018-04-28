@@ -25,7 +25,7 @@ APP_DIR="/var/lib/onlyoffice"
 LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
 EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
 JSON="json -I -q -f $LOCAL_CONFIG"
-JSON_EXAMPLE="json -q -f ${EXAMPLE_CONFIG}"
+JSON_EXAMPLE="json -I -q -f ${EXAMPLE_CONFIG}"
 
 OLD_VERSION="$2"
 
