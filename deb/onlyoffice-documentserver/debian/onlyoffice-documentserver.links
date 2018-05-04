@@ -17,6 +17,7 @@ var/www/onlyoffice/documentserver/server/FileConverter/bin/libdoctrenderer.so li
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libgraphics.so lib/libgraphics.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libHtmlFile.so lib/libHtmlFile.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libHtmlRenderer.so lib/libHtmlRenderer.so
+var/www/onlyoffice/documentserver/server/FileConverter/bin/libkernel.so lib/libkernel.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libPdfReader.so lib/libPdfReader.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libPdfWriter.so lib/libPdfWriter.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libXpsFile.so lib/libXpsFile.so
