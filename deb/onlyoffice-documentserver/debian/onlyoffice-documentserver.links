@@ -14,6 +14,7 @@ etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver.conf etc/supe
 
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libDjVuFile.so lib/libDjVuFile.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libdoctrenderer.so lib/libdoctrenderer.so
+var/www/onlyoffice/documentserver/server/FileConverter/bin/libgraphics.so lib/libgraphics.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libHtmlFile.so lib/libHtmlFile.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libHtmlRenderer.so lib/libHtmlRenderer.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libPdfReader.so lib/libPdfReader.so

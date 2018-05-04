@@ -44,7 +44,7 @@ CLUSTER_MODE=""
 
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
-		if [ ! -f ${i} ]; then
+		if [ -d $(dirname ${i}) -a ! -f ${i} ]; then
 			echo {} > ${i}
 		fi
   	done
