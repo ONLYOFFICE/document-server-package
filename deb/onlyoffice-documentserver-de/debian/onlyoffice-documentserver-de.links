@@ -19,8 +19,8 @@ var/www/onlyoffice/documentserver/server/FileConverter/bin/libPdfReader.so lib/l
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libPdfWriter.so lib/libPdfWriter.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libXpsFile.so lib/libXpsFile.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libUnicodeConverter.so lib/libUnicodeConverter.so
-var/www/onlyoffice/documentserver/server/FileConverter/bin/libicudata.so.60 lib/libicudata.so.60
-var/www/onlyoffice/documentserver/server/FileConverter/bin/libicuuc.so.60 lib/libicuuc.so.60
+var/www/onlyoffice/documentserver/server/FileConverter/bin/libicudata.so.58 lib/libicudata.so.58
+var/www/onlyoffice/documentserver/server/FileConverter/bin/libicuuc.so.58 lib/libicuuc.so.58
 
 etc/onlyoffice/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf etc/nginx/includes/onlyoffice-documentserver-example.conf
 etc/onlyoffice/documentserver-example/supervisor/onlyoffice-documentserver-example.conf etc/supervisor/conf.d/onlyoffice-documentserver-example.conf
