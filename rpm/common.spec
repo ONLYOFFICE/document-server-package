@@ -124,7 +124,7 @@ mkdir -p "%{buildroot}/etc/supervisord.d/"
 find \
   %{buildroot}/etc/onlyoffice/documentserver*/supervisor/ \
   -name *.ini \
-  -exec sh -c '%__ln_s -sf {} %{buildroot}/etc/supervisord.d/$(basename {})' \;
+  -exec sh -c '%__ln_s {} %{buildroot}/etc/supervisord.d/$(basename {})' \;
 
 # Convert absolute links to relative links
 symlinks -c \
