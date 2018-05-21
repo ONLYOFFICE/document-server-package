@@ -155,6 +155,8 @@ esac
 exit 0
 
 %post
+# Make symlink to libcurl-gnutls
+ln -sf /usr/lib64/libcurl.so.4 /usr/lib64/libcurl-gnutls.so.4
 
 # Make symlinks for nginx configs
 find \
