@@ -40,7 +40,7 @@ delete_saved_params()
 }
 
 save_rabbitmq_params(){
-	json -I -f $DEFAULT_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'" >/dev/null 2>&1
+	json -I -f $DEFAULT_CONFIG -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH'" >/dev/null 2>&1
 }
 
 save_redis_params(){
@@ -102,7 +102,9 @@ parse_rabbitmq_url(){
   # extract the path (if any)
   local path="$(echo $url | grep / | cut -d/ -f2-)"
 
-  RABBITMQ_HOST=$hostport$path
+  RABBITMQ_HOST=$host
+  RABBITMQ_PORT=$port
+  RABBITMQ_HOST_PORT_PATH=$hostport$path
   RABBITMQ_USER=$user
   RABBITMQ_PWD=$pass
 }
@@ -137,8 +139,8 @@ input_redis_params(){
 input_rabbitmq_params(){
 	echo "Configuring RabbitMQ access... "
 
-	read -e -p "Host [${RABBITMQ_HOST}]: " USER_INPUT
-	RABBITMQ_HOST=${USER_INPUT:-${RABBITMQ_HOST}}
+	read -e -p "Host [${RABBITMQ_HOST_PORT_PATH}]: " USER_INPUT
+	RABBITMQ_HOST=${USER_INPUT:-${RABBITMQ_HOST_PORT_PATH}}
 
 	read -e -p "User [${RABBITMQ_USER}]: " USER_INPUT
 	RABBITMQ_USER=${USER_INPUT:-${RABBITMQ_USER}}
@@ -198,9 +200,22 @@ establish_redis_conn() {
 
 establish_rabbitmq_conn() {
 	echo -n "Trying to establish RabbitMQ connection... "
+  
+  exec {FD}<> /dev/tcp/$RABBITMQ_HOST/$RABBITMQ_PORT && exec {FD}>&-
+
+	if [ "$?" != 0 ]; then
+		echo "FAILURE";
+		exit 1;
+	fi
+
+	echo "OK"
+}
+
+establish_rabbitmq_conn_by_tools() {
+	echo -n "Trying to establish RabbitMQ connection... "
 
 	TEST_QUEUE=dc.test
-	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST
+	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH
 
 	amqp-declare-queue -u "$RABBITMQ_URL" -q "$TEST_QUEUE" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 	amqp-delete-queue -u "$RABBITMQ_URL" -q "$TEST_QUEUE" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
