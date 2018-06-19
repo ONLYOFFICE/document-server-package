@@ -176,8 +176,8 @@ save_jwt_params(){
 
 setup_nginx(){
   NGINX_CONF_DIR=/etc/onlyoffice/documentserver/nginx
-  DS_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver.conf.template
-  DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
+  DS_CONF=$NGINX_CONF_DIR/etc/nginx/conf.d/onlyoffice-documentserver.conf
+  # DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
   # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
   
   db_get onlyoffice/ds-port || true
@@ -192,11 +192,22 @@ setup_nginx(){
   # db_get onlyoffice/example-port || true
   # EXAMPLE_PORT="$RET"
   
+  # setup ds port
   sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF  
+
+  # install nginx config
+  if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
+	  ln -s $DS_CONF /etc/nginx/conf.d/onlyoffice-documentserver.conf
+  fi
 
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
   # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/'  -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
+		
+  rm -f /etc/nginx/sites-enabled/default
+  mkdir -p /var/cache/nginx/onlyoffice/documentserver
+  chown www-data:www-data /var/cache/nginx/onlyoffice/documentserver
+
 }
 
 case "$1" in
@@ -217,6 +228,7 @@ case "$1" in
 		save_redis_params
 		save_jwt_params
 
+		# configure ngninx for onlyoffice
 		setup_nginx
 
 		# modify permissions for onlyoffice files and folders
@@ -241,11 +253,6 @@ case "$1" in
 
 		chown onlyoffice:onlyoffice -R "$LOG_DIR"
 		chown onlyoffice:onlyoffice -R "$APP_DIR"
-
-		# configure ngninx for onlyoffice
-		rm -f /etc/nginx/sites-enabled/default
-		mkdir -p /var/cache/nginx/onlyoffice/documentserver
-		chown www-data:www-data /var/cache/nginx/onlyoffice/documentserver
 
 		# call db_stop to prevent installation hang
 		db_stop
