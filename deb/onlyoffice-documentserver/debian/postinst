@@ -176,7 +176,7 @@ save_jwt_params(){
 
 setup_nginx(){
   NGINX_CONF_DIR=/etc/onlyoffice/documentserver/nginx
-  DS_CONF=$NGINX_CONF_DIR/etc/nginx/conf.d/onlyoffice-documentserver.conf
+  DS_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver.conf
   # DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
   # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
   
