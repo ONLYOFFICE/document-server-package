@@ -159,10 +159,12 @@ rm -rf "%{buildroot}"
 
 %config(noreplace) /etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf
 
+%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/logrotate/*
 %config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/supervisor*/*
 
 %attr(-, root, root) /usr/lib64/*.so*
 %attr(-, root, root) /usr/bin/documentserver-*.sh
+%attr(-, root, root) /etc/logrotate/conf.d/*
 %attr(-, root, root) /etc/nginx/*
 %attr(-, root, root) /etc/supervisord.d/*
 
