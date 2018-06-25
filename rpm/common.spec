@@ -85,7 +85,7 @@ mkdir -p "%{buildroot}/etc/nginx/%{nginx_conf_d}/"
 #install logrotate config
 DS_LOGROTATE_CONF=%{buildroot}/etc/onlyoffice/documentserver/logrotate/
 mkdir -p "$DS_LOGROTATE_CONF"
-cp -r %{_builddir}/../../../common/documentserver/logrotate/* "$DS_NGINX_CONF"
+cp -r %{_builddir}/../../../common/documentserver/logrotate/* "$DS_LOGROTATE_CONF"
 
 %if %{defined example}
 #install documentserver example files
