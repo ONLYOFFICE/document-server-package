@@ -82,6 +82,11 @@ mkdir -p "%{buildroot}/var/cache/nginx/onlyoffice/documentserver/"
 mkdir -p "%{buildroot}/etc/nginx/includes/"
 mkdir -p "%{buildroot}/etc/nginx/%{nginx_conf_d}/"
 
+#install logrotate config
+DS_LOGROTATE_CONF=%{buildroot}/etc/onlyoffice/documentserver/logrotate/
+mkdir -p "$DS_LOGROTATE_CONF"
+cp -r %{_builddir}/../../../common/documentserver/logrotate/* "$DS_NGINX_CONF"
+
 %if %{defined example}
 #install documentserver example files
 mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver-example/"
@@ -126,11 +131,20 @@ find \
   -name *.ini \
   -exec sh -c '%__ln_s {} %{buildroot}/etc/supervisord.d/$(basename {})' \;
 
+mkdir -p "%{buildroot}/etc/logrotate/conf.d/"
+
+# Make symlinks for supervisor configs
+find \
+  %{buildroot}/etc/logrotate/conf.d/ \
+  -name *.conf \
+  -exec sh -c '%__ln_s {} %{buildroot}/etc/logrotate/conf.d/$(basename {})' \;
+
 # Convert absolute links to relative links
 symlinks -c \
   %{buildroot}/etc/nginx/%{nginx_conf_d} \
   %{buildroot}/etc/nginx/includes \
-  %{buildroot}/etc/supervisord.d
+  %{buildroot}/etc/supervisord.d \
+  %{buildroot}/etc/logrotate/conf.d 
 
 %clean
 rm -rf "%{buildroot}"
