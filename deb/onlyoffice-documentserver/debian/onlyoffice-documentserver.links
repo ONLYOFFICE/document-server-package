@@ -1,3 +1,5 @@
+etc/onlyoffice/documentserver/logrotate/onlyoffice-documentserver.conf etc/logrotate/conf.d/onlyoffice-documentserver.conf
+
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-common.conf etc/nginx/includes/onlyoffice-documentserver-common.conf
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf etc/nginx/includes/onlyoffice-documentserver-docservice.conf
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf etc/nginx/includes/onlyoffice-documentserver-spellchecker.conf
