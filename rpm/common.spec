@@ -133,9 +133,9 @@ find \
 
 mkdir -p "%{buildroot}/etc/logrotate/conf.d/"
 
-# Make symlinks for supervisor configs
+# Make symlinks for logrotate configs
 find \
-  %{buildroot}/etc/logrotate/conf.d/ \
+  %{buildroot}/etc/onlyoffice/documentserver/logrotate/ \
   -name *.conf \
   -exec sh -c '%__ln_s {} %{buildroot}/etc/logrotate/conf.d/$(basename {})' \;
 
