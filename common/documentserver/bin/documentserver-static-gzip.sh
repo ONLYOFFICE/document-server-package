@@ -5,7 +5,7 @@ NGINX_ONLYOFFICE_PATH="/etc/onlyoffice/documentserver/nginx"
 
 cd ${DIR}
 # Make gziped scripts
-find ./sdkjs ./web-apps ./sdkjs-plugins -type f \( -name *.js* -o -name *.htm* -o -name *.css \) -exec gzip -kf9 {} \;
+find ./sdkjs ./web-apps ./sdkjs-plugins -type f \( -name *.js -o -name *.json -o -name *.htm -o -name *.html -o -name *.css \) -exec gzip -kf9 {} \;
 
 # Make gziped fonts
 find ./fonts -type f ! -name "*.*" -exec gzip -kf9 {} \;
