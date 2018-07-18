@@ -254,7 +254,7 @@ documentserver-example:
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	# Prevent for modification original config
-	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
+	chmod ug=r $(DOCUMENTSERVER_EXAMPLE_CONFIG)/*.json
 
 	
 	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
