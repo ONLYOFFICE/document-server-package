@@ -22,8 +22,9 @@ set -e
 DIR="/var/www/onlyoffice"
 LOG_DIR="/var/log/onlyoffice"
 APP_DIR="/var/lib/onlyoffice"
-LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
-EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
+CONF_DIR="/etc/onlyoffice/documentserver"
+LOCAL_CONFIG=${CONF_DIR}/local.json
+EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
 JSON="json -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="json -I -q -f ${EXAMPLE_CONFIG}"
 
@@ -247,6 +248,10 @@ case "$1" in
 		mkdir -p "$DIR/documentserver/fonts"
 		mkdir -p "$DIR/documentserver-example/public/files"
 		chown onlyoffice:onlyoffice -R "$DIR"
+
+    #setup logrotate config rights
+    chmod 644 ${CONF_DIR}/logrotate/*
+    chown root:root ${CONF_DIR}/logrotate/*
 
 		# generate allfonts.js and thumbnail
 		documentserver-generate-allfonts.sh true
