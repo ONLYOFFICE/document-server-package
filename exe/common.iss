@@ -85,7 +85,7 @@
 
 #define LICENSE_PATH '{commonappdata}\ONLYOFFICE\Data'
 
-#define LogRotateTaskName str(sAppName + "Log Rotate Task")
+#define LogRotateTaskName str(sAppName + " Log Rotate Task")
 
 [Setup]
 AppName                   ={#sAppName}
