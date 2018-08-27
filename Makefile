@@ -220,10 +220,9 @@ endif
 	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|{{DEV_NULL}}|"$(DEV_NULL)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-	sed "s|\(_dc=\)0|\1"$(BUILD_DATE)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+
+	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
 	cp common/documentserver/nginx/onlyoffice-documentserver.conf.template common/documentserver/nginx/onlyoffice-documentserver.conf
 
@@ -253,7 +252,6 @@ documentserver-example:
 	chmod ug=r $(DOCUMENTSERVER_EXAMPLE_CONFIG)/*.json
 
 	
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	
