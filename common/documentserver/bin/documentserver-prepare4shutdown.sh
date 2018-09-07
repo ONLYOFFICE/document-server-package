@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo -n Preparing for shutdown, it can take a lot of time, please wait...
+echo Preparing for shutdown, it can take a lot of time, please wait...
 
 sudo -u onlyoffice \
   sh -c '\
