@@ -3,8 +3,8 @@
 DIR="/var/www/onlyoffice"
 LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
 EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
-JSON=json -I -q -f $LOCAL_CONFIG
-JSON_EXAMPLE=json -I -q -f $EXAMPLE_CONFIG
+JSON="json -I -q -f $LOCAL_CONFIG"
+JSON_EXAMPLE="json -I -q -f $EXAMPLE_CONFIG"
 
 PSQL=""
 CREATEDB=""
