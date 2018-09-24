@@ -54,7 +54,7 @@ save_db_params(){
 
 save_rabbitmq_params(){
 	$JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-	$JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH'"
+	$JSON -e "this.rabbitmq.url = '$RABBITMQ_URL'"
 }
 
 save_redis_params(){
@@ -168,6 +168,7 @@ input_rabbitmq_params(){
 	read -e -p "Host: " -i "$RABBITMQ_HOST_PORT_PATH" RABBITMQ_HOST_PORT_PATH
 	read -e -p "User: " -i "$RABBITMQ_USER" RABBITMQ_USER 
 	read -e -p "Password: " -s RABBITMQ_PWD
+	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH
 	echo
 }
 
@@ -286,6 +287,7 @@ input_redis_params
 establish_redis_conn || exit $?
 
 input_rabbitmq_params
+parse_rabbitmq_url
 establish_rabbitmq_conn || exit $?
 
 save_db_params
