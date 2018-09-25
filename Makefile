@@ -100,7 +100,11 @@ NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
+WEBAPPS_DIR = web-apps
+
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
 WEBAPPS_DIR = web-apps-pro
+endif
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
 OFFICIAL_PRODUCT_NAME := 'Integration Edition'
