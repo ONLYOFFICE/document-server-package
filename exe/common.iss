@@ -34,8 +34,12 @@
   #define sUpdatesURL=str(sPublisherUrl)
 #endif
 
+#ifndef sBrandingFolder
+  #define sBrandingFolder ../branding
+#endif
+
 #ifndef sPackageName
-  #define sPackageName        str(LowerCase(sCompanyName) + "-" + LowerCase(sProductName))
+  #define sPackageName        str(LowerCase(sIntCompanyName) + "-" + LowerCase(sIntProductName))
 #endif
 
 #define sAppName            str(sCompanyName + " " + sProductName)
@@ -163,10 +167,10 @@ PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
 MinVersion                =6.1.7600
-WizardImageFile           = data\dialogpicture.bmp
-WizardSmallImageFile      = data\dialogicon.bmp
-SetupIconFile             = data\icon.ico
-LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
+WizardImageFile           = {#sBrandingFolder}\exe\data\dialogpicture.bmp
+WizardSmallImageFile      = {#sBrandingFolder}\exe\data\dialogicon.bmp
+SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
+LicenseFile               = {#sBrandingFolder}\common\documentserver\license\{#sPackageName}\LICENSE.txt
 ShowLanguageDialog        = no
 
 #ifdef ISPPCC_INVOKED
