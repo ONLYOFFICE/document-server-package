@@ -1,10 +1,46 @@
-#ifndef sPackageName
-  #define sPackageName        'onlyoffice-documentserver'
+#ifndef sCompanyName
+  #define sCompanyName        'ONLYOFFICE'
 #endif
 
-#define sAppName            'ONLYOFFICE DocumentServer'
-#define APP_PATH            'ONLYOFFICE\DocumentServer'
-#define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
+#ifndef sIntCompanyName
+  #define sIntCompanyName     str(sCompanyName)
+#endif
+
+#ifndef sProductName
+  #define sProductName        'DocumentServer'
+#endif
+
+#ifndef sIntProductName
+  #define sIntProductName     str(sProductName)
+#endif
+
+#ifndef sPublisherName
+  #define sPublisherName      'Ascensio System SIA;
+#endif
+
+#ifndef sAppCopyright
+  #define sAppCopyright      str("Copyright (C) 2018" + sPublisherName)
+#endif
+
+#ifndef sPublisherUrl
+  #define sPublisherUrl       'https://www.onlyoffice.com/'
+#endif
+
+#ifndef sSupportURL
+  #define sSupportURL=str(sPublisherUrl + "support.aspx")
+#endif
+
+#ifndef sUpdatesURL
+  #define sUpdatesURL=str(sPublisherUrl)
+#endif
+
+#ifndef sPackageName
+  #define sPackageName        str(LowerCase(sCompanyName) + "-" + LowerCase(sProductName))
+#endif
+
+#define sAppName            str(sCompanyName + " " + sProductName)
+#define APP_PATH            str(sIntCompanyName + "\" + sIntProductName)
+#define APP_REG_PATH        str("Software\" + sIntCompanyName + "\" + sIntProductName)
 
 #define REG_LICENSE_PATH      'LicensePath'
 #define REG_DB_HOST           'DbHost'
@@ -38,26 +74,26 @@
 #define LOCAL_SERVICE 'Local Service'
 
 #define CONVERTER_SRV        'DsConverterSvc'
-#define CONVERTER_SRV_DISPLAY  'ONLYOFFICE DocumentServer Converter'
-#define CONVERTER_SRV_DESCR  'ONLYOFFICE DocumentServer Converter Service'
+#define CONVERTER_SRV_DISPLAY  str(sAppName + " Converter")
+#define CONVERTER_SRV_DESCR  str(sAppName + " Converter Service")
 #define CONVERTER_SRV_DIR    '{app}\server\FileConverter\sources'
 #define CONVERTER_SRV_LOG_DIR    '{app}\Log\converter'
 
 #define DOCSERVICE_SRV        'DsDocServiceSvc'
-#define DOCSERVICE_SRV_DISPLAY  'ONLYOFFICE DocumentServer DocService'
-#define DOCSERVICE_SRV_DESCR  'ONLYOFFICE DocumentServer DocService Service'
+#define DOCSERVICE_SRV_DISPLAY  str(sAppName + " DocService")
+#define DOCSERVICE_SRV_DESCR  str(sAppName + " DocService Service")
 #define DOCSERVICE_SRV_DIR    '{app}\server\docservice\sources'
 #define DOCSERVICE_SRV_LOG_DIR    '{app}\Log\docservice'
 
 #define GC_SRV        'DsGcSvc'
-#define GC_SRV_DISPLAY  'ONLYOFFICE DocumentServer Gc'
-#define GC_SRV_DESCR  'ONLYOFFICE DocumentServer Gc Service'
+#define GC_SRV_DISPLAY  str(sAppName + " Gc")
+#define GC_SRV_DESCR  str(sAppName + " Gc Service")
 #define GC_SRV_DIR    '{app}\server\docservice\sources'
 #define GC_SRV_LOG_DIR    '{app}\Log\gc'
 
 #define SPELLCHECKER_SRV        'DsSpellcheckerSvc'
-#define SPELLCHECKER_SRV_DISPLAY  'ONLYOFFICE DocumentServer Spellchecker'
-#define SPELLCHECKER_SRV_DESCR  'ONLYOFFICE DocumentServer Spellchecker Service'
+#define SPELLCHECKER_SRV_DISPLAY  str(sAppName + " Spellchecker")
+#define SPELLCHECKER_SRV_DESCR  str(sAppName + " Spellchecker Service")
 #define SPELLCHECKER_SRV_DIR    '{app}\server\SpellChecker\sources'
 #define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
 
@@ -75,15 +111,15 @@
 #define REPLACE '{userappdata}\npm\replace.cmd'
 
 #define NGINX_SRV  'DsProxySvc'
-#define NGINX_SRV_DISPLAY  'ONLYOFFICE DocumentServer Proxy'
-#define NGINX_SRV_DESCR  'ONLYOFFICE DocumentServer Proxy Service'
+#define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
+#define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
 #define NGINX_SRV_DIR  '{app}\nginx'
 #define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
 #define NGINX_DS_CONF '{app}\nginx\conf\onlyoffice-documentserver.conf'
 #define NGINX_DS_TMPL '{app}\nginx\conf\onlyoffice-documentserver.conf.template'
 #define NGINX_DS_SSL_TMPL '{app}\nginx\conf\onlyoffice-documentserver-ssl.conf.template'
 
-#define LICENSE_PATH '{commonappdata}\ONLYOFFICE\Data'
+#define LICENSE_PATH str("{commonappdata}\" + sCompanyName + "\Data")
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
@@ -95,15 +131,17 @@ AppVersion                ={#sAppVersion}
 VersionInfoVersion        ={#sAppVersion}
 OutputBaseFilename        ={#sPackageName}-{#sAppVersion}
 
-AppPublisher            =Ascensio System SIA.
-AppPublisherURL         =http://www.onlyoffice.com/
-AppSupportURL           =http://www.onlyoffice.com/support.aspx
-AppCopyright            =Copyright (C) 2018 Ascensio System SIA.
+AppPublisher            ={#sPublisherName}
+AppPublisherURL         ={#sPublisherUrl}
+AppSupportURL           ={#sSupportURL}
+AppUpdatesURL           ={#sUpdatesURL}
+AppCopyright            ={#sAppCopyright}
+
 
 ArchitecturesAllowed              =x64
 ArchitecturesInstallIn64BitMode   =x64
 
-DefaultGroupName        =ONLYOFFICE
+DefaultGroupName        ={#sCompanyName}
 ;WizardImageFile         = data\dialogpicture.bmp
 ;WizardSmallImageFile    = data\dialogicon.bmp
 

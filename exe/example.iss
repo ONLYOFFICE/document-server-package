@@ -1,6 +1,6 @@
 #define EXAMPLE_SRV        'DsExampleSvc'
-#define EXAMPLE_SRV_DISPLAY  'ONLYOFFICE DocumentServer Example'
-#define EXAMPLE_SRV_DESCR  'ONLYOFFICE DocumentServer Example Service'
+#define EXAMPLE_SRV_DISPLAY  str(sAppName + " Example")
+#define EXAMPLE_SRV_DESCR  str(sAppName + " Example Service")
 #define EXAMPLE_SRV_DIR    '{app}\example'
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
