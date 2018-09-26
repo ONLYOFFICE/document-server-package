@@ -15,11 +15,11 @@
 #endif
 
 #ifndef sPublisherName
-  #define sPublisherName      'Ascensio System SIA;
+  #define sPublisherName      'Ascensio System SIA'
 #endif
 
 #ifndef sAppCopyright
-  #define sAppCopyright      str("Copyright (C) 2018" + sPublisherName)
+  #define sAppCopyright      str("Copyright (C) 2018 " + sPublisherName)
 #endif
 
 #ifndef sPublisherUrl
