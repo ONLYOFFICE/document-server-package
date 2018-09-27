@@ -1,3 +1,13 @@
+#ifndef sBrandingFolder
+  #define sBrandingFolder '..\branding'
+#endif
+
+#define sBrandingFile str(sBrandingFolder + "\branding.iss")
+
+#if FileExists(sBrandingFile)
+  #include str(sBrandingFile)
+#endif
+
 #ifndef sCompanyName
   #define sCompanyName        'ONLYOFFICE'
 #endif
@@ -32,10 +42,6 @@
 
 #ifndef sUpdatesURL
   #define sUpdatesURL=str(sPublisherUrl)
-#endif
-
-#ifndef sBrandingFolder
-  #define sBrandingFolder ../branding
 #endif
 
 #ifndef sPackageName
