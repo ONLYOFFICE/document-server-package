@@ -12,6 +12,8 @@ etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver-metrics.conf 
 etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver-spellchecker.conf etc/supervisor/conf.d/onlyoffice-documentserver-spellchecker.conf
 etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver.conf etc/supervisor/conf.d/onlyoffice-documentserver.conf
 
+etc/onlyoffice/documentserver/logrotate/onlyoffice-documentserver.conf etc/logrotate/conf.d/onlyoffice-documentserver.conf
+
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libDjVuFile.so lib/libDjVuFile.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libdoctrenderer.so lib/libdoctrenderer.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libgraphics.so lib/libgraphics.so
