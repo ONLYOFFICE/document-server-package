@@ -2,4 +2,4 @@
 %define service service
 %define semanage semanage
 %define getenforce getenforce
-%define nginx_conf_d /etc/nginx/conf.d
+%define nginx_conf_d conf.d

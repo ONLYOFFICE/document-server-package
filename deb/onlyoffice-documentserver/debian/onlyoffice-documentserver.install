@@ -3,3 +3,4 @@
 ../../common/documentserver/home/* var/www/onlyoffice/documentserver/
 ../../common/documentserver/nginx/* etc/onlyoffice/documentserver/nginx/
 ../../common/documentserver/supervisor/* etc/onlyoffice/documentserver/supervisor/
+../../common/documentserver/logrotate/* etc/onlyoffice/documentserver/logrotate/

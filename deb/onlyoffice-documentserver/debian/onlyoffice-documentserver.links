@@ -1,4 +1,4 @@
-etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf.template etc/nginx/conf.d/onlyoffice-documentserver.conf
+etc/onlyoffice/documentserver/logrotate/onlyoffice-documentserver.conf etc/logrotate/conf.d/onlyoffice-documentserver.conf
 
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-common.conf etc/nginx/includes/onlyoffice-documentserver-common.conf
 etc/onlyoffice/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf etc/nginx/includes/onlyoffice-documentserver-docservice.conf
@@ -12,10 +12,14 @@ etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver-metrics.conf 
 etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver-spellchecker.conf etc/supervisor/conf.d/onlyoffice-documentserver-spellchecker.conf
 etc/onlyoffice/documentserver/supervisor/onlyoffice-documentserver.conf etc/supervisor/conf.d/onlyoffice-documentserver.conf
 
+etc/onlyoffice/documentserver/logrotate/onlyoffice-documentserver.conf etc/logrotate/conf.d/onlyoffice-documentserver.conf
+
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libDjVuFile.so lib/libDjVuFile.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libdoctrenderer.so lib/libdoctrenderer.so
+var/www/onlyoffice/documentserver/server/FileConverter/bin/libgraphics.so lib/libgraphics.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libHtmlFile.so lib/libHtmlFile.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libHtmlRenderer.so lib/libHtmlRenderer.so
+var/www/onlyoffice/documentserver/server/FileConverter/bin/libkernel.so lib/libkernel.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libPdfReader.so lib/libPdfReader.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libPdfWriter.so lib/libPdfWriter.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libXpsFile.so lib/libXpsFile.so

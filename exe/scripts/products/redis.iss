@@ -3,8 +3,7 @@
 [CustomMessages]
 redis_title=PostgreSQL
 
-en.redis_size=5.9 MB
-; de.redis_size=5,9 MB
+redis_size=5.9 MB
 
 [Code]
 const

@@ -90,7 +90,7 @@ ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
 
 NGINX_VER := nginx-1.11.4
 NGINX_ZIP := $(NGINX_VER).zip
-NGINX := $(DOCUMENTSERVER)/$(NGINX_VER)
+NGINX := $(DOCUMENTSERVER)/nginx
 
 PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
 PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
@@ -198,6 +198,9 @@ documentserver:
 	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 	
+	# Prevent for modification original config
+	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
+
 	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 
@@ -221,11 +224,11 @@ endif
 	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|{{DEV_NULL}}|"$(DEV_NULL)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+
+	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
+	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 	
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-	sed "s|\(_dc=\)0|\1"$(BUILD_DATE)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
-	
+	cp common/documentserver/nginx/onlyoffice-documentserver.conf.template common/documentserver/nginx/onlyoffice-documentserver.conf
 
 ifeq ($(PRODUCT_NAME), documentserver)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
@@ -248,8 +251,11 @@ documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
+
+	# Prevent for modification original config
+	chmod ug=r $(DOCUMENTSERVER_EXAMPLE_CONFIG)/*.json
+
 	
-	sed "s/{{DATE}}/"$(BUILD_DATE)"/"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
 	
@@ -295,6 +301,7 @@ $(ISXDL):
 $(NGINX):
 	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
+	mv $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
 	rm -f $(NGINX_ZIP)
 	
 $(PSQL):
