@@ -131,20 +131,20 @@ find \
   -name *.ini \
   -exec sh -c '%__ln_s {} %{buildroot}/etc/supervisord.d/$(basename {})' \;
 
-mkdir -p "%{buildroot}/etc/logrotate/conf.d/"
+mkdir -p "%{buildroot}/etc/logrotate.d/"
 
 # Make symlinks for logrotate configs
 find \
   %{buildroot}/etc/onlyoffice/documentserver/logrotate/ \
   -name *.conf \
-  -exec sh -c '%__ln_s {} %{buildroot}/etc/logrotate/conf.d/$(basename {})' \;
+  -exec sh -c '%__ln_s {} %{buildroot}/etc/logrotate.d/$(basename {})' \;
 
 # Convert absolute links to relative links
 symlinks -c \
   %{buildroot}/etc/nginx/%{nginx_conf_d} \
   %{buildroot}/etc/nginx/includes \
   %{buildroot}/etc/supervisord.d \
-  %{buildroot}/etc/logrotate/conf.d 
+  %{buildroot}/etc/logrotate.d 
 
 %clean
 rm -rf "%{buildroot}"
@@ -164,7 +164,7 @@ rm -rf "%{buildroot}"
 
 %attr(-, root, root) /usr/lib64/*.so*
 %attr(-, root, root) /usr/bin/documentserver-*.sh
-%attr(-, root, root) /etc/logrotate/conf.d/*
+%attr(-, root, root) /etc/logrotate.d/*
 %attr(-, root, root) /etc/nginx/*
 %attr(-, root, root) /etc/supervisord.d/*
 
