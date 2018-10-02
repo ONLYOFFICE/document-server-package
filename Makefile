@@ -68,7 +68,6 @@ LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/license
 
 LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
-HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
@@ -157,6 +156,10 @@ else
 	endif
 endif
 
+EXEC_FILES += $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal$(EXEC_EXT)
+EXEC_FILES += $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
+EXEC_FILES += $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
+
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
 
 all: rpm deb apt-rpm
@@ -211,11 +214,11 @@ ifeq ($(PLATFORM),win)
 endif
 
 	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE) || true
+	
+	for i in $(EXEC_FILES) ; do \
+		[ -f $${i} ] && chmod u+x $${i} || true ; \
+	done
 
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
-	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
-	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
 	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf.template
