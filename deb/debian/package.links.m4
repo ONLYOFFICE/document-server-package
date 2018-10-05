@@ -26,3 +26,9 @@ var/www/onlyoffice/documentserver/server/FileConverter/bin/libXpsFile.so lib/lib
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libUnicodeConverter.so lib/libUnicodeConverter.so
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libicudata.so.58 lib/libicudata.so.58
 var/www/onlyoffice/documentserver/server/FileConverter/bin/libicuuc.so.58 lib/libicuuc.so.58
+
+ifelse('DS_EXAMPLE','1',
+etc/onlyoffice/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf etc/nginx/includes/onlyoffice-documentserver-example.conf
+etc/onlyoffice/documentserver-example/supervisor/onlyoffice-documentserver-example.conf etc/supervisor/conf.d/onlyoffice-documentserver-example.conf
+etc/onlyoffice/documentserver-example/supervisor/onlyoffice-documentserver.conf etc/supervisor/conf.d/onlyoffice-documentserver.conf
+,)

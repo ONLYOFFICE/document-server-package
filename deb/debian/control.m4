@@ -1,10 +1,10 @@
-Source: {{PACKAGE_NAME}}
+Source: PACKAGE_NAME
 Section: web
 Priority: optional
-Maintainer: Ascensio System SIA <support@onlyoffice.com>
+Maintainer: PUBLISHER_NAME
 Build-Depends: debhelper (>= 8.0.0)
 
-Package: {{PACKAGE_NAME}}
+Package: PACKAGE_NAME
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
   adduser,

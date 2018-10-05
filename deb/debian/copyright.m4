@@ -4,6 +4,8 @@ Source: http://onlyoffice.com
 
 Files: *
 Copyright: (c) Copyright Ascensio System SIA, 2018 <support@onlyoffice.com>
+
+ifdef(COMMERCIAL, License: Commercial,
 License: AGPLv3
  This program is a free software product. You can redistribute it and/or 
  modify it under the terms of the GNU Affero General Public License (AGPL) 
@@ -31,3 +33,4 @@ License: AGPLv3
  well as technical writing content are licensed under the terms of the
  Creative Commons Attribution-ShareAlike 4.0 International. See the License
  terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+)
