@@ -2,34 +2,34 @@
 rewrite ^/$ $the_scheme://$the_host/welcome/ redirect;
 
 #support old version
-rewrite ^\/OfficeWeb(\/apps\/.*)$ $the_scheme://$the_host/v{{PACKAGE_VERSION}}/web-apps$1 redirect;
+rewrite ^\/OfficeWeb(\/apps\/.*)$ $the_scheme://$the_host/PACKAGE_VERSION/web-apps$1 redirect;
 
 #script caching protection
-rewrite ^(\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host/v{{PACKAGE_VERSION}}/$1 redirect;
+rewrite ^(\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host/PACKAGE_VERSION/$1 redirect;
 
 #disable caching for api.js
-location ~ ^(\/v[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
   expires -1;
   # gzip_static on;
-  alias  {{DS_ROOT}}/$2;
+  alias  DS_ROOT/$2;
 }
 
 #suppress logging the unsupported locale error
-location ~ ^(\/v[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps)(\/.*\.json)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps)(\/.*\.json)$ {
   expires 365d;
-  error_log {{DEV_NULL}} crit;
+  error_log DEV_NULL crit;
   # gzip_static on;
-  alias {{DS_ROOT}}$2$3;
+  alias DS_ROOT/$2$3;
 }
 
-location ~ ^(\/v[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps|sdkjs|sdkjs-plugins|fonts)(\/.*)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps|sdkjs|sdkjs-plugins|fonts)(\/.*)$ {
   expires 365d;
   # gzip_static on;
-  alias {{DS_ROOT}}$2$3;
+  alias DS_ROOT/$2$3;
 }
 
 location ~ ^(\/cache\/files.*)(\/.*) {
-  alias {{DS_FILES}}App_Data$1;
+  alias DS_FILES/App_Data$1;
   add_header Content-Disposition $arg_disposition;
 
   set $secret_string onlyoffice;
@@ -56,12 +56,12 @@ location / {
   proxy_pass http://docservice;
 }
 
-location ~ ^(\/v[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?(\/doc\/.*) {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?(\/doc\/.*) {
   proxy_pass http://docservice$2;
   proxy_http_version 1.1;
 }
 
-location /v{{PACKAGE_VERSION}}/ {
+location /PACKAGE_VERSION/ {
   proxy_pass http://docservice/;
 }
 

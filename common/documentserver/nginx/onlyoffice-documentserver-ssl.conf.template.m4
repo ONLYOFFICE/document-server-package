@@ -1,4 +1,4 @@
-include {{NGINX_CONF}}includes/onlyoffice-http.conf;
+include NGINX_CONF/onlyoffice-http.conf;
 
 ## Normal HTTP host
 server {
@@ -19,8 +19,8 @@ server {
   server_name localhost;
   server_tokens off;
   
-  include {{NGINX_CONF}}includes/onlyoffice-documentserver-common.conf;
-  include {{NGINX_CONF}}includes/onlyoffice-documentserver-docservice.conf;
+  include NGINX_CONF/onlyoffice-documentserver-common.conf;
+  include NGINX_CONF/onlyoffice-documentserver-docservice.conf;
 }
 
 ## HTTPS host
@@ -65,6 +65,6 @@ server {
   ##
   # ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
-  include {{NGINX_CONF}}includes/onlyoffice-documentserver-*.conf;
+  include NGINX_CONF/onlyoffice-documentserver-*.conf;
 
 }
