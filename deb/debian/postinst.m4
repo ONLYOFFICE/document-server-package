@@ -213,10 +213,10 @@ setup_nginx(){
 
 case "$1" in
 	configure)
-		adduser --quiet --home "$DIR" --system --group onlyoffice
+		adduser --quiet --home "$DIR" --system --group ds
 
 		# add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
-		adduser --quiet www-data onlyoffice
+		adduser --quiet www-data ds
 
 		#install node modules
 		npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
@@ -247,7 +247,7 @@ case "$1" in
 		mkdir -p "$DIR/../Data" #! 
 		mkdir -p "$DIR/fonts"
 		mkdir -p "$DIR-example/public/files"
-		chown onlyoffice:onlyoffice -R "$DIR"
+		chown ds:ds -R "$DIR"
 
     #setup logrotate config rights
     chmod 644 ${CONF_DIR}/logrotate/*
@@ -256,8 +256,8 @@ case "$1" in
 		# generate allfonts.js and thumbnail
 		documentserver-generate-allfonts.sh true
 
-		chown onlyoffice:onlyoffice -R "$LOG_DIR"
-		chown onlyoffice:onlyoffice -R "$APP_DIR"
+		chown ds:ds -R "$LOG_DIR"
+		chown ds:ds -R "$APP_DIR"
 
 		# call db_stop to prevent installation hang
 		db_stop

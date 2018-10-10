@@ -1,7 +1,7 @@
 [program:example]
 command=node  /var/www/M4_DS_PREFIX-example/bin/www
 directory=/var/www/M4_DS_PREFIX-example/
-user=onlyoffice
+user=ds
 environment=NODE_ENV=production-linux,NODE_CONFIG_DIR=/etc/M4_DS_PREFIX-example,NODE_DISABLE_COLORS=1
 stdout_logfile=/var/log/M4_DS_PREFIX-example/out.log
 stdout_logfile_backups=0
