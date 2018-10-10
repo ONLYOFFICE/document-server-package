@@ -11,25 +11,25 @@ rewrite ^(\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host/PACKAGE_VERSIO
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
   expires -1;
   # gzip_static on;
-  alias  DS_ROOT/$2;
+  alias  M4_DS_ROOT/$2;
 }
 
 #suppress logging the unsupported locale error
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps)(\/.*\.json)$ {
   expires 365d;
-  error_log DEV_NULL crit;
+  error_log M4_DEV_NULL crit;
   # gzip_static on;
-  alias DS_ROOT/$2$3;
+  alias M4_DS_ROOT/$2$3;
 }
 
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps|sdkjs|sdkjs-plugins|fonts)(\/.*)$ {
   expires 365d;
   # gzip_static on;
-  alias DS_ROOT/$2$3;
+  alias M4_DS_ROOT/$2$3;
 }
 
 location ~ ^(\/cache\/files.*)(\/.*) {
-  alias DS_FILES/App_Data$1;
+  alias M4_M4_DS_FILES/App_Data$1;
   add_header Content-Disposition $arg_disposition;
 
   set $secret_string onlyoffice;

@@ -17,4 +17,4 @@ gzip_types  text/plain
             application/rtf
 
 access_log off;
-error_log NGINX_LOG/nginx.error.log;
+error_log M4_NGINX_LOG/nginx.error.log;
