@@ -1,17 +1,17 @@
 ../common/documentserver/bin/*.sh usr/bin/
-../common/documentserver/config/* etc/onlyoffice/documentserver/
-../common/documentserver/home/* var/www/onlyoffice/documentserver/
-../common/documentserver/nginx/*.conf etc/onlyoffice/documentserver/nginx/
-../common/documentserver/nginx/*.template etc/onlyoffice/documentserver/nginx/
-../common/documentserver/nginx/includes/*.conf etc/onlyoffice/documentserver/nginx/includes/
+../common/documentserver/config/* etc/M4_DS_PREFIX/
+../common/documentserver/home/* var/www/M4_DS_PREFIX/
+../common/documentserver/nginx/*.conf etc/M4_DS_PREFIX/nginx/
+../common/documentserver/nginx/*.template etc/M4_DS_PREFIX/nginx/
+../common/documentserver/nginx/includes/*.conf etc/M4_DS_PREFIX/nginx/includes/
 
 ifelse('DS_EXAMPLE', '1',
-../common/documentserver-example/supervisor/* etc/onlyoffice/documentserver-example/supervisor/,
-../common/documentserver/supervisor/* etc/onlyoffice/documentserver/supervisor/)
+../common/documentserver-example/supervisor/* etc/M4_DS_PREFIX-example/supervisor/,
+../common/documentserver/supervisor/* etc/M4_DS_PREFIX/supervisor/)
 
-../common/documentserver/logrotate/* etc/onlyoffice/documentserver/logrotate/
+../common/documentserver/logrotate/* etc/M4_DS_PREFIX/logrotate/
 
 ifelse('DS_EXAMPLE', '1',
-../common/documentserver-example/config/* etc/onlyoffice/documentserver-example/
-../common/documentserver-example/home/* var/www/onlyoffice/documentserver-example/
-../common/documentserver-example/nginx/includes/*.conf etc/onlyoffice/documentserver-example/nginx/includes/,)
+../common/documentserver-example/config/* etc/M4_DS_PREFIX-example/
+../common/documentserver-example/home/* var/www/M4_DS_PREFIX-example/
+../common/documentserver-example/nginx/includes/*.conf etc/M4_DS_PREFIX-example/nginx/includes/,)
