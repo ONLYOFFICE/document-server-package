@@ -1,8 +1,8 @@
 #!/bin/bash
 
-DIR="/var/www/onlyoffice"
-LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
-EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
+DIR="/var/www/M4_DS_PREFIX"
+LOCAL_CONFIG="/etc/M4_DS_PREFIX/local.json"
+EXAMPLE_CONFIG="/etc/M4_DS_PREFIX-example/local.json"
 JSON="json -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="json -I -q -f $EXAMPLE_CONFIG"
 
@@ -180,10 +180,10 @@ execute_db_scripts(){
         fi
 
         if [ ! "$CLUSTER_MODE" = true ]; then
-                $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+                $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
         fi
 	
-	$PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
+	$PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
 	echo "OK"
 }
@@ -245,7 +245,7 @@ establish_rabbitmq_conn_by_tools() {
 }
 
 setup_nginx(){
-  NGINX_CONF_DIR=/etc/onlyoffice/documentserver/nginx
+  NGINX_CONF_DIR=/etc/M4_DS_PREFIX/nginx
   DS_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver.conf.template
   DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
   # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf

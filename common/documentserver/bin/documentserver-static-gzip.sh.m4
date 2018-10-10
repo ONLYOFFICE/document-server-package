@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DIR="/var/www/onlyoffice/documentserver"
-NGINX_ONLYOFFICE_PATH="/etc/onlyoffice/documentserver/nginx"
+DIR="/var/www/M4_DS_PREFIX"
+NGINX_ONLYOFFICE_PATH="/etc/M4_DS_PREFIX/nginx"
 
 cd ${DIR}
 # Make gziped scripts
