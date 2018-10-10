@@ -5,7 +5,7 @@ if [ "$1" != "" ]; then
     ONLYOFFICE_DATA_CONTAINER=$1
 fi
 
-DIR="/var/www/onlyoffice/documentserver"
+DIR="/var/www/M4_DS_PREFIX"
 
 #Start generate AllFonts.js, font thumbnails and font_selection.bin
 echo -n Generating AllFonts.js, please wait...

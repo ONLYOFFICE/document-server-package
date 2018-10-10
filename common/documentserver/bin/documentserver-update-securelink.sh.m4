@@ -1,7 +1,7 @@
 #!/bin/sh
 
 NGINX_CONF=/etc/nginx/includes/onlyoffice-documentserver-docservice.conf
-DOCSERVICE_CONF=/etc/onlyoffice/documentserver/default.json
+DOCSERVICE_CONF=/etc/M4_DS_PREFIX/default.json
 JSON="json -q -f ${DOCSERVICE_CONF}"
 
 SECRET_STRING=$(pwgen -s 20)
