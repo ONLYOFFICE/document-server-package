@@ -2,7 +2,7 @@
 ../common/documentserver/config/* etc/M4_DS_PREFIX/
 ../common/documentserver/home/* var/www/M4_DS_PREFIX/
 ../common/documentserver/nginx/*.conf etc/M4_DS_PREFIX/nginx/
-../common/documentserver/nginx/*.template etc/M4_DS_PREFIX/nginx/
+../common/documentserver/nginx/*.tmpl etc/M4_DS_PREFIX/nginx/
 ../common/documentserver/nginx/includes/*.conf etc/M4_DS_PREFIX/nginx/includes/
 
 ifelse('DS_EXAMPLE', '1',

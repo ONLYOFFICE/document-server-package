@@ -1,9 +1,9 @@
 etc/M4_DS_PREFIX/logrotate/onlyoffice-documentserver.conf etc/logrotate/conf.d/onlyoffice-documentserver.conf
 
-etc/M4_DS_PREFIX/nginx/includes/onlyoffice-documentserver-common.conf etc/nginx/includes/onlyoffice-documentserver-common.conf
-etc/M4_DS_PREFIX/nginx/includes/onlyoffice-documentserver-docservice.conf etc/nginx/includes/onlyoffice-documentserver-docservice.conf
-etc/M4_DS_PREFIX/nginx/includes/onlyoffice-documentserver-spellchecker.conf etc/nginx/includes/onlyoffice-documentserver-spellchecker.conf
-etc/M4_DS_PREFIX/nginx/includes/onlyoffice-http.conf etc/nginx/includes/onlyoffice-http.conf
+etc/M4_DS_PREFIX/nginx/includes/ds-common.conf etc/nginx/includes/ds-common.conf
+etc/M4_DS_PREFIX/nginx/includes/ds-docservice.conf etc/nginx/includes/ds-docservice.conf
+etc/M4_DS_PREFIX/nginx/includes/ds-spellchecker.conf etc/nginx/includes/ds-spellchecker.conf
+etc/M4_DS_PREFIX/nginx/includes/http-common.conf etc/nginx/includes/http-common.conf
 
 etc/M4_DS_PREFIX/supervisor/ds-converter.conf etc/supervisor/conf.d/ds-converter.conf
 etc/M4_DS_PREFIX/supervisor/ds-docservice.conf etc/supervisor/conf.d/ds-docservice.conf
@@ -27,7 +27,7 @@ var/www/M4_DS_PREFIX/server/FileConverter/bin/libicudata.so.58 lib/libicudata.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libicuuc.so.58 lib/libicuuc.so.58
 
 ifelse('DS_EXAMPLE','1',
-etc/M4_DS_PREFIX-example/nginx/includes/onlyoffice-documentserver-example.conf etc/nginx/includes/onlyoffice-documentserver-example.conf
+etc/M4_DS_PREFIX-example/nginx/includes/ds-example.conf etc/nginx/includes/ds-example.conf
 etc/M4_DS_PREFIX-example/supervisor/ds-example.conf etc/supervisor/conf.d/ds-example.conf
 etc/M4_DS_PREFIX-example/supervisor/ds.conf etc/supervisor/conf.d/ds.conf
 ,
