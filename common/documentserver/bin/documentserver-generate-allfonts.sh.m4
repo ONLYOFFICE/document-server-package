@@ -27,6 +27,6 @@ rm -f $DIR/fonts/*.gz $DIR/sdkjs/common/AllFonts.js.gz
 
 #Restart web-site and converter
 if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
- sudo supervisorctl restart onlyoffice-documentserver:docservice
- sudo supervisorctl restart onlyoffice-documentserver:converter
+ sudo supervisorctl restart ds:docservice
+ sudo supervisorctl restart ds:converter
 fi
