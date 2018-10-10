@@ -19,10 +19,10 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-DIR="/var/www/onlyoffice"
-LOG_DIR="/var/log/onlyoffice"
-APP_DIR="/var/lib/onlyoffice"
-CONF_DIR="/etc/onlyoffice/documentserver"
+DIR="/var/www/M4_DS_PREFIX"
+LOG_DIR="/var/log/M4_DS_PREFIX"
+APP_DIR="/var/lib/M4_DS_PREFIX"
+CONF_DIR="/etc/M4_DS_PREFIX"
 LOCAL_CONFIG=${CONF_DIR}/local.json
 EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
 JSON="json -I -q -f $LOCAL_CONFIG"
@@ -106,9 +106,9 @@ install_db(){
         fi
 
         if [ ! "$CLUSTER_MODE" = true ]; then
-                $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+                $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
         fi
-        $PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
+        $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 }
 
 save_db_params(){
@@ -233,20 +233,20 @@ case "$1" in
 		setup_nginx
 
 		# modify permissions for onlyoffice files and folders
-		mkdir -p "$LOG_DIR/documentserver/docservice"
-		mkdir -p "$LOG_DIR/documentserver-example"
-		mkdir -p "$LOG_DIR/documentserver/converter"
-		mkdir -p "$LOG_DIR/documentserver/spellchecker"
-		mkdir -p "$LOG_DIR/documentserver/metrics"
-		mkdir -p "$LOG_DIR/documentserver/gc"
+		mkdir -p "$LOG_DIR/docservice"
+		mkdir -p "$LOG_DIR-example"
+		mkdir -p "$LOG_DIR/converter"
+		mkdir -p "$LOG_DIR/spellchecker"
+		mkdir -p "$LOG_DIR/metrics"
+		mkdir -p "$LOG_DIR/gc"
 
-		mkdir -p "$APP_DIR/documentserver/App_Data"
-		mkdir -p "$APP_DIR/documentserver/App_Data/cache/files"
-		mkdir -p "$APP_DIR/documentserver/App_Data/docbuilder"
+		mkdir -p "$APP_DIR/App_Data"
+		mkdir -p "$APP_DIR/App_Data/cache/files"
+		mkdir -p "$APP_DIR/App_Data/docbuilder"
 
-		mkdir -p "$DIR/Data"
-		mkdir -p "$DIR/documentserver/fonts"
-		mkdir -p "$DIR/documentserver-example/public/files"
+		mkdir -p "$DIR/../Data" #! 
+		mkdir -p "$DIR/fonts"
+		mkdir -p "$DIR-example/public/files"
 		chown onlyoffice:onlyoffice -R "$DIR"
 
     #setup logrotate config rights

@@ -23,7 +23,9 @@ if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
 fi
 
 clean_ds_files() {
-	DIR="/var/www/onlyoffice/documentserver"
+	DIR="/var/www/M4_DS_PREFIX"
+	LOG_DIR="/var/log/M4_DS_PREFIX"
+	APP_DIR="/var/lib/M4_DS_PREFIX"
 	rm -f $DIR/sdkjs/common/AllFonts.js
 	rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
 	rm -f $DIR/sdkjs/*/sdk-all.cache
@@ -42,13 +44,13 @@ clean_ds_files() {
 case "$1" in
 	purge)
 		# purge logs
-		if [ -d /var/log/onlyoffice ]; then
-			rm -rf /var/log/onlyoffice/documentserver
+		if [ -d $LOG_DIR ]; then
+			rm -rf $LOG_DIR
 		fi
 
     # purge files
-		if [ -d /var/lib/onlyoffice ]; then
-			rm -rf /var/lib/onlyoffice/documentserver
+		if [ -d $APP_DIR ]; then
+			rm -rf 	$APP_DIR
 		fi
     
 		db_input high onlyoffice/remove-db || true
