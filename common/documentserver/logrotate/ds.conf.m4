@@ -1,4 +1,4 @@
-/var/log/onlyoffice/documentserver/nginx.error.log {
+/var/log/M4_DS_PREFIX/nginx.error.log {
         daily
         missingok
         rotate 30
@@ -13,8 +13,8 @@
         endscript
 }
 
-/var/log/onlyoffice/documentserver/**/*.log
-/var/log/onlyoffice/documentserver-example/*.log {
+/var/log/M4_DS_PREFIX/**/*.log
+/var/log/M4_DS_PREFIX-example/*.log {
         daily
         missingok
         rotate 30
