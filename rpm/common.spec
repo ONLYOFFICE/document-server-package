@@ -3,9 +3,9 @@ Name: %{_package_name}
 Version: %{_product_version}
 Release: %{_build_number}
 Group: Applications/Internet
-URL: http://onlyoffice.com/
-Vendor: ONLYOFFICE (Online documents editor)
-Packager: ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
+URL: %{_publisher_url}
+Vendor: %{_publisher_name}
+Packager: %{_publisher_name} %{_support_url}
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no
@@ -28,43 +28,50 @@ DOCUMENTSERVER_CONFIG=%{_builddir}/../../../common/documentserver/config
 DOCUMENTSERVER_EXAMPLE_HOME=%{_builddir}/../../../common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG=%{_builddir}/../../../common/documentserver-example/config
 
+BIN_DIR=%{buildroot}%{_bindir}
+DATA_DIR=%{buildroot}%{_localstatedir}/lib/%{_ds_prefix}
+CONF_DIR=%{buildroot}%{_sysconfdir}/%{_ds_prefix}
+HOME_DIR=%{buildroot}%{_localstatedir}/www/%{_ds_prefix}
+LIB_DIR=%{buildroot}%{_libdir}
+LOG_DIR=%{buildroot}%{_localstatedir}/log/%{_ds_prefix}
+
 #install documentserver files
-mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver/"
-cp -r $DOCUMENTSERVER_HOME/* "%{buildroot}/var/www/onlyoffice/documentserver/"
+mkdir -p "$HOME_DIR/"
+cp -r $DOCUMENTSERVER_HOME/* "$HOME_DIR/"
 
 #install documentserver libs
-mkdir -p "%{buildroot}/usr/lib64/"
-cp -r $DOCUMENTSERVER_HOME/server/FileConverter/bin/*.so* "%{buildroot}/usr/lib64/" 
-rm "%{buildroot}"/var/www/onlyoffice/documentserver/server/FileConverter/bin/*.so*
+mkdir -p "$LIB_DIR/"
+cp -r $DOCUMENTSERVER_HOME/server/FileConverter/bin/*.so* "$LIB_DIR/" 
+rm $HOME_DIR/server/FileConverter/bin/*.so*
 
 #install documentserver bin
-mkdir -p "%{buildroot}/usr/bin/"
-cp -r $DOCUMENTSERVER_BIN/*.sh "%{buildroot}/usr/bin/"
-cp -r %{_builddir}/../../bin/*.sh "%{buildroot}/usr/bin/"
+mkdir -p "$BIN_DIR/"
+cp -r $DOCUMENTSERVER_BIN/*.sh "$BIN_DIR/"
+cp -r %{_builddir}/../../bin/*.sh "$BIN_DIR/"
 
 #install configs
-mkdir -p "%{buildroot}/etc/onlyoffice/documentserver/"
-cp -r $DOCUMENTSERVER_CONFIG/* "%{buildroot}/etc/onlyoffice/documentserver/" 
+mkdir -p "$CONF_DIR/"
+cp -r $DOCUMENTSERVER_CONFIG/* "$CONF_DIR/" 
 
 #make log dir
-mkdir -p "%{buildroot}/var/log/onlyoffice/documentserver/docservice"
-mkdir -p "%{buildroot}/var/log/onlyoffice/documentserver/converter"
-mkdir -p "%{buildroot}/var/log/onlyoffice/documentserver/spellchecker"
-mkdir -p "%{buildroot}/var/log/onlyoffice/documentserver/metrics"
-mkdir -p "%{buildroot}/var/log/onlyoffice/documentserver/gc"
+mkdir -p "$LOG_DIR/docservice"
+mkdir -p "$LOG_DIR/converter"
+mkdir -p "$LOG_DIR/spellchecker"
+mkdir -p "$LOG_DIR/metrics"
+mkdir -p "$LOG_DIR/gc"
 
 #make cache dir
-mkdir -p "%{buildroot}/var/lib/onlyoffice/documentserver/App_Data/cache/files"
-mkdir -p "%{buildroot}/var/lib/onlyoffice/documentserver/App_Data/docbuilder"
+mkdir -p "$DATA_DIR/App_Data/cache/files"
+mkdir -p "$DATA_DIR/App_Data/docbuilder"
 
 #make exchange dir
-mkdir -p "%{buildroot}/var/www/onlyoffice/Data"
+mkdir -p "%{buildroot}%{_localstatedir}/www/%{_ds_prefix}/../Data"
 
 #make exchange dir
-mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver/fonts"
+mkdir -p "$HOME_DIR/fonts"
 
 #install supervisor configs
-DS_SUPERVISOR_CONF=%{buildroot}/etc/onlyoffice/documentserver/supervisor/
+DS_SUPERVISOR_CONF=$CONF_DIR/supervisor/
 mkdir -p "$DS_SUPERVISOR_CONF"
 cp %{_builddir}/../../../common/documentserver/supervisor/* "$DS_SUPERVISOR_CONF"
 
@@ -72,35 +79,38 @@ cp %{_builddir}/../../../common/documentserver/supervisor/* "$DS_SUPERVISOR_CONF
 rename 's/.conf$/.ini/' "$DS_SUPERVISOR_CONF"*
 
 #install nginx config
-DS_NGINX_CONF=%{buildroot}/etc/onlyoffice/documentserver/nginx/
+DS_NGINX_CONF=$CONF_DIR/nginx/
 mkdir -p "$DS_NGINX_CONF"
+mkdir -p "$DS_NGINX_CONF/includes/"
 
-cp -r %{_builddir}/../../../common/documentserver/nginx/* "$DS_NGINX_CONF"
+cp -r %{_builddir}/../../../common/documentserver/nginx/*.conf "$DS_NGINX_CONF"
+cp -r %{_builddir}/../../../common/documentserver/nginx/*.tmpl "$DS_NGINX_CONF"
+cp -r %{_builddir}/../../../common/documentserver/nginx/includes/*.conf "$DS_NGINX_CONF/includes/"
 
-mkdir -p "%{buildroot}/var/cache/nginx/onlyoffice/documentserver/"
+mkdir -p "%{buildroot}%{_localstatedir}/cache/nginx/%{_ds_prefix}/"
 
-mkdir -p "%{buildroot}/etc/nginx/includes/"
-mkdir -p "%{buildroot}/etc/nginx/%{nginx_conf_d}/"
+mkdir -p "%{buildroot}%{_sysconfdir}/nginx/includes/"
+mkdir -p "%{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d}/"
 
 #install logrotate config
-DS_LOGROTATE_CONF=%{buildroot}/etc/onlyoffice/documentserver/logrotate/
+DS_LOGROTATE_CONF=$CONF_DIR/logrotate/
 mkdir -p "$DS_LOGROTATE_CONF"
 cp -r %{_builddir}/../../../common/documentserver/logrotate/* "$DS_LOGROTATE_CONF"
 
 %if %{defined example}
 #install documentserver example files
-mkdir -p "%{buildroot}/var/www/onlyoffice/documentserver-example/"
-cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "%{buildroot}/var/www/onlyoffice/documentserver-example/"
+mkdir -p "${HOME_DIR}-example/"
+cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "${HOME_DIR}-example/"
 
 #install dcoumentserver example configs
-mkdir -p "%{buildroot}/etc/onlyoffice/documentserver-example/"
-cp -r $DOCUMENTSERVER_EXAMPLE_CONFIG/* "%{buildroot}/etc/onlyoffice/documentserver-example/" 
+mkdir -p "${CONF_DIR}-example/"
+cp -r $DOCUMENTSERVER_EXAMPLE_CONFIG/* "${CONF_DIR}-example/" 
 
 #make log dir
-mkdir -p "%{buildroot}/var/log/onlyoffice/documentserver-example"
+mkdir -p "${LOG_DIR}-example"
 
 #install example supervisor configs
-DSE_SUPERVISOR_CONF=%{buildroot}/etc/onlyoffice/documentserver-example/supervisor/
+DSE_SUPERVISOR_CONF=${CONF_DIR}-example/supervisor/
 mkdir -p "$DSE_SUPERVISOR_CONF"
 cp %{_builddir}/../../../common/documentserver-example/supervisor/* "$DSE_SUPERVISOR_CONF"
 
@@ -108,75 +118,75 @@ cp %{_builddir}/../../../common/documentserver-example/supervisor/* "$DSE_SUPERV
 rename 's/.conf$/.ini/' "$DSE_SUPERVISOR_CONF"*
 
 #install nginx config
-DSE_NGINX_CONF=%{buildroot}/etc/onlyoffice/documentserver-example/nginx/
-mkdir -p "$DSE_NGINX_CONF"
-cp -r %{_builddir}/../../../common/documentserver-example/nginx/includes "$DSE_NGINX_CONF"
+DSE_NGINX_CONF=${CONF_DIR}-example/nginx/
+mkdir -p "$DSE_NGINX_CONF/includes/"
+cp -r %{_builddir}/../../../common/documentserver-example/nginx/includes/*.conf "$DSE_NGINX_CONF"
 %endif
 
 # Make symlinks for nginx configs
 find \
-  %{buildroot}/etc/onlyoffice/documentserver*/nginx/includes \
+  ${CONF_DIR}*/nginx/includes \
   -name *.conf \
-  -exec sh -c '%__ln_s {} %{buildroot}/etc/nginx/includes/$(basename {})' \;
+  -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/nginx/includes/$(basename {})' \;
 
 %__ln_s \
-  %{buildroot}/etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf \
-  %{buildroot}/etc/nginx/%{nginx_conf_d}/onlyoffice-documentserver.conf
+  $CONF_DIR/nginx/ds.conf \
+  %{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d}/ds.conf
 
-mkdir -p "%{buildroot}/etc/supervisord.d/"
+mkdir -p "%{buildroot}%{_sysconfdir}/supervisord.d/"
 
 # Make symlinks for supervisor configs
 find \
-  %{buildroot}/etc/onlyoffice/documentserver*/supervisor/ \
+  ${CONF_DIR}*/supervisor/ \
   -name *.ini \
-  -exec sh -c '%__ln_s {} %{buildroot}/etc/supervisord.d/$(basename {})' \;
+  -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/supervisord.d/$(basename {})' \;
 
-mkdir -p "%{buildroot}/etc/logrotate/conf.d/"
+mkdir -p "%{buildroot}%{_sysconfdir}/logrotate/conf.d/"
 
 # Make symlinks for logrotate configs
 find \
-  %{buildroot}/etc/onlyoffice/documentserver/logrotate/ \
+  $CONF_DIR/logrotate/ \
   -name *.conf \
-  -exec sh -c '%__ln_s {} %{buildroot}/etc/logrotate/conf.d/$(basename {})' \;
+  -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/logrotate/conf.d/$(basename {})' \;
 
 # Convert absolute links to relative links
 symlinks -c \
-  %{buildroot}/etc/nginx/%{nginx_conf_d} \
-  %{buildroot}/etc/nginx/includes \
-  %{buildroot}/etc/supervisord.d \
-  %{buildroot}/etc/logrotate/conf.d 
+  %{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d} \
+  %{buildroot}%{_sysconfdir}/nginx/includes \
+  %{buildroot}%{_sysconfdir}/supervisord.d \
+  %{buildroot}%{_sysconfdir}/logrotate/conf.d 
 
 %clean
 rm -rf "%{buildroot}"
 
 %files
-%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/documentserver*/*
-%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/*.json
-%config %attr(440, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/log4js/*.json
+%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*/*
+%config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/*.json
+%config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
 
-%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/nginx/includes/*
-%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver/nginx/*.template
+%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/nginx/includes/*
+%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}/nginx/*.tmpl
 
-%config(noreplace) /etc/onlyoffice/documentserver/nginx/onlyoffice-documentserver.conf
+%config(noreplace) %{_sysconfdir}/%{_ds_prefix}/nginx/ds.conf
 
-%config %attr(644, root, root) /etc/onlyoffice/documentserver/logrotate/*
-%config %attr(-, onlyoffice, onlyoffice) /etc/onlyoffice/documentserver*/supervisor*/*
+%config %attr(644, root, root) %{_sysconfdir}/%{_ds_prefix}/logrotate/*
+%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
 
-%attr(-, root, root) /usr/lib64/*.so*
-%attr(-, root, root) /usr/bin/documentserver-*.sh
-%attr(-, root, root) /etc/logrotate/conf.d/*
-%attr(-, root, root) /etc/nginx/*
-%attr(-, root, root) /etc/supervisord.d/*
+%attr(-, root, root) %{_libdir}/*.so*
+%attr(-, root, root) %{_bindir}/documentserver-*.sh
+%attr(-, root, root) %{_sysconfdir}/logrotate/conf.d/*
+%attr(-, root, root) %{_sysconfdir}/nginx/*
+%attr(-, root, root) %{_sysconfdir}/supervisord.d/*
 
 %dir
-%attr(-, %{nginx_user}, %{nginx_user}) /var/cache/nginx/onlyoffice/documentserver
-%attr(755, onlyoffice, onlyoffice) /var/log/onlyoffice
+%attr(-, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
+%attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}
 
-%attr(-, onlyoffice, onlyoffice) /var/lib/onlyoffice
-%attr(-, onlyoffice, onlyoffice) /var/www/onlyoffice/Data
+%attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
+%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/../Data
 
 %if %{defined example}
-%attr(-, onlyoffice, onlyoffice) /var/log/onlyoffice/documentserver-example
+%attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
 %endif
 
 %pre
@@ -184,24 +194,24 @@ case "$1" in
   1)
     # Initial installation
     # add group and user for onlyoffice app
-    getent group onlyoffice >/dev/null || groupadd -r onlyoffice
-    getent passwd onlyoffice >/dev/null || useradd -r -g onlyoffice -d /var/www/onlyoffice/ -s /sbin/nologin onlyoffice
+    getent group ds >/dev/null || groupadd -r ds
+    getent passwd ds >/dev/null || useradd -r -g ds -d %{_localstatedir}/www/%{_ds_prefix}/ -s /sbin/nologin ds
     # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
-    usermod -a -G onlyoffice %{nginx_user}
+    usermod -a -G ds %{nginx_user}
   ;;
   2)
     # Upgrade
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
     echo "Stoping documentserver services..."
-    supervisorctl stop onlyoffice-documentserver:*
+    supervisorctl stop ds:*
   ;;
 esac
 exit 0
 
 %post
 # Make symlink to libcurl-gnutls
-ln -sf /usr/lib64/libcurl.so.4 /usr/lib64/libcurl-gnutls.so.4
+ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
 
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
@@ -237,7 +247,7 @@ case "$1" in
     # Uninstall
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
-    supervisorctl stop onlyoffice-documentserver:*
+    supervisorctl stop ds:*
   ;;
   1)
     # Upgrade
@@ -246,7 +256,7 @@ case "$1" in
 esac
 
 %postun
-DIR="/var/www/onlyoffice/documentserver"
+DIR="%{_localstatedir}/www/%{_ds_prefix}"
 
 # remove v8 cache
 rm -f $DIR/sdkjs/*/sdk-all.cache
@@ -271,22 +281,3 @@ case "$1" in
 esac
 
 %changelog
-* Tue Apr 28 2015 ONLYOFFICE (Online documents editor) <support@onlyoffice.com>
-- Initial release.
-  
-- Free version based on open source code licensed under AGPLv3.
-  
-- Fixed OnlineEditorsExample page work with HTTPS protocol.
-  
-- Changed the package dependencies.
-  
-- Updated OnlineEditorsExample module.
-  
-- Added the 'X-Forwarded-Host' and 'X-Forwarded-Proto' request headers 
-    handler.
-
-- Changed use tcp-sockets to unix-sockets.
-  
-- Changed mono-runtime version in dependencies.
-  
-- Nodejs back-end.
