@@ -118,8 +118,8 @@ cp %{_builddir}/../../../common/documentserver-example/supervisor/* "$DSE_SUPERV
 rename 's/.conf$/.ini/' "$DSE_SUPERVISOR_CONF"*
 
 #install nginx config
-DSE_NGINX_CONF=${CONF_DIR}-example/nginx/
-mkdir -p "$DSE_NGINX_CONF/includes/"
+DSE_NGINX_CONF=${CONF_DIR}-example/nginx/includes/
+mkdir -p "$DSE_NGINX_CONF"
 cp -r %{_builddir}/../../../common/documentserver-example/nginx/includes/*.conf "$DSE_NGINX_CONF"
 %endif
 
