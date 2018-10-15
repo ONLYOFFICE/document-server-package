@@ -3,8 +3,16 @@ CURL := curl -L -o
 
 COMPANY_NAME ?= onlyoffice
 PRODUCT_NAME ?= documentserver
+
+COMPANY_NAME_LOW = $(shell echo $(COMPANY_NAME) | tr A-Z a-z)
+PRODUCT_NAME_LOW = $(shell echo $(PRODUCT_NAME) | tr A-Z a-z)
+
+PUBLISHER_NAME ?= Ascensio System SIA
+
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
+
+BRANDING_DIR ?= ./branding
 
 PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
@@ -67,7 +75,7 @@ LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/license
 
-LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
+LICENSE_FILE = $(BRANDING_DIR)/common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
 HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
@@ -120,11 +128,10 @@ ifeq ($(OS),Windows_NT)
 	SHELL_EXT := .bat
 	SHARED_EXT := .dll
 	DEPLOY := $(EXE_REPO_DATA)
-	NGINX_CONF := 
-	NGINX_LOG := logs/
-	NGINX_CASH := temp/
-	DS_ROOT := ../
-	DS_FILES := ../server/
+	NGINX_CONF := includes
+	NGINX_LOG := logs
+	DS_ROOT := ..
+	DS_FILES := ../server
 	DS_EXAMLE := ../example
 	DEV_NULL := nul
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
@@ -140,12 +147,12 @@ else
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
 		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
-		NGINX_CONF := /etc/nginx/
-		NGINX_LOG := /var/log/onlyoffice/documentserver/
-		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
-		DS_ROOT := /var/www/onlyoffice/documentserver/
-		DS_FILES := /var/lib/onlyoffice/documentserver/
-		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
+		DS_PREFIX := onlyoffice/documentserver
+		NGINX_CONF := /etc/nginx/includes
+		NGINX_LOG := /var/log/$(DS_PREFIX)
+		DS_ROOT := /var/www/$(DS_PREFIX)
+		DS_FILES := /var/lib/$(DS_PREFIX)
+		DS_EXAMLE := /var/www/$(DS_PREFIX)-example
 		DEV_NULL := /dev/null
 	endif
 	UNAME_P := $(shell uname -p)
@@ -156,6 +163,53 @@ else
 		ARCHITECTURE := 32
 	endif
 endif
+
+DEB_DEPS += deb/debian/changelog
+DEB_DEPS += deb/debian/control
+DEB_DEPS += deb/debian/copyright
+DEB_DEPS += deb/debian/postinst
+DEB_DEPS += deb/debian/postrm
+DEB_DEPS += deb/debian/$(PACKAGE_NAME).install
+DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
+
+COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
+COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
+COMMON_DEPS += common/documentserver/nginx/includes/ds-spellchecker.conf
+COMMON_DEPS += common/documentserver/nginx/includes/http-common.conf
+COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
+COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl
+COMMON_DEPS += common/documentserver/nginx/ds.conf
+COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
+
+LINUX_DEPS += common/documentserver/logrotate/ds.conf
+
+LINUX_DEPS += common/documentserver/supervisor/ds.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-gc.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-spellchecker.conf
+LINUX_DEPS += common/documentserver-example/supervisor/ds.conf
+LINUX_DEPS += common/documentserver-example/supervisor/ds-example.conf
+
+LINUX_DEPS += common/documentserver/bin/documentserver-generate-allfonts.sh
+LINUX_DEPS += common/documentserver/bin/documentserver-prepare4shutdown.sh
+LINUX_DEPS += common/documentserver/bin/documentserver-update-securelink.sh
+
+LINUX_DEPS += rpm/bin/documentserver-configure.sh
+LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+M4_PARAMS += -D PACKAGE_NAME=$(PACKAGE_NAME)
+M4_PARAMS += -D PRODUCT_NAME=$(PRODUCT_NAME)
+M4_PARAMS += -D PACKAGE_VERSION=$(PACKAGE_VERSION)
+M4_PARAMS += -D PUBLISHER_NAME="$(PUBLISHER_NAME)"
+M4_PARAMS += -D M4_PLATFORM="$(PLATFORM)"
+M4_PARAMS += -D M4_NGINX_CONF="$(NGINX_CONF)"
+M4_PARAMS += -D M4_NGINX_LOG="$(NGINX_LOG)"
+M4_PARAMS += -D M4_DS_PREFIX="$(DS_PREFIX)"
+M4_PARAMS += -D M4_DS_ROOT="$(DS_ROOT)"
+M4_PARAMS += -D M4_DS_FILES="$(DS_FILES)"
+M4_PARAMS += -D M4_DS_EXAMLE="$(DS_EXAMLE)"
+M4_PARAMS += -D M4_DEV_NULL="$(DEV_NULL)"
 
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
 
@@ -184,7 +238,12 @@ clean:
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
 		$(FONTS)\
-		documentserver \
+		$(DEB_DEPS)\
+		$(COMMON_DEPS)\
+		$(LINUX_DEPS)\
+		deb/debian/$(PACKAGE_NAME)\
+		deb/debian/$(PACKAGE_NAME).*\
+		documentserver\
 		documentserver-example
 		
 documentserver:
@@ -195,8 +254,8 @@ documentserver:
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
 
-	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
-	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
+	mv -f $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
+	mv -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 	
 	# Prevent for modification original config
 	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
@@ -216,19 +275,8 @@ endif
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
-	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
-	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf.template
-	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver-ssl.conf.template
-	sed "s|{{NGINX_LOG}}|"$(NGINX_LOG)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
-	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed "s|{{DEV_NULL}}|"$(DEV_NULL)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-
-	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
-	
-	cp common/documentserver/nginx/onlyoffice-documentserver.conf.template common/documentserver/nginx/onlyoffice-documentserver.conf
 
 ifeq ($(PRODUCT_NAME), documentserver)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
@@ -250,49 +298,59 @@ documentserver-example:
 	
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
-	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
+	mv -f $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	# Prevent for modification original config
 	chmod ug=r $(DOCUMENTSERVER_EXAMPLE_CONFIG)/*.json
 
-	
-	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
-	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
-	
 	sed "s|{{OFFICIAL_PRODUCT_NAME}}|"$(OFFICIAL_PRODUCT_NAME)"|"  -i $(DOCUMENTSERVER_EXAMPLE)/welcome/*.html
 
 	echo "Done" > $@
 
-$(APT_RPM):	documentserver documentserver-example
-	chmod u+x apt-rpm/bin/documentserver-configure.sh
+$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 
-	cd apt-rpm && rpmbuild \
+%.rpm: 
+	mkdir -p $(@D)
+
+	cd $(@D)/../../.. && rpmbuild \
 		-bb \
-		--define "_topdir $(APT_RPM_BUILD_DIR)" \
+		--define "_topdir $(@D)/../../../builddir" \
 		--define "_package_name $(PACKAGE_NAME)" \
 		--define "_product_version $(PRODUCT_VERSION)" \
 		--define "_build_number $(BUILD_NUMBER)" \
+		--define "_company_name $(COMPANY_NAME)" \
+		--define "_product_name $(PRODUCT_NAME)" \
+		--define "_company_name_low $(COMPANY_NAME_LOW)" \
+		--define "_product_name_low $(PRODUCT_NAME_LOW)" \
+		--define "_ds_prefix $(DS_PREFIX)" \
 		$(PACKAGE_NAME).spec
 
-$(RPM):	documentserver documentserver-example
-	chmod u+x rpm/bin/documentserver-configure.sh
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
+M4_PARAMS += -D DS_EXAMPLE=1
+endif
 
-	cd rpm && rpmbuild \
-		-bb \
-		--define "_topdir $(RPM_BUILD_DIR)" \
-		--define "_package_name $(PACKAGE_NAME)" \
-		--define "_product_version $(PRODUCT_VERSION)" \
-		--define "_build_number $(BUILD_NUMBER)" \
-		$(PACKAGE_NAME).spec
+%.sh : %.sh.m4
+	m4 $(M4_PARAMS)	$< > $@
+	chmod u+x $@
 
-$(DEB): documentserver documentserver-example
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/control
-	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
+% : %.m4
+	m4 $(M4_PARAMS)	$< > $@
 
-	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
+% : %.tmpl
+	cp $< $@
 
-$(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
+common/documentserver/nginx/ds.conf: common/documentserver/nginx/ds.conf.tmpl
+
+deb/debian/$(PACKAGE_NAME).install : deb/debian/package.install
+	mv -f $< $@
+
+deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
+	mv -f $< $@
+
+$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+	cd deb && dpkg-buildpackage -b -uc -us
+
+$(EXE): $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 	cd exe && iscc //DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
 
 $(ISXDL):
@@ -301,7 +359,7 @@ $(ISXDL):
 $(NGINX):
 	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
-	mv $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
+	mv -f $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
 	rm -f $(NGINX_ZIP)
 	
 $(PSQL):
