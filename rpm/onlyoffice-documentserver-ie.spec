@@ -1,1 +1,0 @@
-onlyoffice-documentserver-de.spec

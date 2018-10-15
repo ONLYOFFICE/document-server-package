@@ -196,8 +196,12 @@ LINUX_DEPS += common/documentserver/bin/documentserver-generate-allfonts.sh
 LINUX_DEPS += common/documentserver/bin/documentserver-prepare4shutdown.sh
 LINUX_DEPS += common/documentserver/bin/documentserver-update-securelink.sh
 
+LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
+LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
+
 LINUX_DEPS += rpm/bin/documentserver-configure.sh
 LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+
 M4_PARAMS += -D PACKAGE_NAME=$(PACKAGE_NAME)
 M4_PARAMS += -D PRODUCT_NAME=$(PRODUCT_NAME)
 M4_PARAMS += -D PACKAGE_VERSION=$(PACKAGE_VERSION)
@@ -272,7 +276,7 @@ endif
 	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE) || true
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
+	#chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
 
@@ -307,7 +311,14 @@ documentserver-example:
 
 	echo "Done" > $@
 
+$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 $(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+
+apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
+	mv -f $< $@
+
+rpm/$(PACKAGE_NAME).spec : rpm/package.spec
+	mv -f $< $@
 
 %.rpm: 
 	mkdir -p $(@D)
