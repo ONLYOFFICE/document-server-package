@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NGINX_CONF=/etc/nginx/includes/onlyoffice-documentserver-docservice.conf
+NGINX_CONF=/etc/nginx/includes/ds-docservice.conf
 DOCSERVICE_CONF=/etc/M4_DS_PREFIX/default.json
 JSON="json -q -f ${DOCSERVICE_CONF}"
 

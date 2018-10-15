@@ -12,7 +12,7 @@ find ./fonts -type f ! -name "*.*" -exec gzip -kf9 {} \;
 
 # Turn on static gzip for nginx
 sed 's/#*\s*\(gzip_static\).*/\1 on;/g' \
-  -i ${NGINX_ONLYOFFICE_PATH}/includes/onlyoffice-documentserver-docservice.conf
+  -i ${NGINX_ONLYOFFICE_PATH}/includes/ds-docservice.conf
 
 # Reload nginx config
 sudo service nginx reload

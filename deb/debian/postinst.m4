@@ -177,8 +177,8 @@ save_jwt_params(){
 
 setup_nginx(){
   NGINX_CONF_DIR=/etc/onlyoffice/documentserver/nginx
-  DS_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver.conf
-  # DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
+  DS_CONF=$NGINX_CONF_DIR/ds.conf
+  # DS_SSL_CONF=$NGINX_CONF_DIR/ds-ssl.conf.tmpl
   # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
   
   db_get onlyoffice/ds-port || true
@@ -197,8 +197,8 @@ setup_nginx(){
   sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF  
 
   # install nginx config
-  if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
-	  ln -s $DS_CONF /etc/nginx/conf.d/onlyoffice-documentserver.conf
+  if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
+	  ln -s $DS_CONF /etc/nginx/conf.d/ds.conf
   fi
 
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF

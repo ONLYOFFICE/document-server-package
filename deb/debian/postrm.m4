@@ -33,8 +33,8 @@ clean_ds_files() {
 	rm -f $DIR/server/FileConverter/bin/AllFonts.js
 	rm -fr $DIR/fonts
 
-    if [ -d /etc/nginx/conf.d/ ] && [ -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
-	  rm -f /etc/nginx/conf.d/onlyoffice-documentserver.conf
+    if [ -d /etc/nginx/conf.d/ ] && [ -e /etc/nginx/conf.d/ds.conf ]; then
+	  rm -f /etc/nginx/conf.d/ds.conf
     fi
 
 	supervisorctl update >/dev/null 2>&1

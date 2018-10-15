@@ -125,9 +125,9 @@
 #define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
 #define NGINX_SRV_DIR  '{app}\nginx'
 #define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
-#define NGINX_DS_CONF '{app}\nginx\conf\onlyoffice-documentserver.conf'
-#define NGINX_DS_TMPL '{app}\nginx\conf\onlyoffice-documentserver.conf.template'
-#define NGINX_DS_SSL_TMPL '{app}\nginx\conf\onlyoffice-documentserver-ssl.conf.template'
+#define NGINX_DS_CONF '{app}\nginx\conf\ds.conf'
+#define NGINX_DS_TMPL '{app}\nginx\conf\ds.conf.tmpl'
+#define NGINX_DS_SSL_TMPL '{app}\nginx\conf\ds-ssl.conf.tmpl'
 
 #define LICENSE_PATH str("{commonappdata}\" + sCompanyName + "\Data")
 
@@ -254,8 +254,8 @@ Source: local\local.json;                           DestDir: {app}\config; Flags
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\includes\*;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*.template;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\onlyoffice-documentserver.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify

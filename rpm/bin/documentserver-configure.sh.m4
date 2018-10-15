@@ -246,8 +246,8 @@ establish_rabbitmq_conn_by_tools() {
 
 setup_nginx(){
   NGINX_CONF_DIR=/etc/M4_DS_PREFIX/nginx
-  DS_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver.conf.template
-  DS_SSL_CONF=$NGINX_CONF_DIR/onlyoffice-documentserver-ssl.conf.template
+  DS_CONF=$NGINX_CONF_DIR/ds.conf.tmpl
+  DS_SSL_CONF=$NGINX_CONF_DIR/ds-ssl.conf.tmpl
   # OO_CONF=$NGINX_CONF_DIR/includes/onlyoffice-http.conf
   sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
 
