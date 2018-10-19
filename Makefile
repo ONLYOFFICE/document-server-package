@@ -147,7 +147,7 @@ else
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
 		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
-		DS_PREFIX := onlyoffice/documentserver
+		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
 		DS_ROOT := /var/www/$(DS_PREFIX)
