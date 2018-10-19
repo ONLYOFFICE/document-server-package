@@ -337,7 +337,7 @@ rpm/$(PACKAGE_NAME).spec : rpm/package.spec
 		$(PACKAGE_NAME).spec
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
-M4_PARAMS += -D DS_EXAMPLE=1
+M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 
 %.sh : %.sh.m4

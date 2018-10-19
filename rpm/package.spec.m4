@@ -1,6 +1,6 @@
 License: AGPL
 
-ifelse('DS_EXAMPLE', '1',
+ifelse('M4_DS_EXAMPLE_ENABLE', '1',
 %define example 1,)
 
 %include requires.spec
