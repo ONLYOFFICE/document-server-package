@@ -260,7 +260,10 @@ documentserver:
 
 	mv -f $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
-	
+
+	# rename product specific folders
+	sed "s|onlyoffice\/documentserver|"$(DS_PREFIX)"|"  -i $(DOCUMENTSERVER_CONFIG)/*.json
+
 	# Prevent for modification original config
 	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
 
