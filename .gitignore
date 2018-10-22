@@ -8,7 +8,7 @@ apt-rpm/builddir
 rpm/builddir
 common/documentserver*/**/*.conf
 common/documentserver*/nginx/*.tmpl
-common/documentserver/bin/*.sh
+/common/documentserver/bin/*.sh
 common/documentserver/config
 common/documentserver/home
 common/documentserver-example/config

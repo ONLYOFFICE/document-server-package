@@ -11,7 +11,7 @@ DIR="/var/www/M4_DS_PREFIX"
 echo -n Generating AllFonts.js, please wait...
 
 
-sudo -u onlyoffice "$DIR/server/tools/AllFontsGen"\
+sudo -u ds "$DIR/server/tools/AllFontsGen"\
   --input="$DIR/core-fonts"\
   --allfonts-web="$DIR/sdkjs/common/AllFonts.js"\
   --allfonts="$DIR/server/FileConverter/bin/AllFonts.js"\

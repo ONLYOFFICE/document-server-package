@@ -2,7 +2,7 @@
 
 echo -n Preparing for shutdown, it can take a lot of time, please wait...
 
-sudo -u onlyoffice \
+sudo -u ds \
   sh -c '\
     NODE_ENV=production-linux \
     NODE_CONFIG_DIR=/etc/M4_DS_PREFIX \
