@@ -29,7 +29,7 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps|sdkjs|sdkjs-plugins|f
 }
 
 location ~ ^(\/cache\/files.*)(\/.*) {
-  alias M4_M4_DS_FILES/App_Data$1;
+  alias M4_DS_FILES/App_Data$1;
   add_header Content-Disposition $arg_disposition;
 
   set $secret_string onlyoffice;
