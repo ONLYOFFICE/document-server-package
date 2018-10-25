@@ -115,12 +115,12 @@ parse_rabbitmq_url(){
   local url="$(echo ${amqp/$proto/})"
 
   # extract the user and password (if any)
-  local userpass="`echo $url | grep @ | cut -d@ -f1`"
-  local pass=`echo $userpass | grep : | cut -d: -f2`
+  local userpass="$(echo $url | grep @ | cut -d@ -f1)"
+  local pass=$(echo $userpass | grep : | cut -d: -f2)
 
   local user
   if [ -n "$pass" ]; then
-    user=`echo $userpass | grep : | cut -d: -f1`
+    user=$(echo $userpass | grep : | cut -d: -f1)
   else
     user=$userpass
   fi
@@ -132,7 +132,7 @@ parse_rabbitmq_url(){
 
   local host
   if [ -n "$port" ]; then
-    host=`echo $hostport | grep : | cut -d: -f1`
+    host=$(echo $hostport | grep : | cut -d: -f1)
   else
     host=$hostport
     port="5672"
