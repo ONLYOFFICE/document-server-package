@@ -1,7 +1,7 @@
 Source: PACKAGE_NAME
 Section: web
 Priority: optional
-Maintainer: PUBLISHER_NAME
+Maintainer: PUBLISHER_NAME <SUPPORT_MAIL>
 Build-Depends: debhelper (>= 8.0.0)
 
 Package: PACKAGE_NAME

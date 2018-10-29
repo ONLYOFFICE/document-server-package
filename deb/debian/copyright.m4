@@ -1,9 +1,10 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: onlyoffice
-Source: http://onlyoffice.com
+Upstream-Name: PUBLISHER_NAME
+Upstream-Contact: PUBLISHER_NAME <SUPPORT_MAIL>
+Source: PUBLISHER_URL
 
 Files: *
-Copyright: (c) Copyright Ascensio System SIA, 2018 <support@onlyoffice.com>
+Copyright: (c) Copyright PUBLISHER_NAME, 2018 <SUPPORT_MAIL>
 
 ifdef(COMMERCIAL, License: Commercial,
 License: AGPLv3

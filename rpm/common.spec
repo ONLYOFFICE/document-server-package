@@ -5,7 +5,7 @@ Release: %{_build_number}
 Group: Applications/Internet
 URL: %{_publisher_url}
 Vendor: %{_publisher_name}
-Packager: %{_publisher_name} %{_support_url}
+Packager: %{_publisher_name} <%{_support_mail}>
 BuildArch: x86_64
 AutoReq: no
 AutoProv: no

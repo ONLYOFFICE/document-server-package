@@ -8,6 +8,9 @@ COMPANY_NAME_LOW = $(shell echo $(COMPANY_NAME) | tr A-Z a-z)
 PRODUCT_NAME_LOW = $(shell echo $(PRODUCT_NAME) | tr A-Z a-z)
 
 PUBLISHER_NAME ?= Ascensio System SIA
+PUBLISHER_URL ?= http://onlyoffice.com
+SUPPORT_URL ?= http://support.onlyoffice.com
+SUPPORT_MAIL ?= support@onlyoffice.com
 
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
@@ -206,6 +209,9 @@ M4_PARAMS += -D PACKAGE_NAME=$(PACKAGE_NAME)
 M4_PARAMS += -D PRODUCT_NAME=$(PRODUCT_NAME)
 M4_PARAMS += -D PACKAGE_VERSION=$(PACKAGE_VERSION)
 M4_PARAMS += -D PUBLISHER_NAME="$(PUBLISHER_NAME)"
+M4_PARAMS += -D PUBLISHER_URL="$(PUBLISHER_URL)"
+M4_PARAMS += -D SUPPORT_MAIL="$(SUPPORT_MAIL)"
+M4_PARAMS += -D SUPPORT_URL="$(SUPPORT_URL)"
 M4_PARAMS += -D M4_PLATFORM="$(PLATFORM)"
 M4_PARAMS += -D M4_NGINX_CONF="$(NGINX_CONF)"
 M4_PARAMS += -D M4_NGINX_LOG="$(NGINX_LOG)"
@@ -334,6 +340,10 @@ rpm/$(PACKAGE_NAME).spec : rpm/package.spec
 		--define "_build_number $(BUILD_NUMBER)" \
 		--define "_company_name $(COMPANY_NAME)" \
 		--define "_product_name $(PRODUCT_NAME)" \
+		--define "_publisher_name $(PUBLISHER_NAME)" \
+		--define "_publisher_url $(PUBLISHER_URL)" \
+		--define "_support_url $(SUPPORT_URL)" \
+		--define "_support_mail $(SUPPORT_MAIL)" \
 		--define "_company_name_low $(COMPANY_NAME_LOW)" \
 		--define "_product_name_low $(PRODUCT_NAME_LOW)" \
 		--define "_ds_prefix $(DS_PREFIX)" \
