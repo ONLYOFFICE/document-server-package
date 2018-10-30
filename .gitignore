@@ -25,6 +25,7 @@ deb/debian/*.links
 deb/debian/files
 deb/debian/postinst
 deb/debian/postrm
+/pgsql
 
 *rpm/bin/*.sh
 .gitignore

@@ -1,8 +1,8 @@
 PWD := $(shell pwd)
 CURL := curl -L -o
 
-COMPANY_NAME ?= onlyoffice
-PRODUCT_NAME ?= documentserver
+COMPANY_NAME ?= ONLYOFFICE
+PRODUCT_NAME ?= DocumentServer
 
 COMPANY_NAME_LOW = $(shell echo $(COMPANY_NAME) | tr A-Z a-z)
 PRODUCT_NAME_LOW = $(shell echo $(PRODUCT_NAME) | tr A-Z a-z)
@@ -17,7 +17,7 @@ BUILD_NUMBER ?= 0
 
 BRANDING_DIR ?= ./branding
 
-PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
+PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
 RPM_ARCH = x86_64
@@ -113,15 +113,15 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 
 WEBAPPS_DIR ?= web-apps
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ie))
 WEBAPPS_DIR ?= web-apps-pro
 endif
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ie))
 OFFICIAL_PRODUCT_NAME := 'Integration Edition'
 endif
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de))
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de))
 OFFICIAL_PRODUCT_NAME := 'Developer Edition'
 endif
 
@@ -205,6 +205,8 @@ LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += rpm/bin/documentserver-configure.sh
 LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
 
+WIN_DEPS += exe/$(PACKAGE_NAME).iss
+
 M4_PARAMS += -D PACKAGE_NAME=$(PACKAGE_NAME)
 M4_PARAMS += -D PRODUCT_NAME=$(PRODUCT_NAME)
 M4_PARAMS += -D PACKAGE_VERSION=$(PACKAGE_VERSION)
@@ -251,6 +253,7 @@ clean:
 		$(DEB_DEPS)\
 		$(COMMON_DEPS)\
 		$(LINUX_DEPS)\
+		$(WIN_DEPS)\
 		deb/debian/$(PACKAGE_NAME)\
 		deb/debian/$(PACKAGE_NAME).*\
 		documentserver\
@@ -291,15 +294,15 @@ endif
 
 	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 
-ifeq ($(PRODUCT_NAME), documentserver)
+ifeq ($(PRODUCT_NAME_LOW), documentserver)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
 endif
 
-ifeq ($(PRODUCT_NAME), documentserver-de)
+ifeq ($(PRODUCT_NAME_LOW), documentserver-de)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_D;|" -i $(LICENSE_JS)
 endif
 
-ifeq ($(PRODUCT_NAME), documentserver-ie)
+ifeq ($(PRODUCT_NAME_LOW), documentserver-ie)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
 endif
 
@@ -329,6 +332,9 @@ apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
 rpm/$(PACKAGE_NAME).spec : rpm/package.spec
 	mv -f $< $@
 
+exe/$(PACKAGE_NAME).iss : exe/package.iss
+	mv -f $< $@
+
 %.rpm: 
 	mkdir -p $(@D)
 
@@ -349,7 +355,7 @@ rpm/$(PACKAGE_NAME).spec : rpm/package.spec
 		--define "_ds_prefix $(DS_PREFIX)" \
 		$(PACKAGE_NAME).spec
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ie))
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 
@@ -371,11 +377,21 @@ deb/debian/$(PACKAGE_NAME).install : deb/debian/package.install
 deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 	mv -f $< $@
 
+%.exe:
+	cd $(@D) && ./iscc \
+	//DsCompanyName=$(PRODUCT_VERSION).$(BUILD_NUMBER) \
+	//DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) \
+	//DsCompanyName=$(COMPANY_NAME) \
+	//DsPublisherName=$(PUBLISHER_NAME) \
+	//DsPublisherUrl=$(PUBLISHER_URL) \
+	//Qp \
+	//S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" \
+	$(PACKAGE_NAME).iss
+
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 	cd deb && dpkg-buildpackage -b -uc -us
 
-$(EXE): $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
-	cd exe && iscc //DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
+$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
 $(ISXDL):
 	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
