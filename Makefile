@@ -378,7 +378,7 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 	mv -f $< $@
 
 %.exe:
-	cd $(@D) && ./iscc \
+	cd $(@D) && iscc \
 	//DsCompanyName=$(PRODUCT_VERSION).$(BUILD_NUMBER) \
 	//DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) \
 	//DsCompanyName=$(COMPANY_NAME) \
