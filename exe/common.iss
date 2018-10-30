@@ -8,6 +8,11 @@
   #include str(sBrandingFile)
 #endif
 
+#define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\" + sPackageName + "\LICENSE.txt")
+#ifnexist #{sLicenseFile}
+  #define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\onlyoffice-documentserver\LICENSE.txt")
+#endif
+
 #ifndef sCompanyName
   #define sCompanyName        'ONLYOFFICE'
 #endif
@@ -176,7 +181,7 @@ MinVersion                =6.1.7600
 WizardImageFile           = {#sBrandingFolder}\exe\data\dialogpicture.bmp
 WizardSmallImageFile      = {#sBrandingFolder}\exe\data\dialogicon.bmp
 SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
-LicenseFile               = {#sBrandingFolder}\common\documentserver\license\{#sPackageName}\LICENSE.txt
+LicenseFile               = 
 ShowLanguageDialog        = no
 
 #ifdef ISPPCC_INVOKED
