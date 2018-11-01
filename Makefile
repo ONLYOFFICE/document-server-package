@@ -195,9 +195,7 @@ LINUX_DEPS += common/documentserver/supervisor/ds-spellchecker.conf
 LINUX_DEPS += common/documentserver-example/supervisor/ds.conf
 LINUX_DEPS += common/documentserver-example/supervisor/ds-example.conf
 
-LINUX_DEPS += common/documentserver/bin/documentserver-generate-allfonts.sh
-LINUX_DEPS += common/documentserver/bin/documentserver-prepare4shutdown.sh
-LINUX_DEPS += common/documentserver/bin/documentserver-update-securelink.sh
+LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
