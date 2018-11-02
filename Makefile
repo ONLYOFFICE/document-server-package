@@ -353,7 +353,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define "_ds_prefix $(DS_PREFIX)" \
 		$(PACKAGE_NAME).spec
 
-ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ie))
+ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-de onlyoffice-documentserver-ie))
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 
