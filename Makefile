@@ -260,7 +260,10 @@ clean:
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf -t $(DOCUMENTSERVER) ../$(WEBAPPS_DIR)/deploy/* ../server/build/* 
+
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)	
 	cp -fr -t $(DOCUMENTSERVER)/$(SDKJS_PLUGINS) $(DOCUMENTSERVER_PLUGINS)
+endif
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
