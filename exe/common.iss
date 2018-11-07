@@ -8,11 +8,6 @@
   #include str(sBrandingFile)
 #endif
 
-#define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\" + sPackageName + "\LICENSE.txt")
-#ifnexist #{sLicenseFile}
-  #define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\onlyoffice-documentserver\LICENSE.txt")
-#endif
-
 #ifndef sCompanyName
   #define sCompanyName        'ONLYOFFICE'
 #endif
@@ -27,6 +22,15 @@
 
 #ifndef sIntProductName
   #define sIntProductName     str(sProductName)
+#endif
+
+#ifndef sPackageName
+  #define sPackageName        str(LowerCase(sIntCompanyName) + "-" + LowerCase(sIntProductName))
+#endif
+
+#define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\" + sPackageName + "\LICENSE.txt")
+#ifnexist sLicenseFile
+  #define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\onlyoffice-documentserver\LICENSE.txt")
 #endif
 
 #ifndef sPublisherName
@@ -47,10 +51,6 @@
 
 #ifndef sUpdatesURL
   #define sUpdatesURL=str(sPublisherUrl)
-#endif
-
-#ifndef sPackageName
-  #define sPackageName        str(LowerCase(sIntCompanyName) + "-" + LowerCase(sIntProductName))
 #endif
 
 #define sAppName            str(sCompanyName + " " + sProductName)

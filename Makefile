@@ -15,6 +15,8 @@ SUPPORT_MAIL ?= support@onlyoffice.com
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
+SIGN_STR := "byparam=signtool.exe sign /v /n $(word 1, $(PUBLISHER_NAME)) /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f"
+
 BRANDING_DIR ?= ./branding
 
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
@@ -205,6 +207,7 @@ LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
 
 WIN_DEPS += exe/$(PACKAGE_NAME).iss
 
+M4_PARAMS += -D COMPANY_NAME=$(COMPANY_NAME)
 M4_PARAMS += -D PACKAGE_NAME=$(PACKAGE_NAME)
 M4_PARAMS += -D PRODUCT_NAME=$(PRODUCT_NAME)
 M4_PARAMS += -D PACKAGE_VERSION=$(PACKAGE_VERSION)
@@ -380,13 +383,9 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 
 %.exe:
 	cd $(@D) && iscc \
-	//DsCompanyName=$(PRODUCT_VERSION).$(BUILD_NUMBER) \
 	//DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) \
-	//DsCompanyName=$(COMPANY_NAME) \
-	//DsPublisherName=$(PUBLISHER_NAME) \
-	//DsPublisherUrl=$(PUBLISHER_URL) \
 	//Qp \
-	//S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" \
+	//S$(SIGN_STR) \
 	$(PACKAGE_NAME).iss
 
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
