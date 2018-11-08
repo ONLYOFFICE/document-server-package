@@ -5,6 +5,8 @@ changecom(`;',)
 #define sPublisherUrl       'PUBLISHER_URL'
 #define sSupportUrl         'SUPPORT_URL'
 
+#define sBrandingFolder     'M4_BRANDING_DIR'
+
 #include "common.iss"
 
 ifelse('M4_DS_EXAMPLE_ENABLE', '1',
