@@ -3,9 +3,11 @@ CURL := curl -L -o
 
 COMPANY_NAME ?= ONLYOFFICE
 PRODUCT_NAME ?= DocumentServer
+PRODUCT_SHORT_NAME ?= $(firstword $(subst -, ,$(PRODUCT_NAME)))
 
 COMPANY_NAME_LOW = $(shell echo $(COMPANY_NAME) | tr A-Z a-z)
 PRODUCT_NAME_LOW = $(shell echo $(PRODUCT_NAME) | tr A-Z a-z)
+PRODUCT_SHORT_NAME_LOW = $(shell echo $(PRODUCT_SHORT_NAME) | tr A-Z a-z)
 
 PUBLISHER_NAME ?= Ascensio System SIA
 PUBLISHER_URL ?= http://onlyoffice.com
@@ -152,7 +154,7 @@ else
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
 		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
-		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_NAME_LOW)
+		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
 		DS_ROOT := /var/www/$(DS_PREFIX)
