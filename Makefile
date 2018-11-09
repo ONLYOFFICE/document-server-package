@@ -15,7 +15,7 @@ SUPPORT_MAIL ?= support@onlyoffice.com
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
-SIGN_STR := "byparam=signtool.exe sign /v /n $(word 1, $(PUBLISHER_NAME)) /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f"
+SIGN_STR := "byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f"
 
 BRANDING_DIR ?= ./branding
 
