@@ -1,4 +1,5 @@
 *.deb
+*.dll
 *.changes
 /documentserver
 /documentserver-example
@@ -14,17 +15,18 @@ common/documentserver/home
 common/documentserver-example/config
 common/documentserver-example/home
 common/fonts
-deb/debian/changelog
-deb/debian/control
-deb/debian/copyright
-deb/debian/onlyoffice-documentserver*/
-deb/debian/*.debhelper*
-deb/debian/*.substvars
-deb/debian/*.install
-deb/debian/*.links
-deb/debian/files
-deb/debian/postinst
-deb/debian/postrm
+/deb/debian/changelog
+/deb/debian/config
+/deb/debian/control
+/deb/debian/copyright
+/deb/debian/*-documentserver*/
+/deb/debian/*.debhelper*
+/deb/debian/*.substvars
+/deb/debian/*.install
+/deb/debian/*.links
+/deb/debian/files
+/deb/debian/postinst
+/deb/debian/postrm
 /pgsql
 
 *rpm/bin/*.sh

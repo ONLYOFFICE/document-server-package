@@ -1,5 +1,5 @@
 #!/bin/sh
-# postrm script for onlyoffice
+# postrm script for M4_ONLYOFFICE_VALUE
 #
 # see: dh_installdeb(1)
 
@@ -53,17 +53,17 @@ case "$1" in
 			rm -rf 	$APP_DIR
 		fi
     
-		db_input high onlyoffice/remove-db || true
+		db_input high M4_ONLYOFFICE_VALUE/remove-db || true
 		db_go
-		db_get onlyoffice/remove-db
+		db_get M4_ONLYOFFICE_VALUE/remove-db
 		if [ "$RET" = "true" ]; then
-			db_get onlyoffice/db-host
+			db_get M4_ONLYOFFICE_VALUE/db-host
 			DB_HOST="$RET"
-			db_get onlyoffice/db-user
+			db_get M4_ONLYOFFICE_VALUE/db-user
 			DB_USER="$RET"
-			db_get onlyoffice/db-pwd
+			db_get M4_ONLYOFFICE_VALUE/db-pwd
 			DB_PWD="$RET"
-			db_get onlyoffice/db-name
+			db_get M4_ONLYOFFICE_VALUE/db-name
 			DB_NAME="$RET"
 
                         CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
@@ -73,7 +73,7 @@ case "$1" in
 
                         DROPDB="dropdb $CONNECTION_PARAMS"
 
-			$DROPDB --if-exists $DB_NAME &>/dev/null || { echo "WARNING: can't delete ONLYOFFICE database" >&2; }
+			$DROPDB --if-exists $DB_NAME &>/dev/null || { echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
 		fi
 
 		clean_ds_files

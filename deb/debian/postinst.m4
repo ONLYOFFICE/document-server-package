@@ -1,5 +1,5 @@
 #!/bin/sh
-# postinst script for onlyoffice
+# postinst script for M4_ONLYOFFICE_VALUE
 #
 # see: dh_installdeb(1)
 
@@ -52,33 +52,33 @@ create_local_configs(){
 }
 
 read_saved_params(){
-	db_get onlyoffice/db-host || true
+	db_get M4_ONLYOFFICE_VALUE/db-host || true
 	DB_HOST="$RET"
-	db_get onlyoffice/db-user || true
+	db_get M4_ONLYOFFICE_VALUE/db-user || true
 	DB_USER="$RET"
-	db_get onlyoffice/db-pwd || true
+	db_get M4_ONLYOFFICE_VALUE/db-pwd || true
 	DB_PWD="$RET"
-	db_get onlyoffice/db-name || true
+	db_get M4_ONLYOFFICE_VALUE/db-name || true
 	DB_NAME="$RET"
 
-	db_get onlyoffice/rabbitmq-host || true
+	db_get M4_ONLYOFFICE_VALUE/rabbitmq-host || true
 	RABBITMQ_HOST="$RET"
-	db_get onlyoffice/rabbitmq-user || true
+	db_get M4_ONLYOFFICE_VALUE/rabbitmq-user || true
 	RABBITMQ_USER="$RET"
-	db_get onlyoffice/rabbitmq-pwd || true
+	db_get M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
 	RABBITMQ_PWD="$RET"
 
-	db_get onlyoffice/redis-host || true
+	db_get M4_ONLYOFFICE_VALUE/redis-host || true
 	REDIS_HOST="$RET"
 
-	db_get onlyoffice/cluster-mode || true
+	db_get M4_ONLYOFFICE_VALUE/cluster-mode || true
 	CLUSTER_MODE="$RET"
 
-	db_get onlyoffice/jwt-enabled || true
+	db_get M4_ONLYOFFICE_VALUE/jwt-enabled || true
 	JWT_ENABLED="$RET"
-	db_get onlyoffice/jwt-secret || true
+	db_get M4_ONLYOFFICE_VALUE/jwt-secret || true
 	JWT_SECRET="$RET"
-	db_get onlyoffice/jwt-header || true
+	db_get M4_ONLYOFFICE_VALUE/jwt-header || true
 	JWT_HEADER="$RET"
 }
   
@@ -178,16 +178,16 @@ save_jwt_params(){
 setup_nginx(){
    DS_CONF=$CONF_DIR/nginx/ds.conf
   
-  db_get onlyoffice/ds-port || true
+  db_get M4_ONLYOFFICE_VALUE/ds-port || true
   DS_PORT="$RET"
   
-  # db_get onlyoffice/docservice-port || true
+  # db_get M4_ONLYOFFICE_VALUE/docservice-port || true
   # DOCSERVICE_PORT="$RET"
   
-  # db_get onlyoffice/spellchecker-port || true
+  # db_get M4_ONLYOFFICE_VALUE/spellchecker-port || true
   # SPELLCHECKER_PORT="$RET"
   
-  # db_get onlyoffice/example-port || true
+  # db_get M4_ONLYOFFICE_VALUE/example-port || true
   # EXAMPLE_PORT="$RET"
   
   # setup ds port
@@ -210,7 +210,7 @@ case "$1" in
 	configure)
 		adduser --quiet --home "$DIR" --system --group ds
 
-		# add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
+		# add nginx user to M4_ONLYOFFICE_VALUE group to allow access nginx to M4_ONLYOFFICE_VALUE log dir
 		adduser --quiet www-data ds
 
 		#install node modules
@@ -224,10 +224,10 @@ case "$1" in
 		save_redis_params
 		save_jwt_params
 
-		# configure ngninx for onlyoffice
+		# configure ngninx for M4_ONLYOFFICE_VALUE
 		setup_nginx
 
-		# modify permissions for onlyoffice files and folders
+		# modify permissions for M4_ONLYOFFICE_VALUE files and folders
 		mkdir -p "$LOG_DIR/docservice"
 		mkdir -p "$LOG_DIR-example"
 		mkdir -p "$LOG_DIR/converter"
@@ -261,7 +261,7 @@ case "$1" in
 		service supervisor restart >/dev/null 2>&1
 		service nginx restart >/dev/null 2>&1
 		
-		echo "Congratulations, the ONLYOFFICE DocumentServer has been installed successfully!"
+		echo "Congratulations, the M4_ONLYOFFICE_VALUE DocumentServer has been installed successfully!"
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)
