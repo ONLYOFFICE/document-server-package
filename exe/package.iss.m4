@@ -6,6 +6,7 @@ changecom(`;',)
 #define sSupportUrl         'SUPPORT_URL'
 
 #define sBrandingFolder     'patsubst(M4_BRANDING_DIR,`/',`\\')'
+#define sDbDefValue         'M4_DB_DEF_VALUE'
 
 #include "common.iss"
 

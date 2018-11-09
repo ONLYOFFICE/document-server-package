@@ -81,6 +81,10 @@
   #define sAppVersion         '4.0.0.0'
 #endif
 
+#ifndef sDbDefValue
+  #define sDbDefValue         'onlyoffice'
+#endif
+
 #define sAppVerShort
 
 #define NSSM                  '{app}\nssm\nssm.exe'
@@ -658,9 +662,9 @@ begin
   DbPage.Add('Database:', False);
 
   DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_USER}|onlyoffice}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_PWD}|onlyoffice}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_NAME}|onlyoffice}}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_USER}|{#sDbDefValue}}}');
+  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_PWD}|{#sDbDefValue}}}');
+  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',

@@ -207,6 +207,12 @@ LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
 
 WIN_DEPS += exe/$(PACKAGE_NAME).iss
 
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)
+DB_DEF_VALUE := onlyoffice
+else
+DB_DEF_VALUE := ds
+endif
+
 M4_PARAMS += -D COMPANY_NAME=$(COMPANY_NAME)
 M4_PARAMS += -D PACKAGE_NAME=$(PACKAGE_NAME)
 M4_PARAMS += -D PRODUCT_NAME=$(PRODUCT_NAME)
@@ -216,6 +222,7 @@ M4_PARAMS += -D PUBLISHER_URL="$(PUBLISHER_URL)"
 M4_PARAMS += -D SUPPORT_MAIL="$(SUPPORT_MAIL)"
 M4_PARAMS += -D SUPPORT_URL="$(SUPPORT_URL)"
 M4_PARAMS += -D M4_BRANDING_DIR="$(abspath $(BRANDING_DIR))"
+M4_PARAMS += -D M4_DB_DEF_VALUE="$(DB_DEF_VALUE)"
 M4_PARAMS += -D M4_PLATFORM="$(PLATFORM)"
 M4_PARAMS += -D M4_NGINX_CONF="$(NGINX_CONF)"
 M4_PARAMS += -D M4_NGINX_LOG="$(NGINX_LOG)"
@@ -277,6 +284,10 @@ endif
 
 	# rename product specific folders
 	sed "s|onlyoffice\/documentserver|"$(DS_PREFIX)"|"  -i $(DOCUMENTSERVER_CONFIG)/*.json
+
+	# rename db account params
+	sed 's|\("db.*": "\)onlyoffice\("\)|\1'$(DB_DEF_VALUE)'\2|'  -i $(DOCUMENTSERVER_CONFIG)/*.json
+
 
 	# Prevent for modification original config
 	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
