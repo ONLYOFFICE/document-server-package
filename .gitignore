@@ -6,6 +6,7 @@
 repo
 repo-rpm
 apt-rpm/builddir
+/apt-rpm/*documentserver*.spec
 rpm/builddir
 common/documentserver*/**/*.conf
 common/documentserver*/nginx/*.tmpl
@@ -27,7 +28,8 @@ common/fonts
 /deb/debian/files
 /deb/debian/postinst
 /deb/debian/postrm
+/exe/*documentserver*.iss
 /pgsql
-
+/rpm/*documentserver*.spec
 *rpm/bin/*.sh
 .gitignore
