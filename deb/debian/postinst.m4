@@ -261,7 +261,7 @@ case "$1" in
 		service supervisor restart >/dev/null 2>&1
 		service nginx restart >/dev/null 2>&1
 		
-		echo "Congratulations, the M4_ONLYOFFICE_VALUE DocumentServer has been installed successfully!"
+		echo "Congratulations, the COMPANY_NAME PRODUCT_NAME has been installed successfully!"
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)
