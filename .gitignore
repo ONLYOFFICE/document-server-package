@@ -28,6 +28,7 @@ common/fonts
 /deb/debian/files
 /deb/debian/postinst
 /deb/debian/postrm
+/deb/debian/templates
 /exe/*documentserver*.iss
 /pgsql
 /rpm/*documentserver*.spec

@@ -177,6 +177,7 @@ DEB_DEPS += deb/debian/control
 DEB_DEPS += deb/debian/copyright
 DEB_DEPS += deb/debian/postinst
 DEB_DEPS += deb/debian/postrm
+DEB_DEPS += deb/debian/templates
 DEB_DEPS += deb/debian/$(PACKAGE_NAME).install
 DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
 
