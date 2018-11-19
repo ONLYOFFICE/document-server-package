@@ -292,6 +292,9 @@ endif
 	# rename db account params
 	sed 's|\("db.*": "\)onlyoffice\("\)|\1'$(ONLYOFFICE_VALUE)'\2|'  -i $(DOCUMENTSERVER_CONFIG)/*.json
 
+	# rename db schema name
+	sed 's|onlyoffice|'$(ONLYOFFICE_VALUE)'|'  -i $(DOCUMENTSERVER)/server/schema/**/*.sql
+
 
 	# Prevent for modification original config
 	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
