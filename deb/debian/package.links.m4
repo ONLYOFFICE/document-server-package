@@ -1,3 +1,5 @@
+etc/M4_DS_PREFIX/logrotate/ds.conf etc/logrotate.d/ds.conf
+
 etc/M4_DS_PREFIX/nginx/includes/ds-common.conf etc/nginx/includes/ds-common.conf
 etc/M4_DS_PREFIX/nginx/includes/ds-docservice.conf etc/nginx/includes/ds-docservice.conf
 etc/M4_DS_PREFIX/nginx/includes/ds-spellchecker.conf etc/nginx/includes/ds-spellchecker.conf
@@ -8,8 +10,6 @@ etc/M4_DS_PREFIX/supervisor/ds-docservice.conf etc/supervisor/conf.d/ds-docservi
 etc/M4_DS_PREFIX/supervisor/ds-gc.conf etc/supervisor/conf.d/ds-gc.conf
 etc/M4_DS_PREFIX/supervisor/ds-metrics.conf etc/supervisor/conf.d/ds-metrics.conf
 etc/M4_DS_PREFIX/supervisor/ds-spellchecker.conf etc/supervisor/conf.d/ds-spellchecker.conf
-
-etc/M4_DS_PREFIX/logrotate/ds.conf etc/logrotate/conf.d/ds.conf
 
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libDjVuFile.so lib/libDjVuFile.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libdoctrenderer.so lib/libdoctrenderer.so

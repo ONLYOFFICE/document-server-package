@@ -141,20 +141,20 @@ find \
   -name *.ini \
   -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/supervisord.d/$(basename {})' \;
 
-mkdir -p "%{buildroot}%{_sysconfdir}/logrotate/conf.d/"
+mkdir -p "%{buildroot}%{_sysconfdir}/logrotate.d/"
 
 # Make symlinks for logrotate configs
 find \
   $CONF_DIR/logrotate/ \
   -name *.conf \
-  -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/logrotate/conf.d/$(basename {})' \;
+  -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/logrotate.d/$(basename {})' \;
 
 # Convert absolute links to relative links
 symlinks -c \
   %{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d} \
   %{buildroot}%{_sysconfdir}/nginx/includes \
   %{buildroot}%{_sysconfdir}/supervisord.d \
-  %{buildroot}%{_sysconfdir}/logrotate/conf.d 
+  %{buildroot}%{_sysconfdir}/logrotate.d 
 
 %clean
 rm -rf "%{buildroot}"
@@ -174,7 +174,7 @@ rm -rf "%{buildroot}"
 
 %attr(-, root, root) %{_libdir}/*.so*
 %attr(-, root, root) %{_bindir}/documentserver-*.sh
-%attr(-, root, root) %{_sysconfdir}/logrotate/conf.d/*
+%attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/*
 %attr(-, root, root) %{_sysconfdir}/supervisord.d/*
 
