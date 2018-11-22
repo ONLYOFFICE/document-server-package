@@ -119,6 +119,8 @@ ifeq ($(OS),Windows_NT)
 	EXEC_EXT := .exe
 	SHELL_EXT := .bat
 	SHARED_EXT := .dll
+	ARCH_EXT := .zip
+	AR := 7z a -y
 	DEPLOY := $(EXE_REPO_DATA)
 	NGINX_CONF := 
 	NGINX_LOG := logs/
@@ -139,6 +141,8 @@ else
 		PLATFORM := linux
 		SHARED_EXT := .so*
 		SHELL_EXT := .sh
+		ARCH_EXT := .zip
+		AR := 7z a -y
 		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
 		NGINX_CONF := /etc/nginx/
 		NGINX_LOG := /var/log/onlyoffice/documentserver/
@@ -156,8 +160,10 @@ else
 		ARCHITECTURE := 32
 	endif
 endif
+DS_BIN_REPO := ./ds-repo
+DS_BIN := $(DS_BIN_REPO)/$(PLATFORM)_$(ARCHITECTURE)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
-.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb
+.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb deploy-bin
 
 all: rpm deb apt-rpm
 
@@ -183,6 +189,7 @@ clean:
 		$(EXE_REPO)\
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
+		$(DS_BIN_REPO)\
 		$(FONTS)\
 		documentserver \
 		documentserver-example
@@ -311,6 +318,12 @@ $(PSQL):
 	cp -rf -t $(DOCUMENTSERVER)/pgsql/bin  pgsql/bin/psql.exe  pgsql/bin/*.dll && \
 	rm -f $(PSQL_ZIP)
 	
+$(DS_BIN): documentserver
+
+%$(ARCH_EXT):
+	mkdir -p $(@D)
+	$(AR) $@ ./$(DOCUMENTSERVER)/sdkjs ./$(DOCUMENTSERVER)/server/FileConverter/bin
+
 $(NSSM):
 	$(CURL) $(NSSM_ZIP) https://github.com/ONLYOFFICE/nssm/releases/download/v2.24.1/$(NSSM_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
@@ -381,6 +394,12 @@ $(EXE_REPO_DATA): $(EXE)
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
+		--acl public-read --delete
+
+deploy-bin: $(DS_BIN)
+	aws s3 sync \
+		$(DS_BIN_REPO) \
+		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
 		--acl public-read --delete
 
 deploy: $(DEPLOY)
