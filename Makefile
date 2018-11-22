@@ -121,7 +121,7 @@ ifeq ($(OS),Windows_NT)
 	SHARED_EXT := .dll
 	ARCH_EXT := .zip
 	AR := 7z a -y
-	DEPLOY := $(EXE_REPO_DATA)
+	DEPLOY := $(EXE_REPO_DATA) $(DS_BIN_REPO)
 	NGINX_CONF := 
 	NGINX_LOG := logs/
 	NGINX_CASH := temp/
@@ -143,7 +143,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA) $(DS_BIN_REPO)
 		NGINX_CONF := /etc/nginx/
 		NGINX_LOG := /var/log/onlyoffice/documentserver/
 		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
@@ -396,7 +396,9 @@ $(EXE_REPO_DATA): $(EXE)
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
 		--acl public-read --delete
 
-deploy-bin: $(DS_BIN)
+deploy-bin: $(DS_BIN_REPO)
+
+$(DS_BIN_REPO): $(DS_BIN)
 	aws s3 sync \
 		$(DS_BIN_REPO) \
 		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
