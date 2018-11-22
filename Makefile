@@ -152,6 +152,20 @@ else
 		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
 		DEV_NULL := /dev/null
 	endif
+	ifeq ($(UNAME_S),Darwin)
+		PLATFORM := mac
+		SHARED_EXT := .dylib
+		SHELL_EXT := .sh
+		ARCH_EXT := .zip
+		AR := 7z a -y
+		NGINX_CONF := /etc/nginx/
+		NGINX_LOG := /var/log/onlyoffice/documentserver/
+		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
+		DS_ROOT := /var/www/onlyoffice/documentserver/
+		DS_FILES := /var/lib/onlyoffice/documentserver/
+		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
+		DEV_NULL := /dev/null
+	endif
 	UNAME_P := $(shell uname -p)
 	ifeq ($(UNAME_P),x86_64)
 		ARCHITECTURE := 64
