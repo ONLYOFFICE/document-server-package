@@ -121,7 +121,7 @@ ifeq ($(OS),Windows_NT)
 	SHARED_EXT := .dll
 	ARCH_EXT := .zip
 	AR := 7z a -y
-	DEPLOY := $(EXE_REPO_DATA) $(DS_BIN_REPO)
+	DEPLOY := $(EXE_REPO_DATA)
 	NGINX_CONF := 
 	NGINX_LOG := logs/
 	NGINX_CASH := temp/
@@ -143,7 +143,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA) $(DS_BIN_REPO)
+		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
 		NGINX_CONF := /etc/nginx/
 		NGINX_LOG := /var/log/onlyoffice/documentserver/
 		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
@@ -160,8 +160,13 @@ else
 		ARCHITECTURE := 32
 	endif
 endif
+
 DS_BIN_REPO := ./ds-repo
-DS_BIN := $(DS_BIN_REPO)/$(PLATFORM)_$(ARCHITECTURE)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
+DS_BIN := ./$(PLATFORM)_$(ARCHITECTURE)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
+
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
+DEPLOY += $(DS_BIN_REPO)
+endif
 
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb deploy-bin
 
@@ -187,9 +192,10 @@ clean:
 		$(DEB_REPO)\
 		$(RPM_REPO)\
 		$(EXE_REPO)\
+		$(DS_BIN_REPO)\
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
-		$(DS_BIN_REPO)\
+		$(DS_BIN)\
 		$(FONTS)\
 		documentserver \
 		documentserver-example
@@ -399,6 +405,8 @@ $(EXE_REPO_DATA): $(EXE)
 deploy-bin: $(DS_BIN_REPO)
 
 $(DS_BIN_REPO): $(DS_BIN)
+	mkdir -p $(DS_BIN_REPO)
+	cp -rv $(dir $(DS_BIN)) $(DS_BIN_REPO)
 	aws s3 sync \
 		$(DS_BIN_REPO) \
 		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
