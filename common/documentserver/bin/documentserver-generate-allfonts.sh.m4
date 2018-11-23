@@ -20,9 +20,9 @@ echo -n Generating AllFonts.js, please wait...
   --output-web="$DIR/fonts"\
   --use-system="true"
 
-chown -R onlyoffice:onlyoffice "$DIR/sdkjs"
-chown -R onlyoffice:onlyoffice "$DIR/server/FileConverter/bin"
-chown -R onlyoffice:onlyoffice "$DIR/fonts"
+chown -R ds:ds "$DIR/sdkjs"
+chown -R ds:ds "$DIR/server/FileConverter/bin"
+chown -R ds:ds "$DIR/fonts"
 
 echo Done
 
