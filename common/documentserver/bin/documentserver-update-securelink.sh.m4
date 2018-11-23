@@ -10,6 +10,6 @@ sed "s,\(set \+\$secret_string\).*,\1 "${SECRET_STRING}";," -i ${NGINX_CONF}
 
 ${JSON} -I -e "this.storage.fs.secretString = '${SECRET_STRING}'"
 
-sudo supervisorctl restart ds:docservice
-sudo supervisorctl restart ds:converter
-sudo service nginx reload
+supervisorctl restart ds:docservice
+supervisorctl restart ds:converter
+service nginx reload

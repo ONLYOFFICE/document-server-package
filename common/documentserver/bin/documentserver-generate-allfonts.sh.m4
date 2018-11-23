@@ -11,7 +11,7 @@ DIR="/var/www/M4_DS_PREFIX"
 echo -n Generating AllFonts.js, please wait...
 
 
-sudo -u ds "$DIR/server/tools/AllFontsGen"\
+"$DIR/server/tools/AllFontsGen"\
   --input="$DIR/core-fonts"\
   --allfonts-web="$DIR/sdkjs/common/AllFonts.js"\
   --allfonts="$DIR/server/FileConverter/bin/AllFonts.js"\
@@ -20,6 +20,10 @@ sudo -u ds "$DIR/server/tools/AllFontsGen"\
   --output-web="$DIR/fonts"\
   --use-system="true"
 
+chown -R onlyoffice:onlyoffice "$DIR/sdkjs"
+chown -R onlyoffice:onlyoffice "$DIR/server/FileConverter/bin"
+chown -R onlyoffice:onlyoffice "$DIR/fonts"
+
 echo Done
 
 #Remove gzipped fonts
@@ -27,6 +31,6 @@ rm -f $DIR/fonts/*.gz $DIR/sdkjs/common/AllFonts.js.gz
 
 #Restart web-site and converter
 if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
- sudo supervisorctl restart ds:docservice
- sudo supervisorctl restart ds:converter
+ supervisorctl restart ds:docservice
+ supervisorctl restart ds:converter
 fi
