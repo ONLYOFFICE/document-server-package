@@ -424,6 +424,6 @@ $(DS_BIN_REPO): $(DS_BIN)
 	aws s3 sync \
 		$(DS_BIN_REPO) \
 		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
-		--acl public-read --delete
+		--acl public-read
 
 deploy: $(DEPLOY)
