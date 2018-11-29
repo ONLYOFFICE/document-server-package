@@ -36,7 +36,7 @@ restart_services() {
 	echo -n "Restarting services... "
 	for SVC in supervisord nginx
 	do
-		/sbin/service $SVC restart
+		systemctl restart $SVC
 	done
 	echo "OK"
 }

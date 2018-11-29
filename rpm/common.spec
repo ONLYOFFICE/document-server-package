@@ -238,8 +238,13 @@ for PORT in ${PORTS[@]}; do
 done
 
 # restart dependent services
-%{service} supervisord restart >/dev/null 2>&1
-%{service} nginx reload >/dev/null 2>&1
+if systemctl is-active --quiet supervisord; then
+  systemctl restart supervisord >/dev/null 2>&1
+fi
+
+if systemctl is-active --quiet nginx; then
+  systemctl reload nginx >/dev/null 2>&1
+fi
 
 %preun
 case "$1" in
@@ -247,7 +252,9 @@ case "$1" in
     # Uninstall
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
-    supervisorctl stop ds:*
+    if systemctl is-active --quiet supervisord; then
+      supervisorctl stop ds:*
+    fi
   ;;
   1)
     # Upgrade
@@ -270,9 +277,14 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
-
-    supervisorctl update >/dev/null 2>&1
-    %{service} nginx reload >/dev/null 2>&1
+    
+    if systemctl is-active --quiet supervisord; then
+      supervisorctl update >/dev/null 2>&1
+    fi
+    
+    if systemctl is-active --quiet nginx; then
+      systemctl reload nginx >/dev/null 2>&1
+    fi
   ;;
   1)
     # Upgrade
