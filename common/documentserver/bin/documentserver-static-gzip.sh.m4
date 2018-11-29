@@ -15,4 +15,4 @@ sed 's/#*\s*\(gzip_static\).*/\1 on;/g' \
   -i ${NGINX_ONLYOFFICE_PATH}/includes/ds-docservice.conf
 
 # Reload nginx config
-sudo service nginx reload
+service nginx reload
