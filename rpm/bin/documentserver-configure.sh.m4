@@ -25,8 +25,16 @@ npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ ! -f ${i} ]; then
-			install -o ds -g ds -m 640 -D /dev/null ${i}
+			install -m 640 -D /dev/null ${i}
 			echo {} > ${i}
+		fi
+  	done
+}
+
+tune_local_configs(){
+	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
+		if [ -f ${i} ]; then
+			chown ds:ds -R ${i}
 		fi
   	done
 }
@@ -295,6 +303,8 @@ save_db_params
 save_rabbitmq_params
 save_redis_params
 save_jwt_params
+
+tune_local_configs
 
 setup_nginx
 
