@@ -25,7 +25,7 @@ npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ ! -f ${i} ]; then
-			install -m 640 -D /dev/null ${i}
+			install -o ds -g ds -m 640 -D /dev/null ${i}
 			echo {} > ${i}
 		fi
   	done
