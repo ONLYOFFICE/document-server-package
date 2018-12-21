@@ -316,11 +316,13 @@ input_redis_params
 # establish_redis_conn || exit $?
 
 input_rabbitmq_params
+parse_rabbitmq_url
 # establish_rabbitmq_conn || exit $?
 
 save_db_params
 save_rabbitmq_params
 save_redis_params
+save_jwt_params
 
 tune_local_configs
 
