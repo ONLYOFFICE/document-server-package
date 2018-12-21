@@ -187,7 +187,7 @@ input_rabbitmq_params(){
 	echo "Configuring RabbitMQ access... "
 
 	read -e -p "Host [${RABBITMQ_HOST_PORT_PATH}]: " USER_INPUT
-	RABBITMQ_HOST=${USER_INPUT:-${RABBITMQ_HOST_PORT_PATH}}
+	RABBITMQ_HOST_PORT_PATH=${USER_INPUT:-${RABBITMQ_HOST_PORT_PATH}}
 
 	read -e -p "User [${RABBITMQ_USER}]: " USER_INPUT
 	RABBITMQ_USER=${USER_INPUT:-${RABBITMQ_USER}}
