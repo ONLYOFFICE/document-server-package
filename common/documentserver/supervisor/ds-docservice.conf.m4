@@ -1,5 +1,5 @@
 [program:docservice]
-command=node --max_old_space_size=4096 /var/www/M4_DS_PREFIX/server/DocService/sources/server.js
+command=node --max_old_space_size=4096 --use-openssl-ca /var/www/M4_DS_PREFIX/server/DocService/sources/server.js
 directory=/var/www/M4_DS_PREFIX/server/DocService/sources/
 user=ds
 environment=NODE_ENV=production-linux,NODE_CONFIG_DIR=/etc/M4_DS_PREFIX,NODE_DISABLE_COLORS=1

@@ -8,6 +8,7 @@ Package: PACKAGE_NAME
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
   adduser,
+  ca-certificates,
   coreutils,
   libasound2,
   libboost-regex-dev,
