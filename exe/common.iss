@@ -138,7 +138,7 @@
 #define NGINX_DS_TMPL '{app}\nginx\conf\ds.conf.tmpl'
 #define NGINX_DS_SSL_TMPL '{app}\nginx\conf\ds-ssl.conf.tmpl'
 
-#define LICENSE_PATH str("{commonappdata}\" + sCompanyName + "\Data")
+#define LICENSE_PATH str("{commonappdata}\" + sIntCompanyName + "\Data")
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
