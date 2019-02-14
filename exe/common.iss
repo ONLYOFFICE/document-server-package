@@ -1,10 +1,61 @@
-#ifndef sPackageName
-  #define sPackageName        'onlyoffice-documentserver'
+#ifndef sBrandingFolder
+  #define sBrandingFolder '..\branding'
 #endif
 
-#define sAppName            'ONLYOFFICE DocumentServer'
-#define APP_PATH            'ONLYOFFICE\DocumentServer'
-#define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
+#define sBrandingFile str(sBrandingFolder + "\branding.iss")
+
+#if FileExists(sBrandingFile)
+  #include str(sBrandingFile)
+#endif
+
+#ifndef sCompanyName
+  #define sCompanyName        'ONLYOFFICE'
+#endif
+
+#ifndef sIntCompanyName
+  #define sIntCompanyName     str(sCompanyName)
+#endif
+
+#ifndef sProductName
+  #define sProductName        'DocumentServer'
+#endif
+
+#ifndef sIntProductName
+  #define sIntProductName     str(sProductName)
+#endif
+
+#ifndef sPackageName
+  #define sPackageName        str(LowerCase(sIntCompanyName) + "-" + LowerCase(sIntProductName))
+#endif
+
+#define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\" + sPackageName + "\LICENSE.txt")
+#ifnexist sLicenseFile
+  #define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\onlyoffice-documentserver\LICENSE.txt")
+#endif
+
+#ifndef sPublisherName
+  #define sPublisherName      'Ascensio System SIA'
+#endif
+
+#ifndef sAppCopyright
+  #define sAppCopyright      str("Copyright (C) 2018 " + sPublisherName)
+#endif
+
+#ifndef sPublisherUrl
+  #define sPublisherUrl       'https://www.onlyoffice.com/'
+#endif
+
+#ifndef sSupportURL
+  #define sSupportURL=str(sPublisherUrl + "support.aspx")
+#endif
+
+#ifndef sUpdatesURL
+  #define sUpdatesURL=str(sPublisherUrl)
+#endif
+
+#define sAppName            str(sCompanyName + " " + sProductName)
+#define APP_PATH            str(sIntCompanyName + "\" + sIntProductName)
+#define APP_REG_PATH        str("Software\" + sIntCompanyName + "\" + sIntProductName)
 
 #define REG_LICENSE_PATH      'LicensePath'
 #define REG_DB_HOST           'DbHost'
@@ -30,6 +81,10 @@
   #define sAppVersion         '4.0.0.0'
 #endif
 
+#ifndef sDbDefValue
+  #define sDbDefValue         'onlyoffice'
+#endif
+
 #define sAppVerShort
 
 #define NSSM                  '{app}\nssm\nssm.exe'
@@ -38,26 +93,26 @@
 #define LOCAL_SERVICE 'Local Service'
 
 #define CONVERTER_SRV        'DsConverterSvc'
-#define CONVERTER_SRV_DISPLAY  'ONLYOFFICE DocumentServer Converter'
-#define CONVERTER_SRV_DESCR  'ONLYOFFICE DocumentServer Converter Service'
+#define CONVERTER_SRV_DISPLAY  str(sAppName + " Converter")
+#define CONVERTER_SRV_DESCR  str(sAppName + " Converter Service")
 #define CONVERTER_SRV_DIR    '{app}\server\FileConverter\sources'
 #define CONVERTER_SRV_LOG_DIR    '{app}\Log\converter'
 
 #define DOCSERVICE_SRV        'DsDocServiceSvc'
-#define DOCSERVICE_SRV_DISPLAY  'ONLYOFFICE DocumentServer DocService'
-#define DOCSERVICE_SRV_DESCR  'ONLYOFFICE DocumentServer DocService Service'
+#define DOCSERVICE_SRV_DISPLAY  str(sAppName + " DocService")
+#define DOCSERVICE_SRV_DESCR  str(sAppName + " DocService Service")
 #define DOCSERVICE_SRV_DIR    '{app}\server\docservice\sources'
 #define DOCSERVICE_SRV_LOG_DIR    '{app}\Log\docservice'
 
 #define GC_SRV        'DsGcSvc'
-#define GC_SRV_DISPLAY  'ONLYOFFICE DocumentServer Gc'
-#define GC_SRV_DESCR  'ONLYOFFICE DocumentServer Gc Service'
+#define GC_SRV_DISPLAY  str(sAppName + " Gc")
+#define GC_SRV_DESCR  str(sAppName + " Gc Service")
 #define GC_SRV_DIR    '{app}\server\docservice\sources'
 #define GC_SRV_LOG_DIR    '{app}\Log\gc'
 
 #define SPELLCHECKER_SRV        'DsSpellcheckerSvc'
-#define SPELLCHECKER_SRV_DISPLAY  'ONLYOFFICE DocumentServer Spellchecker'
-#define SPELLCHECKER_SRV_DESCR  'ONLYOFFICE DocumentServer Spellchecker Service'
+#define SPELLCHECKER_SRV_DISPLAY  str(sAppName + " Spellchecker")
+#define SPELLCHECKER_SRV_DESCR  str(sAppName + " Spellchecker Service")
 #define SPELLCHECKER_SRV_DIR    '{app}\server\SpellChecker\sources'
 #define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
 
@@ -75,15 +130,15 @@
 #define REPLACE '{userappdata}\npm\replace.cmd'
 
 #define NGINX_SRV  'DsProxySvc'
-#define NGINX_SRV_DISPLAY  'ONLYOFFICE DocumentServer Proxy'
-#define NGINX_SRV_DESCR  'ONLYOFFICE DocumentServer Proxy Service'
+#define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
+#define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
 #define NGINX_SRV_DIR  '{app}\nginx'
 #define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
-#define NGINX_DS_CONF '{app}\nginx\conf\onlyoffice-documentserver.conf'
-#define NGINX_DS_TMPL '{app}\nginx\conf\onlyoffice-documentserver.conf.template'
-#define NGINX_DS_SSL_TMPL '{app}\nginx\conf\onlyoffice-documentserver-ssl.conf.template'
+#define NGINX_DS_CONF '{app}\nginx\conf\ds.conf'
+#define NGINX_DS_TMPL '{app}\nginx\conf\ds.conf.tmpl'
+#define NGINX_DS_SSL_TMPL '{app}\nginx\conf\ds-ssl.conf.tmpl'
 
-#define LICENSE_PATH '{commonappdata}\ONLYOFFICE\Data'
+#define LICENSE_PATH str("{commonappdata}\" + sCompanyName + "\Data")
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
@@ -95,15 +150,17 @@ AppVersion                ={#sAppVersion}
 VersionInfoVersion        ={#sAppVersion}
 OutputBaseFilename        ={#sPackageName}-{#sAppVersion}
 
-AppPublisher            =Ascensio System SIA.
-AppPublisherURL         =http://www.onlyoffice.com/
-AppSupportURL           =http://www.onlyoffice.com/support.aspx
-AppCopyright            =Copyright (C) 2018 Ascensio System SIA.
+AppPublisher            ={#sPublisherName}
+AppPublisherURL         ={#sPublisherUrl}
+AppSupportURL           ={#sSupportURL}
+AppUpdatesURL           ={#sUpdatesURL}
+AppCopyright            ={#sAppCopyright}
+
 
 ArchitecturesAllowed              =x64
 ArchitecturesInstallIn64BitMode   =x64
 
-DefaultGroupName        =ONLYOFFICE
+DefaultGroupName        ={#sCompanyName}
 ;WizardImageFile         = data\dialogpicture.bmp
 ;WizardSmallImageFile    = data\dialogicon.bmp
 
@@ -125,10 +182,10 @@ PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
 MinVersion                =6.1.7600
-WizardImageFile           = data\dialogpicture.bmp
-WizardSmallImageFile      = data\dialogicon.bmp
-SetupIconFile             = data\icon.ico
-LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
+WizardImageFile           = {#sBrandingFolder}\exe\data\dialogpicture.bmp
+WizardSmallImageFile      = {#sBrandingFolder}\exe\data\dialogicon.bmp
+SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
+LicenseFile               = 
 ShowLanguageDialog        = no
 
 #ifdef ISPPCC_INVOKED
@@ -137,6 +194,7 @@ SignTool=byparam $p
 
 ; supported languages
 #include "scripts\lang\english.iss"
+#include "scripts\lang\russian.iss"
 ; #include "scripts\lang\german.iss"
 ; #include "scripts\lang\french.iss"
 ; #include "scripts\lang\italian.iss"
@@ -150,24 +208,48 @@ SignTool=byparam $p
 ; #endif
 
 [CustomMessages]
-GenFonts=Generating AllFonts.js...
-InstallSrv=Installing service %1...
-CfgSrv=Configuring service %1...
-StartSrv=Starting service %1...
-InstallNpm=Installing npm modules...
-CreateDb=Creating database...
-RemoveDb=Removing database...
-FireWallExt=Adding firewall extention...
-AddRotateTask=Adding scheduled tasks...
+en.AddRotateTask=Adding scheduled tasks...
+ru.AddRotateTask=Добавление задачи в планировщик...
 
-CfgDs=Configuring {#sAppName}...
-Uninstall=Uninstall {#sAppName}
-PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
+en.CfgDs=Configuring {#sAppName}...
+ru.CfgDs=Настройка {#sAppName}...
 
-DependenciesDir={#sAppName} Dependencies
+en.CfgSrv=Configuring service %1...
+ru.CfgSrv=Настройка сервиса %1...
+
+en.CreateDb=Creating database...
+ru.CreateDb=Создание базы данных...
+
+en.DependenciesDir={#sAppName} Dependencies
+ru.DependenciesDir={#sAppName} Зависимости
+
+en.FireWallExt=Adding firewall extention...
+ru.FireWallExt=Добавление исключения в файервол ...
+
+en.GenFonts=Generating AllFonts.js...
+ru.GenFonts=Создание AllFonts.js...
+
+en.InstallNpm=Installing npm modules...
+ru.InstallNpm=Установка npm модулей...
+
+en.InstallSrv=Installing service %1...
+ru.InstallSrv=Установка сервиса %1...
+
+en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
+ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' что бы удалить ей, или 'Отменить' что бы выйти из программы инсталляции.
+
+en.RemoveDb=Removing database...
+ru.RemoveDb=Удаление базы данных...
+
+en.StartSrv=Starting service %1...
+ru.StartSrv=Запуск сервиса %1...
+
+en.Uninstall=Uninstall {#sAppName}
+ru.Uninstall=Удаление {#sAppName}
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 ;Name: "de"; MessagesFile: "compiler:Languages\German.isl"
 ;Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
 ;Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
@@ -181,8 +263,8 @@ Source: local\local.json;                           DestDir: {app}\config; Flags
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\includes\*;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*.template;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\onlyoffice-documentserver.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -580,9 +662,9 @@ begin
   DbPage.Add('Database:', False);
 
   DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_USER}|onlyoffice}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_PWD}|onlyoffice}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_NAME}|onlyoffice}}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_USER}|{#sDbDefValue}}}');
+  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_PWD}|{#sDbDefValue}}}');
+  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
