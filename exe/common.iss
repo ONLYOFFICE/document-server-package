@@ -53,7 +53,7 @@
   #define sUpdatesURL=str(sPublisherUrl)
 #endif
 
-#define sAppName            str(sCompanyName + " " + sProductName)
+#define sAppName            str(sCompanyName + ". " + sProductName)
 #define APP_PATH            str(sIntCompanyName + "\" + sIntProductName)
 #define APP_REG_PATH        str("Software\" + sIntCompanyName + "\" + sIntProductName)
 
