@@ -122,12 +122,11 @@
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define NODE_PATH '{pf64}\nodejs'
-#define NPM '{pf64}\nodejs\npm'
-#define JSON '{userappdata}\npm\json.cmd'
+#define JSON '{app}\npm\node_modules\.bin\json.cmd'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\local.json""'
 
-#define REPLACE '{userappdata}\npm\replace.cmd'
+#define REPLACE '{app}\npm\node_modules\.bin\replace.cmd'
 
 #define NGINX_SRV  'DsProxySvc'
 #define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
@@ -229,9 +228,6 @@ ru.FireWallExt=Добавление исключения в файервол ...
 en.GenFonts=Generating AllFonts.js...
 ru.GenFonts=Создание AllFonts.js...
 
-en.InstallNpm=Installing npm modules...
-ru.InstallNpm=Установка npm модулей...
-
 en.InstallSrv=Installing service %1...
 ru.InstallSrv=Установка сервиса %1...
 
@@ -306,9 +302,6 @@ Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_JW
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
-
-Filename: "{#NPM}"; Parameters: "install -g json"; Flags: runhidden shellexec waituntilterminated; StatusMsg: "{cm:InstallNpm}"
-Filename: "{#NPM}"; Parameters: "install -g replace"; Flags: runhidden shellexec waituntilterminated; StatusMsg: "{cm:InstallNpm}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 

@@ -3,8 +3,9 @@
 DIR="/var/www/M4_DS_PREFIX"
 LOCAL_CONFIG="/etc/M4_DS_PREFIX/local.json"
 EXAMPLE_CONFIG="/etc/M4_DS_PREFIX-example/local.json"
-JSON="json -I -q -f $LOCAL_CONFIG"
-JSON_EXAMPLE="json -I -q -f $EXAMPLE_CONFIG"
+JSON_BIN="$DIR/npm/.bin/json"
+JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
+JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
 PSQL=""
 CREATEDB=""
@@ -19,8 +20,6 @@ JWT_SECRET=${JWT_SECRET:-secret}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
-
-npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do

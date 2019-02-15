@@ -361,6 +361,8 @@ ifeq ($(PRODUCT_NAME_LOW), documentserver-ie)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
 endif
 
+	cd $(DOCUMENTSERVER)/npm && npm install
+
 	echo "Done" > $@
 
 documentserver-example:

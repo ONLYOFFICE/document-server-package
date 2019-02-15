@@ -25,8 +25,9 @@ APP_DIR="/var/lib/M4_DS_PREFIX"
 CONF_DIR="/etc/M4_DS_PREFIX"
 LOCAL_CONFIG=${CONF_DIR}/local.json
 EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
-JSON="json -I -q -f $LOCAL_CONFIG"
-JSON_EXAMPLE="json -I -q -f ${EXAMPLE_CONFIG}"
+JSON_BIN="$DIR/npm/.bin/json"
+JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
+JSON_EXAMPLE="$JSON_BIN -I -q -f ${EXAMPLE_CONFIG}"
 
 OLD_VERSION="$2"
 
@@ -212,9 +213,6 @@ case "$1" in
 
 		# add nginx user to M4_ONLYOFFICE_VALUE group to allow access nginx to M4_ONLYOFFICE_VALUE log dir
 		adduser --quiet www-data ds
-
-		#install node modules
-		npm list -g json >/dev/null 2>&1 || npm install -g json >/dev/null 2>&1
 
 		create_local_configs
 		read_saved_params
