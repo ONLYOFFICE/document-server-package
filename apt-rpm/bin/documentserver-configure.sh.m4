@@ -3,7 +3,7 @@
 DIR="/var/www/M4_DS_PREFIX"
 LOCAL_CONFIG="/etc/M4_DS_PREFIX/local.json"
 EXAMPLE_CONFIG="/etc/M4_DS_PREFIX-example/local.json"
-JSON_BIN="$DIR/npm/.bin/json"
+JSON_BIN="$DIR/npm/node_modules/.bin/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 

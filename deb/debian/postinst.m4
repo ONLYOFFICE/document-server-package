@@ -25,7 +25,7 @@ APP_DIR="/var/lib/M4_DS_PREFIX"
 CONF_DIR="/etc/M4_DS_PREFIX"
 LOCAL_CONFIG=${CONF_DIR}/local.json
 EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
-JSON_BIN="$DIR/npm/.bin/json"
+JSON_BIN="$DIR/npm/node_modules/.bin/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f ${EXAMPLE_CONFIG}"
 
