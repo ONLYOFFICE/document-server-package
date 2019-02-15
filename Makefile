@@ -117,10 +117,10 @@ NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
-WEBAPPS_DIR ?= web-apps
-
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ie))
 WEBAPPS_DIR ?= web-apps-pro
+else
+WEBAPPS_DIR ?= web-apps
 endif
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ie))
