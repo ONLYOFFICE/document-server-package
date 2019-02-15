@@ -77,15 +77,21 @@
 
 #define iconsExe            'projicons.exe'
 
+#ifndef sAppVerShort
+	#define sAppVerShort	'0.0.0
+#endif
+
+#ifndef sAppBuildNumber
+	#define sAppBuildNumber	'0'
+#endif
+
 #ifndef sAppVersion
-  #define sAppVersion         '4.0.0.0'
+  #define sAppVersion         str(sAppVerShort + "." + sAppBuildNumber)
 #endif
 
 #ifndef sDbDefValue
   #define sDbDefValue         'onlyoffice'
 #endif
-
-#define sAppVerShort
 
 #define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'

@@ -436,7 +436,8 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 
 %.exe:
 	cd $(@D) && iscc \
-	//DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) \
+	//DsAppVerShort=$(PRODUCT_VERSION) \
+	//DsAppBuildNumber=$(BUILD_NUMBER) \
 	//Qp \
 	//S$(SIGN_STR) \
 	$(PACKAGE_NAME).iss
