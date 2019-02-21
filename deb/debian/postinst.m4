@@ -240,7 +240,7 @@ case "$1" in
 		mkdir -p "$DIR/../Data" #! 
 		mkdir -p "$DIR/fonts"
 		mkdir -p "$DIR-example/public/files"
-		chown ds:ds -R "$DIR"
+		chown ds:ds -R "$DIR" "$DIR-example"
 
     #setup logrotate config rights
     chmod 644 ${CONF_DIR}/logrotate/*
