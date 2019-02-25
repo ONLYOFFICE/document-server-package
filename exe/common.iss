@@ -1,5 +1,5 @@
 #ifndef sBrandingFolder
-  #define sBrandingFolder '..\branding'
+  #define sBrandingFolder '..\branding\exe'
 #endif
 
 #define sBrandingFile str(sBrandingFolder + "\branding.iss")
@@ -38,7 +38,7 @@
 #endif
 
 #ifndef sAppCopyright
-  #define sAppCopyright      str("Copyright (C) 2018 " + sPublisherName)
+  #define sAppCopyright      str("Copyright (C) 2019 " + sPublisherName)
 #endif
 
 #ifndef sPublisherUrl
@@ -78,7 +78,7 @@
 #define iconsExe            'projicons.exe'
 
 #ifndef sAppVerShort
-	#define sAppVerShort	'0.0.0
+	#define sAppVerShort	'0.0.0'
 #endif
 
 #ifndef sAppBuildNumber
@@ -86,7 +86,7 @@
 #endif
 
 #ifndef sAppVersion
-  #define sAppVersion         str(sAppVerShort + "." + sAppBuildNumber)
+  #define sAppVersion         str(sAppVerShort + '.' + sAppBuildNumber)
 #endif
 
 #ifndef sDbDefValue
