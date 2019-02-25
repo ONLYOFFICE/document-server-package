@@ -1,8 +1,8 @@
 #ifndef sBrandingFolder
-  #define sBrandingFolder '..\branding\exe'
+  #define sBrandingFolder '..\branding'
 #endif
 
-#define sBrandingFile str(sBrandingFolder + "\branding.iss")
+#define sBrandingFile str(sBrandingFolder + "\exe\branding.iss")
 
 #if FileExists(sBrandingFile)
   #include str(sBrandingFile)
