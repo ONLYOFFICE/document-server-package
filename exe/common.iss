@@ -94,7 +94,11 @@
 #endif
 
 #define NSSM                  '{app}\nssm\nssm.exe'
-#define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'
+#define NODE_ENV	          'NODE_ENV=production-windows'
+#define NODE_CONFIG_DIR       'NODE_CONFIG_DIR=""{app}\config""'
+#define NODE_DISABLE_COLORS   'NODE_DISABLE_COLORS=1'
+#define APPLICATION_NAME      str("APPLICATION_NAME=" + sCompanyName)
+#define NODE_SRV_ENV          str(NODE_ENV + ' ' + NODE_CONFIG_DIR + ' ' + NODE_DISABLE_COLORS + ' ' + APPLICATION_NAME)
 
 #define LOCAL_SERVICE 'Local Service'
 
