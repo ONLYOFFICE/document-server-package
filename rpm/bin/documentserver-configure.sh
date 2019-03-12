@@ -5,7 +5,7 @@ LOCAL_CONFIG="/etc/onlyoffice/documentserver/local.json"
 EXAMPLE_CONFIG="/etc/onlyoffice/documentserver-example/local.json"
 JSON="json -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="json -I -q -f $EXAMPLE_CONFIG"
-
+MYSQL=""
 PSQL=""
 CREATEDB=""
 
@@ -149,7 +149,7 @@ parse_rabbitmq_url(){
 }
 
 input_db_params(){
-	echo "Configuring PostgreSQL access... "
+	echo "Configuring database access... "
 	read -e -p "Host: " -i "$DB_HOST" DB_HOST
 	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
 	read -e -p "User: " -i "$DB_USER" DB_USER 
@@ -171,9 +171,25 @@ input_rabbitmq_params(){
 	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH
 	echo
 }
+execute_db_case(){
+         read db
+         case $db in
+                m) echo -n "Installing MYSQL datatbase..."
+                                if [ "$OLD_VERSION" = "" ]; then
+                                   $MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" >/dev/null 2>&1
 
-execute_db_scripts(){
-	echo -n "Installing PostgreSQL database... "
+                                 fi
+                         $MYSQL "$DB_NAME" < "$DIR/documentserver/server/schema/createdb.sql" >/dev/null 2>&1
+                  echo "OK"
+                  echo -n "Trying to establish MySQL connection... "
+                  command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+                  MYSQL="mysql -h$DB_HOST -u$DB_USER"
+                  if [ -n "$DB_PWD" ]; then
+                  MYSQL="$MYSQL -p$DB_PWD"
+                  fi         
+                  $MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+                  echo "OK";;
+               p)   echo -n "Installing PostgreSQL database... "
 
         if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
                 $CREATEDB $DB_NAME >/dev/null 2>&1
@@ -185,11 +201,8 @@ execute_db_scripts(){
 	
 	$PSQL -d "$DB_NAME" -f "$DIR/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
-	echo "OK"
-}
-
-establish_db_conn() {
-	echo -n "Trying to establish PostgreSQL connection... "
+	echo "OK" 
+        echo -n "Trying to establish PostgreSQL connection... "
 
 	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
 
@@ -203,8 +216,11 @@ establish_db_conn() {
 
 	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
-	echo "OK"
-}
+	echo "OK" ;;
+esac  
+    
+      }         
+
 
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
@@ -281,8 +297,8 @@ setup_nginx(){
 create_local_configs
 
 input_db_params
-establish_db_conn || exit $?
-execute_db_scripts || exit $?
+execute_db_case || exit $?
+
 
 input_redis_params
 establish_redis_conn || exit $?
