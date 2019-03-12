@@ -101,6 +101,10 @@ DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/pluginBase.js
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/plugins.css
 
+ifneq ($(COMPANY_NAME_LOW),onlyoffice)	
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/examples/gl?vred
+endif
+
 FONTS = common/fonts
 
 ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
