@@ -259,7 +259,7 @@ case "$1" in
 		service supervisor restart >/dev/null 2>&1
 		service nginx restart >/dev/null 2>&1
 		
-		echo "Congratulations, the COMPANY_NAME PRODUCT_NAME has been installed successfully!"
+		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)

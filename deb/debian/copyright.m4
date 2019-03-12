@@ -1,10 +1,10 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: PUBLISHER_NAME
-Upstream-Contact: PUBLISHER_NAME <SUPPORT_MAIL>
-Source: PUBLISHER_URL
+Upstream-Name: M4_PUBLISHER_NAME
+Upstream-Contact: M4_PUBLISHER_NAME <M4_SUPPORT_MAIL>
+Source: M4_PUBLISHER_URL
 
 Files: *
-Copyright: (c) Copyright PUBLISHER_NAME, 2018 <SUPPORT_MAIL>
+Copyright: (c) Copyright M4_PUBLISHER_NAME, 2018 <M4_SUPPORT_MAIL>
 
 ifdef(COMMERCIAL, License: Commercial,
 License: AGPLv3

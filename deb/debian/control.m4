@@ -1,10 +1,10 @@
-Source: PACKAGE_NAME
+Source: M4_PACKAGE_NAME
 Section: web
 Priority: optional
-Maintainer: PUBLISHER_NAME <SUPPORT_MAIL>
+Maintainer: M4_PUBLISHER_NAME <M4_SUPPORT_MAIL>
 Build-Depends: debhelper (>= 8.0.0)
 
-Package: PACKAGE_NAME
+Package: M4_PACKAGE_NAME
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
   adduser,

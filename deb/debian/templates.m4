@@ -28,27 +28,27 @@ Template: M4_ONLYOFFICE_VALUE/cluster-mode
 Type: boolean
 Default: false
 Description: Use cluster mode?
- Type true if PRODUCT_NAME will use in cluster mode.
+ Type true if M4_PRODUCT_NAME will use in cluster mode.
 
 Template: M4_ONLYOFFICE_VALUE/ds-port
 Type: string
 Default: 80
-Description: PRODUCT_NAME listening port:
+Description: M4_PRODUCT_NAME listening port:
 
 Template: M4_ONLYOFFICE_VALUE/docservice-port
 Type: string
 Default: 8000
-Description: PRODUCT_NAME docservice listening port:
+Description: M4_PRODUCT_NAME docservice listening port:
 
 Template: M4_ONLYOFFICE_VALUE/spellchecker-port
 Type: string
 Default: 8080
-Description: PRODUCT_NAME spellchecker listening port:
+Description: M4_PRODUCT_NAME spellchecker listening port:
 
 Template: M4_ONLYOFFICE_VALUE/example-port
 Type: string
 Default: 3000
-Description: PRODUCT_NAME example listening port:
+Description: M4_PRODUCT_NAME example listening port:
 
 Template: M4_ONLYOFFICE_VALUE/redis-host
 Type: string
@@ -73,7 +73,7 @@ Description: RabbitMQ password:
 Template: M4_ONLYOFFICE_VALUE/jwt-enabled
 Type: boolean
 Default: false
-Description: Enable jwt for PRODUCT_NAME?
+Description: Enable jwt for M4_PRODUCT_NAME?
 
 Template: M4_ONLYOFFICE_VALUE/jwt-secret
 Type: string
