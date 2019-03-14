@@ -7,10 +7,13 @@ JSON_BIN="$DIR/npm/node_modules/.bin/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
+BD=""
+MYSQL=""
 PSQL=""
 CREATEDB=""
 
 DS_PORT=${DS_PORT:-80}
+DB_TYPE=${DB_TYPE:-postgres}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # SPELLCHECKER_PORT=${SPELLCHECKER_PORT:-8080}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
@@ -213,6 +216,43 @@ establish_db_conn() {
 	echo "OK"
 }
 
+ex_base_sq_sqript(){
+      echo -n "Installing MYSQL........"
+      if [ "$OLD_VERSION" = "" ]; then
+      $MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" >/dev/null 2>&1
+
+      fi
+      $MYSQL "$DB_NAME" < "$DIR/var/www/onlyoffice/documentserver/server/schema/mysql/createdb.sql" >/dev/null 2>&1
+                  
+
+      echo "OK"
+}
+
+ex_base_sq_con(){
+           echo -n "Trying to establish MySQL connection... "
+           command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+           MYSQL="mysql -h$DB_HOST -u$DB_USER"
+           if [ -n "$DB_PWD" ]; then
+                   MYSQL="$MYSQL -p$DB_PWD"
+           fi         
+              $MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+                   
+        echo "OK";;
+}
+
+
+cause_db(){
+      echo" If you click 1 then installing MYSQL, other, if you click 2, then installing PostgreSQL" 
+      case $BD in
+      1)      ex_base_sq_con
+              ex_base_sq_sqript
+     
+      2)      establish_db_conn
+              execute_db_scripts
+
+
+   ;;
+
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
@@ -288,8 +328,8 @@ setup_nginx(){
 create_local_configs
 
 input_db_params
-establish_db_conn || exit $?
-execute_db_scripts || exit $?
+cause_db || exit $?
+
 
 input_redis_params
 establish_redis_conn || exit $?
