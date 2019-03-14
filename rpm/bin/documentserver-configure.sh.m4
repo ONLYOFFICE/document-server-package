@@ -190,10 +190,10 @@ execute_db_scripts(){
         fi
 
         if [ ! "$CLUSTER_MODE" = true ]; then
-                $PSQL -d "$DB_NAME" -f "$DIRvar/www/onlyoffice/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+                $PSQL -d "$DB_NAME" -f "$DIR/var/www/onlyoffice/documentserver/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
         fi
 	
-	$PSQL -d "$DB_NAME" -f "$DIRvar/www/onlyoffice/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
+	$PSQL -d "$DB_NAME" -f "$DIR/var/www/onlyoffice/documentserver/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
 	echo "OK"
 }
