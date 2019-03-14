@@ -56,7 +56,7 @@
 #define sAppName            str(sCompanyName + ". " + sProductName)
 
 #ifndef sAppId
-	#define sAppId              str(sAppName + "_is1")
+	#define sAppId              str(sAppName)
 #endif
 
 #define APP_PATH            str(sIntCompanyName + "\" + sIntProductName)
@@ -500,7 +500,7 @@ var
 begin
   Result := True;
   UninstallerParam := '/VERYSILENT';
-  UninstallRegKey := '{reg:HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#sAppId},UninstallString}';
+  UninstallRegKey := '{reg:HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#sAppId}_is1,UninstallString}';
 
   UninstallerPath := RemoveQuotes(ExpandConstant(UninstallRegKey));
   if Length(UninstallerPath) > 0 then begin
