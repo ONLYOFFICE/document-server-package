@@ -53,7 +53,9 @@
   #define sUpdatesURL=str(sPublisherUrl)
 #endif
 
-#define sAppName            str(sCompanyName + ". " + sProductName)
+#ifndef sAppName
+  #define sAppName            str(sCompanyName + " " + sProductName)
+#endif
 
 #ifndef sAppId
 	#define sAppId              str(sAppName)
