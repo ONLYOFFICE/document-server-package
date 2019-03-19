@@ -326,13 +326,11 @@ setup_nginx(){
 }
 
 create_local_configs
-
 input_db_params
 execute_db_script
 
 input_redis_params
 establish_redis_conn || exit $?
-
 input_rabbitmq_params
 parse_rabbitmq_url
 establish_rabbitmq_conn || exit $?
@@ -347,3 +345,4 @@ tune_local_configs
 setup_nginx
 
 restart_services
+
