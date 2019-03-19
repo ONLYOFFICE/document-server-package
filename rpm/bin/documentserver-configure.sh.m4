@@ -325,7 +325,6 @@ setup_nginx(){
       true
   done
 }
-
 create_local_configs
 input_db_params
 execute_db_script
