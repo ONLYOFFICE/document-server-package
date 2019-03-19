@@ -215,6 +215,7 @@ establish_postgres_conn() {
 
 	echo "OK"
 }
+
 execute_mysql_sqript(){
 	echo -n "Installing MYSQL database... "
 	$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" 
