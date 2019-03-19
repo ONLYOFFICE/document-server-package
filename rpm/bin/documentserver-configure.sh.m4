@@ -239,10 +239,8 @@ execute_db_script(){
 			DB_PORT=5432 
 			establish_postgres_conn || exit $?
 			execute_postgres_scripts || exit $?
-				
-			;;
-
-		mysql) 
+			;;	
+			mysql) 
 			DB_PORT=3306  
 			establish_mysql_conn || exit $?
 			execute_mysql_sqript || exit $?
@@ -251,6 +249,8 @@ execute_db_script(){
 			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
 			exit 1	  
 	esac
+		
+		
 }
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
@@ -328,8 +328,6 @@ create_local_configs
 
 input_db_params
 execute_db_script
-
-
 
 input_redis_params
 establish_redis_conn || exit $?
