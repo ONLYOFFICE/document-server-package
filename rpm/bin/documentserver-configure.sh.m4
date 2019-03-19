@@ -218,22 +218,21 @@ establish_postgres_conn() {
 	echo "OK"
 }
 execute_mysql_sqript(){
-      echo -n "Installing MYSQL database........"
-      $MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" 
-      $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql" 
-      
-			echo "OK"
+	echo -n "Installing MYSQL database... "
+	$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" 
+	$MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql" 
+	echo "OK"
 }
 establish_mysql_conn(){
-           echo -n "Trying to database MySQL connection... "
-           command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
-           MYSQL="mysql -h$DB_HOST -u$DB_USER"
-           if [ -n "$DB_PWD" ]; then
-                   MYSQL="$MYSQL -p$DB_PWD"
-           fi         
-              $MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-                   
-        echo "OK"
+	echo -n "Trying to database MySQL connection... "
+	command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+	MYSQL="mysql -h$DB_HOST -u$DB_USER"
+	if [ -n "$DB_PWD" ]; then
+	MYSQL="$MYSQL -p$DB_PWD"
+	fi         
+	$MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+							
+	echo "OK"
 }
 
 execute_db_script(){
@@ -251,8 +250,8 @@ execute_db_script(){
 			execute_mysql_sqript || exit $?
 			;;   
 		*)
-		    echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
-			exit	  
+			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+			exit 1	  
 	esac
 }
 establish_redis_conn() {
@@ -307,17 +306,17 @@ setup_nginx(){
 
   # check whethere enabled
   shopt -s nocasematch
-   PORTS=()
-   case $(getenforce) in
+  PORTS=()
+  case $(getenforce) in
      enforcing|permissive)
-       PORTS+=('8000')
-       PORTS+=('8080')
-       PORTS+=('3000')
+      PORTS+=('8000')
+      PORTS+=('8080')
+      PORTS+=('3000')
      ;;
      disabled)
-       :
+      :
      ;;
-   esac
+  esac
 
   # add selinux extentions
    for PORT in ${PORTS[@]}; do
