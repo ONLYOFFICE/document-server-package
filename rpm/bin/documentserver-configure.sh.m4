@@ -46,7 +46,6 @@ restart_services() {
 	for SVC in supervisor nginx
 	do
 		service $SVC stop
-                sleep 2s
 		service $SVC start
 	done
 	echo "OK"
@@ -308,22 +307,22 @@ setup_nginx(){
   shopt -s nocasematch
   PORTS=()
   case $(getenforce) in
-     enforcing|permissive)
+    enforcing|permissive)
       PORTS+=('8000')
       PORTS+=('8080')
       PORTS+=('3000')
-     ;;
-     disabled)
+    ;;
+    disabled)
       :
-     ;;
+    ;;
   esac
 
   # add selinux extentions
-   for PORT in ${PORTS[@]}; do
-     semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-       semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-       true
-   done
+  for PORT in ${PORTS[@]}; do
+    semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+    semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+    true
+  done
 }
 
 create_local_configs
