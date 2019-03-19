@@ -251,7 +251,7 @@ execute_db_script(){
 			execute_mysql_sqript || exit $?
 			;;   
 		*)
-		    echo "You entered false value"
+		    echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
 			exit	  
 	esac
 }
@@ -306,25 +306,25 @@ setup_nginx(){
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
   # check whethere enabled
-#  shopt -s nocasematch
-#   PORTS=()
-#   case $(getenforce) in
-#     enforcing|permissive)
-#       PORTS+=('8000')
-#       PORTS+=('8080')
-#       PORTS+=('3000')
-#     ;;
-#     disabled)
-#       :
-#     ;;
-#   esac
+  shopt -s nocasematch
+   PORTS=()
+   case $(getenforce) in
+     enforcing|permissive)
+       PORTS+=('8000')
+       PORTS+=('8080')
+       PORTS+=('3000')
+     ;;
+     disabled)
+       :
+     ;;
+   esac
 
-#   # add selinux extentions
-#   for PORT in ${PORTS[@]}; do
-#     semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-#       semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-#       true
-#   done
+  # add selinux extentions
+   for PORT in ${PORTS[@]}; do
+     semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+       semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+       true
+   done
 }
 
 create_local_configs
