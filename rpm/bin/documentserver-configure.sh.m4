@@ -227,31 +227,32 @@ establish_mysql_conn(){
 	MYSQL="mysql -h$DB_HOST -u$DB_USER"
 	if [ -n "$DB_PWD" ]; then
 	MYSQL="$MYSQL -p$DB_PWD"
-	fi         
+
+	fi 
+
 	$MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 							
 	echo "OK"
 }
 
 execute_db_script(){
-	case $DB_TYPE in
+		case $DB_TYPE in
 		postgres)
 			DB_PORT=5432 
 			establish_postgres_conn || exit $?
 			execute_postgres_scripts || exit $?
 			;;	
-			mysql) 
+		mysql) 
 			DB_PORT=3306  
 			establish_mysql_conn || exit $?
 			execute_mysql_sqript || exit $?
 			;;   
-			*)
+		*)
 			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
 			exit 1	  
-	esac
-		
-		
+		esac
 }
+
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
