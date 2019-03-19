@@ -6,10 +6,11 @@ EXAMPLE_CONFIG="/etc/M4_DS_PREFIX-example/local.json"
 JSON_BIN="$DIR/npm/node_modules/.bin/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
-
+MYSQL=""
 PSQL=""
 CREATEDB=""
-
+DB_TYPE=${DB_TYPE:-postgres}
+DB_PORT=""
 DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # SPELLCHECKER_PORT=${SPELLCHECKER_PORT:-8080}
@@ -33,7 +34,7 @@ create_local_configs(){
 tune_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ -f ${i} ]; then
-			chown ds:ds -R ${i}
+			chown onlyoffice:onlyoffice -R ${i}
 		fi
   	done
 }
@@ -42,9 +43,11 @@ restart_services() {
 	[ -a /etc/nginx/conf.d/default.conf ] && mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.old
 
 	echo -n "Restarting services... "
-	for SVC in supervisord nginx
+	for SVC in supervisor nginx
 	do
-		systemctl restart $SVC 
+		service $SVC stop
+                sleep 2s
+		service $SVC start
 	done
 	echo "OK"
 }
@@ -57,6 +60,8 @@ save_db_params(){
 	$JSON -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'"
 	$JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
 	$JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
+	$JSON -e "this.services.CoAuthoring.sql.type = '$DB_TYPE'"
+	$JSON -e "this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
 }
 
 save_rabbitmq_params(){
@@ -156,7 +161,7 @@ parse_rabbitmq_url(){
 }
 
 input_db_params(){
-	echo "Configuring PostgreSQL access... "
+	echo "Configuring database access... "
 	read -e -p "Host: " -i "$DB_HOST" DB_HOST
 	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
 	read -e -p "User: " -i "$DB_USER" DB_USER 
@@ -179,7 +184,7 @@ input_rabbitmq_params(){
 	echo
 }
 
-execute_db_scripts(){
+execute_postgres_scripts(){
 	echo -n "Installing PostgreSQL database... "
 
         if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
@@ -195,7 +200,7 @@ execute_db_scripts(){
 	echo "OK"
 }
 
-establish_db_conn() {
+establish_postgres_conn() {
 	echo -n "Trying to establish PostgreSQL connection... "
 
 	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
@@ -212,7 +217,41 @@ establish_db_conn() {
 
 	echo "OK"
 }
+execute_mysql_sqript(){
+      echo -n "Installing MYSQL database........"
+      $MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" 
+      $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql" 
+      
+			echo "OK"
+}
+establish_mysql_conn(){
+           echo -n "Trying to database MySQL connection... "
+           command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+           MYSQL="mysql -h$DB_HOST -u$DB_USER"
+           if [ -n "$DB_PWD" ]; then
+                   MYSQL="$MYSQL -p$DB_PWD"
+           fi         
+              $MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+                   
+        echo "OK"
+}
 
+execute_db_script(){
+	case $DB_TYPE in
+		postgres)
+			DB_PORT=5432 
+			establish_postgres_conn || exit $?
+			execute_postgres_scripts || exit $?
+				
+			;;
+
+		mysql) 
+			DB_PORT=3306  
+			establish_mysql_conn || exit $?
+			execute_mysql_sqript || exit $?
+			;;     
+	esac
+}
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
@@ -264,32 +303,33 @@ setup_nginx(){
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
   # check whethere enabled
-  shopt -s nocasematch
-  PORTS=()
-  case $(getenforce) in
-    enforcing|permissive)
-      PORTS+=('8000')
-      PORTS+=('8080')
-      PORTS+=('3000')
-    ;;
-    disabled)
-      :
-    ;;
-  esac
+#  shopt -s nocasematch
+#   PORTS=()
+#   case $(getenforce) in
+#     enforcing|permissive)
+#       PORTS+=('8000')
+#       PORTS+=('8080')
+#       PORTS+=('3000')
+#     ;;
+#     disabled)
+#       :
+#     ;;
+#   esac
 
-  # add selinux extentions
-  for PORT in ${PORTS[@]}; do
-    semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-      semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-      true
-  done
+#   # add selinux extentions
+#   for PORT in ${PORTS[@]}; do
+#     semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+#       semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+#       true
+#   done
 }
 
 create_local_configs
 
 input_db_params
-establish_db_conn || exit $?
-execute_db_scripts || exit $?
+execute_db_script
+
+
 
 input_redis_params
 establish_redis_conn || exit $?
