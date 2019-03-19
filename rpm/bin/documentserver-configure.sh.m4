@@ -249,7 +249,10 @@ execute_db_script(){
 			DB_PORT=3306  
 			establish_mysql_conn || exit $?
 			execute_mysql_sqript || exit $?
-			;;     
+			;;   
+		*)
+		    echo "You entered false value"
+			exit	  
 	esac
 }
 establish_redis_conn() {
