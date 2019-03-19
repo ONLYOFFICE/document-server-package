@@ -43,10 +43,9 @@ restart_services() {
 	[ -a /etc/nginx/conf.d/default.conf ] && mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.old
 
 	echo -n "Restarting services... "
-	for SVC in supervisor nginx
+	for SVC in supervisord nginx
 	do
-		service $SVC stop
-		service $SVC start
+		systemctl restart $SVC 
 	done
 	echo "OK"
 }
