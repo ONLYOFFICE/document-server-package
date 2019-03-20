@@ -222,6 +222,7 @@ execute_mysql_sqript(){
 	$MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql" 
 	echo "OK"
 }
+
 establish_mysql_conn(){
 	echo -n "Trying to database MySQL connection... "
 	command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
@@ -237,21 +238,21 @@ establish_mysql_conn(){
 }
 
 execute_db_script(){
-		case $DB_TYPE in
-			postgres)
-				DB_PORT=5432 
-				establish_postgres_conn || exit $?
-				execute_postgres_scripts || exit $?
-				;;	
-			mysql) 
-				DB_PORT=3306  
-				establish_mysql_conn || exit $?
-				execute_mysql_sqript || exit $?
-				;;   
-			*)
-				echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
-				exit 1	  
-		esac
+	case $DB_TYPE in
+		postgres)
+			DB_PORT=5432 
+			establish_postgres_conn || exit $?
+			execute_postgres_scripts || exit $?
+			;;	
+		mysql) 
+			DB_PORT=3306  
+			establish_mysql_conn || exit $?
+			execute_mysql_sqript || exit $?
+			;;   
+		*)
+			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+			exit 1	  
+	esac
 }
 
 establish_redis_conn() {
