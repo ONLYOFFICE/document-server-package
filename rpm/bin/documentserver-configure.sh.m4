@@ -228,13 +228,11 @@ establish_mysql_conn(){
 	command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
 	MYSQL="mysql -h$DB_HOST -u$DB_USER"
 	if [ -n "$DB_PWD" ]; then
-
-	MYSQL="$MYSQL -p$DB_PWD"
-
+		MYSQL="$MYSQL -p$DB_PWD"
 	fi 
 
 	$MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-							
+
 	echo "OK"
 }
 
