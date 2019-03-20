@@ -228,7 +228,7 @@ establish_mysql_conn(){
 	command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
 	MYSQL="mysql -h$DB_HOST -u$DB_USER"
 	if [ -n "$DB_PWD" ]; then
-	
+
 	MYSQL="$MYSQL -p$DB_PWD"
 
 	fi 
@@ -327,12 +327,15 @@ setup_nginx(){
       true
   done
 }
+
 create_local_configs
+
 input_db_params
 execute_db_script
 
 input_redis_params
 establish_redis_conn || exit $?
+
 input_rabbitmq_params
 parse_rabbitmq_url
 establish_rabbitmq_conn || exit $?
