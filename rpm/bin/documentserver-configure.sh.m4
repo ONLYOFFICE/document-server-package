@@ -238,19 +238,19 @@ establish_mysql_conn(){
 
 execute_db_script(){
 		case $DB_TYPE in
-		postgres)
-			DB_PORT=5432 
-			establish_postgres_conn || exit $?
-			execute_postgres_scripts || exit $?
-			;;	
-		mysql) 
-			DB_PORT=3306  
-			establish_mysql_conn || exit $?
-			execute_mysql_sqript || exit $?
-			;;   
-		*)
-			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
-			exit 1	  
+			postgres)
+				DB_PORT=5432 
+				establish_postgres_conn || exit $?
+				execute_postgres_scripts || exit $?
+				;;	
+			mysql) 
+				DB_PORT=3306  
+				establish_mysql_conn || exit $?
+				execute_mysql_sqript || exit $?
+				;;   
+			*)
+				echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+				exit 1	  
 		esac
 }
 
