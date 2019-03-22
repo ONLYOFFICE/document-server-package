@@ -6,7 +6,7 @@ EXAMPLE_CONFIG="/etc/M4_DS_PREFIX-example/local.json"
 JSON_BIN="$DIR/npm/node_modules/.bin/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
-
+AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 PSQL=""
 CREATEDB=""
 
@@ -33,7 +33,7 @@ create_local_configs(){
 tune_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ -f ${i} ]; then
-			chown ds:ds -R ${i}
+			chown onlyoffice:onlyoffice -R ${i}
 		fi
   	done
 }
@@ -60,10 +60,36 @@ save_db_params(){
 }
 
 save_rabbitmq_params(){
-	$JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-	$JSON -e "this.rabbitmq.url = '$RABBITMQ_URL'"
+	$JSON -e "if(this.queue===undefined)this.queue={};"
+	$JSON -e "this.queue.type = 'rabbitmq'"
+	$JSON -e "this.rabbitmq.url = '${AMQP_SERVER_URL}'"
 }
 
+save_activemq_params(){
+	$JSON -e "if(this.queue===undefined)this.queue={};"
+	$JSON -e "this.queue.type = 'activemq'"
+	$JSON -e "if(this.activemq===undefined)this.activemq={};"
+	$JSON -e "if(this.activemq.connectOptions===undefined)this.activemq.connectOptions={};"
+
+	$JSON -e "this.activemq.connectOptions.host = '${AMQP_SERVER_HOST}'"
+	if [ ! "${AMQP_SERVER_PORT}" == "" ]; then
+		$JSON -e "this.activemq.connectOptions.port = '${AMQP_SERVER_PORT}'"
+	else
+		$JSON -e "delete this.activemq.connectOptions.port"
+	fi
+
+	if [ ! "${AMQP_SERVER_USER}" == "" ]; then
+		$JSON -e "this.activemq.connectOptions.username = '${AMQP_SERVER_USER}'"
+	else
+		$JSON -e "delete this.activemq.connectOptions.username"
+	fi
+
+	if [ ! "${AMQP_SERVER_PWD}" == "" ]; then
+		$JSON -e "this.activemq.connectOptions.password = '${AMQP_SERVER_PWD}'"
+	else
+		$JSON -e "delete this.activemq.connectOptions.password"
+	fi
+}
 save_redis_params(){
 	$JSON -e "if(this.services===undefined)this.services={};"
 	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
@@ -113,8 +139,8 @@ save_jwt_params(){
   fi
 }
 
-parse_rabbitmq_url(){
-  local amqp=${RABBITMQ_URL}
+parse_amqp_url(){
+  local amqp=${AMQP_SERVER_URL}
 
   # extract the protocol
   local proto="$(echo $amqp | grep :// | sed -e's,^\(.*://\).*,\1,g')"
@@ -148,11 +174,11 @@ parse_rabbitmq_url(){
   # extract the path (if any)
   local path="$(echo $url | grep / | cut -d/ -f2-)"
 
-  RABBITMQ_HOST=$host
-  RABBITMQ_PORT=$port
-  RABBITMQ_HOST_PORT_PATH=$hostport$path
-  RABBITMQ_USER=$user
-  RABBITMQ_PWD=$pass
+  AMQP_SERVER_HOST=$host
+  AMQP_SERVER_PORT=$port
+  AMQP_SERVER_HOST_PORT_PATH=$hostport$path
+  AMQP_SERVER_USER=$user
+  AMQP_SERVER_PWD=$pass
 }
 
 input_db_params(){
@@ -182,19 +208,19 @@ input_redis_params(){
 	echo
 }
 
-input_rabbitmq_params(){
+input_amqp_params(){
 	echo "Configuring RabbitMQ access... "
 
-	read -e -p "Host [${RABBITMQ_HOST_PORT_PATH}]: " USER_INPUT
-	RABBITMQ_HOST_PORT_PATH=${USER_INPUT:-${RABBITMQ_HOST_PORT_PATH}}
+	read -e -p "Host [${AMQP_SERVER_HOST_PORT_PATH}]: " USER_INPUT
+	AMQP_SERVER_HOST_PORT_PATH=${USER_INPUT:-${AMQP_SERVER_HOST_PORT_PATH}}
 
-	read -e -p "User [${RABBITMQ_USER}]: " USER_INPUT
-	RABBITMQ_USER=${USER_INPUT:-${RABBITMQ_USER}}
+	read -e -p "User [${AMQP_SERVER_USER}]: " USER_INPUT
+	AMQP_SERVER_USER=${USER_INPUT:-${AMQP_SERVER_USER}}
 
 	read -e -p "Password []: " -s USER_INPUT
-	RABBITMQ_PWD=${USER_INPUT:-${RABBITMQ_PWD}}
+	AMQP_SERVER_PWD=${USER_INPUT:-${AMQP_SERVER_PWD}}
 
- 	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH
+ 	AMQP_SERVER_URL=amqp://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
 
 	echo
 }
@@ -246,10 +272,10 @@ establish_redis_conn() {
 	echo "OK"
 }
 
-establish_rabbitmq_conn() {
+establish_amqp_conn() {
 	echo -n "Trying to establish RabbitMQ connection... "
   
-  exec {FD}<> /dev/tcp/$RABBITMQ_HOST/$RABBITMQ_PORT && exec {FD}>&-
+  exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/$AMQP_SERVER_PORT && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -259,16 +285,19 @@ establish_rabbitmq_conn() {
 	echo "OK"
 }
 
-establish_rabbitmq_conn_by_tools() {
-	echo -n "Trying to establish RabbitMQ connection... "
-
-	TEST_QUEUE=dc.test
-	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH
-
-	amqp-declare-queue -u "$RABBITMQ_URL" -q "$TEST_QUEUE" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-	amqp-delete-queue -u "$RABBITMQ_URL" -q "$TEST_QUEUE" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-
-	echo "OK"
+save_amqp_params(){
+	case $AMQP_SERVER_TYPE in
+		activemq)
+			save_activemq_params
+			;;
+		rabbitmq)
+			save_rabbitmq_params
+			;;
+		*)
+			echo "Incorrect AMQP_SERVER_TYPE value! Possible value of AMQP_SERVER_TYPE is 'activemq' or 'rabbitmq"
+			exit 1
+			;;
+	esac
 }
 
 setup_nginx(){
@@ -314,12 +343,12 @@ execute_db_scripts || exit $?
 input_redis_params
 # establish_redis_conn || exit $?
 
-input_rabbitmq_params
-parse_rabbitmq_url
-# establish_rabbitmq_conn || exit $?
+input_amqp_params
+parse_amqp_url
+# establish_amqp_conn || exit $?
 
 save_db_params
-save_rabbitmq_params
+save_amqp_params
 save_redis_params
 save_jwt_params
 
