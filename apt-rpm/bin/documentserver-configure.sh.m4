@@ -181,7 +181,7 @@ parse_amqp_url(){
   AMQP_SERVER_HOST_PORT_PATH=$hostport$path
   AMQP_SERVER_USER=$user
   AMQP_SERVER_PWD=$pass
-}
+}	
 
 input_db_params(){
 	echo "Configuring PostgreSQL access... "
