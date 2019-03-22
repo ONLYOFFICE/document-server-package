@@ -6,6 +6,7 @@ EXAMPLE_CONFIG="/etc/M4_DS_PREFIX-example/local.json"
 JSON_BIN="$DIR/npm/node_modules/.bin/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
+
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 PSQL=""
 CREATEDB=""
@@ -33,7 +34,7 @@ create_local_configs(){
 tune_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ -f ${i} ]; then
-			chown onlyoffice:onlyoffice -R ${i}
+			chown ds:ds -R ${i}
 		fi
   	done
 }
@@ -90,6 +91,7 @@ save_activemq_params(){
 		$JSON -e "delete this.activemq.connectOptions.password"
 	fi
 }
+
 save_redis_params(){
 	$JSON -e "if(this.services===undefined)this.services={};"
 	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
@@ -209,7 +211,7 @@ input_redis_params(){
 }
 
 input_amqp_params(){
-	echo "Configuring RabbitMQ access... "
+	echo "Configuring AMQP access... "
 
 	read -e -p "Host [${AMQP_SERVER_HOST_PORT_PATH}]: " USER_INPUT
 	AMQP_SERVER_HOST_PORT_PATH=${USER_INPUT:-${AMQP_SERVER_HOST_PORT_PATH}}
@@ -221,6 +223,7 @@ input_amqp_params(){
 	AMQP_SERVER_PWD=${USER_INPUT:-${AMQP_SERVER_PWD}}
 
  	AMQP_SERVER_URL=amqp://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
+
 
 	echo
 }
@@ -273,7 +276,7 @@ establish_redis_conn() {
 }
 
 establish_amqp_conn() {
-	echo -n "Trying to establish RabbitMQ connection... "
+	echo -n "Trying to establish AMQP connection... "
   
   exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/$AMQP_SERVER_PORT && exec {FD}>&-
 
