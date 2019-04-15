@@ -58,7 +58,7 @@
 #endif
 
 #ifndef sAppId
-	#define sAppId              str(sIntCompanyName + " " + sIntProductName))
+	#define sAppId              str(sIntCompanyName + " " + sIntProductName)
 #endif
 
 #ifndef sAppPath
