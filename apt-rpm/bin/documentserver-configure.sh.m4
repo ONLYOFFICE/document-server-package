@@ -279,6 +279,11 @@ setup_nginx(){
   cp -f ${DS_CONF_TMPL} ${DS_CONF}
   sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
 
+  # check if ipv6 supported otherwise remove it from nginx config
+  if [ ! -f /proc/net/if_inet6 ]; then
+    sed '/listen\s\+\[::[0-9]*\].\+/d' -i $DS_CONF
+  fi
+
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
   # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
