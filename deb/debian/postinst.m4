@@ -192,7 +192,12 @@ setup_nginx(){
   # EXAMPLE_PORT="$RET"
   
   # setup ds port
-  sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF  
+  sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
+
+  # check if ipv6 supported otherwise remove it from nginx config
+  if [ ! -f /proc/net/if_inet6 ]; then
+    sed '/listen\s\+\[::[0-9]*\].\+/d' -i $DS_CONF
+  fi
 
   # install nginx config
   if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
@@ -259,7 +264,7 @@ case "$1" in
 		service supervisor restart >/dev/null 2>&1
 		service nginx restart >/dev/null 2>&1
 		
-		echo "Congratulations, the COMPANY_NAME PRODUCT_NAME has been installed successfully!"
+		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)

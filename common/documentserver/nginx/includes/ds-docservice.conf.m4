@@ -2,10 +2,10 @@
 rewrite ^/$ $the_scheme://$the_host/welcome/ redirect;
 
 #support old version
-rewrite ^\/OfficeWeb(\/apps\/.*)$ $the_scheme://$the_host/PACKAGE_VERSION/web-apps$1 redirect;
+rewrite ^\/OfficeWeb(\/apps\/.*)$ $the_scheme://$the_host/M4_PACKAGE_VERSION/web-apps$1 redirect;
 
 #script caching protection
-rewrite ^(\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host/PACKAGE_VERSION/$1 redirect;
+rewrite ^(\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host/M4_PACKAGE_VERSION/$1 redirect;
 
 #disable caching for api.js
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
@@ -61,7 +61,7 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?(\/doc\/.*) {
   proxy_http_version 1.1;
 }
 
-location /PACKAGE_VERSION/ {
+location /M4_PACKAGE_VERSION/ {
   proxy_pass http://docservice/;
 }
 
