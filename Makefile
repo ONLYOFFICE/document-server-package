@@ -1,12 +1,27 @@
 PWD := $(shell pwd)
 CURL := curl -L -o
 
-COMPANY_NAME ?= onlyoffice
-PRODUCT_NAME ?= documentserver
+COMPANY_NAME ?= ONLYOFFICE
+PRODUCT_NAME ?= DocumentServer
+PRODUCT_SHORT_NAME ?= $(firstword $(subst -, ,$(PRODUCT_NAME)))
+
+COMPANY_NAME_LOW = $(shell echo $(COMPANY_NAME) | tr A-Z a-z)
+PRODUCT_NAME_LOW = $(shell echo $(PRODUCT_NAME) | tr A-Z a-z)
+PRODUCT_SHORT_NAME_LOW = $(shell echo $(PRODUCT_SHORT_NAME) | tr A-Z a-z)
+
+PUBLISHER_NAME ?= Ascensio System SIA
+PUBLISHER_URL ?= http://onlyoffice.com
+SUPPORT_URL ?= http://support.onlyoffice.com
+SUPPORT_MAIL ?= support@onlyoffice.com
+
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
-PACKAGE_NAME := $(COMPANY_NAME)-$(PRODUCT_NAME)
+SIGN_STR := "byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f"
+
+BRANDING_DIR ?= ./branding
+
+PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
 RPM_ARCH = x86_64
@@ -14,7 +29,7 @@ DEB_ARCH = amd64
 
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
-DEB_BUILD_DIR = $(PWD)/deb
+DEB_BUILD_DIR = $(PWD)
 EXE_BUILD_DIR = $(PWD)/exe
 
 APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
@@ -67,7 +82,7 @@ LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/license
 
-LICENSE_FILE = common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
+LICENSE_FILE = $(BRANDING_DIR)/common/documentserver/license/$(PACKAGE_NAME)/LICENSE.txt
 HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
@@ -86,6 +101,10 @@ DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/pluginBase.js
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/plugins.css
 
+ifneq ($(COMPANY_NAME_LOW),onlyoffice)	
+DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/examples/gl?vred
+endif
+
 FONTS = common/fonts
 
 ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
@@ -102,17 +121,13 @@ NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
-WEBAPPS_DIR = web-apps
+WEBAPPS_DIR := web-apps-pro
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de documentserver-ie))
-WEBAPPS_DIR = web-apps-pro
-endif
-
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ie))
 OFFICIAL_PRODUCT_NAME := 'Integration Edition'
 endif
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-de))
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de))
 OFFICIAL_PRODUCT_NAME := 'Developer Edition'
 endif
 
@@ -124,11 +139,10 @@ ifeq ($(OS),Windows_NT)
 	ARCH_EXT := .zip
 	AR := 7z a -y
 	DEPLOY := $(EXE_REPO_DATA)
-	NGINX_CONF := 
-	NGINX_LOG := logs/
-	NGINX_CASH := temp/
-	DS_ROOT := ../
-	DS_FILES := ../server/
+	NGINX_CONF := includes
+	NGINX_LOG := logs
+	DS_ROOT := ..
+	DS_FILES := ../server
 	DS_EXAMLE := ../example
 	DEV_NULL := nul
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
@@ -146,12 +160,12 @@ else
 		ARCH_EXT := .zip
 		AR := 7z a -y
 		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
-		NGINX_CONF := /etc/nginx/
-		NGINX_LOG := /var/log/onlyoffice/documentserver/
-		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
-		DS_ROOT := /var/www/onlyoffice/documentserver/
-		DS_FILES := /var/lib/onlyoffice/documentserver/
-		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
+		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
+		NGINX_CONF := /etc/nginx/includes
+		NGINX_LOG := /var/log/$(DS_PREFIX)
+		DS_ROOT := /var/www/$(DS_PREFIX)
+		DS_FILES := /var/lib/$(DS_PREFIX)
+		DS_EXAMLE := /var/www/$(DS_PREFIX)-example
 		DEV_NULL := /dev/null
 	endif
 	ifeq ($(UNAME_S),Darwin)
@@ -184,6 +198,71 @@ ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
 DEPLOY += $(DS_BIN_REPO)
 endif
 
+DEB_DEPS += deb/debian/changelog
+DEB_DEPS += deb/debian/config
+DEB_DEPS += deb/debian/control
+DEB_DEPS += deb/debian/copyright
+DEB_DEPS += deb/debian/postinst
+DEB_DEPS += deb/debian/postrm
+DEB_DEPS += deb/debian/templates
+DEB_DEPS += deb/debian/$(PACKAGE_NAME).install
+DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
+
+COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
+COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
+COMMON_DEPS += common/documentserver/nginx/includes/ds-spellchecker.conf
+COMMON_DEPS += common/documentserver/nginx/includes/http-common.conf
+COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
+COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl
+COMMON_DEPS += common/documentserver/nginx/ds.conf
+COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
+
+LINUX_DEPS += common/documentserver/logrotate/ds.conf
+
+LINUX_DEPS += common/documentserver/supervisor/ds.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-gc.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
+LINUX_DEPS += common/documentserver/supervisor/ds-spellchecker.conf
+LINUX_DEPS += common/documentserver-example/supervisor/ds.conf
+LINUX_DEPS += common/documentserver-example/supervisor/ds-example.conf
+
+LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
+
+LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
+LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
+
+LINUX_DEPS += rpm/bin/documentserver-configure.sh
+LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+
+WIN_DEPS += exe/$(PACKAGE_NAME).iss
+
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)
+ONLYOFFICE_VALUE := onlyoffice
+else
+ONLYOFFICE_VALUE := ds
+endif
+
+M4_PARAMS += -D M4_COMPANY_NAME=$(COMPANY_NAME)
+M4_PARAMS += -D M4_PACKAGE_NAME=$(PACKAGE_NAME)
+M4_PARAMS += -D M4_PRODUCT_NAME=$(PRODUCT_NAME)
+M4_PARAMS += -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)
+M4_PARAMS += -D M4_PUBLISHER_NAME="$(PUBLISHER_NAME)"
+M4_PARAMS += -D M4_PUBLISHER_URL="$(PUBLISHER_URL)"
+M4_PARAMS += -D M4_SUPPORT_MAIL="$(SUPPORT_MAIL)"
+M4_PARAMS += -D M4_SUPPORT_URL="$(SUPPORT_URL)"
+M4_PARAMS += -D M4_BRANDING_DIR="$(abspath $(BRANDING_DIR))"
+M4_PARAMS += -D M4_ONLYOFFICE_VALUE="$(ONLYOFFICE_VALUE)"
+M4_PARAMS += -D M4_PLATFORM="$(PLATFORM)"
+M4_PARAMS += -D M4_NGINX_CONF="$(NGINX_CONF)"
+M4_PARAMS += -D M4_NGINX_LOG="$(NGINX_LOG)"
+M4_PARAMS += -D M4_DS_PREFIX="$(DS_PREFIX)"
+M4_PARAMS += -D M4_DS_ROOT="$(DS_ROOT)"
+M4_PARAMS += -D M4_DS_FILES="$(DS_FILES)"
+M4_PARAMS += -D M4_DS_EXAMLE="$(DS_EXAMLE)"
+M4_PARAMS += -D M4_DEV_NULL="$(DEV_NULL)"
+
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb deploy-bin
 
 all: rpm deb apt-rpm
@@ -213,7 +292,13 @@ clean:
 		$(DOCUMENTSERVER_EXAMPLE)\
 		$(DS_BIN)\
 		$(FONTS)\
-		documentserver \
+		$(DEB_DEPS)\
+		$(COMMON_DEPS)\
+		$(LINUX_DEPS)\
+		$(WIN_DEPS)\
+		deb/debian/$(PACKAGE_NAME)\
+		deb/debian/$(PACKAGE_NAME).*\
+		documentserver\
 		documentserver-example
 		
 documentserver:
@@ -224,9 +309,22 @@ documentserver:
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
 
-	mv $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
-	mv $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
-	
+	mv -f $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
+	mv -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
+
+	# rename product specific folders
+	sed "s|onlyoffice\/documentserver|"$(DS_PREFIX)"|"  -i $(DOCUMENTSERVER_CONFIG)/*.json
+
+	# rename db account params
+	sed 's|\("db.*": "\)onlyoffice\("\)|\1'$(ONLYOFFICE_VALUE)'\2|'  -i $(DOCUMENTSERVER_CONFIG)/*.json
+
+	# rename db schema name
+	sed 's|onlyoffice|'$(ONLYOFFICE_VALUE)'|'  -i $(DOCUMENTSERVER)/server/schema/**/*.sql
+
+	# rename product in license
+	sed 's|ONLYOFFICE|'$(COMPANY_NAME)'|'  -i $(DOCUMENTSERVER)/server/3rd-Party.txt
+	sed 's|DocumentServer|'$(PRODUCT_NAME)'|'  -i $(DOCUMENTSERVER)/server/3rd-Party.txt
+
 	# Prevent for modification original config
 	chmod ug=r $(DOCUMENTSERVER_CONFIG)/*.json
 
@@ -242,34 +340,25 @@ endif
 	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE) || true
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
-	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
+	#chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
-	chmod u+x $(DOCUMENTSERVER_BIN)/*$(SHELL_EXT)
 
-	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver.conf.template
-	sed "s|{{NGINX_CONF}}|"$(NGINX_CONF)"|"  -i common/documentserver/nginx/onlyoffice-documentserver-ssl.conf.template
-	sed "s|{{NGINX_LOG}}|"$(NGINX_LOG)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-common.conf
-	sed "s|{{DS_ROOT}}|"$(DS_ROOT)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed "s|{{DS_FILES}}|"$(DS_FILES)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-	sed "s|{{DEV_NULL}}|"$(DEV_NULL)"|"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
-
-	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i common/documentserver/nginx/includes/onlyoffice-documentserver-docservice.conf
 	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
-	
-	cp common/documentserver/nginx/onlyoffice-documentserver.conf.template common/documentserver/nginx/onlyoffice-documentserver.conf
 
-ifeq ($(PRODUCT_NAME), documentserver)
+ifeq ($(PRODUCT_NAME_LOW), documentserver)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
 endif
 
-ifeq ($(PRODUCT_NAME), documentserver-de)
+ifeq ($(PRODUCT_NAME_LOW), documentserver-de)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_D;|" -i $(LICENSE_JS)
 endif
 
-ifeq ($(PRODUCT_NAME), documentserver-ie)
+ifeq ($(PRODUCT_NAME_LOW), documentserver-ie)
 	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
 endif
+
+	cd $(DOCUMENTSERVER)/npm && npm install
 
 	echo "Done" > $@
 
@@ -279,50 +368,81 @@ documentserver-example:
 	
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
-	mv $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
+	mv -f $(DOCUMENTSERVER_EXAMPLE)/config/*.json $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
 	# Prevent for modification original config
 	chmod ug=r $(DOCUMENTSERVER_EXAMPLE_CONFIG)/*.json
 
-	
-	sed "s|{{DS_EXAMLE}}|"$(DS_EXAMLE)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
-	sed "s|{{PLATFORM}}|"$(PLATFORM)"|"  -i common/documentserver-example/nginx/includes/onlyoffice-documentserver-example.conf
-	
 	sed "s|{{OFFICIAL_PRODUCT_NAME}}|"$(OFFICIAL_PRODUCT_NAME)"|"  -i $(DOCUMENTSERVER_EXAMPLE)/welcome/*.html
 
 	echo "Done" > $@
 
-$(APT_RPM):	documentserver documentserver-example
-	chmod u+x apt-rpm/bin/documentserver-configure.sh
+$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 
-	cd apt-rpm && rpmbuild \
+apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
+	mv -f $< $@
+
+rpm/$(PACKAGE_NAME).spec : rpm/package.spec
+	mv -f $< $@
+
+exe/$(PACKAGE_NAME).iss : exe/package.iss
+	mv -f $< $@
+
+%.rpm: 
+	mkdir -p $(@D)
+
+	cd $(@D)/../../.. && rpmbuild \
 		-bb \
-		--define "_topdir $(APT_RPM_BUILD_DIR)" \
+		--define "_topdir $(@D)/../../../builddir" \
 		--define "_package_name $(PACKAGE_NAME)" \
 		--define "_product_version $(PRODUCT_VERSION)" \
 		--define "_build_number $(BUILD_NUMBER)" \
+		--define "_company_name $(COMPANY_NAME)" \
+		--define "_product_name $(PRODUCT_NAME)" \
+		--define "_publisher_name $(PUBLISHER_NAME)" \
+		--define "_publisher_url $(PUBLISHER_URL)" \
+		--define "_support_url $(SUPPORT_URL)" \
+		--define "_support_mail $(SUPPORT_MAIL)" \
+		--define "_company_name_low $(COMPANY_NAME_LOW)" \
+		--define "_product_name_low $(PRODUCT_NAME_LOW)" \
+		--define "_ds_prefix $(DS_PREFIX)" \
 		$(PACKAGE_NAME).spec
 
-$(RPM):	documentserver documentserver-example
-	chmod u+x rpm/bin/documentserver-configure.sh
+ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-de onlyoffice-documentserver-ie))
+M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
+endif
 
-	cd rpm && rpmbuild \
-		-bb \
-		--define "_topdir $(RPM_BUILD_DIR)" \
-		--define "_package_name $(PACKAGE_NAME)" \
-		--define "_product_version $(PRODUCT_VERSION)" \
-		--define "_build_number $(BUILD_NUMBER)" \
-		$(PACKAGE_NAME).spec
+%.sh : %.sh.m4
+	m4 $(M4_PARAMS)	$< > $@
+	chmod u+x $@
 
-$(DEB): documentserver documentserver-example
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
-	sed "s/{{PACKAGE_NAME}}/"$(PACKAGE_NAME)"/"  -i deb/$(PACKAGE_NAME)/debian/control
-	sed "s/{{PACKAGE_VERSION}}/"$(PACKAGE_VERSION)"/"  -i deb/$(PACKAGE_NAME)/debian/changelog
+% : %.m4
+	m4 $(M4_PARAMS)	$< > $@
 
-	cd deb/$(PACKAGE_NAME) && dpkg-buildpackage -b -uc -us
+% : %.tmpl
+	cp $< $@
 
-$(EXE): documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
-	cd exe && iscc //DsAppVersion=$(PRODUCT_VERSION).$(BUILD_NUMBER) //Qp //S"byparam=signtool.exe sign /v /s My /n Ascensio /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f" $(PACKAGE_NAME).iss
+common/documentserver/nginx/ds.conf: common/documentserver/nginx/ds.conf.tmpl
+
+deb/debian/$(PACKAGE_NAME).install : deb/debian/package.install
+	mv -f $< $@
+
+deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
+	mv -f $< $@
+
+%.exe:
+	cd $(@D) && iscc \
+	//DsAppVerShort=$(PRODUCT_VERSION) \
+	//DsAppBuildNumber=$(BUILD_NUMBER) \
+	//Qp \
+	//S$(SIGN_STR) \
+	$(PACKAGE_NAME).iss
+
+$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+	cd deb && dpkg-buildpackage -b -uc -us
+
+$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
 $(ISXDL):
 	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
@@ -330,7 +450,7 @@ $(ISXDL):
 $(NGINX):
 	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
-	mv $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
+	mv -f $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
 	rm -f $(NGINX_ZIP)
 	
 $(PSQL):

@@ -1,6 +1,6 @@
 #define EXAMPLE_SRV        'DsExampleSvc'
-#define EXAMPLE_SRV_DISPLAY  'ONLYOFFICE DocumentServer Example'
-#define EXAMPLE_SRV_DESCR  'ONLYOFFICE DocumentServer Example Service'
+#define EXAMPLE_SRV_DISPLAY  str(sAppName + " Example")
+#define EXAMPLE_SRV_DESCR  str(sAppName + " Example Service")
 #define EXAMPLE_SRV_DIR    '{app}\example'
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 
@@ -26,7 +26,7 @@ Name: "{#EXAMPLE_SRV_LOG_DIR}";       Permissions: users-modify
 Name: "{group}\{cm:OpenDemo}"; Filename: "http://localhost:{code:GetDefaultPort}/example"
 
 [Registry]
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_EXAMPLE_PORT}"; ValueData: "{code:GetExamplePort}"; Check: not IsStringEmpty(ExpandConstant('{param:EXAMPLE_PORT}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_EXAMPLE_PORT}"; ValueData: "{code:GetExamplePort}"; Check: not IsStringEmpty(ExpandConstant('{param:EXAMPLE_PORT}'));
 
 [Run]
 Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""if(this.server===undefined)this.server={{token:{{}};"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"

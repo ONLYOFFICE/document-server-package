@@ -1,10 +1,73 @@
-#ifndef sPackageName
-  #define sPackageName        'onlyoffice-documentserver'
+#ifndef sBrandingFolder
+  #define sBrandingFolder '..\branding'
 #endif
 
-#define sAppName            'ONLYOFFICE DocumentServer'
-#define APP_PATH            'ONLYOFFICE\DocumentServer'
-#define APP_REG_PATH        'Software\ONLYOFFICE\DocumentServer'
+#define sBrandingFile str(sBrandingFolder + "\exe\branding.iss")
+
+#if FileExists(sBrandingFile)
+  #include str(sBrandingFile)
+#endif
+
+#ifndef sCompanyName
+  #define sCompanyName        'ONLYOFFICE'
+#endif
+
+#ifndef sIntCompanyName
+  #define sIntCompanyName     str(sCompanyName)
+#endif
+
+#ifndef sProductName
+  #define sProductName        'DocumentServer'
+#endif
+
+#ifndef sIntProductName
+  #define sIntProductName     'DocumentServer'
+#endif
+
+#ifndef sPackageName
+  #define sPackageName        str(LowerCase(sCompanyName) + "-" + LowerCase(sProductName))
+#endif
+
+#define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\" + sPackageName + "\LICENSE.txt")
+#ifnexist sLicenseFile
+  #define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\onlyoffice-documentserver\LICENSE.txt")
+#endif
+
+#ifndef sPublisherName
+  #define sPublisherName      'Ascensio System SIA'
+#endif
+
+#ifndef sAppCopyright
+  #define sAppCopyright      str("Copyright (C) 2019 " + sPublisherName)
+#endif
+
+#ifndef sPublisherUrl
+  #define sPublisherUrl       'https://www.onlyoffice.com/'
+#endif
+
+#ifndef sSupportURL
+  #define sSupportURL=str(sPublisherUrl + "support.aspx")
+#endif
+
+#ifndef sUpdatesURL
+  #define sUpdatesURL=str(sPublisherUrl)
+#endif
+
+#ifndef sAppName
+  #define sAppName            str(sCompanyName + " " + sProductName)
+#endif
+
+#ifndef sAppId
+	#define sAppId              str(sIntCompanyName + " " + sIntProductName)
+#endif
+
+#ifndef sAppPath
+  #define sAppPath            str(sIntCompanyName + "\" + sIntProductName)
+#endif
+
+#ifndef sAppRegPath
+  #define sAppRegPath        str("Software\" + sIntCompanyName + "\" + sIntProductName)
+#endif
 
 #define REG_LICENSE_PATH      'LicensePath'
 #define REG_DB_HOST           'DbHost'
@@ -26,38 +89,52 @@
 
 #define iconsExe            'projicons.exe'
 
-#ifndef sAppVersion
-  #define sAppVersion         '4.0.0.0'
+#ifndef sAppVerShort
+	#define sAppVerShort	'0.0.0'
 #endif
 
-#define sAppVerShort
+#ifndef sAppBuildNumber
+	#define sAppBuildNumber	'0'
+#endif
+
+#ifndef sAppVersion
+  #define sAppVersion         str(sAppVerShort + '.' + sAppBuildNumber)
+#endif
+
+#ifndef sDbDefValue
+  #define sDbDefValue         'onlyoffice'
+#endif
 
 #define NSSM                  '{app}\nssm\nssm.exe'
-#define NODE_SRV_ENV          'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\config"" NODE_DISABLE_COLORS=1'
+#define NODE_ENV	          'NODE_ENV=production-windows'
+#define NODE_CONFIG_DIR       'NODE_CONFIG_DIR=""{app}\config""'
+#define NODE_DISABLE_COLORS   'NODE_DISABLE_COLORS=1'
+#define APPLICATION_NAME      str("APPLICATION_NAME=" + sCompanyName)
+#define NODE_SRV_ENV          str(NODE_ENV + ' ' + NODE_CONFIG_DIR + ' ' + NODE_DISABLE_COLORS + ' ' + APPLICATION_NAME)
 
 #define LOCAL_SERVICE 'Local Service'
 
 #define CONVERTER_SRV        'DsConverterSvc'
-#define CONVERTER_SRV_DISPLAY  'ONLYOFFICE DocumentServer Converter'
-#define CONVERTER_SRV_DESCR  'ONLYOFFICE DocumentServer Converter Service'
+#define CONVERTER_SRV_DISPLAY  str(sAppName + " Converter")
+#define CONVERTER_SRV_DESCR  str(sAppName + " Converter Service")
 #define CONVERTER_SRV_DIR    '{app}\server\FileConverter\sources'
 #define CONVERTER_SRV_LOG_DIR    '{app}\Log\converter'
 
 #define DOCSERVICE_SRV        'DsDocServiceSvc'
-#define DOCSERVICE_SRV_DISPLAY  'ONLYOFFICE DocumentServer DocService'
-#define DOCSERVICE_SRV_DESCR  'ONLYOFFICE DocumentServer DocService Service'
+#define DOCSERVICE_SRV_DISPLAY  str(sAppName + " DocService")
+#define DOCSERVICE_SRV_DESCR  str(sAppName + " DocService Service")
 #define DOCSERVICE_SRV_DIR    '{app}\server\docservice\sources'
 #define DOCSERVICE_SRV_LOG_DIR    '{app}\Log\docservice'
 
 #define GC_SRV        'DsGcSvc'
-#define GC_SRV_DISPLAY  'ONLYOFFICE DocumentServer Gc'
-#define GC_SRV_DESCR  'ONLYOFFICE DocumentServer Gc Service'
+#define GC_SRV_DISPLAY  str(sAppName + " Gc")
+#define GC_SRV_DESCR  str(sAppName + " Gc Service")
 #define GC_SRV_DIR    '{app}\server\docservice\sources'
 #define GC_SRV_LOG_DIR    '{app}\Log\gc'
 
 #define SPELLCHECKER_SRV        'DsSpellcheckerSvc'
-#define SPELLCHECKER_SRV_DISPLAY  'ONLYOFFICE DocumentServer Spellchecker'
-#define SPELLCHECKER_SRV_DESCR  'ONLYOFFICE DocumentServer Spellchecker Service'
+#define SPELLCHECKER_SRV_DISPLAY  str(sAppName + " Spellchecker")
+#define SPELLCHECKER_SRV_DESCR  str(sAppName + " Spellchecker Service")
 #define SPELLCHECKER_SRV_DIR    '{app}\server\SpellChecker\sources'
 #define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
 
@@ -67,50 +144,52 @@
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define NODE_PATH '{pf64}\nodejs'
-#define NPM '{pf64}\nodejs\npm'
-#define JSON '{userappdata}\npm\json.cmd'
+#define JSON '{app}\npm\node_modules\.bin\json.cmd'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\local.json""'
 
-#define REPLACE '{userappdata}\npm\replace.cmd'
+#define REPLACE '{app}\npm\node_modules\.bin\replace.cmd'
 
 #define NGINX_SRV  'DsProxySvc'
-#define NGINX_SRV_DISPLAY  'ONLYOFFICE DocumentServer Proxy'
-#define NGINX_SRV_DESCR  'ONLYOFFICE DocumentServer Proxy Service'
+#define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
+#define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
 #define NGINX_SRV_DIR  '{app}\nginx'
 #define NGINX_SRV_LOG_DIR    '{app}\Log\nginx'
-#define NGINX_DS_CONF '{app}\nginx\conf\onlyoffice-documentserver.conf'
-#define NGINX_DS_TMPL '{app}\nginx\conf\onlyoffice-documentserver.conf.template'
-#define NGINX_DS_SSL_TMPL '{app}\nginx\conf\onlyoffice-documentserver-ssl.conf.template'
+#define NGINX_DS_CONF '{app}\nginx\conf\ds.conf'
+#define NGINX_DS_TMPL '{app}\nginx\conf\ds.conf.tmpl'
+#define NGINX_DS_SSL_TMPL '{app}\nginx\conf\ds-ssl.conf.tmpl'
 
-#define LICENSE_PATH '{commonappdata}\ONLYOFFICE\Data'
+#define LICENSE_PATH str("{commonappdata}\" + sIntCompanyName + "\Data")
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
 
 [Setup]
 AppName                   ={#sAppName}
+AppId                     ={#sAppId}
 AppVerName                ={#sAppName} {#sAppVerShort}
 AppVersion                ={#sAppVersion}
 VersionInfoVersion        ={#sAppVersion}
 OutputBaseFilename        ={#sPackageName}-{#sAppVersion}
 
-AppPublisher            =Ascensio System SIA.
-AppPublisherURL         =http://www.onlyoffice.com/
-AppSupportURL           =http://www.onlyoffice.com/support.aspx
-AppCopyright            =Copyright (C) 2018 Ascensio System SIA.
+AppPublisher            ={#sPublisherName}
+AppPublisherURL         ={#sPublisherUrl}
+AppSupportURL           ={#sSupportURL}
+AppUpdatesURL           ={#sUpdatesURL}
+AppCopyright            ={#sAppCopyright}
+
 
 ArchitecturesAllowed              =x64
 ArchitecturesInstallIn64BitMode   =x64
 
-DefaultGroupName        =ONLYOFFICE
+DefaultGroupName        ={#sCompanyName}
 ;WizardImageFile         = data\dialogpicture.bmp
 ;WizardSmallImageFile    = data\dialogicon.bmp
 
 
 UsePreviousAppDir         = yes
 DirExistsWarning          =no
-DefaultDirName            ={pf}\{#APP_PATH}
+DefaultDirName            ={pf}\{#sAppPath}
 DisableProgramGroupPage   = yes
 DisableWelcomePage        = no
 DEPCompatible             = no
@@ -125,10 +204,10 @@ PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
 MinVersion                =6.1.7600
-WizardImageFile           = data\dialogpicture.bmp
-WizardSmallImageFile      = data\dialogicon.bmp
-SetupIconFile             = data\icon.ico
-LicenseFile               = ..\common\documentserver\license\{#sPackageName}\LICENSE.txt
+WizardImageFile           = {#sBrandingFolder}\exe\data\dialogpicture.bmp
+WizardSmallImageFile      = {#sBrandingFolder}\exe\data\dialogicon.bmp
+SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
+LicenseFile               = 
 ShowLanguageDialog        = no
 
 #ifdef ISPPCC_INVOKED
@@ -137,6 +216,7 @@ SignTool=byparam $p
 
 ; supported languages
 #include "scripts\lang\english.iss"
+#include "scripts\lang\russian.iss"
 ; #include "scripts\lang\german.iss"
 ; #include "scripts\lang\french.iss"
 ; #include "scripts\lang\italian.iss"
@@ -150,24 +230,45 @@ SignTool=byparam $p
 ; #endif
 
 [CustomMessages]
-GenFonts=Generating AllFonts.js...
-InstallSrv=Installing service %1...
-CfgSrv=Configuring service %1...
-StartSrv=Starting service %1...
-InstallNpm=Installing npm modules...
-CreateDb=Creating database...
-RemoveDb=Removing database...
-FireWallExt=Adding firewall extention...
-AddRotateTask=Adding scheduled tasks...
+en.AddRotateTask=Adding scheduled tasks...
+ru.AddRotateTask=Добавление задачи в планировщик...
 
-CfgDs=Configuring {#sAppName}...
-Uninstall=Uninstall {#sAppName}
-PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
+en.CfgDs=Configuring {#sAppName}...
+ru.CfgDs=Настройка {#sAppName}...
 
-DependenciesDir={#sAppName} Dependencies
+en.CfgSrv=Configuring service %1...
+ru.CfgSrv=Настройка сервиса %1...
+
+en.CreateDb=Creating database...
+ru.CreateDb=Создание базы данных...
+
+en.DependenciesDir={#sAppName} Dependencies
+ru.DependenciesDir={#sAppName} Зависимости
+
+en.FireWallExt=Adding firewall extention...
+ru.FireWallExt=Добавление исключения в файервол ...
+
+en.GenFonts=Generating AllFonts.js...
+ru.GenFonts=Создание AllFonts.js...
+
+en.InstallSrv=Installing service %1...
+ru.InstallSrv=Установка сервиса %1...
+
+en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
+ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' что бы удалить ей, или 'Отменить' что бы выйти из программы инсталляции.
+
+en.RemoveDb=Removing database...
+ru.RemoveDb=Удаление базы данных...
+
+en.StartSrv=Starting service %1...
+ru.StartSrv=Запуск сервиса %1...
+
+en.Uninstall=Uninstall {#sAppName}
+ru.Uninstall=Удаление {#sAppName}
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 ;Name: "de"; MessagesFile: "compiler:Languages\German.isl"
 ;Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
 ;Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
@@ -181,8 +282,8 @@ Source: local\local.json;                           DestDir: {app}\config; Flags
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\includes\*;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*.template;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\onlyoffice-documentserver.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -205,28 +306,25 @@ Name: "{#LICENSE_PATH}";
 Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
 
 [Registry]
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}";
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}"; Check: not IsStringEmpty(ExpandConstant('{param:DOCSERVICE_PORT}'));
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_SPELLCHECKER_PORT}"; ValueData: "{code:GetSpellCheckerPort}"; Check: not IsStringEmpty(ExpandConstant('{param:SPELLCHECKER_PORT}'));
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_FONTS_PATH}"; ValueData: "{code:GetFontsPath}"; Check: not IsStringEmpty(ExpandConstant('{param:FONTS_PATH}'));
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_JWT_ENABLED}"; ValueData: "{code:GetJwtEnabled}"; Check: not IsStringEmpty(ExpandConstant('{param:JWT_ENABLED}'));
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_JWT_SECRET}"; ValueData: "{code:GetJwtSecret}";  Check: not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}'));
-Root: HKLM; Subkey: "{#APP_REG_PATH}"; ValueType: "string"; ValueName: "{#REG_JWT_HEADER}"; ValueData: "{code:GetJwtHeader}"; Check: not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}"; Check: not IsStringEmpty(ExpandConstant('{param:DOCSERVICE_PORT}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_SPELLCHECKER_PORT}"; ValueData: "{code:GetSpellCheckerPort}"; Check: not IsStringEmpty(ExpandConstant('{param:SPELLCHECKER_PORT}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_FONTS_PATH}"; ValueData: "{code:GetFontsPath}"; Check: not IsStringEmpty(ExpandConstant('{param:FONTS_PATH}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_ENABLED}"; ValueData: "{code:GetJwtEnabled}"; Check: not IsStringEmpty(ExpandConstant('{param:JWT_ENABLED}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_SECRET}"; ValueData: "{code:GetJwtSecret}";  Check: not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_HEADER}"; ValueData: "{code:GetJwtHeader}"; Check: not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}'));
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
-
-Filename: "{#NPM}"; Parameters: "install -g json"; Flags: runhidden shellexec waituntilterminated; StatusMsg: "{cm:InstallNpm}"
-Filename: "{#NPM}"; Parameters: "install -g replace"; Flags: runhidden shellexec waituntilterminated; StatusMsg: "{cm:InstallNpm}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
@@ -409,7 +507,7 @@ var
 begin
   Result := True;
   UninstallerParam := '/VERYSILENT';
-  UninstallRegKey := '{reg:HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#sAppName}_is1,UninstallString}';
+  UninstallRegKey := '{reg:HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#sAppId}_is1,UninstallString}';
 
   UninstallerPath := RemoveQuotes(ExpandConstant(UninstallRegKey));
   if Length(UninstallerPath) > 0 then begin
@@ -518,29 +616,29 @@ end;
 
 function GetDefaultPort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_DS_PORT}|80}}');
+  Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}');
 end;
 
 function GetDocServicePort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DOCSERVICE_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_DOCSERVICE_PORT}|8000}}');
+  Result := ExpandConstant('{param:DOCSERVICE_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DOCSERVICE_PORT}|8000}}');
 end;
 
 function GetSpellCheckerPort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:SPELLCHECKER_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_SPELLCHECKER_PORT}|8080}}');
+  Result := ExpandConstant('{param:SPELLCHECKER_PORT|{reg:HKLM\{#sAppRegPath},{#REG_SPELLCHECKER_PORT}|8080}}');
 end;
 
 function GetExamplePort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#APP_REG_PATH},{#REG_EXAMPLE_PORT}|3000}}');
+  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#sAppRegPath},{#REG_EXAMPLE_PORT}|3000}}');
 end;
 
 function GetLicensePath(Param: String): String;
 var
   LicensePath: String;
 begin
-  LicensePath := ExpandConstant('{param:LICENSE_PATH|{reg:HKLM\{#APP_REG_PATH},{#REG_LICENSE_PATH}|{#LICENSE_PATH}\license.lic}}');
+  LicensePath := ExpandConstant('{param:LICENSE_PATH|{reg:HKLM\{#sAppRegPath},{#REG_LICENSE_PATH}|{#LICENSE_PATH}\license.lic}}');
   StringChangeEx(LicensePath, '\', '/', True);
   Result := LicensePath;
 end;
@@ -549,24 +647,24 @@ function GetFontsPath(Param: String): String;
 var
   FontPath: String;
 begin
-  FontPath := ExpandConstant('{param:FONTS_PATH|{reg:HKLM\{#APP_REG_PATH},{#REG_FONTS_PATH}|{fonts}}}');
+  FontPath := ExpandConstant('{param:FONTS_PATH|{reg:HKLM\{#sAppRegPath},{#REG_FONTS_PATH}|{fonts}}}');
   StringChangeEx(FontPath, '\', '/', True);
   Result := FontPath;
 end;
 
 function GetJwtEnabled(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#APP_REG_PATH},{#REG_JWT_ENABLED}|false}}');
+  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#sAppRegPath},{#REG_JWT_ENABLED}|false}}');
 end;
 
 function GetJwtSecret(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#APP_REG_PATH},{#REG_JWT_SECRET}|secret}}');
+  Result := ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}|secret}}');
 end;
 
 function GetJwtHeader(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_HEADER|{reg:HKLM\{#APP_REG_PATH},{#REG_JWT_HEADER}|Authorization}}');
+  Result := ExpandConstant('{param:JWT_HEADER|{reg:HKLM\{#sAppRegPath},{#REG_JWT_HEADER}|Authorization}}');
 end;
 
 procedure InitializeWizard;
@@ -579,10 +677,10 @@ begin
   DbPage.Add('Password:', True);
   DbPage.Add('Database:', False);
 
-  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_USER}|onlyoffice}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_PWD}|onlyoffice}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#APP_REG_PATH},{#REG_DB_NAME}|onlyoffice}}');
+  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
+  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
+  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
@@ -591,16 +689,16 @@ begin
   RabbitMqPage.Add('User:', False);
   RabbitMqPage.Add('Password:', True);
 
-  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_RABBITMQ_HOST}|localhost}}');
-  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#APP_REG_PATH},{#REG_RABBITMQ_USER}|guest}}');
-  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#APP_REG_PATH},{#REG_RABBITMQ_PWD}|guest}}');
+  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
+  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
+  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
 
   RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
     'Redis In-Memory Database', 'Configure Redis Connection...',
     'Please specify your Reids connection, then click Next.');
   RedisPage.Add('Host:', False);
 
-  RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#APP_REG_PATH},{#REG_REDIS_HOST}|localhost}}');
+  RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
 
 end;
 
