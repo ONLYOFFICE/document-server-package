@@ -100,6 +100,7 @@ cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTAT
 %if %{defined example}
 #install documentserver example files
 mkdir -p "${HOME_DIR}-example/"
+mkdir -p "${HOME_DIR}-example/public/files/"
 cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "${HOME_DIR}-example/"
 
 #install dcoumentserver example configs
