@@ -183,7 +183,7 @@ rm -rf "%{buildroot}"
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}
 
 %attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
-%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/../Data
+%attr(755, -, -) %{_localstatedir}/www/%{_ds_prefix}/../Data
 
 %if %{defined example}
 %attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
