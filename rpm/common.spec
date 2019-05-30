@@ -190,21 +190,26 @@ rm -rf "%{buildroot}"
 %endif
 
 %pre
+# add group and user for onlyoffice app
+getent group ds >/dev/null || groupadd -r ds
+getent passwd ds >/dev/null || useradd -r -g ds -d %{_localstatedir}/www/%{_ds_prefix}/ -s /sbin/nologin ds
+# add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
+usermod -a -G ds %{nginx_user}
+
 case "$1" in
   1)
     # Initial installation
-    # add group and user for onlyoffice app
-    getent group ds >/dev/null || groupadd -r ds
-    getent passwd ds >/dev/null || useradd -r -g ds -d %{_localstatedir}/www/%{_ds_prefix}/ -s /sbin/nologin ds
-    # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
-    usermod -a -G ds %{nginx_user}
   ;;
   2)
     # Upgrade
     # disconnect all users and stop running services
-    documentserver-prepare4shutdown.sh
-    echo "Stoping documentserver services..."
-    supervisorctl stop ds:*
+    documentserver-prepare4shutdown.sh || true
+    for i in ds onlyoffice; do
+      if [ $(supervisorctl avail | grep ${i} | wc -l) -gt 0 ]; then
+        echo "Stopping documentserver services..."
+        supervisorctl stop ${i}:*
+      fi
+    done
   ;;
 esac
 exit 0
