@@ -187,6 +187,7 @@ rm -rf "%{buildroot}"
 
 %if %{defined example}
 %attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
+%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-examlpe/public/files
 %endif
 
 %pre
