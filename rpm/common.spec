@@ -95,7 +95,7 @@ mkdir -p "%{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d}/"
 #install logrotate config
 DS_LOGROTATE_CONF=$CONF_DIR/logrotate/
 mkdir -p "$DS_LOGROTATE_CONF"
-cp -r %{_builddir}/../../../common/documentserver/logrotate/* "$DS_LOGROTATE_CONF"
+cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTATE_CONF"
 
 %if %{defined example}
 #install documentserver example files
@@ -112,7 +112,7 @@ mkdir -p "${LOG_DIR}-example"
 #install example supervisor configs
 DSE_SUPERVISOR_CONF=${CONF_DIR}-example/supervisor/
 mkdir -p "$DSE_SUPERVISOR_CONF"
-cp %{_builddir}/../../../common/documentserver-example/supervisor/* "$DSE_SUPERVISOR_CONF"
+cp %{_builddir}/../../../common/documentserver-example/supervisor/*.conf "$DSE_SUPERVISOR_CONF"
 
 # rename extention for supervisor config files
 rename 's/.conf$/.ini/' "$DSE_SUPERVISOR_CONF"*
