@@ -206,7 +206,7 @@ case "$1" in
     # Upgrade
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh || true
-    for i in ds onlyoffice; do
+    for i in ds onlyoffice-documentserver; do
       if [ $(supervisorctl avail | grep ${i} | wc -l) -gt 0 ]; then
         echo "Stopping documentserver services..."
         supervisorctl stop ${i}:*
