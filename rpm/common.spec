@@ -284,19 +284,19 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
-    
-    if systemctl is-active --quiet supervisord; then
-      supervisorctl update >/dev/null 2>&1
-    fi
-    
-    if systemctl is-active --quiet nginx; then
-      systemctl reload nginx >/dev/null 2>&1
-    fi
   ;;
   1)
     # Upgrade
     :
   ;;
 esac
+
+if systemctl is-active --quiet supervisord; then
+  supervisorctl update >/dev/null 2>&1
+fi
+
+if systemctl is-active --quiet nginx; then
+  systemctl reload nginx >/dev/null 2>&1
+fi
 
 %changelog
