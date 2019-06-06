@@ -43,7 +43,11 @@ tune_local_configs(){
 }
 
 restart_services() {
-	[ -a /etc/nginx/conf.d/default.conf ] && mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.old
+	[ -a /etc/nginx/conf.d/default.conf ] && \
+	mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.old
+
+	[ -a /etc/nginx/conf.d/onlyoffice-documentserver.conf ] && \
+	mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
 
 	echo -n "Restarting services... "
 	for SVC in supervisord nginx

@@ -200,6 +200,10 @@ setup_nginx(){
   fi
 
   # install nginx config
+  if [ -d /etc/nginx/conf.d ] && [ -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
+    mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
+  fi
+
   if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
 	  ln -s $DS_CONF /etc/nginx/conf.d/ds.conf
   fi
