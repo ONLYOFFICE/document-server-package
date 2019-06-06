@@ -95,11 +95,12 @@ mkdir -p "%{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d}/"
 #install logrotate config
 DS_LOGROTATE_CONF=$CONF_DIR/logrotate/
 mkdir -p "$DS_LOGROTATE_CONF"
-cp -r %{_builddir}/../../../common/documentserver/logrotate/* "$DS_LOGROTATE_CONF"
+cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTATE_CONF"
 
 %if %{defined example}
 #install documentserver example files
 mkdir -p "${HOME_DIR}-example/"
+mkdir -p "${HOME_DIR}-example/public/files/"
 cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "${HOME_DIR}-example/"
 
 #install dcoumentserver example configs
@@ -112,7 +113,7 @@ mkdir -p "${LOG_DIR}-example"
 #install example supervisor configs
 DSE_SUPERVISOR_CONF=${CONF_DIR}-example/supervisor/
 mkdir -p "$DSE_SUPERVISOR_CONF"
-cp %{_builddir}/../../../common/documentserver-example/supervisor/* "$DSE_SUPERVISOR_CONF"
+cp %{_builddir}/../../../common/documentserver-example/supervisor/*.conf "$DSE_SUPERVISOR_CONF"
 
 # rename extention for supervisor config files
 rename 's/.conf$/.ini/' "$DSE_SUPERVISOR_CONF"*
@@ -183,28 +184,34 @@ rm -rf "%{buildroot}"
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}
 
 %attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
-%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/../Data
+%attr(755, -, -) %{_localstatedir}/www/%{_ds_prefix}/../Data
 
 %if %{defined example}
 %attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
+%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/public/files
 %endif
 
 %pre
+# add group and user for onlyoffice app
+getent group ds >/dev/null || groupadd -r ds
+getent passwd ds >/dev/null || useradd -r -g ds -d %{_localstatedir}/www/%{_ds_prefix}/ -s /sbin/nologin ds
+# add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
+usermod -a -G ds %{nginx_user}
+
 case "$1" in
   1)
     # Initial installation
-    # add group and user for onlyoffice app
-    getent group ds >/dev/null || groupadd -r ds
-    getent passwd ds >/dev/null || useradd -r -g ds -d %{_localstatedir}/www/%{_ds_prefix}/ -s /sbin/nologin ds
-    # add nginx user to onlyoffice group to allow access nginx to onlyoffice log dir
-    usermod -a -G ds %{nginx_user}
   ;;
   2)
     # Upgrade
     # disconnect all users and stop running services
-    documentserver-prepare4shutdown.sh
-    echo "Stoping documentserver services..."
-    supervisorctl stop ds:*
+    documentserver-prepare4shutdown.sh || true
+    for i in ds onlyoffice-documentserver; do
+      if [ $(supervisorctl avail | grep ${i} | wc -l) -gt 0 ]; then
+        echo "Stopping documentserver services..."
+        supervisorctl stop ${i}:*
+      fi
+    done
   ;;
 esac
 exit 0
@@ -212,6 +219,12 @@ exit 0
 %post
 # Make symlink to libcurl-gnutls
 ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
+
+chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
+
+%if %{defined example}
+chown -R ds:ds %{_localstatedir}/www/%{_ds_prefix}-example/public/files
+%endif
 
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
@@ -277,19 +290,19 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
-    
-    if systemctl is-active --quiet supervisord; then
-      supervisorctl update >/dev/null 2>&1
-    fi
-    
-    if systemctl is-active --quiet nginx; then
-      systemctl reload nginx >/dev/null 2>&1
-    fi
   ;;
   1)
     # Upgrade
     :
   ;;
 esac
+
+if systemctl is-active --quiet supervisord; then
+  supervisorctl update >/dev/null 2>&1
+fi
+
+if systemctl is-active --quiet nginx; then
+  systemctl reload nginx >/dev/null 2>&1
+fi
 
 %changelog

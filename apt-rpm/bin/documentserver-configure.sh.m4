@@ -39,7 +39,11 @@ tune_local_configs(){
 }
 
 restart_services() {
-	[ -a /etc/nginx/sites-available.d/default.conf ] && mv /etc/nginx/sites-available.d/default.conf /etc/nginx/sites-available.d/default.conf.old
+	[ -a /etc/nginx/sites-available.d/default.conf ] && \
+	mv /etc/nginx/sites-available.d/default.conf /etc/nginx/sites-available.d/default.conf.old
+
+	[ -a /etc/nginx/sites-available.d/onlyoffice-documentserver.conf ] && \
+	mv /etc/nginx/sites-available.d/onlyoffice-documentserver.conf /etc/nginx/sites-available.d/onlyoffice-documentserver.conf.old
 
 	echo -n "Restarting services... "
 	for SVC in supervisord nginx
