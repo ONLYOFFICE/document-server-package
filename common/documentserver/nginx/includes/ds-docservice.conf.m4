@@ -14,8 +14,16 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents
   alias  M4_DS_ROOT/$2;
 }
 
-#suppress logging the unsupported locale error
+#suppress logging the unsupported locale error in web-apps
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps)(\/.*\.json)$ {
+  expires 365d;
+  error_log M4_DEV_NULL crit;
+  # gzip_static on;
+  alias M4_DS_ROOT/$2$3;
+}
+
+#suppress logging the unsupported locale error in plugins
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(sdkjs-plugins)(\/.*\.json)$ {
   expires 365d;
   error_log M4_DEV_NULL crit;
   # gzip_static on;
