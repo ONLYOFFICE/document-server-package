@@ -695,7 +695,7 @@ begin
 
   RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
     'Redis In-Memory Database', 'Configure Redis Connection...',
-    'Please specify your Reids connection, then click Next.');
+    'Please specify your Redis connection, then click Next.');
   RedisPage.Add('Host:', False);
 
   RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
