@@ -11,7 +11,7 @@ DIR="/var/www/M4_DS_PREFIX"
 echo -n Generating AllFonts.js, please wait...
 
 
-"$DIR/server/tools/AllFontsGen"\
+"$DIR/server/tools/allfontsgen"\
   --input="$DIR/core-fonts"\
   --allfonts-web="$DIR/sdkjs/common/AllFonts.js"\
   --allfonts="$DIR/server/FileConverter/bin/AllFonts.js"\

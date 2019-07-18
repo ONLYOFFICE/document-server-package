@@ -10,7 +10,7 @@ set PATH=%~dp0\..\server\FileConverter\bin;%PATH%
 rem Start generate AllFonts.js, font thumbnails and font_selection.bin
 ECHO | SET /p="Generating AllFonts.js, please wait..."
 
-"%~dp0\..\server\tools\AllFontsGen.exe" ^
+"%~dp0\..\server\tools\allfontsgen.exe" ^
   --input="%~dp0\..\core-fonts" ^
   --allfonts-web="%~dp0\..\sdkjs\common\AllFonts.js" ^
   --allfonts="%~dp0\..\server\FileConverter\bin\AllFonts.js" ^
