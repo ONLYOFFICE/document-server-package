@@ -21,6 +21,14 @@ ECHO | SET /p="Generating AllFonts.js, please wait..."
 
 ECHO Done
 
+ECHO | SET /p="Generating presentation themes, please wait..."
+"%~dp0\..\server\tools\allthemesgen.exe" ^
+  --converter-dir="%~dp0\..\server\FileConverter\bin" ^
+  --src="%~dp0\..\sdkjs\slide\themes" ^
+  --output="%~dp0\..\sdkjs\common\Images"
+
+ECHO Done
+
 rem Restart web-site and converter
 IF NOT "%ONLYOFFICE_DATA_CONTAINER%"=="true" (  
   net stop DsDocServiceSvc

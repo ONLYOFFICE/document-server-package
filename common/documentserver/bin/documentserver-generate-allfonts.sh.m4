@@ -26,6 +26,14 @@ chown -R ds:ds "$DIR/fonts"
 
 echo Done
 
+echo -n Generating presentation themes, please wait...
+"$DIR/server/tools/allthemesgen"\
+  --converter-dir="$DIR/server/FileConverter/bin"\
+  --src="$DIR/sdkjs/slide/themes"\
+  --output="$DIR/sdkjs/common/Images"
+
+echo Done
+
 #Remove gzipped fonts
 rm -f $DIR/fonts/*.gz $DIR/sdkjs/common/AllFonts.js.gz
 
