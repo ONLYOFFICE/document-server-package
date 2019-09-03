@@ -11,7 +11,7 @@ DIR="/var/www/M4_DS_PREFIX"
 echo -n Generating AllFonts.js, please wait...
 
 
-"$DIR/server/tools/AllFontsGen"\
+"$DIR/server/tools/allfontsgen"\
   --input="$DIR/core-fonts"\
   --allfonts-web="$DIR/sdkjs/common/AllFonts.js"\
   --allfonts="$DIR/server/FileConverter/bin/AllFonts.js"\
@@ -23,6 +23,14 @@ echo -n Generating AllFonts.js, please wait...
 chown -R ds:ds "$DIR/sdkjs"
 chown -R ds:ds "$DIR/server/FileConverter/bin"
 chown -R ds:ds "$DIR/fonts"
+
+echo Done
+
+echo -n Generating presentation themes, please wait...
+"$DIR/server/tools/allthemesgen"\
+  --converter-dir="$DIR/server/FileConverter/bin"\
+  --src="$DIR/sdkjs/slide/themes"\
+  --output="$DIR/sdkjs/common/Images"
 
 echo Done
 

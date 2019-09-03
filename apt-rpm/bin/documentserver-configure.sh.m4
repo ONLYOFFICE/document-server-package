@@ -7,9 +7,13 @@ JSON_BIN="$DIR/npm/node_modules/.bin/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
+AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
+
+MYSQL=""
 PSQL=""
 CREATEDB=""
-
+DB_TYPE=${DB_TYPE:-postgres}
+DB_PORT=""
 DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # SPELLCHECKER_PORT=${SPELLCHECKER_PORT:-8080}
@@ -61,11 +65,40 @@ save_db_params(){
 	$JSON -e "this.services.CoAuthoring.sql.dbName= '$DB_NAME'"
 	$JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
 	$JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
+	$JSON -e "this.services.CoAuthoring.sql.type = '$DB_TYPE'"
+	$JSON -e "this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
 }
 
 save_rabbitmq_params(){
-	$JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-	$JSON -e "this.rabbitmq.url = '$RABBITMQ_URL'"
+	$JSON -e "if(this.queue===undefined)this.queue={};"
+	$JSON -e "this.queue.type = 'rabbitmq'"
+	$JSON -e "this.rabbitmq.url = '${AMQP_SERVER_URL}'"
+}
+
+save_activemq_params(){
+	$JSON -e "if(this.queue===undefined)this.queue={};"
+	$JSON -e "this.queue.type = 'activemq'"
+	$JSON -e "if(this.activemq===undefined)this.activemq={};"
+	$JSON -e "if(this.activemq.connectOptions===undefined)this.activemq.connectOptions={};"
+
+	$JSON -e "this.activemq.connectOptions.host = '${AMQP_SERVER_HOST}'"
+	if [ ! "${AMQP_SERVER_PORT}" == "" ]; then
+		$JSON -e "this.activemq.connectOptions.port = '${AMQP_SERVER_PORT}'"
+	else
+		$JSON -e "delete this.activemq.connectOptions.port"
+	fi
+
+	if [ ! "${AMQP_SERVER_USER}" == "" ]; then
+		$JSON -e "this.activemq.connectOptions.username = '${AMQP_SERVER_USER}'"
+	else
+		$JSON -e "delete this.activemq.connectOptions.username"
+	fi
+
+	if [ ! "${AMQP_SERVER_PWD}" == "" ]; then
+		$JSON -e "this.activemq.connectOptions.password = '${AMQP_SERVER_PWD}'"
+	else
+		$JSON -e "delete this.activemq.connectOptions.password"
+	fi
 }
 
 save_redis_params(){
@@ -117,8 +150,8 @@ save_jwt_params(){
   fi
 }
 
-parse_rabbitmq_url(){
-  local amqp=${RABBITMQ_URL}
+parse_amqp_url(){
+  local amqp=${AMQP_SERVER_URL}
 
   # extract the protocol
   local proto="$(echo $amqp | grep :// | sed -e's,^\(.*://\).*,\1,g')"
@@ -152,15 +185,15 @@ parse_rabbitmq_url(){
   # extract the path (if any)
   local path="$(echo $url | grep / | cut -d/ -f2-)"
 
-  RABBITMQ_HOST=$host
-  RABBITMQ_PORT=$port
-  RABBITMQ_HOST_PORT_PATH=$hostport$path
-  RABBITMQ_USER=$user
-  RABBITMQ_PWD=$pass
+  AMQP_SERVER_HOST=$host
+  AMQP_SERVER_PORT=$port
+  AMQP_SERVER_HOST_PORT_PATH=$hostport$path
+  AMQP_SERVER_USER=$user
+  AMQP_SERVER_PWD=$pass
 }
 
 input_db_params(){
-	echo "Configuring PostgreSQL access... "
+	echo "Configuring database access... "
 
 	read -e -p "Host [${DB_HOST}]: " USER_INPUT
 	DB_HOST=${USER_INPUT:-${DB_HOST}}
@@ -186,24 +219,25 @@ input_redis_params(){
 	echo
 }
 
-input_rabbitmq_params(){
-	echo "Configuring RabbitMQ access... "
+input_amqp_params(){
+	echo "Configuring AMQP access... "
 
-	read -e -p "Host [${RABBITMQ_HOST_PORT_PATH}]: " USER_INPUT
-	RABBITMQ_HOST_PORT_PATH=${USER_INPUT:-${RABBITMQ_HOST_PORT_PATH}}
+	read -e -p "Host [${AMQP_SERVER_HOST_PORT_PATH}]: " USER_INPUT
+	AMQP_SERVER_HOST_PORT_PATH=${USER_INPUT:-${AMQP_SERVER_HOST_PORT_PATH}}
 
-	read -e -p "User [${RABBITMQ_USER}]: " USER_INPUT
-	RABBITMQ_USER=${USER_INPUT:-${RABBITMQ_USER}}
+	read -e -p "User [${AMQP_SERVER_USER}]: " USER_INPUT
+	AMQP_SERVER_USER=${USER_INPUT:-${AMQP_SERVER_USER}}
 
 	read -e -p "Password []: " -s USER_INPUT
-	RABBITMQ_PWD=${USER_INPUT:-${RABBITMQ_PWD}}
+	AMQP_SERVER_PWD=${USER_INPUT:-${AMQP_SERVER_PWD}}
 
- 	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH
+ 	AMQP_SERVER_URL=amqp://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
+
 
 	echo
 }
 
-execute_db_scripts(){
+execute_postgres_scripts(){
 	echo -n "Installing PostgreSQL database... "
 
         if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
@@ -219,7 +253,7 @@ execute_db_scripts(){
 	echo "OK"
 }
 
-establish_db_conn() {
+establish_postgres_conn() {
 	echo -n "Trying to establish PostgreSQL connection... "
 
 	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
@@ -237,6 +271,44 @@ establish_db_conn() {
 	echo "OK"
 }
 
+execute_mysql_sqript(){
+	echo -n "Installing MYSQL database... "
+	$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE 'utf8_general_ci';" 
+	$MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql" 
+	echo "OK"
+}
+
+establish_mysql_conn(){
+	echo -n "Trying to database MySQL connection... "
+	command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+	MYSQL="mysql -h$DB_HOST -u$DB_USER"
+	if [ -n "$DB_PWD" ]; then
+		MYSQL="$MYSQL -p$DB_PWD"
+	fi 
+
+	$MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+
+	echo "OK"
+}
+
+execute_db_script(){
+	case $DB_TYPE in
+		postgres)
+			DB_PORT=5432 
+			establish_postgres_conn || exit $?
+			execute_postgres_scripts || exit $?
+			;;	
+		mysql) 
+			DB_PORT=3306  
+			establish_mysql_conn || exit $?
+			execute_mysql_sqript || exit $?
+			;;   
+		*)
+			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+			exit 1	  
+	esac
+}
+
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
@@ -250,10 +322,10 @@ establish_redis_conn() {
 	echo "OK"
 }
 
-establish_rabbitmq_conn() {
-	echo -n "Trying to establish RabbitMQ connection... "
+establish_amqp_conn() {
+	echo -n "Trying to establish AMQP connection... "
   
-  exec {FD}<> /dev/tcp/$RABBITMQ_HOST/$RABBITMQ_PORT && exec {FD}>&-
+  exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/$AMQP_SERVER_PORT && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -263,16 +335,19 @@ establish_rabbitmq_conn() {
 	echo "OK"
 }
 
-establish_rabbitmq_conn_by_tools() {
-	echo -n "Trying to establish RabbitMQ connection... "
-
-	TEST_QUEUE=dc.test
-	RABBITMQ_URL=amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST_PORT_PATH
-
-	amqp-declare-queue -u "$RABBITMQ_URL" -q "$TEST_QUEUE" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-	amqp-delete-queue -u "$RABBITMQ_URL" -q "$TEST_QUEUE" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-
-	echo "OK"
+save_amqp_params(){
+	case $AMQP_SERVER_TYPE in
+		activemq)
+			save_activemq_params
+			;;
+		rabbitmq)
+			save_rabbitmq_params
+			;;
+		*)
+			echo "Incorrect AMQP_SERVER_TYPE value! Possible value of AMQP_SERVER_TYPE is 'activemq' or 'rabbitmq"
+			exit 1
+			;;
+	esac
 }
 
 setup_nginx(){
@@ -317,18 +392,17 @@ setup_nginx(){
 create_local_configs
 
 input_db_params
-establish_db_conn || exit $?
-execute_db_scripts || exit $?
+execute_db_script
 
 input_redis_params
 # establish_redis_conn || exit $?
 
-input_rabbitmq_params
-parse_rabbitmq_url
-# establish_rabbitmq_conn || exit $?
+input_amqp_params
+parse_amqp_url
+# establish_amqp_conn || exit $?
 
 save_db_params
-save_rabbitmq_params
+save_amqp_params
 save_redis_params
 save_jwt_params
 

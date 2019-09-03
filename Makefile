@@ -1,5 +1,6 @@
 PWD := $(shell pwd)
 CURL := curl -L -o
+TOUCH := touch
 
 COMPANY_NAME ?= ONLYOFFICE
 PRODUCT_NAME ?= DocumentServer
@@ -88,7 +89,7 @@ HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/H
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cl?part
+# DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cl?part
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/c?de
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/m?cros
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
@@ -342,7 +343,7 @@ endif
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
 	#chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
-	chmod u+x $(DOCUMENTSERVER)/server/tools/AllFontsGen$(EXEC_EXT)
+	chmod u+x $(DOCUMENTSERVER)/server/tools/allfontsgen$(EXEC_EXT)
 
 	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 
@@ -445,6 +446,7 @@ $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-e
 $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
 $(ISXDL):
+	$(TOUCH) $(ISXDL) && \
 	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 	
 $(NGINX):
