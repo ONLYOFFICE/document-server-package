@@ -72,6 +72,7 @@ save_db_params(){
 save_rabbitmq_params(){
 	$JSON -e "if(this.queue===undefined)this.queue={};"
 	$JSON -e "this.queue.type = 'rabbitmq'"
+	$JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
 	$JSON -e "this.rabbitmq.url = '${AMQP_SERVER_URL}'"
 }
 

@@ -1,5 +1,6 @@
 PWD := $(shell pwd)
 CURL := curl -L -o
+TOUCH := touch
 
 COMPANY_NAME ?= ONLYOFFICE
 PRODUCT_NAME ?= DocumentServer
@@ -445,6 +446,7 @@ $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-e
 $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
 $(ISXDL):
+	$(TOUCH) $(ISXDL) && \
 	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
 	
 $(NGINX):
