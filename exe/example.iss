@@ -1,4 +1,4 @@
-#define EXAMPLE_SRV        'DsExampleSvc'
+﻿#define EXAMPLE_SRV        'DsExampleSvc'
 #define EXAMPLE_SRV_DISPLAY  str(sAppName + " Example")
 #define EXAMPLE_SRV_DESCR  str(sAppName + " Example Service")
 #define EXAMPLE_SRV_DIR    '{app}\example'
