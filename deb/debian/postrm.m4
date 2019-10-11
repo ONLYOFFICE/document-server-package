@@ -33,9 +33,9 @@ clean_ds_files() {
 	rm -f $DIR/server/FileConverter/bin/AllFonts.js
 	rm -fr $DIR/fonts
 
-    if [ -d /etc/nginx/conf.d/ ] && [ -e /etc/nginx/conf.d/ds.conf ]; then
+	if [ -d /etc/nginx/conf.d/ ] && [ -e /etc/nginx/conf.d/ds.conf ]; then
 	  rm -f /etc/nginx/conf.d/ds.conf
-    fi
+	fi
 
 	supervisorctl update >/dev/null 2>&1
 	service nginx reload >/dev/null 2>&1
@@ -48,17 +48,21 @@ case "$1" in
 			rm -rf $LOG_DIR
 		fi
 
-    # purge files
+	# purge files
 		if [ -d $APP_DIR ]; then
 			rm -rf 	$APP_DIR
 		fi
-    
+	
 		db_input high M4_ONLYOFFICE_VALUE/remove-db || true
 		db_go
 		db_get M4_ONLYOFFICE_VALUE/remove-db
 		if [ "$RET" = "true" ]; then
+			db_get M4_ONLYOFFICE_VALUE/db-type
+			DB_TYPE="$RET"
 			db_get M4_ONLYOFFICE_VALUE/db-host
 			DB_HOST="$RET"
+			db_get M4_ONLYOFFICE_VALUE/db-port
+			DB_PORT="$RET"
 			db_get M4_ONLYOFFICE_VALUE/db-user
 			DB_USER="$RET"
 			db_get M4_ONLYOFFICE_VALUE/db-pwd
@@ -66,14 +70,23 @@ case "$1" in
 			db_get M4_ONLYOFFICE_VALUE/db-name
 			DB_NAME="$RET"
 
-                        CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
-                        if [ -n "$DB_PWD" ]; then
-                                export PGPASSWORD=$DB_PWD
-                        fi
+			if [ "$DB_TYPE" = "postgres" ]; then
 
-                        DROPDB="dropdb $CONNECTION_PARAMS"
+							CONNECTION_PARAMS="-h $DB_HOST -U $DB_USER -w"
+							if [ -n "$DB_PWD" ]; then
+									export PGPASSWORD=$DB_PWD
+							fi
+							DROPDB="dropdb $CONNECTION_PARAMS"
+				$DROPDB --if-exists $DB_NAME &>/dev/null || { echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
 
-			$DROPDB --if-exists $DB_NAME &>/dev/null || { echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+			elif [ "$DB_TYPE" = "mysql" ]; then
+
+							CONNECTION_PARAMS="-w -h $DB_HOST -u $DB_USER -p $DB_PWD"
+							MYSQL="mysql -q $CONNECTION_PARAMS"
+				$MYSQL -e "DROP DATABASE IF EXISTS $DB_NAME;" &>/dev/null || { echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+
+			fi
+
 		fi
 
 		clean_ds_files
@@ -84,7 +97,7 @@ case "$1" in
 	;;
   
 	failed-upgrade|abort-install|abort-upgrade|disappear)
-  	:
+	:
 	;;
 
 	*)

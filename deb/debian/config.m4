@@ -4,7 +4,9 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+DB_TYPE=""
 DB_HOST=""
+DB_PORT=""
 DB_NAME=""
 DB_USER=""
 DB_PWD=""
@@ -18,7 +20,9 @@ db_fset M4_ONLYOFFICE_VALUE/jwt-enabled seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-secret seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-header seen true
 
+db_input medium M4_ONLYOFFICE_VALUE/db-type || true
 db_input medium M4_ONLYOFFICE_VALUE/db-host || true
+db_input medium M4_ONLYOFFICE_VALUE/db-port || true
 db_input medium M4_ONLYOFFICE_VALUE/db-name || true
 db_input medium M4_ONLYOFFICE_VALUE/db-user || true
 db_go
@@ -33,8 +37,14 @@ db_input medium M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
 db_input medium M4_ONLYOFFICE_VALUE/redis-host || true
 db_go
 
+db_get M4_ONLYOFFICE_VALUE/db-type
+DB_TYPE="$RET"
+
 db_get M4_ONLYOFFICE_VALUE/db-host
 DB_HOST="$RET"
+
+db_get M4_ONLYOFFICE_VALUE/db-port
+DB_PORT="$RET"
 
 db_get M4_ONLYOFFICE_VALUE/db-name
 DB_NAME="$RET"
