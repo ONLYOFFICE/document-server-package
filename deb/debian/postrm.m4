@@ -33,9 +33,9 @@ clean_ds_files() {
 	rm -f $DIR/server/FileConverter/bin/AllFonts.js
 	rm -fr $DIR/fonts
 
-	if [ -d /etc/nginx/conf.d/ ] && [ -e /etc/nginx/conf.d/ds.conf ]; then
+    if [ -d /etc/nginx/conf.d/ ] && [ -e /etc/nginx/conf.d/ds.conf ]; then
 	  rm -f /etc/nginx/conf.d/ds.conf
-	fi
+    fi
 
 	supervisorctl update >/dev/null 2>&1
 	service nginx reload >/dev/null 2>&1
@@ -48,11 +48,11 @@ case "$1" in
 			rm -rf $LOG_DIR
 		fi
 
-	# purge files
+    # purge files
 		if [ -d $APP_DIR ]; then
 			rm -rf 	$APP_DIR
 		fi
-	
+    
 		db_input high M4_ONLYOFFICE_VALUE/remove-db || true
 		db_go
 		db_get M4_ONLYOFFICE_VALUE/remove-db
@@ -81,7 +81,7 @@ case "$1" in
 
 			elif [ "$DB_TYPE" = "mysql" ]; then
 
-							CONNECTION_PARAMS="-w -h $DB_HOST -u $DB_USER -p $DB_PWD"
+							CONNECTION_PARAMS="-w -h $DB_HOST -u $DB_USER -p$DB_PWD"
 							MYSQL="mysql -q $CONNECTION_PARAMS"
 				$MYSQL -e "DROP DATABASE IF EXISTS $DB_NAME;" &>/dev/null || { echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
 
@@ -97,7 +97,7 @@ case "$1" in
 	;;
   
 	failed-upgrade|abort-install|abort-upgrade|disappear)
-	:
+  	:
 	;;
 
 	*)

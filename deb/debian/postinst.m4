@@ -51,7 +51,7 @@ create_local_configs(){
 		if [ -d $(dirname ${i}) -a ! -f ${i} ]; then
 			echo {} > ${i}
 		fi
-		done
+  	done
 }
 
 read_saved_params(){
@@ -88,7 +88,7 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/jwt-header || true
 	JWT_HEADER="$RET"
 }
-	
+
 install_db(){
 	if [ "$DB_TYPE" = "postgres" ]; then
 
@@ -143,108 +143,106 @@ install_db(){
 }
 
 save_db_params(){
-	$JSON -e "if(this.services===undefined)this.services={};"
-	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
-	$JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};" >/dev/null 2>&1
-	$JSON -e "this.services.CoAuthoring.sql.type = '$DB_TYPE'"
-	$JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
-	$JSON -e "this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
-	$JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
-	$JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
-	$JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
+  $JSON -e "if(this.services===undefined)this.services={};"
+  $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+  $JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};" >/dev/null 2>&1
+  $JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
+  $JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
+  $JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
+  $JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
 }
 
 save_rabbitmq_params(){
-	$JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-	$JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
+  $JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
+  $JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
 save_redis_params(){
-	$JSON -e "if(this.services===undefined)this.services={};"
-	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
-	$JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
-	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
+  $JSON -e "if(this.services===undefined)this.services={};"
+  $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+  $JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
+  $JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
 save_jwt_params(){
-	${JSON} -e "if(this.services===undefined)this.services={};"
-	${JSON} -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
-	${JSON} -e "if(this.services.CoAuthoring.token===undefined)this.services.CoAuthoring.token={};"
+  ${JSON} -e "if(this.services===undefined)this.services={};"
+  ${JSON} -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
+  ${JSON} -e "if(this.services.CoAuthoring.token===undefined)this.services.CoAuthoring.token={};"
 
-	if [ "${JWT_ENABLED}" = "true" ] || [ "${JWT_ENABLED}" = "false" ]; then
-		${JSON} -e "if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={};"
-		${JSON} -e "if(this.services.CoAuthoring.token.enable.request===undefined)this.services.CoAuthoring.token.enable.request={};"
-		${JSON} -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
-		${JSON} -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
-		${JSON} -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
-	fi
-	
-	${JSON} -e "if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={};"
+  if [ "${JWT_ENABLED}" = "true" ] || [ "${JWT_ENABLED}" = "false" ]; then
+    ${JSON} -e "if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={};"
+    ${JSON} -e "if(this.services.CoAuthoring.token.enable.request===undefined)this.services.CoAuthoring.token.enable.request={};"
+    ${JSON} -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
+    ${JSON} -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
+    ${JSON} -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
+  fi
+  
+  ${JSON} -e "if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={};"
 
-	${JSON} -e "if(this.services.CoAuthoring.secret.inbox===undefined)this.services.CoAuthoring.secret.inbox={};"
-	${JSON} -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
+  ${JSON} -e "if(this.services.CoAuthoring.secret.inbox===undefined)this.services.CoAuthoring.secret.inbox={};"
+  ${JSON} -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
 
-	${JSON} -e "if(this.services.CoAuthoring.secret.outbox===undefined)this.services.CoAuthoring.secret.outbox={};"
-	${JSON} -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
+  ${JSON} -e "if(this.services.CoAuthoring.secret.outbox===undefined)this.services.CoAuthoring.secret.outbox={};"
+  ${JSON} -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
 
-	${JSON} -e "if(this.services.CoAuthoring.secret.session===undefined)this.services.CoAuthoring.secret.session={};"
-	${JSON} -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
-	
-	${JSON} -e "if(this.services.CoAuthoring.token.inbox===undefined)this.services.CoAuthoring.token.inbox={};"
-	${JSON} -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
+  ${JSON} -e "if(this.services.CoAuthoring.secret.session===undefined)this.services.CoAuthoring.secret.session={};"
+  ${JSON} -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
+  
+  ${JSON} -e "if(this.services.CoAuthoring.token.inbox===undefined)this.services.CoAuthoring.token.inbox={};"
+  ${JSON} -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
 
-	${JSON} -e "if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={};"
-	${JSON} -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
+  ${JSON} -e "if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={};"
+  ${JSON} -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
 
-	if [ -f "${EXAMPLE_CONFIG}" ]; then
-		${JSON_EXAMPLE} -e "if(this.server===undefined)this.server={};"
-		${JSON_EXAMPLE} -e "if(this.server.token===undefined)this.server.token={};"
+  if [ -f "${EXAMPLE_CONFIG}" ]; then
+    ${JSON_EXAMPLE} -e "if(this.server===undefined)this.server={};"
+    ${JSON_EXAMPLE} -e "if(this.server.token===undefined)this.server.token={};"
 
-		if [ "${JWT_ENABLED}" = "true" ] || [ "${JWT_ENABLED}" = "false" ]; then
-			${JSON_EXAMPLE} -e "this.server.token.enable = ${JWT_ENABLED}"
-		fi
-		${JSON_EXAMPLE} -e "this.server.token.secret = '${JWT_SECRET}'"
-		${JSON_EXAMPLE} -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
-	fi
+    if [ "${JWT_ENABLED}" = "true" ] || [ "${JWT_ENABLED}" = "false" ]; then
+      ${JSON_EXAMPLE} -e "this.server.token.enable = ${JWT_ENABLED}"
+    fi
+    ${JSON_EXAMPLE} -e "this.server.token.secret = '${JWT_SECRET}'"
+    ${JSON_EXAMPLE} -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
+  fi
 }
 
 setup_nginx(){
-	 DS_CONF=$CONF_DIR/nginx/ds.conf
-	
-	db_get M4_ONLYOFFICE_VALUE/ds-port || true
-	DS_PORT="$RET"
-	
-	# db_get M4_ONLYOFFICE_VALUE/docservice-port || true
-	# DOCSERVICE_PORT="$RET"
-	
-	# db_get M4_ONLYOFFICE_VALUE/spellchecker-port || true
-	# SPELLCHECKER_PORT="$RET"
-	
-	# db_get M4_ONLYOFFICE_VALUE/example-port || true
-	# EXAMPLE_PORT="$RET"
-	
-	# setup ds port
-	sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
+   DS_CONF=$CONF_DIR/nginx/ds.conf
+  
+  db_get M4_ONLYOFFICE_VALUE/ds-port || true
+  DS_PORT="$RET"
+  
+  # db_get M4_ONLYOFFICE_VALUE/docservice-port || true
+  # DOCSERVICE_PORT="$RET"
+  
+  # db_get M4_ONLYOFFICE_VALUE/spellchecker-port || true
+  # SPELLCHECKER_PORT="$RET"
+  
+  # db_get M4_ONLYOFFICE_VALUE/example-port || true
+  # EXAMPLE_PORT="$RET"
+  
+  # setup ds port
+  sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
 
-	# check if ipv6 supported otherwise remove it from nginx config
-	if [ ! -f /proc/net/if_inet6 ]; then
-		sed '/listen\s\+\[::[0-9]*\].\+/d' -i $DS_CONF
-	fi
+  # check if ipv6 supported otherwise remove it from nginx config
+  if [ ! -f /proc/net/if_inet6 ]; then
+    sed '/listen\s\+\[::[0-9]*\].\+/d' -i $DS_CONF
+  fi
 
-	# install nginx config
-	if [ -d /etc/nginx/conf.d ] && [ -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
-		mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
-	fi
+  # install nginx config
+  if [ -d /etc/nginx/conf.d ] && [ -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
+    mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
+  fi
 
-	if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
-		ln -s $DS_CONF /etc/nginx/conf.d/ds.conf
-	fi
+  if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
+	  ln -s $DS_CONF /etc/nginx/conf.d/ds.conf
+  fi
 
-	# sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
-	# sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/'  -i $OO_CONF
-	# sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
+  # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
+  # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/'  -i $OO_CONF
+  # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
 		
-	rm -f /etc/nginx/sites-enabled/default
+  rm -f /etc/nginx/sites-enabled/default
 
 }
 
@@ -283,9 +281,9 @@ case "$1" in
 		mkdir -p "$DIR-example/public/files"
 		chown ds:ds -R "$DIR" "$DIR-example"
 
-		#setup logrotate config rights
-		chmod 644 ${CONF_DIR}/logrotate/*
-		chown root:root ${CONF_DIR}/logrotate/*
+    #setup logrotate config rights
+    chmod 644 ${CONF_DIR}/logrotate/*
+    chown root:root ${CONF_DIR}/logrotate/*
 
 		# generate allfonts.js and thumbnail
 		documentserver-generate-allfonts.sh true
