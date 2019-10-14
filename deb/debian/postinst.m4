@@ -90,6 +90,9 @@ read_saved_params(){
 }
 
 install_db(){
+	# ignore CREATE DATABASE commands
+	sed -i -r "s/^(CREATE DATABASE|USE)/-- \1/" $DIR/server/schema/**/*.sql
+
 	if [ "$DB_TYPE" = "postgres" ]; then
 
 					CONNECTION_PARAMS="-h $DB_HOST -U $DB_USER -w"
@@ -130,13 +133,12 @@ install_db(){
 					fi
 		set -e
 					if ! $MYSQL -e "SHOW DATABASES;" | cut -d\| -f 1 | grep -qw $DB_NAME; then
-									$MYSQL $DB_NAME >/dev/null 2>&1
+									$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" >/dev/null 2>&1
 					fi
 
 					if [ ! "$CLUSTER_MODE" = true ]; then
 									$MYSQL $DB_NAME < "$DIR/server/schema/mysql/removetbl.sql" >/dev/null 2>&1
 					fi
-					#$MYSQL -e "CREATE DATABASE IF NOT EXISTS $DB_NAME DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
 					$MYSQL $DB_NAME < "$DIR/server/schema/mysql/createdb.sql" >/dev/null 2>&1
 
 	fi
