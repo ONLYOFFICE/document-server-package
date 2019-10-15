@@ -11,6 +11,7 @@ DB_NAME=""
 DB_USER=""
 DB_PWD=""
 
+db_fset M4_ONLYOFFICE_VALUE/db-type seen true
 db_fset M4_ONLYOFFICE_VALUE/cluster-mode seen true
 db_fset M4_ONLYOFFICE_VALUE/ds-port seen true
 db_fset M4_ONLYOFFICE_VALUE/docservice-port seen true
@@ -20,7 +21,7 @@ db_fset M4_ONLYOFFICE_VALUE/jwt-enabled seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-secret seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-header seen true
 
-db_input high M4_ONLYOFFICE_VALUE/db-type || true
+db_input medium M4_ONLYOFFICE_VALUE/db-type || true
 db_input medium M4_ONLYOFFICE_VALUE/db-host || true
 db_input medium M4_ONLYOFFICE_VALUE/db-port || true
 db_input medium M4_ONLYOFFICE_VALUE/db-name || true
