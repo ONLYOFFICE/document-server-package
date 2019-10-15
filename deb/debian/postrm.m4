@@ -70,7 +70,7 @@ case "$1" in
 			db_get M4_ONLYOFFICE_VALUE/db-pwd
 			DB_PWD="$RET"
 			if [ $DB_TYPE = "postgres" ]; then
-				remove_postges
+				remove_postgres
 			elif [ $DB_TYPE = "mysql" ]; then
 				remove_mysql
 			else
