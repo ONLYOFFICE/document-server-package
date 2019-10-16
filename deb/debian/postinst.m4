@@ -157,16 +157,16 @@ install_mysql() {
 		$MYSQL $DB_NAME < "$DIR/server/schema/mysql/createdb.sql" >/dev/null 2>&1
 }
 
-save_db_params() {
+save_db_params(){
   $JSON -e "if(this.services===undefined)this.services={};"
   $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
   $JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};" >/dev/null 2>&1
   $JSON -e "this.services.CoAuthoring.sql.type = '$DB_TYPE'"
   $JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
   $JSON -e "this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
+  $JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
   $JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
   $JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
-  $JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
 }
 
 save_rabbitmq_params(){

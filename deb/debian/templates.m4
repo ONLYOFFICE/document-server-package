@@ -14,11 +14,6 @@ Type: string
 Description: Database port:
  Leave the field blank to use the default value.
 
-Template: M4_ONLYOFFICE_VALUE/db-name
-Type: string
-Default: M4_ONLYOFFICE_VALUE
-Description: Database name:
-
 Template: M4_ONLYOFFICE_VALUE/db-user
 Type: string
 Default: M4_ONLYOFFICE_VALUE
@@ -28,6 +23,11 @@ Template: M4_ONLYOFFICE_VALUE/db-pwd
 Type: password
 Default: M4_ONLYOFFICE_VALUE
 Description: Database password:
+
+Template: M4_ONLYOFFICE_VALUE/db-name
+Type: string
+Default: M4_ONLYOFFICE_VALUE
+Description: Database name:
 
 Template: M4_ONLYOFFICE_VALUE/remove-db
 Type: boolean
