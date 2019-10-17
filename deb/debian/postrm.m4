@@ -91,7 +91,7 @@ case "$1" in
 				"postgres")
 					remove_postgres
 					;;
-				"mysql")
+				"mariadb"|"mysql")
 					remove_mysql
 					;;
 				*)

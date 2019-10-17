@@ -94,7 +94,7 @@ install_db() {
 		"postgres")
 			install_postges
 			;;
-		"mysql")
+		"mariadb"|"mysql")
 			install_mysql
 			;;
 		*)
