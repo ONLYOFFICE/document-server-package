@@ -96,7 +96,9 @@ DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/ph?toeditor
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/sp?ech
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/s?mboltable
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/s?nonim
+endif
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/tr?nslate
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
 DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/pluginBase.js
@@ -122,7 +124,7 @@ NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
-WEBAPPS_DIR := web-apps-pro
+WEBAPPS_DIR := web-apps
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ie))
 OFFICIAL_PRODUCT_NAME := 'Integration Edition'
