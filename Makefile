@@ -125,6 +125,7 @@ NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
 BUILD_DATE := $(shell date +%F-%H-%M)
 
 WEBAPPS_DIR := web-apps
+SDKJS_DIR :=sdkjs
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ie))
 OFFICIAL_PRODUCT_NAME := 'Integration Edition'
@@ -306,7 +307,7 @@ clean:
 		
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf -t $(DOCUMENTSERVER) ../$(WEBAPPS_DIR)/deploy/* ../server/build/* 
+	cp -rf -t $(DOCUMENTSERVER) ../$(WEBAPPS_DIR)/deploy/web-apps ../$(SDKJS_DIR)/deploy/sdkjs ../server/build/* 
 	cp -fr -t $(DOCUMENTSERVER)/$(SDKJS_PLUGINS) $(DOCUMENTSERVER_PLUGINS)
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
