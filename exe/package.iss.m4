@@ -1,4 +1,4 @@
-changecom(`;',)
+﻿changecom(`;',)
 #define sCompanyName        'M4_COMPANY_NAME'
 #define sProductName        'M4_PRODUCT_NAME'
 #define sPublisherName      'M4_PUBLISHER_NAME'
