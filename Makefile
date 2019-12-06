@@ -194,8 +194,9 @@ else
 	endif
 endif
 
+TARGET := $(PLATFORM)_$(ARCHITECTURE)
 DS_BIN_REPO := ./ds-repo
-DS_BIN := ./$(PLATFORM)_$(ARCHITECTURE)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
+DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
 DEPLOY += $(DS_BIN_REPO)
@@ -306,8 +307,7 @@ clean:
 		
 documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
-	cp -rf -t $(DOCUMENTSERVER) ../$(WEBAPPS_DIR)/deploy/web-apps ../$(SDKJS_DIR)/deploy/sdkjs ../server/build/* 
-	cp -fr -t $(DOCUMENTSERVER)/$(SDKJS_PLUGINS) $(DOCUMENTSERVER_PLUGINS)
+	cp -rf -t $(DOCUMENTSERVER) ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW)/$(PRODUCT_NAME_LOW)/*
 
 	mkdir -p $(DOCUMENTSERVER_CONFIG)
 	mkdir -p $(DOCUMENTSERVER_CONFIG)/log4js
