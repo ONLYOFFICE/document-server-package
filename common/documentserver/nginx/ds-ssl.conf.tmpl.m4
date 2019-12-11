@@ -35,6 +35,8 @@ server {
   ssl on;
   ssl_certificate {{SSL_CERTIFICATE_PATH}};
   ssl_certificate_key {{SSL_KEY_PATH}};
+  # Uncomment string below and specify the path to the file with the password if you use encrypted certificate key
+  # ssl_password_file {{SSL_PASSWORD_PATH}};
   ssl_verify_client off;
 
   ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
