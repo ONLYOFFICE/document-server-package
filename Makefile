@@ -400,19 +400,19 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 
 	cd $(@D)/../../.. && rpmbuild \
 		-bb \
-		--define "_topdir $(@D)/../../../builddir" \
-		--define "_package_name $(PACKAGE_NAME)" \
-		--define "_product_version $(PRODUCT_VERSION)" \
-		--define "_build_number $(BUILD_NUMBER)" \
-		--define "_company_name $(COMPANY_NAME)" \
-		--define "_product_name $(PRODUCT_NAME)" \
-		--define "_publisher_name $(PUBLISHER_NAME)" \
-		--define "_publisher_url $(PUBLISHER_URL)" \
-		--define "_support_url $(SUPPORT_URL)" \
-		--define "_support_mail $(SUPPORT_MAIL)" \
-		--define "_company_name_low $(COMPANY_NAME_LOW)" \
-		--define "_product_name_low $(PRODUCT_NAME_LOW)" \
-		--define "_ds_prefix $(DS_PREFIX)" \
+		--define '_topdir $(@D)/../../../builddir' \
+		--define '_package_name $(PACKAGE_NAME)' \
+		--define '_product_version $(PRODUCT_VERSION)' \
+		--define '_build_number $(BUILD_NUMBER)' \
+		--define '_company_name $(COMPANY_NAME)' \
+		--define '_product_name $(PRODUCT_NAME)' \
+		--define '_publisher_name $(PUBLISHER_NAME)' \
+		--define '_publisher_url $(PUBLISHER_URL)' \
+		--define '_support_url $(SUPPORT_URL)' \
+		--define '_support_mail $(SUPPORT_MAIL)' \
+		--define '_company_name_low $(COMPANY_NAME_LOW)' \
+		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
+		--define '_ds_prefix $(DS_PREFIX)' \
 		$(PACKAGE_NAME).spec
 
 ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-de onlyoffice-documentserver-ie))
