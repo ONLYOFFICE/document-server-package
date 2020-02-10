@@ -8,7 +8,7 @@
 	dh $@
 
 override_dh_shlibdeps:
-	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
+#	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
 
 override_dh_strip:
 	dh_strip -Xdocservice -Xconverter -Xspellchecker
