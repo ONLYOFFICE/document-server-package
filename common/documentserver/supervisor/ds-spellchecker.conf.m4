@@ -1,5 +1,5 @@
 [program:spellchecker]
-command=node /var/www/M4_DS_PREFIX/server/SpellChecker/spellchecker
+command=/var/www/M4_DS_PREFIX/server/SpellChecker/spellchecker
 directory=/var/www/M4_DS_PREFIX/server/SpellChecker
 user=ds
 environment=NODE_ENV=production-linux,NODE_CONFIG_DIR=/etc/M4_DS_PREFIX,NODE_DISABLE_COLORS=1
