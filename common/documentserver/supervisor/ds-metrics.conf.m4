@@ -1,5 +1,5 @@
 [program:metrics]
-command=node /var/www/M4_DS_PREFIX/server/Metrics/metrics ./config/config.js
+command=/var/www/M4_DS_PREFIX/server/Metrics/metrics ./config/config.js
 directory=/var/www/M4_DS_PREFIX/server/Metrics
 user=ds
 environment=NODE_DISABLE_COLORS=1
