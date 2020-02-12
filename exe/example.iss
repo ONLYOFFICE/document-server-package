@@ -19,7 +19,7 @@ Source: local\local.json;                             DestDir: {app}\example\con
 Source: ..\common\documentserver-example\nginx\*;     DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 
 [Dirs]
-Name: "{app}\example\public\files";   Permissions: users-modify
+Name: "{app}\example\files";   Permissions: users-modify
 Name: "{#EXAMPLE_SRV_LOG_DIR}";       Permissions: users-modify
 
 [Icons]

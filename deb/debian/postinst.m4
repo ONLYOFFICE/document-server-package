@@ -292,11 +292,11 @@ case "$1" in
 		mkdir -p "$APP_DIR/App_Data"
 		mkdir -p "$APP_DIR/App_Data/cache/files"
 		mkdir -p "$APP_DIR/App_Data/docbuilder"
+		mkdir -p "$APP_DIR-example/files"
 
 		mkdir -p "$DIR/../Data" #! 
 		mkdir -p "$DIR/fonts"
-		mkdir -p "$DIR-example/public/files"
-		chown ds:ds -R "$DIR" "$DIR-example"
+		chown ds:ds -R "$DIR"
 
     #setup logrotate config rights
     chmod 644 ${CONF_DIR}/logrotate/*
@@ -307,6 +307,7 @@ case "$1" in
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$APP_DIR"
+		chown ds:ds -R "$APP_DIR-example"
 
 		# call db_stop to prevent installation hang
 		db_stop

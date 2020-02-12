@@ -100,7 +100,6 @@ cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTAT
 %if %{defined example}
 #install documentserver example files
 mkdir -p "${HOME_DIR}-example/"
-mkdir -p "${HOME_DIR}-example/public/files/"
 cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "${HOME_DIR}-example/"
 
 #install dcoumentserver example configs
@@ -109,6 +108,9 @@ cp -r $DOCUMENTSERVER_EXAMPLE_CONFIG/* "${CONF_DIR}-example/"
 
 #make log dir
 mkdir -p "${LOG_DIR}-example"
+
+# create data dir
+mkdir -p "${DATA_DIR}-example/files/"
 
 #install example supervisor configs
 DSE_SUPERVISOR_CONF=${CONF_DIR}-example/supervisor/
@@ -188,6 +190,7 @@ rm -rf "%{buildroot}"
 
 %if %{defined example}
 %attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
+%attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}-example
 %attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/public/files
 %endif
 
