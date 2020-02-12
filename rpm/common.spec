@@ -191,7 +191,6 @@ rm -rf "%{buildroot}"
 %if %{defined example}
 %attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
 %attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}-example
-%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/public/files
 %endif
 
 %pre
@@ -226,7 +225,7 @@ ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 
 %if %{defined example}
-chown -R ds:ds %{_localstatedir}/www/%{_ds_prefix}-example/public/files
+chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
 
 # generate allfonts.js and thumbnail
