@@ -14,7 +14,8 @@ gzip_types  text/plain
             application/json
             application/octet-stream
             application/x-font-ttf
-            application/rtf;
+            application/rtf
+            application/wasm;
 
 access_log off;
 error_log M4_NGINX_LOG/nginx.error.log;
