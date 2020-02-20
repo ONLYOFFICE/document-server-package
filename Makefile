@@ -332,14 +332,17 @@ endif
 
 ifeq ($(PRODUCT_NAME_LOW), documentserver)
 	sed 's|\("packageType": \)[0-9]\+\(.*\)|\10\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
+	sed 's|\("editorDataStorage": \)".+"\(.*\)|\1editorDataMemory\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
 ifeq ($(PRODUCT_NAME_LOW), documentserver-ie)
 	sed 's|\("packageType": \)[0-9]\+\(.*\)|\11\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
+	sed 's|\("editorDataStorage": \)".+"\(.*\)|\1editorDataRedis\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
 ifeq ($(PRODUCT_NAME_LOW), documentserver-de)
 	sed 's|\("packageType": \)[0-9]\+\(.*\)|\12\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
+	sed 's|\("editorDataStorage": \)".+"\(.*\)|\1editorDataRedis\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
 	cd $(DOCUMENTSERVER)/npm && npm install
