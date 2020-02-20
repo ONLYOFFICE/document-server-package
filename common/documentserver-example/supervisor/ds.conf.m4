@@ -1,2 +1,2 @@
 [group:ds]
-programs=docservice,converter,spellchecker,metrics,gc,example
+programs=docservice,converter,spellchecker,metrics,example

@@ -58,7 +58,6 @@ mkdir -p "$LOG_DIR/docservice"
 mkdir -p "$LOG_DIR/converter"
 mkdir -p "$LOG_DIR/spellchecker"
 mkdir -p "$LOG_DIR/metrics"
-mkdir -p "$LOG_DIR/gc"
 
 #make cache dir
 mkdir -p "$DATA_DIR/App_Data/cache/files"

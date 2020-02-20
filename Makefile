@@ -204,7 +204,6 @@ LINUX_DEPS += common/documentserver/logrotate/ds.conf
 LINUX_DEPS += common/documentserver/supervisor/ds.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-gc.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-spellchecker.conf
 LINUX_DEPS += common/documentserver-example/supervisor/ds.conf

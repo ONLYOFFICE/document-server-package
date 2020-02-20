@@ -287,7 +287,6 @@ case "$1" in
 		mkdir -p "$LOG_DIR/converter"
 		mkdir -p "$LOG_DIR/spellchecker"
 		mkdir -p "$LOG_DIR/metrics"
-		mkdir -p "$LOG_DIR/gc"
 
 		mkdir -p "$APP_DIR/App_Data"
 		mkdir -p "$APP_DIR/App_Data/cache/files"

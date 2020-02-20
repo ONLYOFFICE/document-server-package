@@ -126,12 +126,6 @@
 #define DOCSERVICE_SRV_DIR    '{app}\server\docservice'
 #define DOCSERVICE_SRV_LOG_DIR    '{app}\Log\docservice'
 
-#define GC_SRV        'DsGcSvc'
-#define GC_SRV_DISPLAY  str(sAppName + " Gc")
-#define GC_SRV_DESCR  str(sAppName + " Gc Service")
-#define GC_SRV_DIR    '{app}\server\docservice\sources'
-#define GC_SRV_LOG_DIR    '{app}\Log\gc'
-
 #define SPELLCHECKER_SRV        'DsSpellcheckerSvc'
 #define SPELLCHECKER_SRV_DISPLAY  str(sAppName + " Spellchecker")
 #define SPELLCHECKER_SRV_DESCR  str(sAppName + " Spellchecker Service")
@@ -293,7 +287,6 @@ Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{app}\fonts";                  Permissions: users-modify
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
-Name: "{#GC_SRV_LOG_DIR}";            Permissions: users-modify
 Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-modify
 Name: "{#NGINX_SRV_DIR}";             Permissions: users-modify
 Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-modify
@@ -406,19 +399,6 @@ Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStderr {#DOCSERVICE_S
 Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "start {#DOCSERVICE_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
 
-Filename: "{#NSSM}"; Parameters: "install {#GC_SRV} node gc.js"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} DisplayName {#GC_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} Description {#GC_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppDirectory {#GC_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppRotateFiles 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppRotateOnline 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppRotateBytes {#LOG_ROTATE_BYTES}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppStdout {#GC_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} AppStderr {#GC_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#GC_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#GC_SRV}}"
-Filename: "{#NSSM}"; Parameters: "start {#GC_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#GC_SRV}}"
-
 Filename: "{#NSSM}"; Parameters: "install {#SPELLCHECKER_SRV} spellchecker.exe"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#SPELLCHECKER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} DisplayName {#SPELLCHECKER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} Description {#SPELLCHECKER_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
@@ -459,9 +439,6 @@ Filename: "{#NSSM}"; Parameters: "remove {#CONVERTER_SRV} confirm"; Flags: runhi
 
 Filename: "{#NSSM}"; Parameters: "stop {#DOCSERVICE_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#DOCSERVICE_SRV} confirm"; Flags: runhidden
-
-Filename: "{#NSSM}"; Parameters: "stop {#GC_SRV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "remove {#GC_SRV} confirm"; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "stop {#SPELLCHECKER_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#SPELLCHECKER_SRV} confirm"; Flags: runhidden
