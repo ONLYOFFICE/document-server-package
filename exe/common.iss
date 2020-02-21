@@ -138,11 +138,11 @@
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define NODE_PATH '{pf64}\nodejs'
-#define JSON '{app}\npm\node_modules\.bin\json.cmd'
+#define JSON '{app}\npm\json.exe'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\local.json""'
 
-#define REPLACE '{app}\npm\node_modules\.bin\replace.cmd'
+#define REPLACE '{app}\npm\replace.exe'
 
 #define NGINX_SRV  'DsProxySvc'
 #define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")

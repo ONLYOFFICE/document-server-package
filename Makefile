@@ -344,7 +344,17 @@ ifeq ($(PRODUCT_NAME_LOW), documentserver-de)
 	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataRedis\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
-	cd $(DOCUMENTSERVER)/npm && npm install
+	cd $(DOCUMENTSERVER)/npm && \
+		npm install && \
+		pkg ./node_modules/json -o json
+
+ifeq ($(PLATFORM),win)		
+		$(DOCUMENTSERVER)/npm && \
+		pkg ./node_modules/replace -o replace
+endif		
+		rm -r \
+		$(DOCUMENTSERVER)/npm/node_modules \
+		$(DOCUMENTSERVER)/npm/package-lock.json
 
 	echo "Done" > $@
 
