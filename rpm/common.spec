@@ -1,3 +1,4 @@
+%define __strip    /bin/true
 Summary: Online viewers and editors for text, spreadsheet and presentation files
 Name: %{_package_name}
 Version: %{_product_version}
@@ -72,7 +73,7 @@ mkdir -p "$HOME_DIR/fonts"
 #install supervisor configs
 DS_SUPERVISOR_CONF=$CONF_DIR/supervisor/
 mkdir -p "$DS_SUPERVISOR_CONF"
-cp %{_builddir}/../../../common/documentserver/supervisor/* "$DS_SUPERVISOR_CONF"
+cp %{_builddir}/../../../common/documentserver/supervisor/*.conf "$DS_SUPERVISOR_CONF"
 
 # rename extention for supervisor config files
 rename 's/.conf$/.ini/' "$DS_SUPERVISOR_CONF"*
