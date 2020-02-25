@@ -53,11 +53,11 @@ location ~ ^(\/cache\/files.*)(\/.*) {
   }
 }
 
-# Allow server info only from 127.0.0.1
-location /info {
+# Allow internal service only from 127.0.0.1
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info|internal)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
-  proxy_pass http://docservice;
+  proxy_pass http://docservice$2$3;
 }
 
 location / {
