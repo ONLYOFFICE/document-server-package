@@ -426,6 +426,9 @@ Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden; StatusM
 
 Filename: "schtasks"; Parameters: "/Create /F /RU ""{#LOCAL_SERVICE}"" /SC DAILY /TN ""{#LogRotateTaskName}"" /TR ""{app}\bin\documentserver-log-rotate.bat"""; Flags: runhidden; StatusMsg: "{cm:AddRotateTask}"
 
+Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#CONVERTER_SRV_DIR}\converter.exe"" ""{#CONVERTER_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#DOCSERVICE_SRV_DIR}\docservice.exe"" ""{#DOCSERVICE_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#SPELLCHECKER_SRV_DIR}\spellchecker.exe"" ""{#SPELLCHECKER_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallRun]
@@ -446,6 +449,9 @@ Filename: "{#NSSM}"; Parameters: "remove {#SPELLCHECKER_SRV} confirm"; Flags: ru
 Filename: "schtasks"; Parameters: "/End /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /F /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 
+Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden
+Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#DOCSERVICE_SRV_DIR}\docservice.exe"""; Flags: runhidden
+Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#SPELLCHECKER_SRV_DIR}\spellchecker.exe"""; Flags: runhidden
 Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#NGINX_SRV_DIR}\nginx.exe"""; Flags: runhidden
 
 [UninstallDelete]

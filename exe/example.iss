@@ -50,9 +50,13 @@ Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStderr {#EXAMPLE_SRV_LOG
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Start SERVICE_DEMAND_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#EXAMPLE_SRV}}"
 
+Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#EXAMPLE_SRV_DIR}\example.exe"" ""{#EXAMPLE_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+
 Filename: "http://localhost:{code:GetDefaultPort}/welcome"; Description: "{cm:OpenWelcome}"; Flags: postinstall shellexec skipifsilent
 
 [UninstallRun]
 Filename: "{#NSSM}"; Parameters: "stop {#EXAMPLE_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#EXAMPLE_SRV} confirm"; Flags: runhidden
+
+Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#EXAMPLE_SRV_DIR}\example.exe"""; Flags: runhidden
 
