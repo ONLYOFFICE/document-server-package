@@ -201,21 +201,37 @@ COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
 
 LINUX_DEPS += common/documentserver/logrotate/ds.conf
 
+#Prevent copy old artifacts
+LINUX_DEPS_CLEAN += common/documentserver/logrotate/*.conf
+
 LINUX_DEPS += common/documentserver/supervisor/ds.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-spellchecker.conf
+
+LINUX_DEPS_CLEAN += common/documentserver/supervisor/*.conf
+
 LINUX_DEPS += common/documentserver-example/supervisor/ds.conf
 LINUX_DEPS += common/documentserver-example/supervisor/ds-example.conf
 
+LINUX_DEPS_CLEAN += common/documentserver-example/supervisor/*.conf
+
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
+
+LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 
+LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
+LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
+
 LINUX_DEPS += rpm/bin/documentserver-configure.sh
 LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+
+LINUX_DEPS_CLEAN += rpm/bin/*.sh
+LINUX_DEPS_CLEAN += apt-rpm/bin/*.sh
 
 WIN_DEPS += exe/$(PACKAGE_NAME).iss
 
@@ -275,7 +291,7 @@ clean:
 		$(FONTS)\
 		$(DEB_DEPS)\
 		$(COMMON_DEPS)\
-		$(LINUX_DEPS)\
+		$(LINUX_DEPS_CLEAN)\
 		$(WIN_DEPS)\
 		deb/debian/$(PACKAGE_NAME)\
 		deb/debian/$(PACKAGE_NAME).*\
