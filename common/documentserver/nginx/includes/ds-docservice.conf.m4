@@ -57,7 +57,7 @@ location ~ ^(\/cache\/files.*)(\/.*) {
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info|internal)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
-  proxy_pass http://docservice$2$3;
+  proxy_pass http://docservice/$2$3;
 }
 
 location / {
