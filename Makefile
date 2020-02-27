@@ -349,10 +349,10 @@ endif
 		pkg ./node_modules/json -o json
 
 ifeq ($(PLATFORM),win)		
-		$(DOCUMENTSERVER)/npm && \
+	cd $(DOCUMENTSERVER)/npm && \
 		pkg ./node_modules/replace -o replace
 endif		
-		rm -r \
+	rm -r \
 		$(DOCUMENTSERVER)/npm/node_modules \
 		$(DOCUMENTSERVER)/npm/package-lock.json
 
