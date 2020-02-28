@@ -375,6 +375,7 @@ setup_nginx(){
       PORTS+=('8000')
       PORTS+=('8080')
       PORTS+=('3000')
+	  /usr/sbin/setsebool -P httpd_can_network_connect on
     ;;
     disabled)
       :
