@@ -22,6 +22,24 @@ if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
 . /usr/share/debconf/confmodule
 fi
 
+remove_postgres() {
+	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -U$DB_USER -w"
+	if [ -n $DB_PWD ]; then
+		export PGPASSWORD="$DB_PWD"
+	fi
+	DROPDB="dropdb $CONNECTION_PARAMS"
+	$DROPDB --if-exists $DB_NAME &>/dev/null || \
+		{ echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+}
+
+remove_mysql() {
+	CONNECTION_PARAMS="-h$DB_HOST -P${DB_PORT:="3306"} -u$DB_USER -p$DB_PWD -w"
+	MYSQL="mysql -q $CONNECTION_PARAMS"
+	$MYSQL -e \
+		"DROP DATABASE IF EXISTS $DB_NAME;" &>/dev/null || \
+		{ echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+}
+
 clean_ds_files() {
 	DIR="/var/www/M4_DS_PREFIX"
 	LOG_DIR="/var/log/M4_DS_PREFIX"
@@ -57,23 +75,30 @@ case "$1" in
 		db_go
 		db_get M4_ONLYOFFICE_VALUE/remove-db
 		if [ "$RET" = "true" ]; then
+			db_get M4_ONLYOFFICE_VALUE/db-type
+			DB_TYPE="$RET"
 			db_get M4_ONLYOFFICE_VALUE/db-host
 			DB_HOST="$RET"
+			db_get M4_ONLYOFFICE_VALUE/db-port
+			DB_PORT="$RET"
 			db_get M4_ONLYOFFICE_VALUE/db-user
 			DB_USER="$RET"
 			db_get M4_ONLYOFFICE_VALUE/db-pwd
 			DB_PWD="$RET"
 			db_get M4_ONLYOFFICE_VALUE/db-name
 			DB_NAME="$RET"
-
-                        CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
-                        if [ -n "$DB_PWD" ]; then
-                                export PGPASSWORD=$DB_PWD
-                        fi
-
-                        DROPDB="dropdb $CONNECTION_PARAMS"
-
-			$DROPDB --if-exists $DB_NAME &>/dev/null || { echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+			case $DB_TYPE in
+				"postgres")
+					remove_postgres
+					;;
+				"mariadb"|"mysql")
+					remove_mysql
+					;;
+				*)
+					echo "ERROR: unknown database type"
+					exit 1
+					;;
+			esac
 		fi
 
 		clean_ds_files

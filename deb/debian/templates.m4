@@ -1,22 +1,33 @@
+Template: M4_ONLYOFFICE_VALUE/db-type
+Type: select
+Choices: postgres, mariadb, mysql
+Default: postgres
+Description: Choose database type:
+
 Template: M4_ONLYOFFICE_VALUE/db-host
 Type: string
 Default: localhost
-Description: PostgreSQL host:
+Description: Database host:
+
+Template: M4_ONLYOFFICE_VALUE/db-port
+Type: string
+Description: Database port:
+ Leave the field blank to use the default value.
 
 Template: M4_ONLYOFFICE_VALUE/db-user
 Type: string
 Default: M4_ONLYOFFICE_VALUE
-Description: PostgreSQL user:
+Description: Database user:
 
 Template: M4_ONLYOFFICE_VALUE/db-pwd
 Type: password
 Default: M4_ONLYOFFICE_VALUE
-Description: PostgreSQL password:
+Description: Database password:
 
 Template: M4_ONLYOFFICE_VALUE/db-name
 Type: string
 Default: M4_ONLYOFFICE_VALUE
-Description: PostgreSQL database name:
+Description: Database name:
 
 Template: M4_ONLYOFFICE_VALUE/remove-db
 Type: boolean

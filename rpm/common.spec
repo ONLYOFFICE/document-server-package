@@ -1,3 +1,4 @@
+%define __strip    /bin/true
 Summary: Online viewers and editors for text, spreadsheet and presentation files
 Name: %{_package_name}
 Version: %{_product_version}
@@ -58,7 +59,6 @@ mkdir -p "$LOG_DIR/docservice"
 mkdir -p "$LOG_DIR/converter"
 mkdir -p "$LOG_DIR/spellchecker"
 mkdir -p "$LOG_DIR/metrics"
-mkdir -p "$LOG_DIR/gc"
 
 #make cache dir
 mkdir -p "$DATA_DIR/App_Data/cache/files"
@@ -73,7 +73,7 @@ mkdir -p "$HOME_DIR/fonts"
 #install supervisor configs
 DS_SUPERVISOR_CONF=$CONF_DIR/supervisor/
 mkdir -p "$DS_SUPERVISOR_CONF"
-cp %{_builddir}/../../../common/documentserver/supervisor/* "$DS_SUPERVISOR_CONF"
+cp %{_builddir}/../../../common/documentserver/supervisor/*.conf "$DS_SUPERVISOR_CONF"
 
 # rename extention for supervisor config files
 rename 's/.conf$/.ini/' "$DS_SUPERVISOR_CONF"*
@@ -100,7 +100,6 @@ cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTAT
 %if %{defined example}
 #install documentserver example files
 mkdir -p "${HOME_DIR}-example/"
-mkdir -p "${HOME_DIR}-example/public/files/"
 cp -r $DOCUMENTSERVER_EXAMPLE_HOME/* "${HOME_DIR}-example/"
 
 #install dcoumentserver example configs
@@ -109,6 +108,9 @@ cp -r $DOCUMENTSERVER_EXAMPLE_CONFIG/* "${CONF_DIR}-example/"
 
 #make log dir
 mkdir -p "${LOG_DIR}-example"
+
+# create data dir
+mkdir -p "${DATA_DIR}-example/files/"
 
 #install example supervisor configs
 DSE_SUPERVISOR_CONF=${CONF_DIR}-example/supervisor/
@@ -188,7 +190,7 @@ rm -rf "%{buildroot}"
 
 %if %{defined example}
 %attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
-%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/public/files
+%attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
 
 %pre
@@ -223,7 +225,7 @@ ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 
 %if %{defined example}
-chown -R ds:ds %{_localstatedir}/www/%{_ds_prefix}-example/public/files
+chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
 
 # generate allfonts.js and thumbnail
@@ -237,6 +239,7 @@ case $(%{getenforce}) in
     PORTS+=('8000')
     PORTS+=('8080')
     PORTS+=('3000')
+    %{setsebool} -P httpd_can_network_connect on
   ;;
   disabled)
     :

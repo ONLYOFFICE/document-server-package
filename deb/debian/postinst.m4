@@ -25,13 +25,15 @@ APP_DIR="/var/lib/M4_DS_PREFIX"
 CONF_DIR="/etc/M4_DS_PREFIX"
 LOCAL_CONFIG=${CONF_DIR}/local.json
 EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
-JSON_BIN="$DIR/npm/node_modules/.bin/json"
+JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f ${EXAMPLE_CONFIG}"
 
 OLD_VERSION="$2"
 
+DB_TYPE=""
 DB_HOST=""
+DB_PORT=""
 DB_USER=""
 DB_PWD=""
 DB_NAME=""
@@ -53,8 +55,12 @@ create_local_configs(){
 }
 
 read_saved_params(){
+	db_get M4_ONLYOFFICE_VALUE/db-type || true
+	DB_TYPE="$RET"
 	db_get M4_ONLYOFFICE_VALUE/db-host || true
 	DB_HOST="$RET"
+	db_get M4_ONLYOFFICE_VALUE/db-port || true
+	DB_PORT="$RET"
 	db_get M4_ONLYOFFICE_VALUE/db-user || true
 	DB_USER="$RET"
 	db_get M4_ONLYOFFICE_VALUE/db-pwd || true
@@ -82,41 +88,82 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/jwt-header || true
 	JWT_HEADER="$RET"
 }
-  
-install_db(){
-        CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
-        if [ -n "$DB_PWD" ]; then
-                export PGPASSWORD=$DB_PWD
-        fi
 
-        PSQL="psql -q $CONNECTION_PARAMS"
-        CREATEDB="createdb $CONNECTION_PARAMS"
+install_db() {
+	case $DB_TYPE in
+		"postgres")
+			install_postges
+			;;
+		"mariadb"|"mysql")
+			install_mysql
+			;;
+		*)
+			echo "ERROR: unknown database type"
+			exit 1
+			;;
+	esac
+}
 
+install_postges() {
+	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -U$DB_USER -w"
+	if [ -n $DB_PWD ]; then
+		export PGPASSWORD="$DB_PWD"
+	fi
+	PSQL="psql -q $CONNECTION_PARAMS"
+	CREATEDB="createdb $CONNECTION_PARAMS"
 	# test postgresql connection
 	set +e
-        $PSQL -c ";" &>/dev/null
-        ERRCODE=$?
-        if [ $ERRCODE -ne 0 ]; then
-                service postgresql start &>/dev/null
-                $PSQL -c ";" &>/dev/null || { echo "ERROR: can't connect to postgressql database"; exit 1; }
-        fi
+		$PSQL -c ";" &>/dev/null
+		ERRCODE=$?
+		if [ $ERRCODE -ne 0 ]; then
+			service postgresql start &>/dev/null
+			$PSQL -d $DB_NAME -c ";" &>/dev/null || \
+				{ echo "ERROR: can't connect to postgressql database"; exit 1; }
+		fi
 	set -e
+		if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
+			$CREATEDB $DB_NAME >/dev/null 2>&1
+		fi
+		if [ ! $CLUSTER_MODE = true ]; then
+			$PSQL -d $DB_NAME -f "$DIR/server/schema/postgresql/removetbl.sql" \
+				>/dev/null 2>&1
+		fi
+		$PSQL -d $DB_NAME -f "$DIR/server/schema/postgresql/createdb.sql" \
+			>/dev/null 2>&1
+}
 
-        if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
-                $CREATEDB $DB_NAME >/dev/null 2>&1
-        fi
-
-        if [ ! "$CLUSTER_MODE" = true ]; then
-                $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
-        fi
-        $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
+install_mysql() {
+	CONNECTION_PARAMS="-h$DB_HOST -P${DB_PORT:="3306"} -u$DB_USER -p$DB_PWD -w"
+	MYSQL="mysql -q $CONNECTION_PARAMS"
+	# test mysql connection
+	set +e
+		$MYSQL -e ";" &>/dev/null
+		ERRCODE=$?
+		if [ $ERRCODE -ne 0 ]; then
+			service mysql start &>/dev/null
+			$MYSQL -e ";" &>/dev/null || \
+				{ echo "ERROR: can't connect to mysql database"; exit 1; }
+		fi
+	set -e
+		if ! $MYSQL -e "SHOW DATABASES;" | cut -d\| -f 1 | grep -qw $DB_NAME; then
+			$MYSQL -e \
+				"CREATE DATABASE IF NOT EXISTS $DB_NAME \
+				DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" \
+				>/dev/null 2>&1
+		fi
+		if [ ! $CLUSTER_MODE = true ]; then
+			$MYSQL $DB_NAME < "$DIR/server/schema/mysql/removetbl.sql" >/dev/null 2>&1
+		fi
+		$MYSQL $DB_NAME < "$DIR/server/schema/mysql/createdb.sql" >/dev/null 2>&1
 }
 
 save_db_params(){
   $JSON -e "if(this.services===undefined)this.services={};"
   $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
   $JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};" >/dev/null 2>&1
+  $JSON -e "this.services.CoAuthoring.sql.type = '$DB_TYPE'"
   $JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
+  $JSON -e "this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
   $JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
   $JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
   $JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
@@ -240,16 +287,15 @@ case "$1" in
 		mkdir -p "$LOG_DIR/converter"
 		mkdir -p "$LOG_DIR/spellchecker"
 		mkdir -p "$LOG_DIR/metrics"
-		mkdir -p "$LOG_DIR/gc"
 
 		mkdir -p "$APP_DIR/App_Data"
 		mkdir -p "$APP_DIR/App_Data/cache/files"
 		mkdir -p "$APP_DIR/App_Data/docbuilder"
+		mkdir -p "$APP_DIR-example/files"
 
 		mkdir -p "$DIR/../Data" #! 
 		mkdir -p "$DIR/fonts"
-		mkdir -p "$DIR-example/public/files"
-		chown ds:ds -R "$DIR" "$DIR-example"
+		chown ds:ds -R "$DIR"
 
     #setup logrotate config rights
     chmod 644 ${CONF_DIR}/logrotate/*
@@ -260,6 +306,7 @@ case "$1" in
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$APP_DIR"
+		chown ds:ds -R "$APP_DIR-example"
 
 		# call db_stop to prevent installation hang
 		db_stop
