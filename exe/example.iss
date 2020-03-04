@@ -19,7 +19,7 @@ Source: local\local.json;                             DestDir: {app}\example\con
 Source: ..\common\documentserver-example\nginx\*;     DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 
 [Dirs]
-Name: "{app}\example\public\files";   Permissions: users-modify
+Name: "{app}\example\files";   Permissions: users-modify
 Name: "{#EXAMPLE_SRV_LOG_DIR}";       Permissions: users-modify
 
 [Icons]
@@ -29,15 +29,15 @@ Name: "{group}\{cm:OpenDemo}"; Filename: "http://localhost:{code:GetDefaultPort}
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_EXAMPLE_PORT}"; ValueData: "{code:GetExamplePort}"; Check: not IsStringEmpty(ExpandConstant('{param:EXAMPLE_PORT}'));
 
 [Run]
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""if(this.server===undefined)this.server={{token:{{}};"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""if(this.server===undefined)this.server={{token:{{}};"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.port = '{code:GetExamplePort}'"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.enable = {code:GetJwtEnabled}"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.secret = '{code:GetJwtSecret}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
-Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.authorizationHeader = '{code:GetJwtHeader}'"""; WorkingDir: "{#NODE_PATH}"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.enable = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.secret = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.authorizationHeader = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 
-Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} node .\bin\www"; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} ""{#EXAMPLE_SRV_DIR}\example.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Description {#EXAMPLE_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppDirectory {#EXAMPLE_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
@@ -50,9 +50,13 @@ Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStderr {#EXAMPLE_SRV_LOG
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Start SERVICE_DEMAND_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#EXAMPLE_SRV}}"
 
+Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#EXAMPLE_SRV_DIR}\example.exe"" ""{#EXAMPLE_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+
 Filename: "http://localhost:{code:GetDefaultPort}/welcome"; Description: "{cm:OpenWelcome}"; Flags: postinstall shellexec skipifsilent
 
 [UninstallRun]
 Filename: "{#NSSM}"; Parameters: "stop {#EXAMPLE_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#EXAMPLE_SRV} confirm"; Flags: runhidden
+
+Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#EXAMPLE_SRV_DIR}\example.exe"""; Flags: runhidden
 

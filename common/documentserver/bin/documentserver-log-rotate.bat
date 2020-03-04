@@ -4,7 +4,6 @@ set PATH=%~dp0..\nssm;%PATH%
 
 nssm rotate DsConverterSvc
 nssm rotate DsDocServiceSvc
-nssm rotate DsGcSvc
 nssm rotate DsProxySvc
 nssm rotate DsSpellcheckerSvc
 

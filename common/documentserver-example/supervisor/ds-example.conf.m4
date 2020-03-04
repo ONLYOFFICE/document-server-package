@@ -1,5 +1,5 @@
 [program:example]
-command=node /var/www/M4_DS_PREFIX-example/bin/www
+command=/var/www/M4_DS_PREFIX-example/example
 directory=/var/www/M4_DS_PREFIX-example/
 user=ds
 environment=NODE_ENV=production-linux,NODE_CONFIG_DIR=/etc/M4_DS_PREFIX-example,NODE_DISABLE_COLORS=1

@@ -68,16 +68,12 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 
-SDKJS_PLUGINS := sdkjs-plugins
-
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
-DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/$(SDKJS_PLUGINS)
-LICENSE_JS = $(DOCUMENTSERVER)/server/Common/sources/license.js
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
@@ -88,24 +84,6 @@ HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/H
 
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
-
-# DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/cl?part
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/c?de
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/m?cros
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/oc?
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/ph?toeditor
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/sp?ech
-ifeq ($(COMPANY_NAME_LOW),onlyoffice)
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/s?nonim
-endif
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/tr?nslate
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/y?utube
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/pluginBase.js
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/plugins.css
-
-ifneq ($(COMPANY_NAME_LOW),onlyoffice)	
-DOCUMENTSERVER_PLUGINS += ../$(SDKJS_PLUGINS)/examples/gl?vred
-endif
 
 FONTS = common/fonts
 
@@ -223,22 +201,37 @@ COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
 
 LINUX_DEPS += common/documentserver/logrotate/ds.conf
 
+#Prevent copy old artifacts
+LINUX_DEPS_CLEAN += common/documentserver/logrotate/*.conf
+
 LINUX_DEPS += common/documentserver/supervisor/ds.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-gc.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-spellchecker.conf
+
+LINUX_DEPS_CLEAN += common/documentserver/supervisor/*.conf
+
 LINUX_DEPS += common/documentserver-example/supervisor/ds.conf
 LINUX_DEPS += common/documentserver-example/supervisor/ds-example.conf
 
+LINUX_DEPS_CLEAN += common/documentserver-example/supervisor/*.conf
+
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
+
+LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 
+LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
+LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
+
 LINUX_DEPS += rpm/bin/documentserver-configure.sh
 LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+
+LINUX_DEPS_CLEAN += rpm/bin/*.sh
+LINUX_DEPS_CLEAN += apt-rpm/bin/*.sh
 
 WIN_DEPS += exe/$(PACKAGE_NAME).iss
 
@@ -252,20 +245,20 @@ M4_PARAMS += -D M4_COMPANY_NAME=$(COMPANY_NAME)
 M4_PARAMS += -D M4_PACKAGE_NAME=$(PACKAGE_NAME)
 M4_PARAMS += -D M4_PRODUCT_NAME=$(PRODUCT_NAME)
 M4_PARAMS += -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)
-M4_PARAMS += -D M4_PUBLISHER_NAME="$(PUBLISHER_NAME)"
-M4_PARAMS += -D M4_PUBLISHER_URL="$(PUBLISHER_URL)"
-M4_PARAMS += -D M4_SUPPORT_MAIL="$(SUPPORT_MAIL)"
-M4_PARAMS += -D M4_SUPPORT_URL="$(SUPPORT_URL)"
-M4_PARAMS += -D M4_BRANDING_DIR="$(abspath $(BRANDING_DIR))"
-M4_PARAMS += -D M4_ONLYOFFICE_VALUE="$(ONLYOFFICE_VALUE)"
-M4_PARAMS += -D M4_PLATFORM="$(PLATFORM)"
-M4_PARAMS += -D M4_NGINX_CONF="$(NGINX_CONF)"
-M4_PARAMS += -D M4_NGINX_LOG="$(NGINX_LOG)"
-M4_PARAMS += -D M4_DS_PREFIX="$(DS_PREFIX)"
-M4_PARAMS += -D M4_DS_ROOT="$(DS_ROOT)"
-M4_PARAMS += -D M4_DS_FILES="$(DS_FILES)"
-M4_PARAMS += -D M4_DS_EXAMLE="$(DS_EXAMLE)"
-M4_PARAMS += -D M4_DEV_NULL="$(DEV_NULL)"
+M4_PARAMS += -D M4_PUBLISHER_NAME='$(PUBLISHER_NAME)'
+M4_PARAMS += -D M4_PUBLISHER_URL='$(PUBLISHER_URL)'
+M4_PARAMS += -D M4_SUPPORT_MAIL='$(SUPPORT_MAIL)'
+M4_PARAMS += -D M4_SUPPORT_URL='$(SUPPORT_URL)'
+M4_PARAMS += -D M4_BRANDING_DIR='$(abspath $(BRANDING_DIR))'
+M4_PARAMS += -D M4_ONLYOFFICE_VALUE=$(ONLYOFFICE_VALUE)
+M4_PARAMS += -D M4_PLATFORM=$(PLATFORM)
+M4_PARAMS += -D M4_NGINX_CONF='$(NGINX_CONF)'
+M4_PARAMS += -D M4_NGINX_LOG='$(NGINX_LOG)'
+M4_PARAMS += -D M4_DS_PREFIX='$(DS_PREFIX)'
+M4_PARAMS += -D M4_DS_ROOT='$(DS_ROOT)'
+M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
+M4_PARAMS += -D M4_DS_EXAMLE='$(DS_EXAMLE)'
+M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
 
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb deploy-bin
 
@@ -298,7 +291,7 @@ clean:
 		$(FONTS)\
 		$(DEB_DEPS)\
 		$(COMMON_DEPS)\
-		$(LINUX_DEPS)\
+		$(LINUX_DEPS_CLEAN)\
 		$(WIN_DEPS)\
 		deb/debian/$(PACKAGE_NAME)\
 		deb/debian/$(PACKAGE_NAME).*\
@@ -353,24 +346,37 @@ endif
 	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
 
 ifeq ($(PRODUCT_NAME_LOW), documentserver)
-	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_OS;|" -i $(LICENSE_JS)
-endif
-
-ifeq ($(PRODUCT_NAME_LOW), documentserver-de)
-	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_D;|" -i $(LICENSE_JS)
+	sed 's|\("packageType": \)[0-9]\+\(.*\)|\10\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
+	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataMemory\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
 ifeq ($(PRODUCT_NAME_LOW), documentserver-ie)
-	sed "s|\(const oPackageType = \).*|\1constants.PACKAGE_TYPE_I;|" -i $(LICENSE_JS)
+	sed 's|\("packageType": \)[0-9]\+\(.*\)|\11\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
+	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataRedis\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
-	cd $(DOCUMENTSERVER)/npm && npm install
+ifeq ($(PRODUCT_NAME_LOW), documentserver-de)
+	sed 's|\("packageType": \)[0-9]\+\(.*\)|\12\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
+	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataRedis\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
+endif
+
+	cd $(DOCUMENTSERVER)/npm && \
+		npm install && \
+		pkg ./node_modules/json -o json
+
+ifeq ($(PLATFORM),win)		
+	cd $(DOCUMENTSERVER)/npm && \
+		pkg ./node_modules/replace -o replace
+endif		
+	rm -r \
+		$(DOCUMENTSERVER)/npm/node_modules \
+		$(DOCUMENTSERVER)/npm/package-lock.json
 
 	echo "Done" > $@
 
 documentserver-example:
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE)
-	cp -rf -t $(DOCUMENTSERVER_EXAMPLE) ../document-server-integration/web/documentserver-example/nodejs/** common/documentserver-example/welcome
+	cp -rf -t $(DOCUMENTSERVER_EXAMPLE) ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)-example/* common/documentserver-example/welcome
 	
 	mkdir -p $(DOCUMENTSERVER_EXAMPLE_CONFIG)
 
@@ -400,19 +406,19 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 
 	cd $(@D)/../../.. && rpmbuild \
 		-bb \
-		--define "_topdir $(@D)/../../../builddir" \
-		--define "_package_name $(PACKAGE_NAME)" \
-		--define "_product_version $(PRODUCT_VERSION)" \
-		--define "_build_number $(BUILD_NUMBER)" \
-		--define "_company_name $(COMPANY_NAME)" \
-		--define "_product_name $(PRODUCT_NAME)" \
-		--define "_publisher_name $(PUBLISHER_NAME)" \
-		--define "_publisher_url $(PUBLISHER_URL)" \
-		--define "_support_url $(SUPPORT_URL)" \
-		--define "_support_mail $(SUPPORT_MAIL)" \
-		--define "_company_name_low $(COMPANY_NAME_LOW)" \
-		--define "_product_name_low $(PRODUCT_NAME_LOW)" \
-		--define "_ds_prefix $(DS_PREFIX)" \
+		--define '_topdir $(@D)/../../../builddir' \
+		--define '_package_name $(PACKAGE_NAME)' \
+		--define '_product_version $(PRODUCT_VERSION)' \
+		--define '_build_number $(BUILD_NUMBER)' \
+		--define '_company_name $(COMPANY_NAME)' \
+		--define '_product_name $(PRODUCT_NAME)' \
+		--define '_publisher_name $(PUBLISHER_NAME)' \
+		--define '_publisher_url $(PUBLISHER_URL)' \
+		--define '_support_url $(SUPPORT_URL)' \
+		--define '_support_mail $(SUPPORT_MAIL)' \
+		--define '_company_name_low $(COMPANY_NAME_LOW)' \
+		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
+		--define '_ds_prefix $(DS_PREFIX)' \
 		$(PACKAGE_NAME).spec
 
 ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-de onlyoffice-documentserver-ie))

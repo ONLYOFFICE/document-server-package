@@ -25,7 +25,7 @@ APP_DIR="/var/lib/M4_DS_PREFIX"
 CONF_DIR="/etc/M4_DS_PREFIX"
 LOCAL_CONFIG=${CONF_DIR}/local.json
 EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
-JSON_BIN="$DIR/npm/node_modules/.bin/json"
+JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f ${EXAMPLE_CONFIG}"
 
@@ -287,16 +287,15 @@ case "$1" in
 		mkdir -p "$LOG_DIR/converter"
 		mkdir -p "$LOG_DIR/spellchecker"
 		mkdir -p "$LOG_DIR/metrics"
-		mkdir -p "$LOG_DIR/gc"
 
 		mkdir -p "$APP_DIR/App_Data"
 		mkdir -p "$APP_DIR/App_Data/cache/files"
 		mkdir -p "$APP_DIR/App_Data/docbuilder"
+		mkdir -p "$APP_DIR-example/files"
 
 		mkdir -p "$DIR/../Data" #! 
 		mkdir -p "$DIR/fonts"
-		mkdir -p "$DIR-example/public/files"
-		chown ds:ds -R "$DIR" "$DIR-example"
+		chown ds:ds -R "$DIR"
 
     #setup logrotate config rights
     chmod 644 ${CONF_DIR}/logrotate/*
@@ -307,6 +306,7 @@ case "$1" in
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$APP_DIR"
+		chown ds:ds -R "$APP_DIR-example"
 
 		# call db_stop to prevent installation hang
 		db_stop
