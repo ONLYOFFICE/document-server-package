@@ -18,8 +18,6 @@ SUPPORT_MAIL ?= support@onlyoffice.com
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
-SIGN_STR := "byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f"
-
 BRANDING_DIR ?= ./branding
 
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
@@ -179,6 +177,15 @@ DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
 DEPLOY += $(DS_BIN_REPO)
 endif
+
+ISCC := iscc
+ISCC_PARAMS +=	//Qp
+ISCC_PARAMS +=	//DsAppVerShort=$(PRODUCT_VERSION)
+ISCC_PARAMS +=	//DsAppBuildNumber=$(BUILD_NUMBER)
+ifdef ENABLE_SIGNING
+ISCC_PARAMS +=	//DENABLE_SIGNING=1
+endif
+ISCC_PARAMS +=	//S"byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f"
 
 DEB_DEPS += deb/debian/changelog
 DEB_DEPS += deb/debian/config
@@ -444,15 +451,7 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 	mv -f $< $@
 
 %.exe:
-	cd $(@D) && iscc \
-	//DsAppVerShort=$(PRODUCT_VERSION) \
-	//DsAppBuildNumber=$(BUILD_NUMBER) \
-ifdef ENABLE_SIGNING
-	//DENABLE_SIGNING=1 \
-endif
-	//Qp \
-	//S$(SIGN_STR) \
-	$(PACKAGE_NAME).iss
+	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
 
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 	cd deb && dpkg-buildpackage -b -uc -us
