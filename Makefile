@@ -447,6 +447,9 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 	cd $(@D) && iscc \
 	//DsAppVerShort=$(PRODUCT_VERSION) \
 	//DsAppBuildNumber=$(BUILD_NUMBER) \
+ifdef ENABLE_SIGNING
+	//DENABLE_SIGNING=1 \
+endif
 	//Qp \
 	//S$(SIGN_STR) \
 	$(PACKAGE_NAME).iss

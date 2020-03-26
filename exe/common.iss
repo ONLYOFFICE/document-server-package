@@ -203,7 +203,7 @@ SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
 LicenseFile               = 
 ShowLanguageDialog        = no
 
-#ifdef ISPPCC_INVOKED
+#ifdef ENABLE_SIGNING
 SignTool=byparam $p
 #endif
 
