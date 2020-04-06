@@ -4,7 +4,7 @@ Upstream-Contact: M4_PUBLISHER_NAME <M4_SUPPORT_MAIL>
 Source: M4_PUBLISHER_URL
 
 Files: *
-Copyright: (c) Copyright M4_PUBLISHER_NAME, 2018 <M4_SUPPORT_MAIL>
+Copyright: (c) Copyright M4_PUBLISHER_NAME, 2020 <M4_SUPPORT_MAIL>
 
 ifdef(COMMERCIAL, License: Commercial,
 License: AGPLv3

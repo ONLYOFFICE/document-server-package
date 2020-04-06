@@ -38,7 +38,7 @@
 #endif
 
 #ifndef sAppCopyright
-  #define sAppCopyright      str("Copyright (C) 2019 " + sPublisherName)
+  #define sAppCopyright      str("Copyright (C) 2020 " + sPublisherName)
 #endif
 
 #ifndef sPublisherUrl
