@@ -63,6 +63,10 @@ DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
 
 EXE_REPO_DIR = windows
 
+INDEX_HTML := index.html
+
+S3_BUCKET ?= repo-doc-onlyoffice-com
+
 APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
@@ -119,7 +123,7 @@ ifeq ($(OS),Windows_NT)
 	SHARED_EXT := .dll
 	ARCH_EXT := .zip
 	AR := 7z a -y
-	DEPLOY := $(EXE_REPO_DATA)
+	DEPLOY := $(EXE_REPO_DATA) $(INDEX_HTML)
 	NGINX_CONF := includes
 	NGINX_LOG := logs
 	DS_ROOT := ..
@@ -140,7 +144,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA) $(INDEX_HTML)
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -259,6 +263,14 @@ M4_PARAMS += -D M4_DS_ROOT='$(DS_ROOT)'
 M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
 M4_PARAMS += -D M4_DS_EXAMLE='$(DS_EXAMLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
+M4_PARAMS += -D M4_S3_BUCKET=$(S3_BUCKET)
+ifeq ($(PLATFORM),win)
+M4_PARAMS += -D M4_EXE_URI="$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/$(notdir $(EXE))"
+else ifeq ($(PLATFORM),linux)
+M4_PARAMS += -D M4_DEB_URI="$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo/$(notdir $(DEB))"
+M4_PARAMS += -D M4_RPM_URI="$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/$(notdir $(RPM))"
+M4_PARAMS += -D M4_APT_RPM_URI="$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/$(notdir $(APT_RPM))"
+endif
 
 .PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb deploy-bin
 
@@ -285,6 +297,7 @@ clean:
 		$(RPM_REPO)\
 		$(EXE_REPO)\
 		$(DS_BIN_REPO)\
+		$(INDEX_HTML)\
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
 		$(DS_BIN)\

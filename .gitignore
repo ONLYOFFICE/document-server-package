@@ -33,4 +33,5 @@ common/fonts
 /pgsql
 /rpm/*documentserver*.spec
 *rpm/bin/*.sh
+index.html
 .gitignore
