@@ -38,7 +38,7 @@
 #endif
 
 #ifndef sAppCopyright
-  #define sAppCopyright      str("Copyright (C) 2019 " + sPublisherName)
+  #define sAppCopyright      str("Copyright (C) 2020 " + sPublisherName)
 #endif
 
 #ifndef sPublisherUrl
@@ -203,7 +203,7 @@ SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
 LicenseFile               = 
 ShowLanguageDialog        = no
 
-#ifdef ISPPCC_INVOKED
+#ifdef ENABLE_SIGNING
 SignTool=byparam $p
 #endif
 
