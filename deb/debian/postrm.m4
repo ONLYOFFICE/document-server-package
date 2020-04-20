@@ -24,9 +24,10 @@ fi
 
 remove_postgres() {
 	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -U$DB_USER -w"
-	sudo -i -u postgres -- sh -c "\
-		if [ -n $DB_PWD ]; then export PGPASSWORD=\"$DB_PWD\"; fi; \
-		psql $CONNECTION_PARAMS $DB_NAME -t -c \"DROP SCHEMA IF EXISTS public CASCADE;\""
+	if [ -n $DB_PWD ]; then
+		export PGPASSWORD="$DB_PWD"
+	fi
+	psql $CONNECTION_PARAMS $DB_NAME -t -c "DROP SCHEMA IF EXISTS public CASCADE;"
 }
 
 remove_mysql() {
