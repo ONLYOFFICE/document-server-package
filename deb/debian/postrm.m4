@@ -23,13 +23,7 @@ if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
 fi
 
 remove_postgres() {
-	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -U$DB_USER -w"
-	if [ -n $DB_PWD ]; then
-		export PGPASSWORD="$DB_PWD"
-	fi
-	DROPDB="dropdb $CONNECTION_PARAMS"
-	$DROPDB --if-exists $DB_NAME &>/dev/null || \
-		{ echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+	sudo -i -u postgres psql $DB_NAME -t -c "DROP SCHEMA IF EXISTS public CASCADE;"
 }
 
 remove_mysql() {
