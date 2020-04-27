@@ -27,9 +27,8 @@ remove_postgres() {
 	if [ -n $DB_PWD ]; then
 		export PGPASSWORD="$DB_PWD"
 	fi
-	DROPDB="dropdb $CONNECTION_PARAMS"
-	$DROPDB --if-exists $DB_NAME &>/dev/null || \
-		{ echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+	psql $CONNECTION_PARAMS $DB_NAME -t -c "DROP SCHEMA IF EXISTS public CASCADE;" &>/dev/null || \
+		{ echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database tables" >&2; }
 }
 
 remove_mysql() {
