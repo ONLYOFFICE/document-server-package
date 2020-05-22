@@ -36,7 +36,7 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps|sdkjs|sdkjs-plugins|f
   alias M4_DS_ROOT/$2$3;
 }
 
-location ~ ^(\/cache\/files.*)(\/.*) {
+location ~* ^(\/cache\/files.*)(\/.*) {
   alias M4_DS_FILES/App_Data$1;
   add_header Content-Disposition "$arg_disposition; filename*=UTF-8''$arg_filename";
 
@@ -54,7 +54,7 @@ location ~ ^(\/cache\/files.*)(\/.*) {
 }
 
 # Allow internal service only from 127.0.0.1
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info|internal)(\/.*)$ {
+location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info|internal)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
   proxy_pass http://docservice/$2$3;
