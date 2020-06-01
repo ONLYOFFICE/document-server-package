@@ -1,3 +1,4 @@
+define(M4_REDIS,eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)))dnl
 #!/bin/bash
 
 DIR="/var/www/M4_DS_PREFIX"
@@ -102,6 +103,7 @@ save_activemq_params(){
 	fi
 }
 
+ifelse(M4_REDIS,1,
 save_redis_params(){
 	$JSON -e "if(this.services===undefined)this.services={};"
 	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
@@ -109,6 +111,7 @@ save_redis_params(){
 	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
+,)dnl
 save_jwt_params(){
 	${JSON} -e "if(this.services===undefined)this.services={};"
 	${JSON} -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
@@ -202,12 +205,14 @@ input_db_params(){
 	echo
 }
 
+ifelse(M4_REDIS,1,
 input_redis_params(){
 	echo "Configuring redis access... "
 	read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
 	echo
 }
 
+,)dnl
 input_amqp_params(){
 	echo "Configuring AMQP access... "
 	read -e -p "Host: " -i "$AMQP_SERVER_HOST_PORT_PATH" AMQP_SERVER_HOST_PORT_PATH
@@ -289,6 +294,7 @@ execute_db_script(){
 	esac
 }
 
+ifelse(M4_REDIS,1,
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
@@ -302,6 +308,7 @@ establish_redis_conn() {
 	echo "OK"
 }
 
+,)dnl
 establish_amqp_conn() {
 	echo -n "Trying to establish AMQP connection... "
   
@@ -375,16 +382,20 @@ create_local_configs
 input_db_params
 execute_db_script
 
+ifelse(M4_REDIS,1,
 input_redis_params
 establish_redis_conn || exit $?
 
+,)dnl
 input_amqp_params
 parse_amqp_url
 establish_amqp_conn || exit $?
 
 save_db_params
 save_amqp_params
+ifelse(M4_REDIS,1,
 save_redis_params
+,)dnl
 save_jwt_params
 
 tune_local_configs

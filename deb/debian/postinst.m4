@@ -1,3 +1,4 @@
+define(M4_REDIS,eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)))dnl
 #!/bin/sh
 # postinst script for M4_ONLYOFFICE_VALUE
 #
@@ -42,8 +43,10 @@ RABBITMQ_HOST=""
 RABBITMQ_USER=""
 RABBITMQ_PWD=""
 
+ifelse(M4_REDIS,1,
 REDIS_HOST=""
 
+,)dnl
 CLUSTER_MODE=""
 
 create_local_configs(){
@@ -75,9 +78,11 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
 	RABBITMQ_PWD="$RET"
 
-	db_get M4_ONLYOFFICE_VALUE/redis-host || true
+ifelse(M4_REDIS,1,
+`	db_get M4_ONLYOFFICE_VALUE/redis-host || true
 	REDIS_HOST="$RET"
 
+',)dnl
 	db_get M4_ONLYOFFICE_VALUE/cluster-mode || true
 	CLUSTER_MODE="$RET"
 
@@ -174,6 +179,7 @@ save_rabbitmq_params(){
   $JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
+ifelse(M4_REDIS,1,
 save_redis_params(){
   $JSON -e "if(this.services===undefined)this.services={};"
   $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
@@ -181,6 +187,7 @@ save_redis_params(){
   $JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
+,)dnl
 save_jwt_params(){
   ${JSON} -e "if(this.services===undefined)this.services={};"
   ${JSON} -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
@@ -275,7 +282,9 @@ case "$1" in
 		install_db
 		save_db_params
 		save_rabbitmq_params
+ifelse(M4_REDIS,1,`
 		save_redis_params
+',)dnl
 		save_jwt_params
 
 		# configure ngninx for M4_ONLYOFFICE_VALUE

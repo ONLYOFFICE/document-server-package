@@ -61,11 +61,13 @@ Type: string
 Default: 3000
 Description: M4_PRODUCT_NAME example listening port:
 
+ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 Template: M4_ONLYOFFICE_VALUE/redis-host
 Type: string
 Default: localhost
 Description: Redis host:
 
+,)dnl
 Template: M4_ONLYOFFICE_VALUE/rabbitmq-host
 Type: string
 Default: localhost
