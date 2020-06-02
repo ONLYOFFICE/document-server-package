@@ -590,7 +590,10 @@ end;
 
 function GetRedisHost(Param: String): String;
 begin
-  Result := RedisPage.Values[0];
+  if ('{#sProductName}' = 'DocumentServer-IE') or ('{#sProductName}' = 'DocumentServer-DE') then begin
+    Result := RedisPage.Values[0];
+  end else
+    Result := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
 end;
 
 function GetDefaultPort(Param: String): String;
@@ -672,12 +675,15 @@ begin
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
   RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
 
-  RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
-    'Redis In-Memory Database', 'Configure Redis Connection...',
-    'Please specify your Redis connection, then click Next.');
-  RedisPage.Add('Host:', False);
+  if ('{#sProductName}' = 'DocumentServer-IE') or ('{#sProductName}' = 'DocumentServer-DE') then
+  begin
+    RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
+      'Redis In-Memory Database', 'Configure Redis Connection...',
+      'Please specify your Redis connection, then click Next.');
+    RedisPage.Add('Host:', False);
 
-  RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+    RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+  end;
 
 end;
 
