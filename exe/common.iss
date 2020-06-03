@@ -590,7 +590,7 @@ end;
 
 function GetRedisHost(Param: String): String;
 begin
-  if ('{#sProductName}' = 'DocumentServer-IE') or ('{#sProductName}' = 'DocumentServer-DE') then begin
+  if Assigned(RedisPage) and not VarIsNull(RedisPage.Values[0]) then begin
     Result := RedisPage.Values[0];
   end else
     Result := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
