@@ -278,7 +278,7 @@ case "$1" in
 		save_db_params
 		save_rabbitmq_params
 ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
-		save_redis_params
+`		save_redis_params
 ',)dnl
 		save_jwt_params
 
