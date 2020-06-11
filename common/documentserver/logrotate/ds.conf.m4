@@ -27,7 +27,11 @@
         sharedscripts
         postrotate
             if [ -f /var/run/supervisord.pid ]; then
-                service supervisor restart > /dev/null
+                if [ ! -f /etc/redhat-release ]; then
+                    service supervisor restart > /dev/null
+                else
+                    service supervisord restart > /dev/null
+                fi
             fi
         endscript
 }
