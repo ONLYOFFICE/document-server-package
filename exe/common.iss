@@ -532,7 +532,7 @@ begin
  
   if WizardSilent() = false then
   begin
-    vcredist2010('10');
+    // vcredist2010('10');
     vcredist2013('12');
     vcredist2015('14');
   end;
