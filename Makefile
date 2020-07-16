@@ -184,7 +184,7 @@ ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
 DEPLOY += $(DS_BIN_REPO)
 endif
 
-DEPLOY += $(TAR_REPO)
+DEPLOY += $(TAR_REPO_DATA)
 
 ISCC := iscc
 ISCC_PARAMS +=	//Qp
