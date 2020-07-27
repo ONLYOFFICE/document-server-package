@@ -474,7 +474,7 @@ $(TAR):
 
 $(ISXDL):
 	$(TOUCH) $(ISXDL) && \
-	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
+	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/is-5_6_1/isxdlfiles/isxdl.dll
 	
 $(NGINX):
 	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
