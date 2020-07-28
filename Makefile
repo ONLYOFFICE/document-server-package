@@ -34,6 +34,11 @@ EXE_BUILD_DIR = $(PWD)/exe
 APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
+TAR_PACKAGE_DIR = $(PWD)
+
+TAR_REPO := repo-tar
+TAR_REPO_DATA := $(TAR_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).tar.gz
+TAR_REPO_DIR = tar
 
 DEB_REPO := $(PWD)/repo
 DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
@@ -65,6 +70,7 @@ APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
+TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION).tar.gz
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -178,6 +184,8 @@ ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
 DEPLOY += $(DS_BIN_REPO)
 endif
 
+DEPLOY += $(TAR_REPO_DATA)
+
 ISCC := iscc
 ISCC_PARAMS +=	//Qp
 ISCC_PARAMS +=	//DsAppVerShort=$(PRODUCT_VERSION)
@@ -278,6 +286,8 @@ rpm: $(RPM)
 deb: $(DEB)
 
 exe: $(EXE)
+
+tar: $(TAR)
 
 clean:
 	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
@@ -458,9 +468,13 @@ $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-e
 
 $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
+$(TAR):
+	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
+	tar -cvzf $(TAR) $(PRODUCT_SHORT_NAME_LOW)-snap
+
 $(ISXDL):
 	$(TOUCH) $(ISXDL) && \
-	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/master/isxdlfiles/isxdl.dll
+	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/is-5_6_1/isxdlfiles/isxdl.dll
 	
 $(NGINX):
 	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
@@ -551,6 +565,22 @@ $(EXE_REPO_DATA): $(EXE)
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
+		--acl public-read --delete
+
+$(TAR_REPO_DATA): $(TAR)
+	rm -rfv $(TAR_REPO)
+	mkdir -p $(TAR_REPO)
+
+	cp -rv $(TAR) $(TAR_REPO);
+
+	aws s3 sync \
+		$(TAR_REPO) \
+		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
+		--acl public-read --delete
+
+	aws s3 sync \
+		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
+		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
 		--acl public-read --delete
 
 deploy-bin: $(DS_BIN_REPO)
