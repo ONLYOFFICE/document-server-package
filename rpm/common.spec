@@ -96,6 +96,7 @@ mkdir -p "%{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d}/"
 DS_LOGROTATE_CONF=$CONF_DIR/logrotate/
 mkdir -p "$DS_LOGROTATE_CONF"
 cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTATE_CONF"
+sed 's/\(service supervisor\)d\?/\1d/g' -i "$DS_LOGROTATE_CONF/ds.conf"
 
 %if %{defined example}
 #install documentserver example files
