@@ -32,6 +32,6 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAM
   supervisor(>= 3.0b2),
   xvfb,
   zlib1g
-Description: online viewers and editors for text, spreadsheet and presentation files.
- Compatible with most office file formats including Office Open XML formats:
- .docx, .xlsx, .pptx, and offer collaborative editing and commenting.
+Description: Document Server is an open-source office suite that includes
+ collaborative online editors for text documents, spreadsheets,
+ and presentations.

@@ -1,5 +1,5 @@
 %define __strip    /bin/true
-Summary: Online viewers and editors for text, spreadsheet and presentation files
+Summary: Online editors for text documents, spreadsheets, and presentations
 Name: %{_package_name}
 Version: %{_product_version}
 Release: %{_build_number}
@@ -12,8 +12,9 @@ AutoReq: no
 AutoProv: no
 
 %description
-Free open source office suite and business productivity tools in one solution:
-online document editors, file and project management, CRM
+Document Server is an open-source office suite that includes
+collaborative online editors for text documents, spreadsheets,
+and presentations.
 
 %prep
 rm -rf "%{buildroot}"
