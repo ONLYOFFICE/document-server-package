@@ -443,11 +443,11 @@ M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 
 %.sh : %.sh.m4
-	m4 $(M4_PARAMS)	$< > $@
+	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 	chmod u+x $@
 
 % : %.m4
-	m4 $(M4_PARAMS)	$< > $@
+	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
 % : %.tmpl
 	cp $< $@
