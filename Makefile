@@ -108,6 +108,10 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
 
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
+OFFICIAL_PRODUCT_NAME := 'Enterprise Edition'
+endif
+
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ie))
 OFFICIAL_PRODUCT_NAME := 'Integration Edition'
 endif
@@ -180,7 +184,7 @@ TARGET := $(PLATFORM)_$(ARCHITECTURE)
 DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ie))
+ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
 DEPLOY += $(DS_BIN_REPO)
 endif
 
@@ -367,7 +371,7 @@ ifeq ($(PRODUCT_NAME_LOW), documentserver)
 	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataMemory\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
-ifeq ($(PRODUCT_NAME_LOW), documentserver-ie)
+ifeq ($(PRODUCT_NAME_LOW), $(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
 	sed 's|\("packageType": \)[0-9]\+\(.*\)|\11\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataRedis\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
@@ -438,7 +442,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_ds_prefix $(DS_PREFIX)' \
 		$(PACKAGE_NAME).spec
 
-ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-de onlyoffice-documentserver-ie))
+ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-ee onlyoffice-documentserver-de onlyoffice-documentserver-ie))
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 

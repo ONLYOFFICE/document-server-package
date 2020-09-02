@@ -35,7 +35,7 @@ db_input medium M4_ONLYOFFICE_VALUE/rabbitmq-host || true
 db_input medium M4_ONLYOFFICE_VALUE/rabbitmq-user || true
 db_input medium M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
 
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
+ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 db_input medium M4_ONLYOFFICE_VALUE/redis-host || true
 ,)dnl
 db_go

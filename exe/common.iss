@@ -649,7 +649,7 @@ end;
 function IsCommercial: Boolean;
 begin
   Result := false;
-  if ('{#sProductName}' = 'DocumentServer-IE') or ('{#sProductName}' = 'DocumentServer-DE') then begin
+  if ('{#sProductName}' = 'DocumentServer-EE') or ('{#sProductName}' = 'DocumentServer-IE') or ('{#sProductName}' = 'DocumentServer-DE') then begin
     Result := true;
   end;
 end;
