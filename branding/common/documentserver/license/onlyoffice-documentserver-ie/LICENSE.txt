@@ -1,10 +1,10 @@
-ONLYOFFICE Integration Edition 
+ONLYOFFICE Docs Integration Edition 
 LICENSE AGREEMENT 
 IMPORTANT  READ CAREFULLY: BY INSTALLING, DOWNLOADING OR OTHERWISE USING 
 ONLYOFFICE AND ANY RELATED DOCUMENTATION, YOU, ON BEHALF OF YOURSELF OR AS AN 
 AUTHORIZED REPRESENTATIVE ON BEHALF OF AN ENTITY ("LICENSEE") AGREE TO ALL 
 THE TERMS OF THIS ONLYOFFICE COMMERCIAL LICENSE AGREEMENT (THE "AGREEMENT") 
-REGARDING YOUR USE OF ONLYOFFICE INTEGRATION EDITION. YOU REPRESENT AND WARRANT 
+REGARDING YOUR USE OF ONLYOFFICE DOCS INTEGRATION EDITION. YOU REPRESENT AND WARRANT 
 THAT YOU HAVE FULL LEGAL AUTHORITY TO BIND THE LICENSEE TO THIS AGREEMENT. IF 
 YOU DO NOT AGREE WITH ALL OF THESE TERMS, DO NOT INSTALL, DOWNLOAD OR OTHERWISE 
 USE ONLYOFFICE. 
@@ -14,7 +14,7 @@ provided by Ascensio System SIA, its object code, binary codes, compiled object
 code as well as any related documentation. The source codes of ONLYOFFICE 
 Document Server are published at https://github.com/ONLYOFFICE under AGPL v.3 
 license and can be modified at any time without prior notice. 
-"ONLYOFFICE Integration Edition" means an advanced version of  ONLYOFFICE 
+"ONLYOFFICE Docs Integration Edition" means an advanced version of  ONLYOFFICE 
 Document Server for professional functions of document editing in accordance 
 with the description on the official site www.onlyoffice.com.
 "ONLYOFFICE" means all software provided by Ascensio System SIA in 
@@ -22,17 +22,17 @@ accordance with the official site at .
 "Effective Date" is the date on which you click "I accept" button or 
 otherwise installs, downloads or uses ONLYOFFICE.
 "License Key" means a computer file containing a unique combination of 
-characters that allows you to use ONLYOFFICE Integration Edition.
+characters that allows you to use ONLYOFFICE Docs Integration Edition.
 "License Fee" means a regular payment by you to us for the right to use 
-ONLYOFFICE Integration Edition.
+ONLYOFFICE Docs Integration Edition.
 
 1. License Grant
 1.1. You are hereby granted a non-exclusive, non-transferable license to 
-install and use ONLYOFFICE Integration Edition in accordance with this 
+install and use ONLYOFFICE Docs Integration Edition in accordance with this 
 Agreement.
 1.2. We reserve all rights not expressly granted to you under this Agreement.
 1.3. Nothing in this Agreement shall limit our rights to use, license, 
-sublicense or otherwise exploit ONLYOFFICE Integration Edition or to permit 
+sublicense or otherwise exploit ONLYOFFICE Docs Integration Edition or to permit 
 third parties to do so.
 
 2. Ownership
@@ -41,14 +41,14 @@ reserve all intellectual property rights to ONLYOFFICE and its original
 components including trademarks and related confidential information. 
 
 3. Payment and Taxes
-3.1. In order to use ONLYOFFICE Integration Edition you shall pay us a License 
+3.1. In order to use ONLYOFFICE Docs Integration Edition you shall pay us a License 
 fee. The License Fee is payable according to the selected plan listed on the 
 official site www.onlyoffice.com. 
 3.2. Upon receiving the License Fee we will send you a License Key along with 
-instructions on how to install and activate ONLYOFFICE Integration Edition. 
-3.3. You should activate your copy of ONLYOFFICE Integration Edition by 
+instructions on how to install and activate ONLYOFFICE Docs Integration Edition. 
+3.3. You should activate your copy of ONLYOFFICE Docs Integration Edition by 
 activating the License Key sent. You must use one License Key per one copy of 
-ONLYOFFICE Integration Edition depending on your pricing plan. 
+ONLYOFFICE Docs Integration Edition depending on your pricing plan. 
 3.4. Every License Key is limited by specific number of concurrent connections 
 to Document Server; this configuration is defined for every pricing plan on the 
 official website www.onlyoffice.com. 
@@ -57,20 +57,20 @@ within 30 days from the Effective Date we will return you your License Fee;
 otherwise, this Fee shall be considered non-recoverable.	
 3.6. You are granted updates and support for your version of ONLYOFFICE 
 Integration Edition for the period defined by the pricing plan selected. After 
-this period you may continue to use ONLYOFFICE Integration Edition in its full 
+this period you may continue to use ONLYOFFICE Docs Integration Edition in its full 
 functionality. You may prolong the right for getting support and updates for 
-ONLYOFFICE Integration Edition by purchasing the appropriate pricing plan from 
+ONLYOFFICE Docs Integration Edition by purchasing the appropriate pricing plan from 
 our official website www.onlyoffice.com and activating the new License Key on 
 your server.
 3.7. We shall have the right to modify the amount of the License Fee for any 
-future period of using ONLYOFFICE Integration Edition by you at any time 
+future period of using ONLYOFFICE Docs Integration Edition by you at any time 
 without prior notice.
-3.8. We can offer ONLYOFFICE Integration Edition for free under certain 
+3.8. We can offer ONLYOFFICE Docs Integration Edition for free under certain 
 conditions. These conditions can cover specific pricing plans, limit the number 
 of users, term of the License Key or any other options and can be published on 
 our official website www.onlyoffice.com, any other websites or offered to you 
 personally in any possible way. 
-3.9. In a free copy of ONLYOFFICE Integration Edition we reserve the right to 
+3.9. In a free copy of ONLYOFFICE Docs Integration Edition we reserve the right to 
 use Google Analytics or any other services for web analytics and add any 
 advertising materials into such free copy. If you pay us a License Fee and 
 insert your new License Key into your free copy of ONLYOFFICE Integration 
@@ -83,8 +83,8 @@ Edition as long as your License Key is valid.
 Integration Edition under your own brand name and logo provided that you have 
 paid us the License Fee.
 4.2. In this case you may arrange your own brand name and/or logo for 
-ONLYOFFICE Integration Edition in accordance with our technical specifications. 
-4.3. Once you have changed the logos in ONLYOFFICE Integration Edition using 
+ONLYOFFICE Docs Integration Edition in accordance with our technical specifications. 
+4.3. Once you have changed the logos in ONLYOFFICE Docs Integration Edition using 
 the appropriate function your copy of ONLYOFFICE remains re-branded.
 
 5. Restrictions on Use
@@ -103,7 +103,7 @@ incorporated in or otherwise applied to ONLYOFFICE.
 5.6. You are not permitted to use trade names, trademarks, service marks, or 
 product names of Ascensio System SIA, except as required for reasonable and 
 customary use of ONLYOFFICE.
-5.7. You may not install and run an ONLYOFFICE Integration Edition server 
+5.7. You may not install and run an ONLYOFFICE Docs Integration Edition server 
 software instance in more than one physical location at the same time, or on 
 more than one active Virtual Machine at the same time, per one ONLYOFFICE 
 Integration Edition license purchased.
@@ -113,7 +113,7 @@ Integration Edition license purchased.
 Integration Edition once they are available during the period defined by the 
 pricing plan selected from the Effective Date.
 6.2. Our services include 
-· provision of updates for ONLYOFFICE Integration Edition once they are 
+· provision of updates for ONLYOFFICE Docs Integration Edition once they are 
 available during the period defined by the pricing plan selected,
 · technical consulting services during the period defined by the pricing plan 
 selected.
@@ -121,7 +121,7 @@ selected.
 6.4. If you need consulting help when using ONLYOFFICE you may file a request 
 by writing a letter to server@onlyoffice.com.
 6.5. We do not provide technical consulting services for the versions of 
-ONLYOFFICE Integration Edition provided for free.
+ONLYOFFICE Docs Integration Edition provided for free.
 
 7. Additional Restrictions
 7.1. You should not make your License Key(s) available to any third persons 
@@ -131,16 +131,16 @@ your License Key(s).
 7.2. You must use one License Key per one copy of ONLYOFFICE Integration 
 Edition depending on your pricing plan.
 7.3. You should not try to disassemble, reverse engineer, analyze, decompile or 
-convert your copy of ONLYOFFICE Integration Edition or permit third parties to 
+convert your copy of ONLYOFFICE Docs Integration Edition or permit third parties to 
 do so.
 
 8. Term and Termination
-8.1. Your License for ONLYOFFICE Integration Edition is perpetual. You are 
+8.1. Your License for ONLYOFFICE Docs Integration Edition is perpetual. You are 
 granted the right to get free updates and support during the period defined by 
 the pricing plan selected by you in accordance with our official site at 
 www.onlyoffice.com.
-8.2. You may cease to use ONLYOFFICE Integration Edition at any time. 
-8.3. We may deprive you of the right to use ONLYOFFICE Integration Edition if 
+8.2. You may cease to use ONLYOFFICE Docs Integration Edition at any time. 
+8.3. We may deprive you of the right to use ONLYOFFICE Docs Integration Edition if 
 you do not comply with this Agreement. 
 
 9. Disclaimer of Warranty
