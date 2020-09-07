@@ -19,28 +19,6 @@ ECHO | SET /p="Generating AllFonts.js, please wait..."
   --output-web="%~dp0\..\fonts" ^
   --use-system="true"
 
-"%~dp0\..\server\tools\allfontsgen.exe" ^
-  --input="%~dp0\..\core-fonts" ^
-  --allfonts-web="%~dp0\..\sdkjs\common\AllFonts.js" ^
-  --allfonts="%~dp0\..\server\FileConverter\bin\AllFonts.js" ^
-  --images="%~dp0\..\sdkjs\common\Images" ^
-  --selection="%~dp0\..\server\FileConverter\bin\font_selection.bin" ^
-  --output-web="%~dp0\..\fonts" ^
-  --use-system="true" ^
-  --postfix="android" ^
-  --params="280,224"
-
-"%~dp0\..\server\tools\allfontsgen.exe" ^
-  --input="%~dp0\..\core-fonts" ^
-  --allfonts-web="%~dp0\..\sdkjs\common\AllFonts.js" ^
-  --allfonts="%~dp0\..\server\FileConverter\bin\AllFonts.js" ^
-  --images="%~dp0\..\sdkjs\common\Images" ^
-  --selection="%~dp0\..\server\FileConverter\bin\font_selection.bin" ^
-  --output-web="%~dp0\..\fonts" ^
-  --use-system="true" ^
-  --postfix="ios" ^
-  --params="280,224"
-
 ECHO Done
 
 ECHO | SET /p="Generating presentation themes, please wait..."
@@ -48,6 +26,20 @@ ECHO | SET /p="Generating presentation themes, please wait..."
   --converter-dir="%~dp0\..\server\FileConverter\bin" ^
   --src="%~dp0\..\sdkjs\slide\themes" ^
   --output="%~dp0\..\sdkjs\common\Images"
+
+"%~dp0\..\server\tools\allthemesgen.exe" ^
+  --converter-dir="%~dp0\..\server\FileConverter\bin" ^
+  --src="%~dp0\..\sdkjs\slide\themes" ^
+  --output="%~dp0\..\sdkjs\common\Images" ^
+  --postfix="ios" ^
+  --params="280,224"
+
+"%~dp0\..\server\tools\allthemesgen.exe" ^
+  --converter-dir="%~dp0\..\server\FileConverter\bin" ^
+  --src="%~dp0\..\sdkjs\slide\themes" ^
+  --output="%~dp0\..\sdkjs\common\Images" ^
+  --postfix="android" ^
+  --params="280,224"
 
 ECHO Done
 
