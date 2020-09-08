@@ -75,7 +75,7 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
 	RABBITMQ_PWD="$RET"
 
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
+ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 `	db_get M4_ONLYOFFICE_VALUE/redis-host || true
 	REDIS_HOST="$RET"
 
@@ -277,7 +277,7 @@ case "$1" in
 		install_db
 		save_db_params
 		save_rabbitmq_params
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
+ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 `		save_redis_params
 ',)dnl
 		save_jwt_params
