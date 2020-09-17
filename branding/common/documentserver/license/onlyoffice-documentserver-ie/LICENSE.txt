@@ -1,4 +1,4 @@
-ONLYOFFICE Docs Enterprise Edition
+ONLYOFFICE Docs Integration Edition
 LICENSE AGREEMENT
 
 THIS AGREEMENT IS INTENDED TO BE LEGALLY BINDING.
@@ -14,7 +14,7 @@ provided by Ascensio System SIA, its object code, binary codes, compiled object
 code as well as any related documentation. The source codes of ONLYOFFICE 
 Document Server are published at https://github.com/ONLYOFFICE under AGPL v.3 
 license and can be modified at any time without prior notice.
-"ONLYOFFICE Docs Enterprise Edition" means an advanced version of 
+"ONLYOFFICE Docs Integration Edition" means an advanced version of 
 ONLYOFFICE Document Server for professional functions of document editing in 
 accordance with the description on the official website www.onlyoffice.com.
 "ONLYOFFICE" means all software provided by Ascensio System SIA in 
@@ -22,31 +22,31 @@ accordance with the official website at www.onlyoffice.com.
 "Effective Date" means the date when you click "Accept" button or 
 otherwise install, download or use ONLYOFFICE.
 "License Key" means a computer file containing a unique combination of 
-characters that allows you to use ONLYOFFICE Docs Enterprise Edition.
+characters that allows you to use ONLYOFFICE Docs Integration Edition.
 "License Fee" means a regular payment by you to us for the right to use 
-ONLYOFFICE Docs Enterprise Edition.
+ONLYOFFICE Docs Integration Edition.
 "Platform" means a software environment that is used for storing and 
 managing your files, installed on your server hardware and integrated with 
-ONLYOFFICE Docs Enterprise Edition.
+ONLYOFFICE Docs Integration Edition.
 
 1. License Grant
 1.1. You are hereby granted a non-exclusive, non-transferable license to 
 install and use in accordance with this Agreement.
 1.1	We grant you a non-exclusive, worldwide license to use ONLYOFFICE Docs 
-Enterprise Edition  for your own purposes on the certain number of Locations 
+Integration Edition  for your own purposes on the certain number of Locations 
 and with the maximum Number of concurrent connections limited by the License 
 Type.
 1.2	We will provide you with a License Key which will allow you to use 
-ONLYOFFICE Docs Enterprise Edition  and get updates for the period specified in 
+ONLYOFFICE Docs Integration Edition  and get updates for the period specified in 
 Section 6. 
 1.4	You do not acquire any exclusive (economic) rights to ONLYOFFICE or any 
 connected documentation according to this Agreement and we are not alienating 
 any rights.
 1.5	You shall pay to us a License Fee in amount specified on our official 
 website www.onlyoffice.com.
-1.6	You are granted to use ONLYOFFICE Docs Enterprise Edition  for 
+1.6	You are granted to use ONLYOFFICE Docs Integration Edition  for 
 legitimate purposes only.
-1.7	You are granted to use ONLYOFFICE Docs Enterprise Edition to conduct 
+1.7	You are granted to use ONLYOFFICE Docs Integration Edition to conduct 
 certain activities specified for the selected License Type. Any other activity 
 which is not indicated in this Agreement and is not allowed by governing law 
 shall be considered as infringement of exclusive (economic) rights.
@@ -57,14 +57,14 @@ reserve all intellectual property rights to ONLYOFFICE and its original
 components including trademarks and related confidential information. 
 
 3. Payment and Taxes
-3.1. In order to use ONLYOFFICE Docs Enterprise Edition you shall pay us a 
+3.1. In order to use ONLYOFFICE Docs Integration Edition you shall pay us a 
 License fee. The License Fee is payable according to the selected plan listed 
 on the official website www.onlyoffice.com. 
 3.2. Upon receiving the License Fee we will send you a License Key along with 
-instructions on how to install and activate ONLYOFFICE Docs Enterprise Edition. 
-3.3. You should activate your copy of ONLYOFFICE Docs Enterprise Edition by 
+instructions on how to install and activate ONLYOFFICE Docs Integration Edition. 
+3.3. You should activate your copy of ONLYOFFICE Docs Integration Edition by 
 activating the License Key sent. You must use one License Key per one copy of 
-ONLYOFFICE Docs Enterprise Edition integrated into one Platform installed on 
+ONLYOFFICE Docs Integration Edition integrated into one Platform installed on 
 your server hardware 
 3.4. Every License Key is limited by specific number of concurrent connections 
 to Document Server; this configuration is defined for every pricing plan on the 
@@ -73,27 +73,27 @@ official website www.onlyoffice.com.
 within 30 days from the Effective Date we will return you your License Fee; 
 otherwise, this Fee shall be considered non-recoverable.	
 3.6. You are granted updates and support for your version of ONLYOFFICE Docs 
-Enterprise Edition for the period defined by the pricing plan selected. After 
-this period you may continue to use ONLYOFFICE Docs Enterprise Edition in its 
+Integration Edition for the period defined by the pricing plan selected. After 
+this period you may continue to use ONLYOFFICE Docs Integration Edition in its 
 full functionality. You may prolong the right for getting support and updates 
-for ONLYOFFICE Docs Enterprise Edition by purchasing the appropriate pricing 
+for ONLYOFFICE Docs Integration Edition by purchasing the appropriate pricing 
 plan from our official website www.onlyoffice.com and activating the new 
 License Key on your server.
 3.7. We shall have the right to modify the amount of the License Fee for any 
-future period of using ONLYOFFICE Docs Enterprise Edition by you at any time 
+future period of using ONLYOFFICE Docs Integration Edition by you at any time 
 without prior notice.
-3.8. We can offer ONLYOFFICE Docs Enterprise Edition for free under certain 
+3.8. We can offer ONLYOFFICE Docs Integration Edition for free under certain 
 conditions. These conditions can cover specific pricing plans, limit the number 
 of users, term of the License Key or any other options and can be published on 
 our official website www.onlyoffice.com, any other websites or offered to you 
 personally in any possible way. 
-3.9. In a free copy of ONLYOFFICE Docs Enterprise Edition we reserve the right 
+3.9. In a free copy of ONLYOFFICE Docs Integration Edition we reserve the right 
 to use Google Analytics or any other services for web analytics and add any 
 advertising materials into such free copy. If you pay us a License Fee and 
-insert your new License Key into your free copy of ONLYOFFICE Docs Enterprise 
+insert your new License Key into your free copy of ONLYOFFICE Docs Integration 
 Edition we guarantee that no services for web analytics may be used or any 
 advertising materials may be presented in your copy of ONLYOFFICE Docs 
-Enterprise Edition as long as your License Key is valid.
+Integration Edition as long as your License Key is valid.
 
 4. Restrictions
 4.1. You may not use ONLYOFFICE as a public SaaS solution under this Agreement.
@@ -111,17 +111,17 @@ incorporated in or otherwise applied to ONLYOFFICE.
 4.6. You are not permitted to use trade names, trademarks, service marks, or 
 product names of Ascensio System SIA, except as required for reasonable and 
 customary use of ONLYOFFICE.
-4.7. You may not install and run an ONLYOFFICE Docs Enterprise Edition server 
+4.7. You may not install and run an ONLYOFFICE Docs Integration Edition server 
 software instance in more than one physical location at the same time, or on 
 more than one active Virtual Machine at the same time integrated into more than 
-one Platform, per one ONLYOFFICE Docs Enterprise Edition license purchased.
+one Platform, per one ONLYOFFICE Docs Integration Edition license purchased.
 
 5. Support and services
 5.1. We will provide you with consulting help and updates for ONLYOFFICE Docs 
-Enterprise Edition once they are available during the period defined by the 
+Integration Edition once they are available during the period defined by the 
 pricing plan selected from the Effective Date.
 5.2. Our services include 
-    • provision of updates for ONLYOFFICE Docs Enterprise Edition once they 
+    • provision of updates for ONLYOFFICE Docs Integration Edition once they 
 are available during the period defined by the pricing plan selected,
     • technical consulting services during the period defined by the pricing 
 plan selected.
@@ -129,36 +129,36 @@ plan selected.
 5.4. If you need consulting help when using ONLYOFFICE you may file a request 
 by submitting the form at https://www.onlyoffice.com/support-contact-form.aspx.
 5.5. We do not provide technical consulting services for the versions of 
-ONLYOFFICE Docs Enterprise Edition provided for free.
+ONLYOFFICE Docs Integration Edition provided for free.
 
 6. Additional Restrictions
 6.1. You should not make your License Key(s) available to any third persons 
 that do not have access to your copy of ONLYOFFICE. You should take any 
 reasonable measures with a view to prevent such third persons from receiving 
 your License Key(s).
-6.2. You must use one License Key per one copy of ONLYOFFICE Docs Enterprise 
+6.2. You must use one License Key per one copy of ONLYOFFICE Docs Integration 
 Edition depending on your pricing plan.
 6.3. You should not try to disassemble, reverse engineer, analyze, decompile or 
-convert your copy of ONLYOFFICE Docs Enterprise Edition or permit third parties 
+convert your copy of ONLYOFFICE Docs Integration Edition or permit third parties 
 to do so.
 
 7. Term and Termination
-7.1. Your License for ONLYOFFICE Docs Enterprise Edition is perpetual. You are 
+7.1. Your License for ONLYOFFICE Docs Integration Edition is perpetual. You are 
 granted the right to get free updates and support during the period defined by 
 the pricing plan selected by you in accordance with our official website at 
 www.onlyoffice.com.
-7.2. You may cease to use ONLYOFFICE Docs Enterprise Edition at any time. 
-7.3. We may deprive you of the right to use ONLYOFFICE Docs Enterprise Edition 
+7.2. You may cease to use ONLYOFFICE Docs Integration Edition at any time. 
+7.3. We may deprive you of the right to use ONLYOFFICE Docs Integration Edition 
 if you do not comply with this Agreement. 
 
 8. Warranties and Limitation of Liability
-8.1 ONLYOFFICE Docs Enterprise Edition and all related services are provided 
+8.1 ONLYOFFICE Docs Integration Edition and all related services are provided 
 "as is" without any warranties unless otherwise specified in this Agreement.
 8.2 To the maximum extent permitted by law, we exclude all warranties unless 
 otherwise specified in this Agreement.
 8.3 We and/or any of our subsidiaries, employees, agents and affiliates are not 
 liable for any loss or damage that may arise to you under or in connection with 
-this Agreement or by using or in connection with ONLYOFFICE Docs Enterprise 
+this Agreement or by using or in connection with ONLYOFFICE Docs Integration 
 Edition, including but not limited to any (direct or indirect) monetary loss, 
 loss of contracts, goodwill, reputation and any loss that may arise from 
 interruption of the business or any other type of loss or damage.
@@ -176,21 +176,21 @@ authorizations, consents, approvals and permits to enter into and perform our
 obligations under this Agreement;
 (d) we own, have obtained or shall obtain valid licenses for all Intellectual 
 Property Rights that are necessary for the performance of our obligations under 
-this Agreement and the use of ONLYOFFICE Docs Enterprise Edition by you;
-(e) ONLYOFFICE Docs Enterprise Edition is and shall remain in compliance with 
+this Agreement and the use of ONLYOFFICE Docs Integration Edition by you;
+(e) ONLYOFFICE Docs Integration Edition is and shall remain in compliance with 
 the Specification set out on our official website www.onlyoffice.com;
-(f) ONLYOFFICE Docs Enterprise Edition and all upgrades to ONLYOFFICE Docs 
-Enterprise Edition provided or released by us shall not infringe any third 
+(f) ONLYOFFICE Docs Integration Edition and all upgrades to ONLYOFFICE Docs 
+Integration Edition provided or released by us shall not infringe any third 
 party’s Intellectual Property Rights and shall be free from material errors 
 and defects.
 8.6 We shall indemnify you in full and on demand against all claims, demands, 
 actions, costs, expenses (including legal costs and disbursements), losses and 
 damages arising from or incurred by reason of (i) any infringement of any 
-Intellectual Property Right by ONLYOFFICE Docs Enterprise Edition or the 
+Intellectual Property Right by ONLYOFFICE Docs Integration Edition or the 
 services; or (ii) any breach of the warranties in clause 8.5.
 8.7 We shall promptly notify you if any claim or demand is made or action 
 brought against us for infringement of any Intellectual Property right that may 
-affect our supply of ONLYOFFICE Docs Enterprise Edition or provision of the 
+affect our supply of ONLYOFFICE Docs Integration Edition or provision of the 
 Services.
 8.8 You shall immediately notify us in case of loss or compromise or suspected 
 compromise of License Key.
