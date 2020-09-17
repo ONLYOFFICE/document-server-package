@@ -32,21 +32,21 @@ ONLYOFFICE Docs Enterprise Edition.
 1. License Grant
 1.1. You are hereby granted a non-exclusive, non-transferable license to 
 install and use in accordance with this Agreement.
-1.1	We grant you a non-exclusive, worldwide license to use ONLYOFFICE Docs 
+1.1 We grant you a non-exclusive, worldwide license to use ONLYOFFICE Docs 
 Enterprise Edition  for your own purposes on the certain number of Locations 
 and with the maximum Number of concurrent connections limited by the License 
 Type.
-1.2	We will provide you with a License Key which will allow you to use 
+1.2 We will provide you with a License Key which will allow you to use 
 ONLYOFFICE Docs Enterprise Edition  and get updates for the period specified in 
 Section 6. 
-1.4	You do not acquire any exclusive (economic) rights to ONLYOFFICE or any 
+1.4 You do not acquire any exclusive (economic) rights to ONLYOFFICE or any 
 connected documentation according to this Agreement and we are not alienating 
 any rights.
-1.5	You shall pay to us a License Fee in amount specified on our official 
+1.5 You shall pay to us a License Fee in amount specified on our official 
 website www.onlyoffice.com.
-1.6	You are granted to use ONLYOFFICE Docs Enterprise Edition  for 
+1.6 You are granted to use ONLYOFFICE Docs Enterprise Edition  for 
 legitimate purposes only.
-1.7	You are granted to use ONLYOFFICE Docs Enterprise Edition to conduct 
+1.7 You are granted to use ONLYOFFICE Docs Enterprise Edition to conduct 
 certain activities specified for the selected License Type. Any other activity 
 which is not indicated in this Agreement and is not allowed by governing law 
 shall be considered as infringement of exclusive (economic) rights.
