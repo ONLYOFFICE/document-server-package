@@ -371,7 +371,7 @@ ifeq ($(PRODUCT_NAME_LOW), documentserver)
 	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataMemory\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
 
-ifeq ($(PRODUCT_NAME_LOW), $(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
+ifeq ($(PRODUCT_NAME_LOW), $(filter $(PRODUCT_NAME_LOW),documentserver-ee documentserver-ie))
 	sed 's|\("packageType": \)[0-9]\+\(.*\)|\11\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 	sed 's|\("editorDataStorage": "\).\+\(".*\)|\1editorDataRedis\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json
 endif
