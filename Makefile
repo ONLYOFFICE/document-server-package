@@ -148,7 +148,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA)
+		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA) $(TAR_REPO_DATA)
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -187,8 +187,6 @@ DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
 DEPLOY += $(DS_BIN_REPO)
 endif
-
-DEPLOY += $(TAR_REPO_DATA)
 
 ISCC := iscc
 ISCC_PARAMS +=	//Qp
