@@ -32,6 +32,20 @@ echo -n Generating presentation themes, please wait...
   --src="$DIR/sdkjs/slide/themes"\
   --output="$DIR/sdkjs/common/Images"
 
+"$DIR/server/tools/allthemesgen"\
+  --converter-dir="$DIR/server/FileConverter/bin"\
+  --src="$DIR/sdkjs/slide/themes"\
+  --output="$DIR/sdkjs/common/Images"\
+  --postfix="ios"\
+  --params="280,224"
+
+"$DIR/server/tools/allthemesgen"\
+  --converter-dir="$DIR/server/FileConverter/bin"\
+  --src="$DIR/sdkjs/slide/themes"\
+  --output="$DIR/sdkjs/common/Images"\
+  --postfix="android"\
+  --params="280,224"
+
 echo Done
 
 #Remove gzipped fonts

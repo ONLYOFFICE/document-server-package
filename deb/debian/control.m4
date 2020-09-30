@@ -1,3 +1,4 @@
+include(variables.m4)
 Source: M4_PACKAGE_NAME
 Section: web
 Priority: optional
@@ -32,6 +33,4 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
   supervisor(>= 3.0b2),
   xvfb,
   zlib1g
-Description: Document Server is an open-source office suite that includes
- collaborative online editors for text documents, spreadsheets,
- and presentations.
+Description: defn(`DEB[Description]')

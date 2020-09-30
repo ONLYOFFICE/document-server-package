@@ -27,6 +27,20 @@ ECHO | SET /p="Generating presentation themes, please wait..."
   --src="%~dp0\..\sdkjs\slide\themes" ^
   --output="%~dp0\..\sdkjs\common\Images"
 
+"%~dp0\..\server\tools\allthemesgen.exe" ^
+  --converter-dir="%~dp0\..\server\FileConverter\bin" ^
+  --src="%~dp0\..\sdkjs\slide\themes" ^
+  --output="%~dp0\..\sdkjs\common\Images" ^
+  --postfix="ios" ^
+  --params="280,224"
+
+"%~dp0\..\server\tools\allthemesgen.exe" ^
+  --converter-dir="%~dp0\..\server\FileConverter\bin" ^
+  --src="%~dp0\..\sdkjs\slide\themes" ^
+  --output="%~dp0\..\sdkjs\common\Images" ^
+  --postfix="android" ^
+  --params="280,224"
+
 ECHO Done
 
 rem Restart web-site and converter
