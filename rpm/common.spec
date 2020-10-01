@@ -262,6 +262,17 @@ if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
 
+# check msttcore-fonts-installer
+rpm -qa | grep msttcore-fonts-installer > msttcore-fonts-out
+OUTFILESIZE=$(stat -c%s "msttcore-fonts-out")
+MAXOUTSIZE=1
+if [ "$OUTFILESIZE" -le "$MAXOUTSIZE" ]
+then
+  echo "The package msttcore-fonts-installer not found"
+  echo "You can install it by command:"
+  echo "    rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
+fi
+
 %preun
 case "$1" in
   0)
