@@ -269,7 +269,9 @@ MAXOUTSIZE=1
 if [ "$OUTFILESIZE" -le "$MAXOUTSIZE" ]
 then
   echo "The package msttcore-fonts-installer not found"
-  echo "You can install it by command:"
+  echo "You can install it by commands:"
+  echo "    yum install cabextract"
+  echo "    yum install xorg-x11-font-utils"
   echo "    rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
 fi
 
