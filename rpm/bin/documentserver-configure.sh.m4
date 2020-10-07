@@ -224,7 +224,7 @@ execute_postgres_scripts(){
                 $CREATEDB $DB_NAME >/dev/null 2>&1
         fi
 
-        if [ ! "$CLUSTER_MODE" = true ]; then
+        if [ ! "$CLUSTER_MODE" == true ]; then
                 $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
         fi
 	
