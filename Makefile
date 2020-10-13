@@ -210,6 +210,7 @@ DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-spellchecker.conf
+COMMON_DEPS += common/documentserver/nginx/includes/ds-letsencrypt.conf
 COMMON_DEPS += common/documentserver/nginx/includes/http-common.conf
 COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl

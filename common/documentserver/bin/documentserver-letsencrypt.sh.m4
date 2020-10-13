@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LETSENCRYPT_ROOT_DIR="/etc/letsencrypt/live";
-ROOT_DIR="/var/www/M4_COMPANY_NAME/Data/certs";
+ROOT_DIR="M4_DS_ROOT/../Data/certs";
 
 LETS_ENCRYPT_MAIL=none
 LETS_ENCRYPT_DOMAIN=none

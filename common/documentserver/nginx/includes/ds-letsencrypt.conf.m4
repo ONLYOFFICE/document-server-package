@@ -1,4 +1,4 @@
 location ~ /.well-known/acme-challenge {
-  root /var/www/M4_COMPANY_NAME/Data/certs/;
+  root M4_DS_ROOT/../Data/certs/;
   allow all;
 }
