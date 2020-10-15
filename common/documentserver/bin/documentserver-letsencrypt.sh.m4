@@ -15,6 +15,9 @@ if [ "$2" != "" ]; then
     LETS_ENCRYPT_DOMAIN=$2
 fi
 
+SSL_CERT="${LETSENCRYPT_ROOT_DIR}/${LETS_ENCRYPT_DOMAIN}/fullchain.pem";
+SSL_KEY="${LETSENCRYPT_ROOT_DIR}/${LETS_ENCRYPT_DOMAIN}/privkey.pem";
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 mkdir -p ${ROOT_DIR}
@@ -23,9 +26,11 @@ echo certbot certonly --expand --webroot -w ${ROOT_DIR} --noninteractive --agree
 
 certbot certonly --expand --webroot -w ${ROOT_DIR} --noninteractive --agree-tos --email $LETS_ENCRYPT_MAIL -d $LETS_ENCRYPT_DOMAIN > /var/log/le-new.log
 
-cp -f ${NGINX_CONF_DIR}/ds-ssl.conf.tmpl ${NGINX_CONF_DIR}/ds.conf
-sed 's,{{SSL_CERTIFICATE_PATH}},'"${LETSENCRYPT_ROOT_DIR}/${LETS_ENCRYPT_DOMAIN}/fullchain.pem"',' -i ${NGINX_CONF_DIR}/ds.conf
-sed 's,{{SSL_KEY_PATH}},'"${LETSENCRYPT_ROOT_DIR}/${LETS_ENCRYPT_DOMAIN}/privkey.pem"',' -i ${NGINX_CONF_DIR}/ds.conf
+if [ -f ${SSL_CERT} -a -f ${SSL_KEY} ]; then
+    cp -f ${NGINX_CONF_DIR}/ds-ssl.conf.tmpl ${NGINX_CONF_DIR}/ds.conf
+    sed 's,{{SSL_CERTIFICATE_PATH}},'"${SSL_CERT}"',' -i ${NGINX_CONF_DIR}/ds.conf
+    sed 's,{{SSL_KEY_PATH}},'"${SSL_KEY}"',' -i ${NGINX_CONF_DIR}/ds.conf
+fi
 
 service nginx reload
 
