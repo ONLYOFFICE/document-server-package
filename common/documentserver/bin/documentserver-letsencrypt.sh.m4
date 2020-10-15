@@ -2,7 +2,6 @@
 
 LETSENCRYPT_ROOT_DIR="/etc/letsencrypt/live";
 ROOT_DIR="M4_DS_ROOT/../Data/le";
-CERTS_DIR="M4_DS_ROOT/../Data/certs";
 NGINX_CONF_DIR="/etc/M4_DS_PREFIX/nginx";
 
 LETS_ENCRYPT_MAIL=none
@@ -19,7 +18,6 @@ fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 mkdir -p ${ROOT_DIR}
-mkdir -p ${CERTS_DIR}
 
 echo certbot certonly --expand --webroot -w ${ROOT_DIR} --noninteractive --agree-tos --email $LETS_ENCRYPT_MAIL -d $LETS_ENCRYPT_DOMAIN > /var/log/le-start.log
 
