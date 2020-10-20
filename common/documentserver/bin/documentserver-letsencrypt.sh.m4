@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LETSENCRYPT_ROOT_DIR="/etc/letsencrypt/live";
-ROOT_DIR="M4_DS_ROOT/../Data/le";
+ROOT_DIR="M4_DS_ROOT/letsencrypt";
 NGINX_CONF_DIR="/etc/M4_DS_PREFIX/nginx";
 
 LETS_ENCRYPT_MAIL=none
