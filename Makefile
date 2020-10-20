@@ -109,7 +109,7 @@ WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
-OFFICIAL_PRODUCT_NAME := 'Comunity Edition'
+OFFICIAL_PRODUCT_NAME := 'Community Edition'
 endif
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
