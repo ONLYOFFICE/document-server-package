@@ -108,6 +108,10 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
 
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
+OFFICIAL_PRODUCT_NAME := 'Comunity Edition'
+endif
+
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
 OFFICIAL_PRODUCT_NAME := 'Enterprise Edition'
 endif
