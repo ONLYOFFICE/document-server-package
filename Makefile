@@ -440,9 +440,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_ds_prefix $(DS_PREFIX)' \
 		$(PACKAGE_NAME).spec
 
-ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-ee onlyoffice-documentserver-de onlyoffice-documentserver-ie))
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
-endif
 
 %.sh : %.sh.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
