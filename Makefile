@@ -108,6 +108,10 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
 
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
+OFFICIAL_PRODUCT_NAME := 'Community Edition'
+endif
+
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
 OFFICIAL_PRODUCT_NAME := 'Enterprise Edition'
 endif
@@ -440,7 +444,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_ds_prefix $(DS_PREFIX)' \
 		$(PACKAGE_NAME).spec
 
-ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-ee onlyoffice-documentserver-de onlyoffice-documentserver-ie))
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 
