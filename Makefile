@@ -444,7 +444,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_ds_prefix $(DS_PREFIX)' \
 		$(PACKAGE_NAME).spec
 
-ifeq ($(PACKAGE_NAME),$(filter onlyoffice%,$(PACKAGE_NAME)))
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 
