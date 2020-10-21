@@ -20,7 +20,7 @@ if [ "$#" -ge "2" ]; then
     certbot certonly --expand --webroot -w ${ROOT_DIR} --noninteractive --agree-tos --email $LETS_ENCRYPT_MAIL -d $LETS_ENCRYPT_DOMAIN > /var/log/le-new.log
 
     if [ -f ${SSL_CERT} -a -f ${SSL_KEY} ]; then
-        if [ -f ${NGINX_CONF_DIR}/ds-ssl.conf.tmpl ];then
+        if [ -f ${NGINX_CONF_DIR}/ds-ssl.conf.tmpl ]; then
             cp -f ${NGINX_CONF_DIR}/ds-ssl.conf.tmpl ${NGINX_CONF_DIR}/ds.conf
             sed 's,{{SSL_CERTIFICATE_PATH}},'"${SSL_CERT}"',' -i ${NGINX_CONF_DIR}/ds.conf
             sed 's,{{SSL_KEY_PATH}},'"${SSL_KEY}"',' -i ${NGINX_CONF_DIR}/ds.conf
