@@ -107,30 +107,27 @@ install_db() {
 }
 
 install_postges() {
-	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -U$DB_USER -w"
+	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
 	if [ -n $DB_PWD ]; then
 		export PGPASSWORD="$DB_PWD"
 	fi
 	PSQL="psql -q $CONNECTION_PARAMS"
-	CREATEDB="createdb $CONNECTION_PARAMS"
+	
 	# test postgresql connection
 	set +e
 		$PSQL -c ";" &>/dev/null
 		ERRCODE=$?
 		if [ $ERRCODE -ne 0 ]; then
 			service postgresql start &>/dev/null
-			$PSQL -d $DB_NAME -c ";" &>/dev/null || \
+			$PSQL -c ";" &>/dev/null || \
 				{ echo "ERROR: can't connect to postgressql database"; exit 1; }
 		fi
 	set -e
-		if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
-			$CREATEDB $DB_NAME >/dev/null 2>&1
-		fi
 		if [ ! $CLUSTER_MODE = true ]; then
-			$PSQL -d $DB_NAME -f "$DIR/server/schema/postgresql/removetbl.sql" \
+			$PSQL -f "$DIR/server/schema/postgresql/removetbl.sql" \
 				>/dev/null 2>&1
 		fi
-		$PSQL -d $DB_NAME -f "$DIR/server/schema/postgresql/createdb.sql" \
+		$PSQL -f "$DIR/server/schema/postgresql/createdb.sql" \
 			>/dev/null 2>&1
 }
 
