@@ -254,13 +254,11 @@ establish_postgres_conn() {
 
 	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
 
-        CONNECTION_PARAMS="-h$DB_HOST -d$DB_NAME -U$DB_USER -w"
         if [ -n "$DB_PWD" ]; then
                 export PGPASSWORD=$DB_PWD
         fi
 
-        PSQL="psql -q $CONNECTION_PARAMS"
-
+        PSQL="psql -q -h$DB_HOST -d$DB_NAME -U$DB_USER -w"
 	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
 	echo "OK"
