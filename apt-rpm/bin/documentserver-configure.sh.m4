@@ -257,8 +257,8 @@ establish_postgres_conn() {
         if [ -n "$DB_PWD" ]; then
                 export PGPASSWORD=$DB_PWD
         fi
-
-        PSQL="psql -q -h$DB_HOST -d$DB_NAME -U$DB_USER -w"
+	
+	PSQL="psql -q -h$DB_HOST -d$DB_NAME -U$DB_USER -w"
 	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
 	echo "OK"
