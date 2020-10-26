@@ -107,11 +107,10 @@ install_db() {
 }
 
 install_postges() {
-	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
 	if [ -n $DB_PWD ]; then
 		export PGPASSWORD="$DB_PWD"
 	fi
-	PSQL="psql -q $CONNECTION_PARAMS"
+	PSQL="psql -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
 	# test postgresql connection
 	set +e
 		$PSQL -c ";" &>/dev/null
