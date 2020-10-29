@@ -370,6 +370,8 @@ setup_nginx(){
   done
 }
 
+chmod 555 -R $DIR
+
 create_local_configs
 
 input_db_params
