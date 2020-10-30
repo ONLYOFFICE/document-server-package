@@ -300,7 +300,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		mkdir -p "$DIR/../Data" #! 
 		mkdir -p "$DIR/fonts"
 		chown ds:ds -R "$DIR"
-		chmod 555 -R "$DIR"
+		find "$DIR" -type d -exec chmod 555 {} \;
 
     #setup logrotate config rights
     chmod 644 ${CONF_DIR}/logrotate/*

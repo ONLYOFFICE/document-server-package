@@ -164,6 +164,7 @@ rm -rf "%{buildroot}"
 
 %files
 %attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*/*
+%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/*.json
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
 
