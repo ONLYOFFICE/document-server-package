@@ -164,7 +164,6 @@ rm -rf "%{buildroot}"
 
 %files
 %attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*/*
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/*.json
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
 
@@ -228,6 +227,8 @@ chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 %if %{defined example}
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
+
+find %{_localstatedir}/www/%{_ds_prefix}/ -type d -exec chmod 555 {} \;
 
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
