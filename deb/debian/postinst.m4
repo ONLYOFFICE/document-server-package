@@ -324,10 +324,12 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 		# call db_stop to prevent installation hang
 		db_stop
-
+		
 		# restart dependent services
 		service supervisor restart >/dev/null 2>&1
 		service nginx restart >/dev/null 2>&1
+		
+		create_trigger
 		
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 	;;
