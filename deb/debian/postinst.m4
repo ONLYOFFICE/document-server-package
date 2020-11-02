@@ -265,6 +265,16 @@ setup_nginx(){
 
 }
 
+create_trigger(){
+	local TRIGGER_DIR="/var/lib/dpkg/triggers"
+	
+	if ! grep -q M4_PACKAGE_NAME ${TRIGGER_DIR}/File; then
+		sudo sed -i "$ a /usr/share/fonts M4_PACKAGE_NAME/noawait" ${TRIGGER_DIR}/File
+		sudo sed -i "$ a /usr/share/ghostscript/fonts M4_PACKAGE_NAME/noawait" ${TRIGGER_DIR}/File
+		sudo sed -i "$ a /usr/share/texmf/fonts M4_PACKAGE_NAME/noawait" ${TRIGGER_DIR}/File
+	fi
+}
+
 case "$1" in
 	configure)
 		adduser --quiet --home "$DIR" --system --group ds
@@ -324,7 +334,11 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 	abort-upgrade|abort-remove|abort-deconfigure)
 	;;
-
+	
+	triggered)
+		documentserver-generate-allfonts.sh true
+	;;
+	
 	*)
 		echo "postinst called with unknown argument \`$1'" >&2
 		exit 1
