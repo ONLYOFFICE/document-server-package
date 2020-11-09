@@ -166,18 +166,18 @@ rm -rf "%{buildroot}"
 %defattr(444, ds, ds, 555)
 %attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*
 %defattr(644, ds, ds, 755)
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/example
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/npm/json
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/SpellChecker/node_modules/nodehun/build/Release/nodehun.node
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/SpellChecker/spellchecker
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/converter
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/docbuilder
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/x2t
-%attr(555, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/example
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/npm/json
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/SpellChecker/node_modules/nodehun/build/Release/nodehun.node
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/SpellChecker/spellchecker
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/converter
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/docbuilder
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/x2t
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
 
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/*.json
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
@@ -243,7 +243,6 @@ chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 %if %{defined example}
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
-
 
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
