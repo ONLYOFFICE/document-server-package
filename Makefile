@@ -477,7 +477,7 @@ $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
-	tar -cvzf $(TAR) $(PRODUCT_SHORT_NAME_LOW)-snap
+	tar -czf $(TAR) $(PRODUCT_SHORT_NAME_LOW)-snap
 
 $(ISXDL):
 	$(TOUCH) $(ISXDL) && \
