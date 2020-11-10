@@ -297,7 +297,7 @@ exe: $(EXE)
 tar: $(TAR)
 
 clean:
-	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
+	rm -rf $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
