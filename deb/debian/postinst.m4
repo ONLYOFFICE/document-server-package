@@ -286,9 +286,6 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		setup_nginx
 
 		# modify permissions for M4_ONLYOFFICE_VALUE files and folders
-		find "$DIR" -type d -exec chmod 555 {} \;
-		find "$DIR" -type f -perm 755 -exec chmod 550 {} \;
-
 		mkdir -p "$LOG_DIR/docservice"
 		mkdir -p "$LOG_DIR-example"
 		mkdir -p "$LOG_DIR/converter"

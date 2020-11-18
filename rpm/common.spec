@@ -163,27 +163,11 @@ symlinks -c \
 rm -rf "%{buildroot}"
 
 %files
-%defattr(444, ds, ds, 555)
-%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*
-%defattr(644, ds, ds, 755)
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/example
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/npm/json
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/SpellChecker/node_modules/nodehun/build/Release/nodehun.node
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/SpellChecker/spellchecker
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/converter
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/docbuilder
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/x2t
-%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/HtmlFileInternal/HtmlFileInternal
-
+%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*/*
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/*.json
 %config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
 
 %config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/nginx/includes/*
-%dir %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}/nginx
 %config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}/nginx/*.tmpl
 
 %config(noreplace) %{_sysconfdir}/%{_ds_prefix}/nginx/ds.conf
@@ -191,8 +175,8 @@ rm -rf "%{buildroot}"
 %config %attr(644, root, root) %{_sysconfdir}/%{_ds_prefix}/logrotate/*
 %config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
 
-%attr(555, root, root) %{_libdir}/*.so*
-%attr(544, root, root) %{_bindir}/documentserver-*.sh
+%attr(-, root, root) %{_libdir}/*.so*
+%attr(-, root, root) %{_bindir}/documentserver-*.sh
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/*
 %attr(-, root, root) %{_sysconfdir}/supervisord.d/*
