@@ -499,9 +499,8 @@ deploy-tar: $(TAR)
 deploy-bin: $(DS_BIN)
 	mkdir -p $(DS_BIN_REPO)
 	cp -rv $(dir $(DS_BIN)) $(DS_BIN_REPO)
-	aws s3 sync \
+	aws s3 sync --no-progress --acl public-read \
 		$(DS_BIN_REPO) \
-		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
-		--acl public-read
+		s3://$(S3_BUCKET)/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/
 
 deploy: $(DEPLOY)
