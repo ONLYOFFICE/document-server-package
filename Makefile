@@ -18,6 +18,9 @@ SUPPORT_MAIL ?= support@onlyoffice.com
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
+S3_BUCKET ?= repo-doc-onlyoffice-com
+REPO_BRANCH ?= develop
+
 BRANDING_DIR ?= ./branding
 
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
@@ -35,36 +38,6 @@ APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
 TAR_PACKAGE_DIR = $(PWD)
-
-TAR_REPO := repo-tar
-TAR_REPO_DATA := $(TAR_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).tar.gz
-TAR_REPO_DIR = tar
-
-DEB_REPO := $(PWD)/repo
-DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
-
-APT_RPM_REPO := $(PWD)/repo-apt-rpm
-APT_RPM_REPO_DATA := $(APT_RPM_REPO)/repodata
-
-RPM_REPO := $(PWD)/repo-rpm
-RPM_REPO_DATA := $(RPM_REPO)/repodata
-
-EXE_REPO := repo-exe
-EXE_REPO_DATA := $(EXE_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
-
-APT_RPM_REPO_OS_NAME = ALTLinux
-APT_RPM_REPO_OS_VER = p8
-APT_RPM_REPO_DIR = $(APT_RPM_REPO_OS_NAME)/$(APT_RPM_REPO_OS_VER)
-
-RPM_REPO_OS_NAME = centos
-RPM_REPO_OS_VER = 7
-RPM_REPO_DIR = $(RPM_REPO_OS_NAME)/$(RPM_REPO_OS_VER)
-
-DEB_REPO_OS_NAME = ubuntu
-DEB_REPO_OS_VER = trusty
-DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
-
-EXE_REPO_DIR = windows
 
 APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
@@ -131,7 +104,7 @@ ifeq ($(OS),Windows_NT)
 	SHARED_EXT := .dll
 	ARCH_EXT := .zip
 	AR := 7z a -y
-	DEPLOY := $(EXE_REPO_DATA)
+	DEPLOY = deploy-exe
 	NGINX_CONF := includes
 	NGINX_LOG := logs
 	DS_ROOT := ..
@@ -152,7 +125,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA) $(TAR_REPO_DATA)
+		DEPLOY = deploy-deb deploy-rpm deploy-tar deploy-apt-rpm
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -304,9 +277,6 @@ clean:
 		$(ISXDL)\
 		$(NGINX)\
 		$(NSSM)\
-		$(DEB_REPO)\
-		$(RPM_REPO)\
-		$(EXE_REPO)\
 		$(DS_BIN_REPO)\
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
@@ -506,92 +476,27 @@ $(NSSM):
 	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
 	rm -f $(NSSM_ZIP)
 
-$(RPM_REPO_DATA): $(RPM)
-	rm -rfv $(RPM_REPO)
-	mkdir -p $(RPM_REPO)
+deploy-rpm: $(RPM)
+	aws s3 cp --no-progress --acl public-read \
+		$(RPM) s3://$(S3_BUCKET)/$(RPM_URI)
 
-	cp -rv $(RPM) $(RPM_REPO);
-	createrepo -v $(RPM_REPO);
+deploy-apt-rpm: $(APT_RPM)
+	aws s3 cp --no-progress --acl public-read \
+		$(APT_RPM) s3://$(S3_BUCKET)/$(APT_RPM_URI)
 
-	aws s3 sync \
-		$(RPM_REPO) \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
+deploy-deb: $(DEB)
+	aws s3 cp --no-progress --acl public-read \
+		$(DEB) s3://$(S3_BUCKET)/$(DEB_URI)
 
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
+deploy-exe: $(EXE)
+	aws s3 cp --no-progress --acl public-read \
+		$(EXE) s3://$(S3_BUCKET)/$(EXE_URI)
 
-$(APT_RPM_REPO_DATA): $(APT_RPM)
-	rm -rfv $(APT_RPM_REPO)
-	mkdir -p $(APT_RPM_REPO)
+deploy-tar: $(TAR)
+	aws s3 cp --no-progress --acl public-read \
+		$(TAR) s3://$(S3_BUCKET)/$(TAR_URI)
 
-	cp -rv $(APT_RPM) $(APT_RPM_REPO);
-	#createrepo -v $(APT_RPM_REPO);
-
-	aws s3 sync \
-		$(APT_RPM_REPO) \
-		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
-
-$(DEB_REPO_DATA): $(DEB)
-	rm -rfv $(DEB_REPO)
-	mkdir -p $(DEB_REPO)
-
-	cp -rv $(DEB) $(DEB_REPO);
-	dpkg-scanpackages -m repo /dev/null | gzip -9c > $(DEB_REPO_DATA)
-
-	aws s3 sync \
-		$(DEB_REPO) \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
-		--acl public-read --delete
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
-		--acl public-read --delete
-
-$(EXE_REPO_DATA): $(EXE)
-	rm -rfv $(EXE_REPO)
-	mkdir -p $(EXE_REPO)
-
-	cp -rv $(EXE) $(EXE_REPO);
-
-	aws s3 sync \
-		$(EXE_REPO) \
-		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
-
-$(TAR_REPO_DATA): $(TAR)
-	rm -rfv $(TAR_REPO)
-	mkdir -p $(TAR_REPO)
-
-	cp -rv $(TAR) $(TAR_REPO);
-
-	aws s3 sync \
-		$(TAR_REPO) \
-		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
-
-deploy-bin: $(DS_BIN_REPO)
-
-$(DS_BIN_REPO): $(DS_BIN)
+deploy-bin: $(DS_BIN)
 	mkdir -p $(DS_BIN_REPO)
 	cp -rv $(dir $(DS_BIN)) $(DS_BIN_REPO)
 	aws s3 sync \
