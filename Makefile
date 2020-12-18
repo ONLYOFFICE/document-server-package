@@ -168,7 +168,7 @@ DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
-DEPLOY += $(DS_BIN_REPO)
+DEPLOY += deploy-bin
 endif
 
 ISCC := iscc
