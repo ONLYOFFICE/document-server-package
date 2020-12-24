@@ -522,13 +522,13 @@ $(DEPLOY_JSON):
 ifeq ($(PLATFORM), win)
 	cat <<< $$(jq '.items += [{ \
 		platform: "windows", \
-		title: "Windows 64-bit", \
+		title: "Windows Server 2012 64-bit", \
 		path: "$(EXE_URI)" }]' $@) > $@
 endif
 ifeq ($(PLATFORM), linux)
 	cat <<< $$(jq '.items += [{ \
 		platform: "ubuntu", \
-		title: "Debian 8 9, Ubuntu 14.04 16.04 18.04 and derivatives", \
+		title: "Debian 8 9 10, Ubuntu 14 16 18 20 and derivatives", \
 		path: "$(DEB_URI)" }]' $@) > $@
 	cat <<< $$(jq '.items += [{ \
 		platform: "centos", \
@@ -536,7 +536,7 @@ ifeq ($(PLATFORM), linux)
 		path: "$(RPM_URI)" }]' $@) > $@
 	cat <<< $$(jq '.items += [{ \
 		platform: "ubuntu", \
-		title: "Altlinux p8", \
+		title: "Altlinux p8 p9", \
 		path: "$(APT_RPM_URI)" }]' $@) > $@
 	cat <<< $$(jq '.items += [{ \
 		platform: "linux", \
