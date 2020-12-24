@@ -535,7 +535,7 @@ ifeq ($(PLATFORM), linux)
 		title: "Centos 7, Redhat 7, Fedora latest and derivatives", \
 		path: "$(RPM_URI)" }]' $@) > $@
 	cat <<< $$(jq '.items += [{ \
-		platform: "ubuntu", \
+		platform: "altlinux", \
 		title: "Altlinux p8 p9", \
 		path: "$(APT_RPM_URI)" }]' $@) > $@
 	cat <<< $$(jq '.items += [{ \
