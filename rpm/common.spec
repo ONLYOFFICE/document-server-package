@@ -231,6 +231,12 @@ chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}-example
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
 
+%filetriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
+documentserver-generate-allfonts.sh true
+
+%filetriggerun -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
+documentserver-generate-allfonts.sh true
+
 # check whethere enabled
 shopt -s nocasematch
 PORTS=()
