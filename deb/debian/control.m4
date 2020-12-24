@@ -33,5 +33,4 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
   supervisor(>= 3.0b2),
   xvfb,
   zlib1g
-Recommends: ttf-mscorefonts-installer
 Description: defn(`DEB[Description]')

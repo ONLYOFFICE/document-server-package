@@ -72,7 +72,6 @@ save_db_params(){
 save_rabbitmq_params(){
 	$JSON -e "if(this.queue===undefined)this.queue={};"
 	$JSON -e "this.queue.type = 'rabbitmq'"
-	$JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
 	$JSON -e "this.rabbitmq.url = '${AMQP_SERVER_URL}'"
 }
 
@@ -245,7 +244,7 @@ execute_postgres_scripts(){
                 $CREATEDB $DB_NAME >/dev/null 2>&1
         fi
 
-        if [ ! "$CLUSTER_MODE" = true ]; then
+        if [ ! "$CLUSTER_MODE" == true ]; then
                 $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
         fi
 
