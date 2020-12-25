@@ -111,6 +111,8 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
 
+DEPLOY_JSON = deploy.json
+
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 OFFICIAL_PRODUCT_NAME := 'Community Edition'
 endif
@@ -322,6 +324,7 @@ clean:
 		$(WIN_DEPS)\
 		deb/debian/$(PACKAGE_NAME)\
 		deb/debian/$(PACKAGE_NAME).*\
+		$(DEPLOY_JSON)\
 		documentserver\
 		documentserver-example
 		
@@ -603,4 +606,36 @@ $(DS_BIN_REPO): $(DS_BIN)
 		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
 		--acl public-read --no-progress
 
-deploy: $(DEPLOY)
+$(DEPLOY_JSON):
+	echo '{}' > $@
+	cat <<< $$(jq '. + { \
+		product: "$(PRODUCT_NAME_LOW)", \
+		version: "$(PRODUCT_VERSION)", \
+		build: "$(BUILD_NUMBER)" \
+		}' $@) > $@
+ifeq ($(PLATFORM), win)
+	cat <<< $$(jq '.items += [{ \
+		platform: "windows", \
+		title: "Windows Server 2012 64-bit", \
+		path: "$(EXE_URI)" }]' $@) > $@
+endif
+ifeq ($(PLATFORM), linux)
+	cat <<< $$(jq '.items += [{ \
+		platform: "ubuntu", \
+		title: "Debian 8 9 10, Ubuntu 14 16 18 20 and derivatives", \
+		path: "$(DEB_URI)" }]' $@) > $@
+	cat <<< $$(jq '.items += [{ \
+		platform: "centos", \
+		title: "Centos 7, Redhat 7, Fedora latest and derivatives", \
+		path: "$(RPM_URI)" }]' $@) > $@
+	cat <<< $$(jq '.items += [{ \
+		platform: "altlinux", \
+		title: "Altlinux p8 p9", \
+		path: "$(APT_RPM_URI)" }]' $@) > $@
+	cat <<< $$(jq '.items += [{ \
+		platform: "linux", \
+		title: "Linux portable", \
+		path: "$(TAR_URI)" }]' $@) > $@
+endif
+
+deploy: $(DEPLOY) $(DEPLOY_JSON)
