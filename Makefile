@@ -18,6 +18,9 @@ SUPPORT_MAIL ?= support@onlyoffice.com
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
+S3_BUCKET ?= repo-doc-onlyoffice-com
+RELEASE_BRANCH ?= unstable
+
 BRANDING_DIR ?= ./branding
 
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
@@ -29,42 +32,12 @@ DEB_ARCH = amd64
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
 DEB_BUILD_DIR = $(PWD)
-EXE_BUILD_DIR = $(PWD)/exe
+EXE_BUILD_DIR = exe
 
 APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
 TAR_PACKAGE_DIR = $(PWD)
-
-TAR_REPO := repo-tar
-TAR_REPO_DATA := $(TAR_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).tar.gz
-TAR_REPO_DIR = tar
-
-DEB_REPO := $(PWD)/repo
-DEB_REPO_DATA := $(DEB_REPO)/Packages.gz
-
-APT_RPM_REPO := $(PWD)/repo-apt-rpm
-APT_RPM_REPO_DATA := $(APT_RPM_REPO)/repodata
-
-RPM_REPO := $(PWD)/repo-rpm
-RPM_REPO_DATA := $(RPM_REPO)/repodata
-
-EXE_REPO := repo-exe
-EXE_REPO_DATA := $(EXE_REPO)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
-
-APT_RPM_REPO_OS_NAME = ALTLinux
-APT_RPM_REPO_OS_VER = p8
-APT_RPM_REPO_DIR = $(APT_RPM_REPO_OS_NAME)/$(APT_RPM_REPO_OS_VER)
-
-RPM_REPO_OS_NAME = centos
-RPM_REPO_OS_VER = 7
-RPM_REPO_DIR = $(RPM_REPO_OS_NAME)/$(RPM_REPO_OS_VER)
-
-DEB_REPO_OS_NAME = ubuntu
-DEB_REPO_OS_VER = trusty
-DEB_REPO_DIR = $(DEB_REPO_OS_NAME)/$(DEB_REPO_OS_VER)
-
-EXE_REPO_DIR = windows
 
 APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
@@ -72,15 +45,18 @@ DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION).tar.gz
 
+EXE_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/windows/$(notdir $(EXE))
+DEB_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/ubuntu/$(notdir $(DEB))
+RPM_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/centos/$(notdir $(RPM))
+TAR_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/linux/$(notdir $(TAR))
+APT_RPM_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/altlinux/$(notdir $(APT_RPM))
+
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
-DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/core-fonts
-DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/license
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
-DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs-plugins
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
@@ -136,7 +112,7 @@ ifeq ($(OS),Windows_NT)
 	SHARED_EXT := .dll
 	ARCH_EXT := .zip
 	AR := 7z a -y
-	DEPLOY := $(EXE_REPO_DATA)
+	DEPLOY = deploy-exe
 	NGINX_CONF := includes
 	NGINX_LOG := logs
 	DS_ROOT := ..
@@ -157,7 +133,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		DEPLOY := $(APT_RPM_REPO_DATA) $(RPM_REPO_DATA) $(DEB_REPO_DATA) $(TAR_REPO_DATA)
+		DEPLOY = deploy-deb deploy-rpm deploy-tar deploy-apt-rpm
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -194,7 +170,7 @@ DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
-DEPLOY += $(DS_BIN_REPO)
+DEPLOY += deploy-bin
 endif
 
 ISCC := iscc
@@ -219,7 +195,6 @@ DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-spellchecker.conf
-COMMON_DEPS += common/documentserver/nginx/includes/ds-letsencrypt.conf
 COMMON_DEPS += common/documentserver/nginx/includes/http-common.conf
 COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl
@@ -310,9 +285,6 @@ clean:
 		$(ISXDL)\
 		$(NGINX)\
 		$(NSSM)\
-		$(DEB_REPO)\
-		$(RPM_REPO)\
-		$(EXE_REPO)\
 		$(DS_BIN_REPO)\
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
@@ -513,98 +485,32 @@ $(NSSM):
 	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
 	rm -f $(NSSM_ZIP)
 
-$(RPM_REPO_DATA): $(RPM)
-	rm -rfv $(RPM_REPO)
-	mkdir -p $(RPM_REPO)
+deploy-rpm: $(RPM)
+	aws s3 cp --no-progress --acl public-read \
+		$(RPM) s3://$(S3_BUCKET)/$(RPM_URI)
 
-	cp -rv $(RPM) $(RPM_REPO);
-	createrepo -v $(RPM_REPO);
+deploy-apt-rpm: $(APT_RPM)
+	aws s3 cp --no-progress --acl public-read \
+		$(APT_RPM) s3://$(S3_BUCKET)/$(APT_RPM_URI)
 
-	aws s3 sync \
-		$(RPM_REPO) \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete --no-progress
+deploy-deb: $(DEB)
+	aws s3 cp --no-progress --acl public-read \
+		$(DEB) s3://$(S3_BUCKET)/$(DEB_URI)
 
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete --no-progress
+deploy-exe: $(EXE)
+	aws s3 cp --no-progress --acl public-read \
+		$(EXE) s3://$(S3_BUCKET)/$(EXE_URI)
 
-$(APT_RPM_REPO_DATA): $(APT_RPM)
-	rm -rfv $(APT_RPM_REPO)
-	mkdir -p $(APT_RPM_REPO)
+deploy-tar: $(TAR)
+	aws s3 cp --no-progress --acl public-read \
+		$(TAR) s3://$(S3_BUCKET)/$(TAR_URI)
 
-	cp -rv $(APT_RPM) $(APT_RPM_REPO);
-	#createrepo -v $(APT_RPM_REPO);
-
-	aws s3 sync \
-		$(APT_RPM_REPO) \
-		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete --no-progress
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete --no-progress
-
-$(DEB_REPO_DATA): $(DEB)
-	rm -rfv $(DEB_REPO)
-	mkdir -p $(DEB_REPO)
-
-	cp -rv $(DEB) $(DEB_REPO);
-	dpkg-scanpackages -m repo /dev/null | gzip -9c > $(DEB_REPO_DATA)
-
-	aws s3 sync \
-		$(DEB_REPO) \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
-		--acl public-read --delete --no-progress
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
-		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
-		--acl public-read --delete --no-progress
-
-$(EXE_REPO_DATA): $(EXE)
-	rm -rfv $(EXE_REPO)
-	mkdir -p $(EXE_REPO)
-
-	cp -rv $(EXE) $(EXE_REPO);
-
-	aws s3 sync \
-		$(EXE_REPO) \
-		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete --no-progress
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete --no-progress
-
-$(TAR_REPO_DATA): $(TAR)
-	rm -rfv $(TAR_REPO)
-	mkdir -p $(TAR_REPO)
-
-	cp -rv $(TAR) $(TAR_REPO);
-
-	aws s3 sync \
-		$(TAR_REPO) \
-		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete --no-progress
-
-	aws s3 sync \
-		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
-		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete --no-progress
-
-deploy-bin: $(DS_BIN_REPO)
-
-$(DS_BIN_REPO): $(DS_BIN)
+deploy-bin: $(DS_BIN)
 	mkdir -p $(DS_BIN_REPO)
 	cp -rv $(dir $(DS_BIN)) $(DS_BIN_REPO)
-	aws s3 sync \
+	aws s3 sync --no-progress --acl public-read \
 		$(DS_BIN_REPO) \
-		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
-		--acl public-read --no-progress
+		s3://$(S3_BUCKET)/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/
 
 $(DEPLOY_JSON):
 	echo '{}' > $@
