@@ -606,36 +606,44 @@ $(DS_BIN_REPO): $(DS_BIN)
 		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
 		--acl public-read --no-progress
 
+comma := ,
+json_edit = cp -f $(1) $(1).tmp; jq $(2) $(1).tmp > $(1); rm -f $(1).tmp
+
 $(DEPLOY_JSON):
 	echo '{}' > $@
-	cat <<< $$(jq '. + { \
-		product: "$(PRODUCT_NAME_LOW)", \
-		version: "$(PRODUCT_VERSION)", \
+	$(call json_edit, $@, '. + { \
+		product: "$(PRODUCT_NAME_LOW)"$(comma) \
+		version: "$(PRODUCT_VERSION)"$(comma) \
 		build: "$(BUILD_NUMBER)" \
-		}' $@) > $@
+	}')
 ifeq ($(PLATFORM), win)
-	cat <<< $$(jq '.items += [{ \
-		platform: "windows", \
-		title: "Windows Server 2012 64-bit", \
-		path: "$(EXE_URI)" }]' $@) > $@
+	$(call json_edit, $@, '.items += [{ \
+		platform: "windows"$(comma) \
+		title: "Windows Server 2012 64-bit"$(comma) \
+		path: "$(EXE_URI)" \
+	}]')
 endif
 ifeq ($(PLATFORM), linux)
-	cat <<< $$(jq '.items += [{ \
-		platform: "ubuntu", \
-		title: "Debian 8 9 10, Ubuntu 14 16 18 20 and derivatives", \
-		path: "$(DEB_URI)" }]' $@) > $@
-	cat <<< $$(jq '.items += [{ \
-		platform: "centos", \
-		title: "Centos 7, Redhat 7, Fedora latest and derivatives", \
-		path: "$(RPM_URI)" }]' $@) > $@
-	cat <<< $$(jq '.items += [{ \
-		platform: "altlinux", \
-		title: "Altlinux p8 p9", \
-		path: "$(APT_RPM_URI)" }]' $@) > $@
-	cat <<< $$(jq '.items += [{ \
-		platform: "linux", \
-		title: "Linux portable", \
-		path: "$(TAR_URI)" }]' $@) > $@
+	$(call json_edit, $@, '.items += [{ \
+		platform: "ubuntu"$(comma) \
+		title: "Debian 8 9 10$(comma) Ubuntu 14 16 18 20 and derivatives"$(comma) \
+		path: "$(DEB_URI)" \
+	}]')
+	$(call json_edit, $@, '.items += [{ \
+		platform: "centos"$(comma) \
+		title: "Centos 7$(comma) Redhat 7$(comma) Fedora latest and derivatives"$(comma) \
+		path: "$(RPM_URI)" \
+	}]')
+	$(call json_edit, $@, '.items += [{ \
+		platform: "altlinux"$(comma) \
+		title: "Altlinux p8 p9"$(comma) \
+		path: "$(APT_RPM_URI)" \
+	}]')
+	$(call json_edit, $@, '.items += [{ \
+		platform: "linux"$(comma) \
+		title: "Linux portable"$(comma) \
+		path: "$(TAR_URI)" \
+	}]')
 endif
 
 deploy: $(DEPLOY) $(DEPLOY_JSON)
