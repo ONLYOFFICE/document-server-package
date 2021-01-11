@@ -183,7 +183,7 @@ ISCC_PARAMS +=	//DsAppBuildNumber=$(BUILD_NUMBER)
 ifdef ENABLE_SIGNING
 ISCC_PARAMS +=	//DENABLE_SIGNING=1
 endif
-ISCC_PARAMS +=	//S"byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.verisign.com/scripts/timstamp.dll \$$f"
+ISCC_PARAMS +=	//S"byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com \$$f"
 
 DEB_DEPS += deb/debian/changelog
 DEB_DEPS += deb/debian/config
