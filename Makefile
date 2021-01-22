@@ -425,6 +425,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_company_name_low $(COMPANY_NAME_LOW)' \
 		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
 		--define '_ds_prefix $(DS_PREFIX)' \
+		--define '_binary_payload w7.xzdio' \
 		$(PACKAGE_NAME).spec
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
