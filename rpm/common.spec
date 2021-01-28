@@ -271,7 +271,7 @@ then
   echo "The package msttcore-fonts-installer not found"
   echo "You can install it with the commands:"
   echo "    # yum install cabextract xorg-x11-font-utils"
-  echo "    # rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
+  echo "    # rpm -i https://deac-ams.dl.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
 fi
 
 %preun
