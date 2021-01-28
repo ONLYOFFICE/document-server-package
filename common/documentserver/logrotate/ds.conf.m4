@@ -9,7 +9,7 @@
         sharedscripts
         postrotate
             if [ -f /var/run/nginx.pid ]; then
-                systemctl reload nginx > /dev/null
+                service nginx reload > /dev/null
             fi
         endscript
 }
@@ -27,7 +27,7 @@
         sharedscripts
         postrotate
             if [ -f /var/run/supervisord.pid ]; then
-                systemctl restart supervisord.service > /dev/null
+                service supervisor restart > /dev/null
             fi
         endscript
 }
