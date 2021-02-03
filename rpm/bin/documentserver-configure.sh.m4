@@ -220,11 +220,15 @@ input_amqp_params(){
 execute_postgres_scripts(){
 	echo -n "Installing PostgreSQL database... "
 
-        if [ ! "$CLUSTER_MODE" == true ]; then
-                $PSQL -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+        if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
+                $CREATEDB $DB_NAME >/dev/null 2>&1
         fi
 
-	$PSQL -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
+        if [ ! "$CLUSTER_MODE" = true ]; then
+                $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+        fi
+	
+	$PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
 
 	echo "OK"
 }
@@ -234,11 +238,14 @@ establish_postgres_conn() {
 
 	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
 
+        CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
         if [ -n "$DB_PWD" ]; then
                 export PGPASSWORD=$DB_PWD
         fi
-	
-	PSQL="psql -q -h$DB_HOST -d$DB_NAME -U$DB_USER -w"
+
+        PSQL="psql -q $CONNECTION_PARAMS"
+        CREATEDB="createdb $CONNECTION_PARAMS"
+
 	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
 	echo "OK"

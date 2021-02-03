@@ -107,25 +107,30 @@ install_db() {
 }
 
 install_postges() {
+	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -U$DB_USER -w"
 	if [ -n $DB_PWD ]; then
 		export PGPASSWORD="$DB_PWD"
 	fi
-	PSQL="psql -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
+	PSQL="psql -q $CONNECTION_PARAMS"
+	CREATEDB="createdb $CONNECTION_PARAMS"
 	# test postgresql connection
 	set +e
 		$PSQL -c ";" &>/dev/null
 		ERRCODE=$?
 		if [ $ERRCODE -ne 0 ]; then
 			service postgresql start &>/dev/null
-			$PSQL -c ";" &>/dev/null || \
+			$PSQL -d $DB_NAME -c ";" &>/dev/null || \
 				{ echo "ERROR: can't connect to postgressql database"; exit 1; }
 		fi
 	set -e
-		if [ ! $CLUSTER_MODE == true ]; then
-			$PSQL -f "$DIR/server/schema/postgresql/removetbl.sql" \
+		if ! $PSQL -lt | cut -d\| -f 1 | grep -qw $DB_NAME; then
+			$CREATEDB $DB_NAME >/dev/null 2>&1
+		fi
+		if [ ! $CLUSTER_MODE = true ]; then
+			$PSQL -d $DB_NAME -f "$DIR/server/schema/postgresql/removetbl.sql" \
 				>/dev/null 2>&1
 		fi
-		$PSQL -f "$DIR/server/schema/postgresql/createdb.sql" \
+		$PSQL -d $DB_NAME -f "$DIR/server/schema/postgresql/createdb.sql" \
 			>/dev/null 2>&1
 }
 
@@ -319,7 +324,11 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 	abort-upgrade|abort-remove|abort-deconfigure)
 	;;
-
+	
+	triggered)
+		documentserver-generate-allfonts.sh true
+	;;
+	
 	*)
 		echo "postinst called with unknown argument \`$1'" >&2
 		exit 1
