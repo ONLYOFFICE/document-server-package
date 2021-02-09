@@ -214,6 +214,9 @@ case "$1" in
         supervisorctl stop ${i}:*
       fi
     done
+
+    #update database
+    documentserver-upgrade.sh
   ;;
 esac
 exit 0
