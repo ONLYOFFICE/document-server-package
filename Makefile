@@ -75,9 +75,12 @@ TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION).tar.gz
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/core-fonts
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/license
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/web-apps
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/server
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs
+DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/sdkjs-plugins
 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/LICENSE.txt 
 3RD_PARTY_LICENSE_FILES += $(DOCUMENTSERVER)/server/3rd-Party.txt 
@@ -107,6 +110,10 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 
 WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
+
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
+OFFICIAL_PRODUCT_NAME := 'Community Edition'
+endif
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
 OFFICIAL_PRODUCT_NAME := 'Enterprise Edition'
@@ -210,6 +217,7 @@ DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-spellchecker.conf
+COMMON_DEPS += common/documentserver/nginx/includes/ds-letsencrypt.conf
 COMMON_DEPS += common/documentserver/nginx/includes/http-common.conf
 COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl
@@ -292,7 +300,7 @@ exe: $(EXE)
 tar: $(TAR)
 
 clean:
-	rm -rfv $(DEB_PACKAGE_DIR)/*.deb\
+	rm -rf $(DEB_PACKAGE_DIR)/*.deb\
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
@@ -440,7 +448,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_ds_prefix $(DS_PREFIX)' \
 		$(PACKAGE_NAME).spec
 
-ifeq ($(PACKAGE_NAME),$(filter $(PACKAGE_NAME),onlyoffice-documentserver-ee onlyoffice-documentserver-de onlyoffice-documentserver-ie))
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 endif
 
@@ -472,7 +480,7 @@ $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
-	tar -cvzf $(TAR) $(PRODUCT_SHORT_NAME_LOW)-snap
+	tar -czf $(TAR) $(PRODUCT_SHORT_NAME_LOW)-snap
 
 $(ISXDL):
 	$(TOUCH) $(ISXDL) && \
@@ -512,12 +520,12 @@ $(RPM_REPO_DATA): $(RPM)
 	aws s3 sync \
 		$(RPM_REPO) \
 		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
 		s3://repo-doc-onlyoffice-com/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 $(APT_RPM_REPO_DATA): $(APT_RPM)
 	rm -rfv $(APT_RPM_REPO)
@@ -529,12 +537,12 @@ $(APT_RPM_REPO_DATA): $(APT_RPM)
 	aws s3 sync \
 		$(APT_RPM_REPO) \
 		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
 		s3://repo-doc-onlyoffice-com/$(APT_RPM_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 $(DEB_REPO_DATA): $(DEB)
 	rm -rfv $(DEB_REPO)
@@ -546,12 +554,12 @@ $(DEB_REPO_DATA): $(DEB)
 	aws s3 sync \
 		$(DEB_REPO) \
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/repo \
 		s3://repo-doc-onlyoffice-com/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/repo \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 $(EXE_REPO_DATA): $(EXE)
 	rm -rfv $(EXE_REPO)
@@ -562,12 +570,12 @@ $(EXE_REPO_DATA): $(EXE)
 	aws s3 sync \
 		$(EXE_REPO) \
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
 		s3://repo-doc-onlyoffice-com/$(EXE_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 $(TAR_REPO_DATA): $(TAR)
 	rm -rfv $(TAR_REPO)
@@ -578,12 +586,12 @@ $(TAR_REPO_DATA): $(TAR)
 	aws s3 sync \
 		$(TAR_REPO) \
 		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 	aws s3 sync \
 		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/$(PACKAGE_VERSION)/  \
 		s3://repo-doc-onlyoffice-com/$(TAR_REPO_DIR)/$(PACKAGE_NAME)/$(GIT_BRANCH)/latest/ \
-		--acl public-read --delete
+		--acl public-read --delete --no-progress
 
 deploy-bin: $(DS_BIN_REPO)
 
@@ -593,6 +601,6 @@ $(DS_BIN_REPO): $(DS_BIN)
 	aws s3 sync \
 		$(DS_BIN_REPO) \
 		s3://repo-doc-onlyoffice-com/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/ \
-		--acl public-read
+		--acl public-read --no-progress
 
 deploy: $(DEPLOY)
