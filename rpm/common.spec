@@ -216,7 +216,7 @@ case "$1" in
     done
 
     #update database
-    documentserver-upgrade.sh
+    documentserver-upgrade-db.sh
   ;;
 esac
 exit 0
