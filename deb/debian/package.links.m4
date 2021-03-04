@@ -9,7 +9,6 @@ etc/M4_DS_PREFIX/nginx/includes/http-common.conf etc/nginx/includes/http-common.
 etc/M4_DS_PREFIX/supervisor/ds-converter.conf etc/supervisor/conf.d/ds-converter.conf
 etc/M4_DS_PREFIX/supervisor/ds-docservice.conf etc/supervisor/conf.d/ds-docservice.conf
 etc/M4_DS_PREFIX/supervisor/ds-metrics.conf etc/supervisor/conf.d/ds-metrics.conf
-etc/M4_DS_PREFIX/supervisor/ds-spellchecker.conf etc/supervisor/conf.d/ds-spellchecker.conf
 
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libDjVuFile.so lib/libDjVuFile.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libdoctrenderer.so lib/libdoctrenderer.so
