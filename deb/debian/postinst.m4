@@ -121,12 +121,21 @@ install_postges() {
 				{ echo "ERROR: can't connect to postgressql database"; exit 1; }
 		fi
 	set -e
-		if [ ! $CLUSTER_MODE = true ]; then
-			$PSQL -f "$DIR/server/schema/postgresql/removetbl.sql" \
+		if [ ! "${IS_UPGARDE}" = "true" ]; then
+			#installation
+			if [ ! $CLUSTER_MODE = true ]; then
+				$PSQL -f "$DIR/server/schema/postgresql/removetbl.sql" \
+					>/dev/null 2>&1
+			fi
+			$PSQL -f "$DIR/server/schema/postgresql/createdb.sql" \
 				>/dev/null 2>&1
-		fi
-		$PSQL -f "$DIR/server/schema/postgresql/createdb.sql" \
-			>/dev/null 2>&1
+		else
+			#upgrading
+			$PSQL -f "$DIR/server/schema/postgresql/removetbl.sql" \
+					>/dev/null 2>&1
+			$PSQL -f "$DIR/server/schema/postgresql/createdb.sql" \
+				>/dev/null 2>&1
+  		fi
 }
 
 install_mysql() {
@@ -142,16 +151,23 @@ install_mysql() {
 				{ echo "ERROR: can't connect to mysql database"; exit 1; }
 		fi
 	set -e
-		if ! $MYSQL -e "SHOW DATABASES;" | cut -d\| -f 1 | grep -qw $DB_NAME; then
-			$MYSQL -e \
-				"CREATE DATABASE IF NOT EXISTS $DB_NAME \
-				DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" \
-				>/dev/null 2>&1
-		fi
-		if [ ! $CLUSTER_MODE = true ]; then
+		if [ ! "${IS_UPGARDE}" = "true" ]; then
+			#installation
+			if ! $MYSQL -e "SHOW DATABASES;" | cut -d\| -f 1 | grep -qw $DB_NAME; then
+				$MYSQL -e \
+					"CREATE DATABASE IF NOT EXISTS $DB_NAME \
+					DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;" \
+					>/dev/null 2>&1
+			fi
+			if [ ! $CLUSTER_MODE = true ]; then
+				$MYSQL $DB_NAME < "$DIR/server/schema/mysql/removetbl.sql" >/dev/null 2>&1
+			fi
+			$MYSQL $DB_NAME < "$DIR/server/schema/mysql/createdb.sql" >/dev/null 2>&1
+		else
+			#upgrading
 			$MYSQL $DB_NAME < "$DIR/server/schema/mysql/removetbl.sql" >/dev/null 2>&1
-		fi
-		$MYSQL $DB_NAME < "$DIR/server/schema/mysql/createdb.sql" >/dev/null 2>&1
+			$MYSQL $DB_NAME < "$DIR/server/schema/mysql/createdb.sql" >/dev/null 2>&1
+  		fi
 }
 
 save_db_params(){
@@ -259,6 +275,13 @@ setup_nginx(){
   rm -f /etc/nginx/sites-enabled/default
 
 }
+
+if test -z "$2"
+then
+	IS_UPGARDE="false"
+else
+	IS_UPGARDE="true"
+fi
 
 case "$1" in
 	configure)
