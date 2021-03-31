@@ -236,6 +236,8 @@ LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += rpm/bin/documentserver-configure.sh
 LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
 
+LINUX_DEPS += rpm/bin/documentserver-upgrade-db.sh
+
 LINUX_DEPS_CLEAN += rpm/bin/*.sh
 LINUX_DEPS_CLEAN += apt-rpm/bin/*.sh
 
