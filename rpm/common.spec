@@ -232,6 +232,72 @@ chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
 
+IS_UPGRADE="false"
+
+case "$1" in
+  1)
+    # Initial installation
+  ;;
+  2)
+    # Upgrade database
+    IS_UPGRADE="true"
+  ;;
+esac
+
+if [ "$IS_UPGRADE" = "true" ]; then
+  DIR="/var/www/%{_ds_prefix}"
+  LOCAL_CONFIG="/etc/%{_ds_prefix}/local.json"
+  JSON_BIN="$DIR/npm/json"
+  JSON="$JSON_BIN -f $LOCAL_CONFIG"
+
+  #load_db_params
+  DB_HOST=$($JSON services.CoAuthoring.sql.dbHost)
+  DB_NAME=$($JSON services.CoAuthoring.sql.dbName)
+  DB_USER=$($JSON services.CoAuthoring.sql.dbUser)
+  DB_PWD=$($JSON services.CoAuthoring.sql.dbPass)
+  DB_TYPE=$($JSON services.CoAuthoring.sql.type)
+  DB_PORT=$($JSON services.CoAuthoring.sql.dbPort)
+
+  case $DB_TYPE in
+    postgres)
+      echo -n "Trying to establish PostgreSQL connection... "
+      command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
+      CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
+      if [ -n "$DB_PWD" ]; then
+        export PGPASSWORD=$DB_PWD
+      fi
+      PSQL="psql -q $CONNECTION_PARAMS"
+      $PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+      echo "OK"
+
+      echo -n "Updating PostgreSQL database... "
+      $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+      $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
+      echo "OK"
+      ;;
+
+    mysql)
+      echo -n "Trying to database MySQL connection... "
+      command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+      MYSQL="mysql -h$DB_HOST -u$DB_USER"
+      if [ -n "$DB_PWD" ]; then
+        MYSQL="$MYSQL -p$DB_PWD"
+      fi
+      $MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+      echo "OK"
+
+      echo -n "Updating MYSQL database... "
+      $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/removetbl.sql"
+      $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql"
+      echo "OK"
+      ;;
+
+    *)
+      echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+      exit 1
+  esac
+fi
+
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
 
