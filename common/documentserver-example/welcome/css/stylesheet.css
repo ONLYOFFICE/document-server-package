@@ -53,7 +53,7 @@ a:hover {
 
 .black-block .content-block {
     background-image: url(../css/footer_help.svg), url(../css/footer_github.svg);
-    background-position: 0 64px, 100% 48px;
+    background-position: 0 64px, 100% 100px;
     background-repeat: no-repeat;
     box-sizing: border-box;
     padding-left: 96px;
@@ -92,7 +92,7 @@ a:hover {
     font-size: 16px;
     line-height: 160%;
     margin: 0;
-    padding: 0;
+    padding-bottom: 24px;
 }
 
 .content-block pre~p {
@@ -125,14 +125,13 @@ h2 {
     font-size: 18px;
     line-height: 133%;
     letter-spacing: -0.02em;
-    padding: 32px 0 16px;
+    padding-bottom: 16px;
 }
 
 h3 {
     font-weight: 700;
     font-size: 14px;
     line-height: 133%;
-    padding-top: 24px;
 }
 
 h6 {
@@ -206,7 +205,7 @@ footer {
     font-size: 13px;
     line-height: 160%;
     margin: 0;
-    padding: 36px 0 0;
+    padding: 0;
     width: auto;
 }
 
