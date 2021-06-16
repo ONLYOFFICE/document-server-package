@@ -56,7 +56,6 @@ cp -r $DOCUMENTSERVER_CONFIG/* "$CONF_DIR/"
 #make log dir
 mkdir -p "$LOG_DIR/docservice"
 mkdir -p "$LOG_DIR/converter"
-mkdir -p "$LOG_DIR/spellchecker"
 mkdir -p "$LOG_DIR/metrics"
 
 #make cache dir
@@ -142,7 +141,6 @@ mkdir -p "%{buildroot}%{_sysconfdir}/supervisord.d/"
 find \
   ${CONF_DIR}*/supervisor/ \
   -name *.ini \
-  -not -name *spellchecker* \
   -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/supervisord.d/$(basename {})' \;
 
 mkdir -p "%{buildroot}%{_sysconfdir}/logrotate.d/"
