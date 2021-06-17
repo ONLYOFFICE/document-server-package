@@ -2,10 +2,6 @@ upstream docservice {
   server localhost:8000 max_fails=0 fail_timeout=0s;
 }
 
-#upstream spellchecker {  
-#  server localhost:8080;
-#}
-
 upstream example {  
   server localhost:3000;
 }
