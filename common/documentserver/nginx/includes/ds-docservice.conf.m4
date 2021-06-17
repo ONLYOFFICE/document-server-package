@@ -73,8 +73,8 @@ location /M4_PACKAGE_VERSION/ {
   proxy_pass http://docservice/;
 }
 
-#location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(dictionaries)(\/.*)$ {
-#  expires 365d;
-#  alias M4_DS_ROOT/server/SpellChecker/$2$3;
-#}
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(dictionaries)(\/.*)$ {
+  expires 365d;
+  alias M4_DS_ROOT/server/$2$3;
+}
 
