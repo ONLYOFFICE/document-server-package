@@ -229,9 +229,6 @@ setup_nginx(){
   # db_get M4_ONLYOFFICE_VALUE/docservice-port || true
   # DOCSERVICE_PORT="$RET"
   
-  # db_get M4_ONLYOFFICE_VALUE/spellchecker-port || true
-  # SPELLCHECKER_PORT="$RET"
-  
   # db_get M4_ONLYOFFICE_VALUE/example-port || true
   # EXAMPLE_PORT="$RET"
   
@@ -253,7 +250,6 @@ setup_nginx(){
   fi
 
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
-  # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/'  -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
 		
   rm -f /etc/nginx/sites-enabled/default
