@@ -51,11 +51,6 @@ Type: string
 Default: 8000
 Description: M4_PRODUCT_NAME docservice listening port:
 
-Template: M4_ONLYOFFICE_VALUE/spellchecker-port
-Type: string
-Default: 8080
-Description: M4_PRODUCT_NAME spellchecker listening port:
-
 Template: M4_ONLYOFFICE_VALUE/example-port
 Type: string
 Default: 3000

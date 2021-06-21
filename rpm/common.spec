@@ -56,7 +56,6 @@ cp -r $DOCUMENTSERVER_CONFIG/* "$CONF_DIR/"
 #make log dir
 mkdir -p "$LOG_DIR/docservice"
 mkdir -p "$LOG_DIR/converter"
-mkdir -p "$LOG_DIR/spellchecker"
 mkdir -p "$LOG_DIR/metrics"
 
 #make cache dir

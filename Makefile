@@ -197,7 +197,6 @@ DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
 
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
-COMMON_DEPS += common/documentserver/nginx/includes/ds-spellchecker.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-letsencrypt.conf
 COMMON_DEPS += common/documentserver/nginx/includes/http-common.conf
 COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
@@ -214,7 +213,6 @@ LINUX_DEPS += common/documentserver/supervisor/ds.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
 LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-spellchecker.conf
 
 LINUX_DEPS_CLEAN += common/documentserver/supervisor/*.conf
 

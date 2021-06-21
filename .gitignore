@@ -1,4 +1,6 @@
 *.deb
+*.ddeb
+*.buildinfo
 *.dll
 *.changes
 /documentserver
