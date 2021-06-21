@@ -367,7 +367,6 @@ setup_nginx(){
   case $(/usr/sbin/getenforce) in
     enforcing|permissive)
       PORTS+=('8000')
-      PORTS+=('8080')
       PORTS+=('3000')
 	  /usr/sbin/setsebool -P httpd_can_network_connect on
     ;;
