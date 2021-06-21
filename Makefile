@@ -285,6 +285,7 @@ clean:
 		$(DEB_PACKAGE_DIR)/*.changes\
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
+		$(TAR_PACKAGE_DIR)/*.tar.gz\
 		$(EXE_BUILD_DIR)/*.exe\
 		$(ISXDL)\
 		$(NGINX)\
