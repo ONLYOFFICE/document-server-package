@@ -16,7 +16,6 @@ DB_TYPE=${DB_TYPE:-postgres}
 DB_PORT=""
 DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
-# SPELLCHECKER_PORT=${SPELLCHECKER_PORT:-8080}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 
 JWT_ENABLED=${JWT_ENABLED:-false}
@@ -336,7 +335,6 @@ setup_nginx(){
   fi
 
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
-  # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/' -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
   # check whethere enabled
@@ -345,7 +343,6 @@ setup_nginx(){
   case $(getenforce) in
     enforcing|permissive)
       PORTS+=('8000')
-      PORTS+=('8080')
       PORTS+=('3000')
 	  setsebool -P httpd_can_network_connect on
     ;;
