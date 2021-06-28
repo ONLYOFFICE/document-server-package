@@ -8,10 +8,6 @@ ONLYOFFICE Docs can be used as a part of [ONLYOFFICE Workspace](#onlyoffice-work
 
 It has three editions - [Community, Enterprise, and Developer](#onlyoffice-docs-editions).
 
-## Building
-
-Run `make all` to build packages and `make deploy` to publish packages
-
 ## Project information
 
 Official website: [https://www.onlyoffice.com](https://www.onlyoffice.com/?utm_source=github&utm_medium=cpc&utm_campaign=GitHubDS)
