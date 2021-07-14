@@ -440,7 +440,7 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
 
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-	cd deb && dpkg-buildpackage -b -uc -us
+	cd deb && dpkg-buildpackage -b -uc -us --changes-option=-u.
 
 $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
