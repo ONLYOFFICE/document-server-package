@@ -18,9 +18,6 @@ SUPPORT_MAIL ?= support@onlyoffice.com
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 
-S3_BUCKET ?= repo-doc-onlyoffice-com
-RELEASE_BRANCH ?= unstable
-
 BRANDING_DIR ?= ./branding
 
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
@@ -44,12 +41,6 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION).tar.gz
-
-EXE_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/windows/$(notdir $(EXE))
-DEB_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/ubuntu/$(notdir $(DEB))
-RPM_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/centos/$(notdir $(RPM))
-TAR_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/linux/$(notdir $(TAR))
-APT_RPM_URI := $(COMPANY_NAME_LOW)/$(RELEASE_BRANCH)/altlinux/$(notdir $(APT_RPM))
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -90,8 +81,6 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
 
-DEPLOY_JSON = deploy.json
-
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 OFFICIAL_PRODUCT_NAME := 'Community Edition'
 endif
@@ -115,7 +104,7 @@ ifeq ($(OS),Windows_NT)
 	SHARED_EXT := .dll
 	ARCH_EXT := .zip
 	AR := 7z a -y
-	DEPLOY = deploy-exe
+	PACKAGES = exe
 	NGINX_CONF := includes
 	NGINX_LOG := logs
 	DS_ROOT := ..
@@ -136,7 +125,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		DEPLOY = deploy-deb deploy-rpm deploy-tar deploy-apt-rpm
+		PACKAGES = deb rpm tar apt-rpm
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -173,7 +162,7 @@ DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
 ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
-DEPLOY += deploy-bin
+PACKAGES += deploy-bin
 endif
 
 ISCC := iscc
@@ -264,7 +253,7 @@ M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
 M4_PARAMS += -D M4_DS_EXAMLE='$(DS_EXAMLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
 
-.PHONY: all clean clean-docker rpm deb deploy deploy-rpm deploy-deb deploy-bin
+.PHONY: all clean clean-docker rpm deb packages deploy-bin
 
 all: rpm deb apt-rpm
 
@@ -298,7 +287,6 @@ clean:
 		$(WIN_DEPS)\
 		deb/debian/$(PACKAGE_NAME)\
 		deb/debian/$(PACKAGE_NAME).*\
-		$(DEPLOY_JSON)\
 		documentserver\
 		documentserver-example
 		
@@ -452,7 +440,7 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
 
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-	cd deb && dpkg-buildpackage -b -uc -us
+	cd deb && dpkg-buildpackage -b -uc -us --changes-option=-u.
 
 $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
@@ -488,25 +476,7 @@ $(NSSM):
 	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
 	rm -f $(NSSM_ZIP)
 
-deploy-rpm: $(RPM)
-	aws s3 cp --no-progress --acl public-read \
-		$(RPM) s3://$(S3_BUCKET)/$(RPM_URI)
-
-deploy-apt-rpm: $(APT_RPM)
-	aws s3 cp --no-progress --acl public-read \
-		$(APT_RPM) s3://$(S3_BUCKET)/$(APT_RPM_URI)
-
-deploy-deb: $(DEB)
-	aws s3 cp --no-progress --acl public-read \
-		$(DEB) s3://$(S3_BUCKET)/$(DEB_URI)
-
-deploy-exe: $(EXE)
-	aws s3 cp --no-progress --acl public-read \
-		$(EXE) s3://$(S3_BUCKET)/$(EXE_URI)
-
-deploy-tar: $(TAR)
-	aws s3 cp --no-progress --acl public-read \
-		$(TAR) s3://$(S3_BUCKET)/$(TAR_URI)
+packages: $(PACKAGES)
 
 deploy-bin: $(DS_BIN)
 	mkdir -p $(DS_BIN_REPO)
@@ -514,45 +484,3 @@ deploy-bin: $(DS_BIN)
 	aws s3 sync --no-progress --acl public-read \
 		$(DS_BIN_REPO) \
 		s3://$(S3_BUCKET)/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/
-
-comma := ,
-json_edit = cp -f $(1) $(1).tmp; jq $(2) $(1).tmp > $(1); rm -f $(1).tmp
-
-$(DEPLOY_JSON):
-	echo '{}' > $@
-	$(call json_edit, $@, '. + { \
-		product: "$(PRODUCT_NAME_LOW)"$(comma) \
-		version: "$(PRODUCT_VERSION)"$(comma) \
-		build: "$(BUILD_NUMBER)" \
-	}')
-ifeq ($(PLATFORM), win)
-	$(call json_edit, $@, '.items += [{ \
-		platform: "windows"$(comma) \
-		title: "Windows Server 2012 64-bit"$(comma) \
-		path: "$(EXE_URI)" \
-	}]')
-endif
-ifeq ($(PLATFORM), linux)
-	$(call json_edit, $@, '.items += [{ \
-		platform: "ubuntu"$(comma) \
-		title: "Debian 8 9 10$(comma) Ubuntu 14 16 18 20 and derivatives"$(comma) \
-		path: "$(DEB_URI)" \
-	}]')
-	$(call json_edit, $@, '.items += [{ \
-		platform: "centos"$(comma) \
-		title: "Centos 7$(comma) Redhat 7$(comma) Fedora latest and derivatives"$(comma) \
-		path: "$(RPM_URI)" \
-	}]')
-	$(call json_edit, $@, '.items += [{ \
-		platform: "altlinux"$(comma) \
-		title: "Altlinux p8 p9"$(comma) \
-		path: "$(APT_RPM_URI)" \
-	}]')
-	$(call json_edit, $@, '.items += [{ \
-		platform: "linux"$(comma) \
-		title: "Linux portable"$(comma) \
-		path: "$(TAR_URI)" \
-	}]')
-endif
-
-deploy: $(DEPLOY) $(DEPLOY_JSON)
