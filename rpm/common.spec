@@ -159,8 +159,10 @@ symlinks -c \
   %{buildroot}%{_sysconfdir}/supervisord.d \
   %{buildroot}%{_sysconfdir}/logrotate.d 
 
+%if %{defined example}
 # index.html for rpm
 sed 's/linux.html/linux-rpm.html/g' -i "$DSE_NGINX_CONF/ds-example.conf"
+%endif
 
 %clean
 rm -rf "%{buildroot}"
