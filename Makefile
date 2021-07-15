@@ -28,7 +28,7 @@ DEB_ARCH = amd64
 
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
-DEB_BUILD_DIR = $(PWD)
+DEB_BUILD_DIR = deb
 EXE_BUILD_DIR = exe
 
 APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
@@ -269,7 +269,7 @@ tar: $(TAR)
 
 clean:
 	rm -rf $(DEB_PACKAGE_DIR)/*.deb\
-		$(DEB_PACKAGE_DIR)/*.changes\
+		$(DEB_PACKAGE_DIR)/../*.changes\
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
