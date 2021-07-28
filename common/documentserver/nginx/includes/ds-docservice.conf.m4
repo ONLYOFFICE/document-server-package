@@ -75,6 +75,6 @@ location /M4_PACKAGE_VERSION/ {
 
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(dictionaries)(\/.*)$ {
   expires 365d;
-  alias M4_DS_ROOT/server/$2$3;
+  alias M4_DS_ROOT/$2$3;
 }
 
