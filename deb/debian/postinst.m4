@@ -107,7 +107,7 @@ install_db() {
 }
 
 install_postges() {
-	if [ -n $DB_PWD ]; then
+	if [ -n "$DB_PWD" ]; then
 		export PGPASSWORD="$DB_PWD"
 	fi
 	PSQL="psql -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
