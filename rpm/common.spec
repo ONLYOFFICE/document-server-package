@@ -352,6 +352,16 @@ then
   echo "    # rpm -i https://deac-ams.dl.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
 fi
 
+case "$1" in
+  1)
+    # Initial installation
+  ;;
+  2)
+    # Upgrade database
+    documentserver-upgrade-db.sh
+  ;;
+esac
+
 %preun
 case "$1" in
   0)
