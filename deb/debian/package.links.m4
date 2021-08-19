@@ -16,6 +16,7 @@ var/www/M4_DS_PREFIX/server/FileConverter/bin/libgraphics.so lib/libgraphics.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libHtmlFile.so lib/libHtmlFile.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libHtmlRenderer.so lib/libHtmlRenderer.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libkernel.so lib/libkernel.so
+var/www/M4_DS_PREFIX/server/FileConverter/bin/libkernel_network.so lib/libkernel_network.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libPdfReader.so lib/libPdfReader.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libPdfWriter.so lib/libPdfWriter.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libXpsFile.so lib/libXpsFile.so
