@@ -83,12 +83,18 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	db_get M4_ONLYOFFICE_VALUE/cluster-mode || true
 	CLUSTER_MODE="$RET"
 
-	db_get M4_ONLYOFFICE_VALUE/jwt-enabled || true
-	JWT_ENABLED="$RET"
-	db_get M4_ONLYOFFICE_VALUE/jwt-secret || true
-	JWT_SECRET="$RET"
-	db_get M4_ONLYOFFICE_VALUE/jwt-header || true
-	JWT_HEADER="$RET"
+	JWT_ENABLED=$($JSON -e "if(this.services!==undefined)console.log(this.services.CoAuthoring.token.enable.request.inbox);")
+	JWT_SECRET=$($JSON -e "if(this.services!==undefined)console.log(this.services.CoAuthoring.secret.inbox.string);")
+	JWT_HEADER=$($JSON -e "if(this.services!==undefined)console.log(this.services.CoAuthoring.token.inbox.header);")
+	
+	if [ -z "${JWT_ENABLED}" ] || [ -z "${JWT_SECRET}" ] || [ -z "${JWT_HEADER}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/jwt-enabled || true
+		JWT_ENABLED="$RET"
+		db_get M4_ONLYOFFICE_VALUE/jwt-secret || true
+		JWT_SECRET="$RET"
+		db_get M4_ONLYOFFICE_VALUE/jwt-header || true
+		JWT_HEADER="$RET"
+	fi
 }
 
 install_db() {
