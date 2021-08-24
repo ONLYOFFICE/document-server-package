@@ -26,7 +26,9 @@
         nocreate
         sharedscripts
         postrotate
-            if [ -f /var/run/supervisord.pid ]; then
+            if [ systemctl is-active supervisor.service -q ]; then
+                systemctl restart supervisor.service > /dev/null
+            elif [ systemctl is-active supervisord.service -q ]; then
                 systemctl restart supervisord.service > /dev/null
             fi
         endscript
