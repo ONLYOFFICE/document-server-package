@@ -38,7 +38,7 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps|sdkjs|sdkjs-plugins|f
 
 location ~* ^(\/cache\/files.*)(\/.*) {
   alias M4_DS_FILES/App_Data$1;
-  add_header Content-Disposition "$arg_disposition; filename*=UTF-8''$arg_filename";
+  add_header Content-Disposition "attachment; filename*=UTF-8''$arg_filename";
 
   set $secret_string verysecretstring;
   secure_link $arg_md5,$arg_expires;
@@ -75,6 +75,6 @@ location /M4_PACKAGE_VERSION/ {
 
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(dictionaries)(\/.*)$ {
   expires 365d;
-  alias M4_DS_ROOT/server/SpellChecker/$2$3;
+  alias M4_DS_ROOT/$2$3;
 }
 

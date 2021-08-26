@@ -107,7 +107,7 @@ install_db() {
 }
 
 install_postges() {
-	if [ -n $DB_PWD ]; then
+	if [ -n "$DB_PWD" ]; then
 		export PGPASSWORD="$DB_PWD"
 	fi
 	PSQL="psql -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
@@ -229,9 +229,6 @@ setup_nginx(){
   # db_get M4_ONLYOFFICE_VALUE/docservice-port || true
   # DOCSERVICE_PORT="$RET"
   
-  # db_get M4_ONLYOFFICE_VALUE/spellchecker-port || true
-  # SPELLCHECKER_PORT="$RET"
-  
   # db_get M4_ONLYOFFICE_VALUE/example-port || true
   # EXAMPLE_PORT="$RET"
   
@@ -253,7 +250,6 @@ setup_nginx(){
   fi
 
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
-  # sed 's/{{SPELLCHECKER_PORT}}/'${SPELLCHECKER_PORT}'/'  -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
 		
   rm -f /etc/nginx/sites-enabled/default
@@ -284,7 +280,6 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		mkdir -p "$LOG_DIR/docservice"
 		mkdir -p "$LOG_DIR-example"
 		mkdir -p "$LOG_DIR/converter"
-		mkdir -p "$LOG_DIR/spellchecker"
 		mkdir -p "$LOG_DIR/metrics"
 
 		mkdir -p "$APP_DIR/App_Data"
