@@ -81,7 +81,6 @@
 #define REG_DS_PORT           'DsPort'
 #define REG_EXAMPLE_PORT      'ExamplePort'
 #define REG_DOCSERVICE_PORT   'DocServicePort'
-#define REG_SPELLCHECKER_PORT 'SpellCheckerPort'
 #define REG_FONTS_PATH        'FontsPath'
 #define REG_JWT_ENABLED       'JwtEnabled'
 #define REG_JWT_SECRET        'JwtSecret'
@@ -125,12 +124,6 @@
 #define DOCSERVICE_SRV_DESCR  str(sAppName + " DocService Service")
 #define DOCSERVICE_SRV_DIR    '{app}\server\docservice'
 #define DOCSERVICE_SRV_LOG_DIR    '{app}\Log\docservice'
-
-#define SPELLCHECKER_SRV        'DsSpellcheckerSvc'
-#define SPELLCHECKER_SRV_DISPLAY  str(sAppName + " Spellchecker")
-#define SPELLCHECKER_SRV_DESCR  str(sAppName + " Spellchecker Service")
-#define SPELLCHECKER_SRV_DIR    '{app}\server\SpellChecker'
-#define SPELLCHECKER_SRV_LOG_DIR    '{app}\Log\spellchecker'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
@@ -287,7 +280,6 @@ Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{app}\fonts";                  Permissions: users-modify
 Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
 Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
-Name: "{#SPELLCHECKER_SRV_LOG_DIR}";  Permissions: users-modify
 Name: "{#NGINX_SRV_DIR}";             Permissions: users-modify
 Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-modify
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-modify
@@ -310,7 +302,6 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RED
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}"; Check: not IsStringEmpty(ExpandConstant('{param:DOCSERVICE_PORT}'));
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_SPELLCHECKER_PORT}"; ValueData: "{code:GetSpellCheckerPort}"; Check: not IsStringEmpty(ExpandConstant('{param:SPELLCHECKER_PORT}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_FONTS_PATH}"; ValueData: "{code:GetFontsPath}"; Check: not IsStringEmpty(ExpandConstant('{param:FONTS_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_ENABLED}"; ValueData: "{code:GetJwtEnabled}"; Check: not IsStringEmpty(ExpandConstant('{param:JWT_ENABLED}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_SECRET}"; ValueData: "{code:GetJwtSecret}";  Check: not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}'));
@@ -336,10 +327,6 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.server===undefined)this.services.CoAuthoring.server={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.SpellChecker===undefined)this.services.SpellChecker={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.SpellChecker.server===undefined)this.services.SpellChecker.server={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.SpellChecker.server.port = '{code:GetSpellCheckerPort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.license===undefined)this.license={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -367,7 +354,6 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-; Filename: "{#REPLACE}"; Parameters: "{{{{SPELLCHECKER_PORT}} {code:GetSpellCheckerPort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
@@ -384,6 +370,7 @@ Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppRotateBytes {#LOG_ROTA
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStdout {#CONVERTER_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStderr {#CONVERTER_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} Start SERVICE_DELAYED_AUTO_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "start {#CONVERTER_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
 
 Filename: "{#NSSM}"; Parameters: "install {#DOCSERVICE_SRV} ""{#DOCSERVICE_SRV_DIR}\docservice.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#DOCSERVICE_SRV}}"
@@ -397,20 +384,8 @@ Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppRotateBytes {#LOG_ROT
 Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStdout {#DOCSERVICE_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStderr {#DOCSERVICE_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} Start SERVICE_DELAYED_AUTO_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#NSSM}"; Parameters: "start {#DOCSERVICE_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
-
-Filename: "{#NSSM}"; Parameters: "install {#SPELLCHECKER_SRV} ""{#SPELLCHECKER_SRV_DIR}\spellchecker.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} DisplayName {#SPELLCHECKER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} Description {#SPELLCHECKER_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppDirectory {#SPELLCHECKER_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppRotateFiles 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppRotateOnline 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppRotateBytes {#LOG_ROTATE_BYTES}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStdout {#SPELLCHECKER_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} AppStderr {#SPELLCHECKER_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#SPELLCHECKER_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#SPELLCHECKER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "start {#SPELLCHECKER_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#SPELLCHECKER_SRV}}"
 
 Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} ""{#NGINX_SRV_DIR}\nginx"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} DisplayName {#NGINX_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
@@ -422,12 +397,16 @@ Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppRotateBytes {#LOG_ROTATE_B
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStdout {#NGINX_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStderr {#NGINX_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Start SERVICE_DELAYED_AUTO_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#NGINX_SRV}}"
+
+Filename: "sc"; Parameters: "failure ""{#CONVERTER_SRV}"" actions= restart/60000/restart/60000/restart/60000 reset= 86400"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
+Filename: "sc"; Parameters: "failure ""{#DOCSERVICE_SRV}"" actions= restart/60000/restart/60000/restart/60000 reset= 86400"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
+Filename: "sc"; Parameters: "failure ""{#NGINX_SRV}"" actions= restart/60000/restart/60000/restart/60000 reset= 86400"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 
 Filename: "schtasks"; Parameters: "/Create /F /RU ""{#LOCAL_SERVICE}"" /SC DAILY /TN ""{#LogRotateTaskName}"" /TR ""{app}\bin\documentserver-log-rotate.bat"""; Flags: runhidden; StatusMsg: "{cm:AddRotateTask}"
 
 Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#DOCSERVICE_SRV_DIR}\docservice.exe"" ""{#DOCSERVICE_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#SPELLCHECKER_SRV_DIR}\spellchecker.exe"" ""{#SPELLCHECKER_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallRun]
@@ -442,14 +421,10 @@ Filename: "{#NSSM}"; Parameters: "remove {#CONVERTER_SRV} confirm"; Flags: runhi
 Filename: "{#NSSM}"; Parameters: "stop {#DOCSERVICE_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#DOCSERVICE_SRV} confirm"; Flags: runhidden
 
-Filename: "{#NSSM}"; Parameters: "stop {#SPELLCHECKER_SRV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "remove {#SPELLCHECKER_SRV} confirm"; Flags: runhidden
-
 Filename: "schtasks"; Parameters: "/End /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /F /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 
 Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#DOCSERVICE_SRV_DIR}\docservice.exe"""; Flags: runhidden
-Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#SPELLCHECKER_SRV_DIR}\spellchecker.exe"""; Flags: runhidden
 Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#NGINX_SRV_DIR}\nginx.exe"""; Flags: runhidden
 
 [UninstallDelete]
@@ -601,11 +576,6 @@ end;
 function GetDocServicePort(Param: String): String;
 begin
   Result := ExpandConstant('{param:DOCSERVICE_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DOCSERVICE_PORT}|8000}}');
-end;
-
-function GetSpellCheckerPort(Param: String): String;
-begin
-  Result := ExpandConstant('{param:SPELLCHECKER_PORT|{reg:HKLM\{#sAppRegPath},{#REG_SPELLCHECKER_PORT}|8080}}');
 end;
 
 function GetExamplePort(Param: String): String;

@@ -15,7 +15,6 @@ db_fset M4_ONLYOFFICE_VALUE/db-type seen true
 db_fset M4_ONLYOFFICE_VALUE/cluster-mode seen true
 db_fset M4_ONLYOFFICE_VALUE/ds-port seen true
 db_fset M4_ONLYOFFICE_VALUE/docservice-port seen true
-db_fset M4_ONLYOFFICE_VALUE/spellchecker-port seen true
 db_fset M4_ONLYOFFICE_VALUE/example-port seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-enabled seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-secret seen true

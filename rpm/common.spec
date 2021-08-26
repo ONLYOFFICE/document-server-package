@@ -56,7 +56,6 @@ cp -r $DOCUMENTSERVER_CONFIG/* "$CONF_DIR/"
 #make log dir
 mkdir -p "$LOG_DIR/docservice"
 mkdir -p "$LOG_DIR/converter"
-mkdir -p "$LOG_DIR/spellchecker"
 mkdir -p "$LOG_DIR/metrics"
 
 #make cache dir
@@ -315,7 +314,6 @@ PORTS=()
 case $(%{getenforce}) in
   enforcing|permissive)
     PORTS+=('8000')
-    PORTS+=('8080')
     PORTS+=('3000')
     %{setsebool} -P httpd_can_network_connect on
   ;;
