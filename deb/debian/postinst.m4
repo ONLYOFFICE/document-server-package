@@ -54,44 +54,88 @@ create_local_configs(){
   	done
 }
 
-read_saved_params(){
-	db_get M4_ONLYOFFICE_VALUE/db-type || true
-	DB_TYPE="$RET"
-	db_get M4_ONLYOFFICE_VALUE/db-host || true
-	DB_HOST="$RET"
-	db_get M4_ONLYOFFICE_VALUE/db-port || true
-	DB_PORT="$RET"
-	db_get M4_ONLYOFFICE_VALUE/db-user || true
-	DB_USER="$RET"
-	db_get M4_ONLYOFFICE_VALUE/db-pwd || true
-	DB_PWD="$RET"
-	db_get M4_ONLYOFFICE_VALUE/db-name || true
-	DB_NAME="$RET"
-
-	db_get M4_ONLYOFFICE_VALUE/rabbitmq-host || true
-	RABBITMQ_HOST="$RET"
-	db_get M4_ONLYOFFICE_VALUE/rabbitmq-user || true
-	RABBITMQ_USER="$RET"
-	db_get M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
-	RABBITMQ_PWD="$RET"
+read_local_params(){
+	if [ -n "$($JSON -e 'if(this.services!==undefined)console.log(true);')" ]; then
+		DB_TYPE=$($JSON -e "console.log(this.services.CoAuthoring.sql.type);")
+		DB_HOST=$($JSON -e "console.log(this.services.CoAuthoring.sql.dbHost);")
+		DB_PORT=$($JSON -e "console.log(this.services.CoAuthoring.sql.dbPort);")
+		DB_USER=$($JSON -e "console.log(this.services.CoAuthoring.sql.dbUser);")
+		DB_PWD=$($JSON -e "console.log(this.services.CoAuthoring.sql.dbPass);")
+		DB_NAME=$($JSON -e "console.log(this.services.CoAuthoring.sql.dbName);")
 
 ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
-`	db_get M4_ONLYOFFICE_VALUE/redis-host || true
-	REDIS_HOST="$RET"
-
+`		REDIS_HOST=$($JSON -e "console.log(this.services.CoAuthoring.redis.host);")
 ',)dnl
+
+		JWT_ENABLED=$($JSON -e "console.log(this.services.CoAuthoring.token.enable.request.inbox);")
+		JWT_SECRET=$($JSON -e "console.log(this.services.CoAuthoring.secret.inbox.string);")
+		JWT_HEADER=$($JSON -e "console.log(this.services.CoAuthoring.token.inbox.header);")
+	fi
+	if [ -n "$($JSON -e 'if(this.rabbitmq!==undefined)console.log(true);')" ]; then
+		RABBITMQ_HOST=$($JSON -e "console.log(this.rabbitmq.url);" | grep -oP '(?<=@).*')
+		RABBITMQ_USER=$($JSON -e "console.log(this.rabbitmq.url);" | grep -oP '(?<=://).*(?=:)')
+		RABBITMQ_PWD=$($JSON -e "console.log(this.rabbitmq.url);" | sed 's!://!!g' | grep -oP '(?<=:).*(?=@)')  
+	fi
+}
+
+read_saved_params(){
+	if [ -z "${DB_TYPE}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/db-type || true
+		DB_TYPE="$RET"
+	fi
+	if [ -z "${DB_HOST}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/db-host || true
+		DB_HOST="$RET"
+	fi
+	if [ -z "${DB_PORT}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/db-port || true
+		DB_PORT="$RET"
+	fi
+	if [ -z "${DB_USER}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/db-user || true
+		DB_USER="$RET"
+	fi
+	if [ -z "${DB_PWD}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/db-pwd || true
+		DB_PWD="$RET"
+	fi
+	if [ -z "${DB_NAME}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/db-name || true
+		DB_NAME="$RET"
+	fi
+
+	if [ -z "${RABBITMQ_HOST}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/rabbitmq-host || true
+		RABBITMQ_HOST="$RET"
+	fi
+	if [ -z "${RABBITMQ_USER}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/rabbitmq-user || true
+		RABBITMQ_USER="$RET"
+	fi
+	if [ -z "${RABBITMQ_PWD}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
+		RABBITMQ_PWD="$RET"
+	fi
+
+ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
+`	if [ -z "${REDIS_HOST}" ]; then
+		db_get M4_ONLYOFFICE_VALUE/redis-host || true
+		REDIS_HOST="$RET"
+	fi
+',)dnl
+
 	db_get M4_ONLYOFFICE_VALUE/cluster-mode || true
 	CLUSTER_MODE="$RET"
 
-	JWT_ENABLED=$($JSON -e "if(this.services!==undefined)console.log(this.services.CoAuthoring.token.enable.request.inbox);")
-	JWT_SECRET=$($JSON -e "if(this.services!==undefined)console.log(this.services.CoAuthoring.secret.inbox.string);")
-	JWT_HEADER=$($JSON -e "if(this.services!==undefined)console.log(this.services.CoAuthoring.token.inbox.header);")
-	
-	if [ -z "${JWT_ENABLED}" ] || [ -z "${JWT_SECRET}" ] || [ -z "${JWT_HEADER}" ]; then
+	if [ -z "${JWT_ENABLED}" ]; then
 		db_get M4_ONLYOFFICE_VALUE/jwt-enabled || true
 		JWT_ENABLED="$RET"
+	fi
+	if [ -z "${JWT_SECRET}" ]; then
 		db_get M4_ONLYOFFICE_VALUE/jwt-secret || true
 		JWT_SECRET="$RET"
+	fi
+	if [ -z "${JWT_HEADER}" ]; then
 		db_get M4_ONLYOFFICE_VALUE/jwt-header || true
 		JWT_HEADER="$RET"
 	fi
@@ -270,6 +314,7 @@ case "$1" in
 		adduser --quiet www-data ds
 
 		create_local_configs
+		read_local_params
 		read_saved_params
 		install_db
 		save_db_params
