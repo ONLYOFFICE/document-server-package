@@ -8,7 +8,7 @@
         notifempty
         sharedscripts
         postrotate
-            if [ -f /var/run/nginx.pid ]; then
+            if systemctl is-active nginx -q; then
                 systemctl reload nginx > /dev/null
             fi
         endscript
@@ -26,10 +26,10 @@
         nocreate
         sharedscripts
         postrotate
-            if [ systemctl is-active supervisor.service -q ]; then
-                systemctl restart supervisor.service > /dev/null
-            elif [ systemctl is-active supervisord.service -q ]; then
-                systemctl restart supervisord.service > /dev/null
+            if systemctl is-active supervisor -q; then
+                systemctl restart supervisor > /dev/null
+            elif systemctl is-active supervisord -q; then
+                systemctl restart supervisord > /dev/null
             fi
         endscript
 }
