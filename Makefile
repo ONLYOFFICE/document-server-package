@@ -66,7 +66,7 @@ FONTS = common/fonts
 
 ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
 
-NGINX_VER := nginx-1.11.4
+NGINX_VER := nginx-1.21.3
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
 
