@@ -71,7 +71,7 @@ NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
 
 PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
-PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
+PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
 
 NSSM_ZIP := nssm_x64.zip
 NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
