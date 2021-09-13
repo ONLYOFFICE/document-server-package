@@ -53,8 +53,8 @@
             <pre>sudo docker exec $(sudo docker ps -q) sudo supervisorctl start ds:example</pre>
             <h3>Add it to the autostart:</h3>
             <pre>sudo docker exec $(sudo docker ps -q) sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf</pre>
-            <p class="wait-example">If you already installed test example, access it here:</p>
-            <a id="example" class="wait-example" href="/example">
+            <p>If you already installed test example, access it here:</p>
+            <a href="/example">
                 <div class="button">GO TO TEST EXAMPLE</div>
             </a>
         </div>
@@ -74,27 +74,5 @@
             <footer>© Ascensio Systems SIA 2021. All rights reserved.</footer>
         </div>
     </div>
-
-    <script type="text/javascript" >
-        window.onload = function () {
-            var adress = document.getElementById("example").getAttribute("href");
-
-            try {
-                request = new XMLHttpRequest();
-                request.open("HEAD", adress, true);
-                request.timeout = 1000;
-                request.onload = function () {
-                    if (request.status == 200){
-                        var elems = document.getElementsByClassName("wait-example");
-                        while (elems.length) {
-                            elems[0].classList.remove("wait-example");
-                        }
-                    }
-                };
-                request.send();
-            } catch (e) {
-            }
-        };
-    </script>
 </body>
 </html>
