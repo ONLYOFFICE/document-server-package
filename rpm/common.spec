@@ -164,6 +164,10 @@ symlinks -c \
 sed 's/linux.html/linux-rpm.html/g' -i "$DSE_NGINX_CONF/ds-example.conf"
 %endif
 
+# Copy supervisord.service drop-in
+mkdir -p %{buildroot}%{_sysconfdir}/systemd/system/supervisord.service.d
+cp -r %{_builddir}/../../../common/documentserver/systemd/supervisor-centos.conf %{buildroot}%{_sysconfdir}/systemd/system/supervisord.service.d/10-documentserver-prepare.conf
+
 %clean
 rm -rf "%{buildroot}"
 
@@ -185,6 +189,7 @@ rm -rf "%{buildroot}"
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/*
 %attr(-, root, root) %{_sysconfdir}/supervisord.d/*
+%attr(-, root, root) %{_sysconfdir}/systemd/system/supervisord.service.d/*.conf
 
 %dir
 %attr(-, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
