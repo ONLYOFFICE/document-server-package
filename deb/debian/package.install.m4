@@ -6,6 +6,7 @@
 ../common/documentserver/nginx/includes/*.conf etc/M4_DS_PREFIX/nginx/includes/
 
 ../common/documentserver/supervisor/*.conf etc/M4_DS_PREFIX/supervisor/
+../common/documentserver/systemd/supervisor-debian.conf etc/systemd/system/supervisor.service.d/10-documentserver-prepare.conf
 
 ifelse('M4_DS_EXAMPLE_ENABLE', '1',
 ../common/documentserver-example/supervisor/*.conf etc/M4_DS_PREFIX-example/supervisor/,)
