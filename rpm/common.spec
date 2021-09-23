@@ -343,6 +343,9 @@ if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
 
+# refresh supervisor.service drop-in config
+systemctl daemon-reload
+
 # check msttcore-fonts-installer
 rpm -qa | grep msttcore-fonts-installer > msttcore-fonts-out
 OUTFILESIZE=$(stat -c%s "msttcore-fonts-out")
@@ -400,5 +403,8 @@ fi
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
+
+# refresh supervisor.service drop-in config
+systemctl daemon-reload
 
 %changelog
