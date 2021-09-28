@@ -302,12 +302,6 @@ fi
 # generate allfonts.js and thumbnail
 documentserver-generate-allfonts.sh true
 
-%filetriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
-documentserver-generate-allfonts.sh true
-
-%filetriggerun -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
-documentserver-generate-allfonts.sh true
-
 # check whethere enabled
 shopt -s nocasematch
 PORTS=()
@@ -349,6 +343,12 @@ then
   echo "    # yum install cabextract xorg-x11-font-utils"
   echo "    # rpm -i https://deac-ams.dl.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
 fi
+
+%transfiletriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
+%{_bindir}/documentserver-generate-allfonts.sh true
+
+%transfiletriggerun -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
+%{_bindir}/documentserver-generate-allfonts.sh true
 
 %preun
 case "$1" in
