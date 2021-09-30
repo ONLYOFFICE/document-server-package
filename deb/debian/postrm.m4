@@ -101,13 +101,13 @@ case "$1" in
 		fi
 
 		clean_ds_files
-		# refresh supervisor.service drop-in config
+		# refresh supervisor.service config
 		systemctl daemon-reload
 	;;
 
 	remove|upgrade)
 		clean_ds_files
-		# refresh supervisor.service drop-in config
+		# refresh supervisor.service config
 		systemctl daemon-reload
 	;;
   

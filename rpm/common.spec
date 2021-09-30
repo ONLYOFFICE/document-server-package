@@ -404,7 +404,7 @@ if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
 
-# refresh supervisor.service drop-in config
+# refresh supervisor.service config
 systemctl daemon-reload
 
 %changelog
