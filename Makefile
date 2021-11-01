@@ -302,6 +302,9 @@ documentserver:
 	mv -f $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
 
+	# download current mime.types
+	wget -O common/documentserver/nginx/includes/ds.mime.types https://raw.githubusercontent.com/nginx/nginx/master/conf/mime.types
+
 	# rename product specific folders
 	sed "s|onlyoffice\/documentserver|"$(DS_PREFIX)"|"  -i $(DOCUMENTSERVER_CONFIG)/*.json
 

@@ -4,5 +4,6 @@ server {
   listen [::]:80 default_server;
   server_tokens off;
   
+  include M4_NGINX_CONF/ds.mime.types;
   include M4_NGINX_CONF/ds-*.conf;
 }

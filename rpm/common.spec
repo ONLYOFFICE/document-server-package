@@ -83,6 +83,7 @@ mkdir -p "$DS_NGINX_CONF/includes/"
 
 cp -r %{_builddir}/../../../common/documentserver/nginx/*.conf "$DS_NGINX_CONF"
 cp -r %{_builddir}/../../../common/documentserver/nginx/*.tmpl "$DS_NGINX_CONF"
+cp -r %{_builddir}/../../../common/documentserver/nginx/includes/ds.mime.types "$DS_NGINX_CONF/includes/"
 cp -r %{_builddir}/../../../common/documentserver/nginx/includes/*.conf "$DS_NGINX_CONF/includes/"
 
 mkdir -p "%{buildroot}%{_localstatedir}/cache/nginx/%{_ds_prefix}/"
@@ -128,7 +129,7 @@ cp -r %{_builddir}/../../../common/documentserver-example/nginx/includes/*.conf 
 # Make symlinks for nginx configs
 find \
   ${CONF_DIR}*/nginx/includes \
-  -name *.conf \
+  -type f \( -name "*.conf" -o -name "*.types" \) \
   -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/nginx/includes/$(basename {})' \;
 
 %__ln_s \
