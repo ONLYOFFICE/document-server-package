@@ -386,7 +386,7 @@ documentserver-example:
 
 	echo "Done" > $@
 
-$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS)  documentserver documentserver-example
+$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 $(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 
 apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
@@ -444,7 +444,7 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
 
-$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example 
+$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 	cd deb && dpkg-buildpackage -b -uc -us --changes-option=-u.
 
 $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
