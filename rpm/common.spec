@@ -128,7 +128,7 @@ cp -r %{_builddir}/../../../common/documentserver-example/nginx/includes/*.conf 
 # Make symlinks for nginx configs
 find \
   ${CONF_DIR}*/nginx/includes \
-  -type f \( -name "*.conf" -o -name "*.types" \) \
+  -name *.conf \
   -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/nginx/includes/$(basename {})' \;
 
 %__ln_s \
