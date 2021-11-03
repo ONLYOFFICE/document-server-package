@@ -4,7 +4,7 @@
 ../common/documentserver/nginx/*.conf etc/M4_DS_PREFIX/nginx/
 ../common/documentserver/nginx/*.tmpl etc/M4_DS_PREFIX/nginx/
 ../common/documentserver/nginx/includes/*.conf etc/M4_DS_PREFIX/nginx/includes/
-../common/documentserver/nginx/includes/ds.mime.types etc/M4_DS_PREFIX/nginx/includes/
+../common/documentserver/nginx/includes/ds-mime.types etc/M4_DS_PREFIX/nginx/includes/
 
 ../common/documentserver/supervisor/*.conf etc/M4_DS_PREFIX/supervisor/
 
