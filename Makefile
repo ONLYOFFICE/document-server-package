@@ -70,6 +70,8 @@ NGINX_VER := nginx-1.21.3
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
 
+DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types
+
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
 PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
 
@@ -276,6 +278,7 @@ clean:
 		$(EXE_BUILD_DIR)/*.exe\
 		$(ISXDL)\
 		$(NGINX)\
+		$(DS_MIME_TYPES)\
 		$(NSSM)\
 		$(PSQL)\
 		$(DS_BIN_REPO)\
@@ -301,9 +304,6 @@ documentserver:
 
 	mv -f $(DOCUMENTSERVER)/server/Common/config/*.json $(DOCUMENTSERVER_CONFIG)
 	mv -f $(DOCUMENTSERVER)/server/Common/config/log4js/*.json $(DOCUMENTSERVER_CONFIG)/log4js/
-
-	# download current mime.types
-	wget -O common/documentserver/nginx/includes/ds-mime.types https://raw.githubusercontent.com/nginx/nginx/master/conf/mime.types
 
 	# rename product specific folders
 	sed "s|onlyoffice\/documentserver|"$(DS_PREFIX)"|"  -i $(DOCUMENTSERVER_CONFIG)/*.json
@@ -386,8 +386,8 @@ documentserver-example:
 
 	echo "Done" > $@
 
-$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) $(DS_MIME_TYPES) documentserver documentserver-example
+$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) $(DS_MIME_TYPES) documentserver documentserver-example
 
 apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
 	mv -f $< $@
@@ -444,10 +444,10 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
 
-$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) $(DS_MIME_TYPES) documentserver documentserver-example 
 	cd deb && dpkg-buildpackage -b -uc -us --changes-option=-u.
 
-$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
+$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(DS_MIME_TYPES) $(PSQL) $(NSSM)
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
@@ -463,6 +463,10 @@ $(NGINX):
 	mv -f $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
 	rm -f $(NGINX_ZIP)
 	
+$(DS_MIME_TYPES):
+	$(TOUCH) $(DS_MIME_TYPES) && \
+	$(CURL) $(DS_MIME_TYPES) https://raw.githubusercontent.com/nginx/nginx/master/conf/mime.types
+
 $(PSQL):
 	$(CURL) $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
 	7z x -y -o. $(PSQL_ZIP) && \
