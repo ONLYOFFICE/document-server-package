@@ -70,7 +70,7 @@ NGINX_VER := nginx-1.21.3
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
 
-DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types
+DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
 
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
 PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
