@@ -194,6 +194,7 @@ COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf
 COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
+COMMON_DEPS += $(DS_MIME_TYPES)
 
 LINUX_DEPS += common/documentserver/logrotate/ds.conf
 
@@ -278,7 +279,6 @@ clean:
 		$(EXE_BUILD_DIR)/*.exe\
 		$(ISXDL)\
 		$(NGINX)\
-		$(DS_MIME_TYPES)\
 		$(NSSM)\
 		$(PSQL)\
 		$(DS_BIN_REPO)\
@@ -386,8 +386,8 @@ documentserver-example:
 
 	echo "Done" > $@
 
-$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) $(DS_MIME_TYPES) documentserver documentserver-example
-$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) $(DS_MIME_TYPES) documentserver documentserver-example
+$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS)  documentserver documentserver-example
+$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 
 apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
 	mv -f $< $@
@@ -444,10 +444,10 @@ deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
 
-$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) $(DS_MIME_TYPES) documentserver documentserver-example 
+$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example 
 	cd deb && dpkg-buildpackage -b -uc -us --changes-option=-u.
 
-$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(DS_MIME_TYPES) $(PSQL) $(NSSM)
+$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
