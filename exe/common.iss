@@ -72,11 +72,12 @@
 #define REG_LICENSE_PATH      'LicensePath'
 #define REG_DB_HOST           'DbHost'
 #define REG_DB_USER           'DbUser'
-#define REG_DB_PWD            'DbPwd'
+#define REG_DB_PWD            'DbPwd' 
 #define REG_DB_NAME           'DbName'
 #define REG_RABBITMQ_HOST     'RabbitMqHost'
 #define REG_RABBITMQ_USER     'RabbitMqUser'
 #define REG_RABBITMQ_PWD      'RabbitMqPwd'
+#define REG_RABBITMQ_PRTCL    'RabbitMqProtocol'
 #define REG_REDIS_HOST        'RedisHost'
 #define REG_DS_PORT           'DsPort'
 #define REG_EXAMPLE_PORT      'ExamplePort'
@@ -85,6 +86,7 @@
 #define REG_JWT_ENABLED       'JwtEnabled'
 #define REG_JWT_SECRET        'JwtSecret'
 #define REG_JWT_HEADER        'JwtHeader'
+
 
 #define iconsExe            'projicons.exe'
 
@@ -298,6 +300,7 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PRTCL}"; ValueData: "{code:GetRabbitMqProtocol}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial;
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
@@ -320,7 +323,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProtocol}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
@@ -568,6 +571,11 @@ begin
   Result := RedisPage.Values[0];
 end;
 
+function GetRabbitMqProtocol(Param: String): String;
+begin
+  Result := RabbitMqPage.Values[3];
+end;
+
 function GetDefaultPort(Param: String): String;
 begin
   Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}');
@@ -645,10 +653,12 @@ begin
   RabbitMqPage.Add('Host:', False);
   RabbitMqPage.Add('User:', False);
   RabbitMqPage.Add('Password:', True);
+  RabbitMqPage.Add('Protocol:', False);
 
   RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
   RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
+  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PRTCL|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PRTCL}|amqp}}');
 
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
