@@ -322,7 +322,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProtocol}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
@@ -652,11 +652,13 @@ begin
   RabbitMqPage.Add('Host:', False);
   RabbitMqPage.Add('User:', False);
   RabbitMqPage.Add('Password:', True);
-
+  RabbitMqPage.Add('Protocol:', False);
+  
   RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
   RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-
+  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PRTCL|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PRTCL}|amqp}}');
+  
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
       'Redis In-Memory Database', 'Configure Redis Connection...',
