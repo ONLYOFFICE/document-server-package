@@ -762,36 +762,46 @@ end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 var i: Integer;
 begin
-  Result := true;
+  Result := True;
   if WizardSilent() = false then
   begin
-    case CurPageID of
+    case CurPageId of
       DbPage.ID:
-      for i := 0 to 3 do begin 
-        if (length(DbPage.Values[i]) = 0) then begin
-          MsgBox('Invalid parameter ' + inttostr(i+1), mbInformation, MB_OK);
+        for i := 0 to 3 do
+        begin
+          if (length(DbPage.Values[i]) = 0) then
+          begin
+            MsgBox('Invalid parameter ' + IntToStr(i + 1), mbError, MB_OK);
+          end;
         end;
-      end;
-      //RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-      //RedisPage.ID: Result := CheckRedisConnection();
-      //wpReady: Result := DownloadDependency();
-    end;
-    case CurPageID of
-      wpReady:
-        if downloadMessage <> '' then begin
-			// change isxdl language only if it is not english because isxdl default language is already english
-        if (ActiveLanguage() <> 'en') then begin
-				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
-				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
-        end;
-			//isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
 
-			//if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [FmtMessage(downloadMessage, [''])]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
-			//	Result := false
-			//else if
-			if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
-				Result := false;
-      end;
-    end; 
+      RabbitMqPage.ID:
+        for i := 0 to 3 do
+        begin
+          if (length(RabbitMqPage.Values[i]) = 0) then
+          begin
+            MsgBox('Invalid parameter ' + IntToStr(i + 1), mbError, MB_OK);
+          end;
+        end;
+      
+      wpReady:
+        if downloadMessage <> '' then
+        begin
+        // change isxdl language only if it is not english because isxdl default language is already english
+          if (ActiveLanguage() <> 'en') then
+          begin
+            ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
+            isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
+          end;
+          //isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
+          //if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [FmtMessage(downloadMessage, [''])]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
+          //	Result := false
+          //else if
+          if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
+          begin
+            Result := false;
+          end;
+        end;
+    end;
   end;
-end;                                                   
+end;
