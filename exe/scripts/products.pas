@@ -1,4 +1,4 @@
-﻿{
+{
 	--- TYPES AND VARIABLES ---
 }
 type
