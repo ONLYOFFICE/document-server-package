@@ -235,7 +235,7 @@ function ButtonClickWpReady(CurPageID: Integer): boolean;
 {
 	At each "next" button click
 	See: http://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
-} 
+}
 begin
 	Result := true;
 

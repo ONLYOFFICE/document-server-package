@@ -1,4 +1,4 @@
-#ifndef sBrandingFolder
+﻿#ifndef sBrandingFolder
   #define sBrandingFolder '..\branding'
 #endif
 
@@ -769,6 +769,6 @@ begin
           Result := CheckDbConnection();
         wpReady:
           ButtonClickWpReady(CurPageID);
-    end; 
+    end;
   end;
 end;
