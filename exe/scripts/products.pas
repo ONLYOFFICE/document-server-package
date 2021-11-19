@@ -231,7 +231,7 @@ begin
 	Result := s
 end;
 
-function wpReadyCurPage(CurPageID: Integer): boolean;
+function ButtonClickWpReady(CurPageID: Integer): boolean;
 {
 	At each "next" button click
 	See: http://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
