@@ -1,4 +1,4 @@
-{
+﻿{
 	--- TYPES AND VARIABLES ---
 }
 type
@@ -229,6 +229,32 @@ begin
 		s := s + MemoTasksInfo;
 
 	Result := s
+end;
+
+function wpReadyCurPage(CurPageID: Integer): boolean;
+{
+	At each "next" button click
+	See: http://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
+}
+begin
+	Result := true;
+
+	if CurPageID = wpReady then begin
+		if downloadMessage <> '' then begin
+			// change isxdl language only if it is not english because isxdl default language is already english
+			if (ActiveLanguage() <> 'en') then begin
+				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
+				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
+			end;
+			//isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
+
+			//if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [FmtMessage(downloadMessage, [''])]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
+			//	Result := false
+			//else if
+			if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
+				Result := false;
+		end;
+	end;
 end;
 
 {
