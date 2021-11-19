@@ -768,7 +768,7 @@ begin
         DbPage.ID:
           Result := CheckDbConnection();
         wpReady:
-          ButtonClickWpReady(CurPageID);
+          DownloadDependency(CurPageID);
     end;
   end;
 end;
