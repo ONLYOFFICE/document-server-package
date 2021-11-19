@@ -769,6 +769,6 @@ begin
           Result := CheckDbConnection();
         wpReady:
           ButtonClickWpReady(CurPageID);
-    end;
+    end; 
   end;
 end;
