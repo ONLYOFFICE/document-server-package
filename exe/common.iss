@@ -1,4 +1,4 @@
-﻿#ifndef sBrandingFolder
+#ifndef sBrandingFolder
   #define sBrandingFolder '..\branding'
 #endif
 
