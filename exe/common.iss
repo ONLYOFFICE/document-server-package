@@ -732,7 +732,7 @@ begin
   Exec(
     ExpandConstant('{#RABBITMQCTL}'),
     '-q list_queues',
-    '', 
+    '',
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
@@ -740,7 +740,7 @@ begin
   Exec(
     ExpandConstant('{#RABBITMQPLUG}'),
     RabbitMqManagement,
-    '', 
+    '',
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
