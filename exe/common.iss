@@ -722,19 +722,40 @@ end;
 function CheckRabbitMqConnection(): Boolean;
 var
   ResultCode: Integer;
+  RabbitMqManagement: String;
+  LocalHost: String;
 begin
   Result := true;
-    Exec(
+  RabbitMqManagement := 'enable rabbitmq_management';
+  LocalHost := 'http://' + GetRabbitMqHost('') + ':15672';
+
+  Exec(
     ExpandConstant('{#RABBITMQCTL}'),
     '-q list_queues',
     '', 
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
+    
+  Exec(
+    ExpandConstant('{#RABBITMQPLUG}'),
+    RabbitMqManagement,
+    '', 
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
 
-  if ResultCode <> 0 then
+  Exec(
+    'explorer.exe',
+    LocalHost,
+    '',
+    SW_SHOW,
+    ewWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 1 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
 end;
@@ -767,8 +788,10 @@ begin
     case CurPageID of
         DbPage.ID:
           Result := CheckDbConnection();
+        RabbitMqPage.ID:
+          Result := CheckRabbitMqConnection();
         wpReady:
-          Result := DownloadDependency(CurPageID);
+          DownloadDependency(CurPageID);
     end;
   end;
 end;
