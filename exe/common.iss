@@ -791,7 +791,7 @@ begin
         RabbitMqPage.ID:
           Result := CheckRabbitMqConnection();
         wpReady:
-          DownloadDependency(CurPageID);
+          Restult := DownloadDependency(CurPageID);
     end;
   end;
 end;
