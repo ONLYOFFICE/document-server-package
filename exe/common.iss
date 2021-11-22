@@ -129,6 +129,7 @@
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
+#define RABBITMQPLUG '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmq-plugins.bat'
 
 #define JSON '{app}\npm\json.exe'
 
