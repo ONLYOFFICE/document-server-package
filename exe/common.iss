@@ -802,7 +802,7 @@ begin
         RabbitMqPage.ID:
           Result := CheckRabbitMqConnection();
         wpReady:
-          Restult := DownloadDependency(CurPageID);
+          Result := DownloadDependency(CurPageID);
     end;
   end;
 end;
