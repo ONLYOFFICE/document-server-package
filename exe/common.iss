@@ -725,10 +725,12 @@ var
   ResultCode: Integer;
   RabbitMqManagement: String;
   LocalHost: String;
+  AuthUser: String;
 begin
   Result := true;
   RabbitMqManagement := 'enable rabbitmq_management';
   LocalHost := 'http://' + GetRabbitMqHost('') + ':15672';
+  AuthUser := 'authenticate_user';
 
   Exec(
     ExpandConstant('{#RABBITMQCTL}'),
@@ -747,6 +749,14 @@ begin
     ResultCode);
 
   Exec(
+    ExpandConstant('{#RABBITMQCTL}'),
+    (AuthUser + ' ' + GetRabbitMqUser('') + ' ' + GetRabbitMqPwd('')),
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  Exec(
     'explorer.exe',
     LocalHost,
     '',
@@ -754,7 +764,7 @@ begin
     ewWaitUntilTerminated,
     ResultCode);
 
-  if ResultCode <> 1 then
+  if ResultCode <> 1 or 0 then
   begin
     MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
