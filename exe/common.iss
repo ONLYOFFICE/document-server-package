@@ -760,14 +760,6 @@ begin
     EwWaitUntilTerminated,
     ResultCode);
 
-  if ResultCode <> 1 or 0 then
-  begin
-    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
-    Result := false;
-  end;
-
-  if ResultCode = 1 then
-  begin
   Exec(
     'explorer.exe',
     LocalHost,
@@ -775,7 +767,14 @@ begin
     SW_SHOW,
     ewWaitUntilTerminated,
     ResultCode);
+
+  if ResultCode <> 1 or 0 then
+  begin
+    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    Result := false;
   end;
+
+  
 end;
 
 function CheckRedisConnection(): Boolean;
