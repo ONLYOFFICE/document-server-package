@@ -748,14 +748,25 @@ begin
     ewWaitUntilTerminated,
     ResultCode);
 
+//for correct operation need python and rabbitmqadmin in dir
+//https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
+
   Exec(
-    ExpandConstant('{#RABBITMQCTL}'),
-    (AuthUser + ' ' + GetRabbitMqUser('') + ' ' + GetRabbitMqPwd('')),
+    ExpandConstant('{#PYTHON}'),
+    'rabbitmqadmin -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('') + ' -p ' + GetRabbitMqPwd('') + ' -P 15672 list queues',
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
+  if ResultCode <> 1 or 0 then
+  begin
+    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    Result := false;
+  end;
+
+  if ResultCode = 1 then
+  begin
   Exec(
     'explorer.exe',
     LocalHost,
@@ -763,11 +774,6 @@ begin
     SW_SHOW,
     ewWaitUntilTerminated,
     ResultCode);
-
-  if ResultCode <> 1 or 0 then
-  begin
-    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
-    Result := false;
   end;
 end;
 
