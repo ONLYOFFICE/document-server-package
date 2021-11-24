@@ -727,12 +727,15 @@ var
   RabbitMqManagement: String;
   LocalHost: String;
   AuthUser: String;
+  Port: String;
+  RabbitMqAdmin: String;
 begin
   Result := true;
   RabbitMqManagement := 'enable rabbitmq_management';
   LocalHost := 'http://' + GetRabbitMqHost('') + ':15672';
   AuthUser := 'authenticate_user';
-
+  Port := '15672';
+  RabbitMqAdmin := 'rabbitmqadmin';
   Exec(
     ExpandConstant('{#RABBITMQCTL}'),
     '-q list_queues',
@@ -754,7 +757,7 @@ begin
 
   Exec(
     ExpandConstant('{#PYTHON}'),
-    'rabbitmqadmin -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('') + ' -p ' + GetRabbitMqPwd('') + ' -P 15672 list queues',
+    (RabbitMqAdmin + ' -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('') + ' -p ' + GetRabbitMqPwd('') + ' -P ' + Port + 'list queues'),
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
