@@ -130,6 +130,7 @@
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 #define RABBITMQPLUG '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmq-plugins.bat'
+#define PYTHON '{localappdata}\Programs\Python\Python\Python310\python.exe'
 
 #define JSON '{app}\npm\json.exe'
 
