@@ -731,26 +731,7 @@ var
   RabbitMqAdmin: String;
 begin
   Result := true;
-  RabbitMqManagement := 'enable rabbitmq_management';
-  LocalHost := 'http://' + GetRabbitMqHost('') + ':15672';
-  AuthUser := 'authenticate_user';
-  Port := '15672';
   RabbitMqAdmin := 'rabbitmqadmin';
-  Exec(
-    ExpandConstant('{#RABBITMQCTL}'),
-    '-q list_queues',
-    '',
-    SW_HIDE,
-    ewWaitUntilTerminated,
-    ResultCode);
-    
-  Exec(
-    ExpandConstant('{#RABBITMQPLUG}'),
-    RabbitMqManagement,
-    '',
-    SW_HIDE,
-    ewWaitUntilTerminated,
-    ResultCode);
 
 //for correct operation need python and rabbitmqadmin in dir
 //https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
@@ -761,14 +742,6 @@ begin
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
-    ResultCode);
-
-  Exec(
-    'explorer.exe',
-    LocalHost,
-    '',
-    SW_SHOW,
-    ewWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 1 or 0 then
