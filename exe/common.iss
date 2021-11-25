@@ -725,32 +725,29 @@ function CheckRabbitMqConnection(): Boolean;
 var
   ResultCode: Integer;
   RabbitMqManagement: String;
-  LocalHost: String;
-  AuthUser: String;
-  Port: String;
   RabbitMqAdmin: String;
 begin
   Result := true;
   RabbitMqAdmin := 'rabbitmqadmin';
-
+  if not FileExists('{#PYTHON}') then
+  begin
+    MsgBox('Python isn''t installed or unreachable, RabbitMQ parameters validation will be skipped.', mbError, MB_OK);
+  end;
 //for correct operation need python and rabbitmqadmin in dir
 //https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
-
   Exec(
     ExpandConstant('{#PYTHON}'),
-    (RabbitMqAdmin + ' -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('') + ' -p ' + GetRabbitMqPwd('') + ' -P ' + Port + 'list queues'),
+    (RabbitMqAdmin + '-H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('') + ' -p ' + GetRabbitMqPwd('') + ' -P 15672 list vhosts'),
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
-
-  if ResultCode <> 1 or 0 then
+  
+  if ResultCode <> 2 then
   begin
-    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Connection to ' + GetDbHost('') + ' failed!' + #13#10 + 'PSQL return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
-
-  
 end;
 
 function CheckRedisConnection(): Boolean;
