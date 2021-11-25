@@ -745,7 +745,8 @@ begin
   
   if ResultCode <> 2 then
   begin
-    MsgBox('Connection to ' + GetDbHost('') + ' failed!' + #13#10 + 'PSQL return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 
+    'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
 end;
