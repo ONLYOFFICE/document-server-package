@@ -451,7 +451,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 [Code]
 const
   Python = 'python.exe';
-  RabbitMqAdmin := 'rabbitmqadmin';
+  RabbitMqAdmin = 'rabbitmqadmin';
 
 #include "scripts\service.pas"
 
