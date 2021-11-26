@@ -130,7 +130,6 @@
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
 #define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 #define RABBITMQPLUG '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmq-plugins.bat'
-#define PYTHON '{localappdata}\Programs\Python\Python\Python310\python.exe'
 
 #define JSON '{app}\npm\json.exe'
 
@@ -451,7 +450,8 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 ;#include "scripts\products\redis.iss"
 
 [Code]
-
+const
+  python = 'python.exe';
 #include "scripts\service.pas"
 
 function UninstallPreviosVersion(): Boolean;
@@ -732,7 +732,7 @@ begin
 //for correct operation need python and rabbitmqadmin in dir
 //https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
   Exec(
-    'python.exe',
+    python,
     '--version',
     '',
     SW_SHOW,
@@ -744,15 +744,18 @@ begin
     MsgBox('Python isn''t installed or unreachable, RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
   end else begin
     Exec(
-    'python.exe',
-    (RabbitMqAdmin + ' -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('') + ' -p ' + GetRabbitMqPwd('') + ' -P 15672 list vhosts'),
+    python,
+    (RabbitMqAdmin + ' -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('')
+    + ' -p ' + GetRabbitMqPwd('') + ' -P 15672 list vhosts'),
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
     if ResultCode <> 0 then
     begin
-      MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 + 'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+      MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10
+      + 'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
+      'Check the connection settings and try again.', mbError, MB_OK);
     end;
   end;
 end;
