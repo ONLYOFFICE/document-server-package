@@ -450,7 +450,9 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
 [Code]
 const
-  python = 'python.exe';
+  Python = 'python.exe';
+  RabbitMqAdmin := 'rabbitmqadmin';
+
 #include "scripts\service.pas"
 
 function UninstallPreviosVersion(): Boolean;
@@ -723,15 +725,13 @@ end;
 function CheckRabbitMqConnection(): Boolean;
 var
   ResultCode: Integer;
-  RabbitMqAdmin: String;
 begin
   Result := true;
-  RabbitMqAdmin := 'rabbitmqadmin';
 
 //for correct operation need python and rabbitmqadmin in dir
 //https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
   Exec(
-    python,
+    Python,
     '--version',
     '',
     SW_SHOW,
@@ -740,21 +740,25 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Python isn''t installed or unreachable, RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+    MsgBox('Python isn''t installed or unreachable, ' +
+    'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
   end else begin
     Exec(
-    python,
-    (RabbitMqAdmin + ' -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('')
-    + ' -p ' + GetRabbitMqPwd('') + ' -P 15672 list vhosts'),
+    Python,
+    (RabbitMqAdmin +
+    ' -H ' + GetRabbitMqHost('') +
+    ' -u '+ GetRabbitMqUser('') +
+    ' -p ' + GetRabbitMqPwd('') +
+    ' -P 15672 list vhosts'),
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
     if ResultCode <> 0 then
     begin
-      MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10
-      + 'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10
-      + 'Check the connection settings and try again.', mbError, MB_OK);
+      MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
+      'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
+      'Check the connection settings and try again.', mbError, MB_OK);
     end;
   end;
 end;
