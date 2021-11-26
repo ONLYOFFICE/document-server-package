@@ -726,7 +726,7 @@ function CheckRabbitMqConnection(): Boolean;
 var
   ResultCode: Integer;
 begin
-
+  Result := true;
 //for correct operation need python and rabbitmqadmin in dir
 //https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
   Exec(
