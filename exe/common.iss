@@ -741,7 +741,7 @@ begin
   begin
     MsgBox('Python isn''t installed or unreachable, ' +
     'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
-    Result := true;
+    Exit;
   end;
 
     Exec(
@@ -761,6 +761,7 @@ begin
       MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
       'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
       'Check the connection settings and try again.', mbError, MB_OK);
+      Result := false;
     end;
 end;
 
