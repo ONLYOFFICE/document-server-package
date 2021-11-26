@@ -734,7 +734,7 @@ begin
     Python,
     '--version',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
