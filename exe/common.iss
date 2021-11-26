@@ -732,7 +732,7 @@ begin
 //for correct operation need python and rabbitmqadmin in dir
 //https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
   Exec(
-    'C:\Python310\python.exe',
+    'python.exe',
     '--version',
     '',
     SW_SHOW,
@@ -744,7 +744,7 @@ begin
     MsgBox('Python isn''t installed or unreachable, RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
   end else begin
     Exec(
-    'C:\Python310\python.exe',
+    'python.exe',
     (RabbitMqAdmin + ' -H ' + GetRabbitMqHost('') + ' -u '+ GetRabbitMqUser('') + ' -p ' + GetRabbitMqPwd('') + ' -P 15672 list vhosts'),
     '',
     SW_HIDE,
