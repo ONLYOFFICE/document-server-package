@@ -726,7 +726,6 @@ function CheckRabbitMqConnection(): Boolean;
 var
   ResultCode: Integer;
 begin
-  Result := true;
 
 //for correct operation need python and rabbitmqadmin in dir
 //https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
@@ -734,7 +733,7 @@ begin
     Python,
     '--version',
     '',
-    SW_HIDE,
+    SW_SHOW,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -742,7 +741,9 @@ begin
   begin
     MsgBox('Python isn''t installed or unreachable, ' +
     'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
-  end else begin
+    Result := true;
+  end;
+
     Exec(
     Python,
     (RabbitMqAdmin +
@@ -754,13 +755,13 @@ begin
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
+
     if ResultCode <> 0 then
     begin
       MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
       'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
       'Check the connection settings and try again.', mbError, MB_OK);
     end;
-  end;
 end;
 
 function CheckRedisConnection(): Boolean;
