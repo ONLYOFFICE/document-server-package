@@ -745,16 +745,16 @@ begin
   end;
 
     Exec(
-    Python,
-    (RabbitMqAdmin +
-    ' -H ' + GetRabbitMqHost('') +
-    ' -u '+ GetRabbitMqUser('') +
-    ' -p ' + GetRabbitMqPwd('') +
-    ' -P 15672 list vhosts'),
-    '',
-    SW_HIDE,
-    EwWaitUntilTerminated,
-    ResultCode);
+      Python,
+      (RabbitMqAdmin +
+      ' -H ' + GetRabbitMqHost('') +
+      ' -u '+ GetRabbitMqUser('') +
+      ' -p ' + GetRabbitMqPwd('') +
+      ' -P 15672 list vhosts'),
+      '',
+      SW_HIDE,
+      EwWaitUntilTerminated,
+      ResultCode);
 
     if ResultCode <> 0 then
     begin
