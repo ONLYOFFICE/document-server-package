@@ -744,25 +744,25 @@ begin
     Exit;
   end;
 
-    Exec(
-      Python,
-      (RabbitMqAdmin +
-      ' -H ' + GetRabbitMqHost('') +
-      ' -u '+ GetRabbitMqUser('') +
-      ' -p ' + GetRabbitMqPwd('') +
-      ' -P 15672 list vhosts'),
-      '',
-      SW_HIDE,
-      EwWaitUntilTerminated,
-      ResultCode);
+  Exec(
+    Python,
+    (RabbitMqAdmin +
+    ' -H ' + GetRabbitMqHost('') +
+    ' -u '+ GetRabbitMqUser('') +
+    ' -p ' + GetRabbitMqPwd('') +
+    ' -P 15672 list vhosts'),
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
 
-    if ResultCode <> 0 then
-    begin
-      MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
-      'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
-      'Check the connection settings and try again.', mbError, MB_OK);
-      Result := false;
-    end;
+  if ResultCode <> 0 then
+  begin
+    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
+    'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
+    'Check the connection settings and try again.', mbError, MB_OK);
+    Result := false;
+  end;
 end;
 
 function CheckRedisConnection(): Boolean;
