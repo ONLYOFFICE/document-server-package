@@ -754,8 +754,8 @@ begin
     if ResultCode <> 0 then
     begin
       MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10
-      + 'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
-      'Check the connection settings and try again.', mbError, MB_OK);
+      + 'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10
+      + 'Check the connection settings and try again.', mbError, MB_OK);
     end;
   end;
 end;
