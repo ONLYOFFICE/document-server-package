@@ -795,6 +795,8 @@ begin
           Result := CheckDbConnection();
         RabbitMqPage.ID:
           Result := CheckRabbitMqConnection();
+        RedisPage.ID:
+          Result := CheckRedisConnection();
         wpReady:
           Result := DownloadDependency(CurPageID);
     end;
