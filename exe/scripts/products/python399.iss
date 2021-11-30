@@ -21,7 +21,7 @@ begin
 	if (not IsIA64()) then begin
 		if (not msiproductupgrade(GetString(python399_upgradecode, python399_upgradecode_x64, ''), minVersion)) then
 			AddProduct('python 3.9.9' + GetArchitectureString() + '.exe',
-				'DefaultAllUsersTargetDir=%HOMEDRIVE%\python /passive /norestart , ',
+				'DefaultAllUsersTargetDir=%HOMEDRIVE%\python /passive /norestart',
 				CustomMessage('python399_title' + GetArchitectureString()),
 				CustomMessage('python399_size' + GetArchitectureString()),
 				GetString(python399_url, python399_url_x64, ''),
