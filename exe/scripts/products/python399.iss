@@ -1,4 +1,4 @@
-; requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003 Service Pack 2, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP Service Pack 3
+; requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1
 ; https://www.python.org/downloads/
 
 [CustomMessages]
@@ -21,7 +21,7 @@ begin
 	if (not IsIA64()) then begin
 		if (not msiproductupgrade(GetString(python399_upgradecode, python399_upgradecode_x64, ''), minVersion)) then
 			AddProduct('python 3.9.9' + GetArchitectureString() + '.exe',
-				'/passive /norestart',
+				'DefaultAllUsersTargetDir=%HOMEDRIVE%\python /passive /norestart , ',
 				CustomMessage('python399_title' + GetArchitectureString()),
 				CustomMessage('python399_size' + GetArchitectureString()),
 				GetString(python399_url, python399_url_x64, ''),
