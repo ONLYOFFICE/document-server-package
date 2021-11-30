@@ -444,6 +444,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\vcredist2010.iss"
 #include "scripts\products\vcredist2013.iss"
 #include "scripts\products\vcredist2015.iss"
+#include "scripts\products\python399.iss"
 ;#include "scripts\products\postgresql.iss"
 ;#include "scripts\products\rabbitmq.iss"
 ;#include "scripts\products\redis.iss"
@@ -513,6 +514,7 @@ begin
     // vcredist2010('10');
     vcredist2013('12');
     vcredist2015('14');
+    python399('3.0.0');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
