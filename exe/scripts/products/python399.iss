@@ -13,15 +13,15 @@ const
 	python399_url = 'http://www.python.org/ftp/python/3.9.9/python-3.9.9.exe';
 	python399_url_x64 = 'http://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe';
 
-	python399_upgradecode = '{B50BC36B-3C19-491C-9CF8-BC5C384D70F2}';
-	python399_upgradecode_x64 = '{5B4B8687-6FD2-4002-A109-CC428BC53026}';
+	python399_upgradecode = '{B0D35164-DCE0-5CD6-B3AE-55F0AE08E42E}';
+	python399_upgradecode_x64 = '{0D8FFA35-4E68-56AE-9C6D-7B33F2B22892}';
 
 procedure python399(minVersion: string);
 begin
 	if (not IsIA64()) then begin
 		if (not msiproductupgrade(GetString(python399_upgradecode, python399_upgradecode_x64, ''), minVersion)) then
 			AddProduct('python 3.9.9' + GetArchitectureString() + '.exe',
-				'DefaultAllUsersTargetDir=%HOMEDRIVE%\python /passive /norestart',
+				'DefaultJustForMeTargetDir=C:\Python /passive /norestart , ',
 				CustomMessage('python399_title' + GetArchitectureString()),
 				CustomMessage('python399_size' + GetArchitectureString()),
 				GetString(python399_url, python399_url_x64, ''),
