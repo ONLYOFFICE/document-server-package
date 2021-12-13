@@ -128,7 +128,6 @@
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
 #define REDISCLI '{pf64}\Redis\redis-cli.exe'
-#define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define JSON '{app}\npm\json.exe'
 
@@ -450,9 +449,6 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 ;#include "scripts\products\redis.iss"
 
 [Code]
-const
-  Python = 'python.exe';
-  RabbitMqAdmin = 'rabbitmqadmin';
 
 #include "scripts\service.pas"
 
@@ -727,11 +723,17 @@ end;
 function CheckRabbitMqConnection(): Boolean;
 var
   ResultCode: Integer;
+  PythonPath: String;
+  Python: String;
+  Pip: String;
 begin
   Result := true;
-//for correct operation need python and rabbitmqadmin in dir
-//https://raw.githubusercontent.com/rabbitmq/rabbitmq-server/v3.9.10/deps/rabbitmq_management/bin/rabbitmqadmin
-  Exec(
+  PythonPath := ExpandConstant('{sd}') + '\Python';
+  Python := PythonPath + '\python.exe';
+  Pip := PythonPath + '\scripts\pip.exe';
+
+  ShellExec(
+    '',
     Python,
     '--version',
     '',
@@ -747,14 +749,22 @@ begin
   end;
 
   Exec(
-    Python,
-    (RabbitMqAdmin +
-    ' -H ' + GetRabbitMqHost('') +
-    ' -u '+ GetRabbitMqUser('') +
-    ' -p ' + GetRabbitMqPwd('') +
-    ' -P 15672 list vhosts'),
+    Pip,
+    'install pika',
     '',
-    SW_HIDE,
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  ShellExec(
+    '',
+    Python,
+    ExpandConstant('{src}\scripts\publish.py') + ' ' +
+    GetRabbitMqUser('') + ' ' +
+    GetRabbitMqPwd('') + ' ' +
+    GetRabbitMqHost(''),
+    '',
+    SW_SHOW,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -774,7 +784,7 @@ begin
   Result := true;
     Exec(
     ExpandConstant('{#REDISCLI}'),
-    '-h ' + GetRedisHost('') + ' --version',
+    '-h ' + GetRedisHost('') + ' quit',
     '', 
     SW_HIDE,
     ewWaitUntilTerminated,
