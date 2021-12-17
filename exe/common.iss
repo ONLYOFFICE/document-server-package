@@ -270,6 +270,7 @@ Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\co
 Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: scripts\publish.py;
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -499,7 +500,11 @@ function InitializeSetup(): Boolean;
 begin
   // initialize windows version
   initwinversion();
-  
+
+  FileCopy(ExpandConstant('{tmp}\publish.py'),
+  ExpandConstant('{pf}\{#sIntCompanyName}\{#sIntProductName}\publish.py'),
+  True);
+
   if not UninstallPreviosVersion() then
   begin
     Abort();
