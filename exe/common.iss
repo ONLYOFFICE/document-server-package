@@ -501,8 +501,7 @@ begin
   // initialize windows version
   initwinversion();
 
-  CreateDir(ExpandConstant('{pf}\{#sCompanyName}'));
-  CreateDir(ExpandConstant('{pf}\{#sCompanyName}\{#sIntProductName}'));
+  ForceDirectories(ExpandConstant('{pf}\{#sCompanyName}\{#sIntProductName}'));
 
   ExtractTemporaryFile('publish.py')
   FileCopy(ExpandConstant('{tmp}\publish.py'),
