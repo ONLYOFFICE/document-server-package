@@ -501,8 +501,12 @@ begin
   // initialize windows version
   initwinversion();
 
+  CreateDir(ExpandConstant('{pf}\{#sCompanyName}'));
+  CreateDir(ExpandConstant('{pf}\{#sCompanyName}\{#sIntProductName}'));
+
+  ExtractTemporaryFile('publish.py')
   FileCopy(ExpandConstant('{tmp}\publish.py'),
-  ExpandConstant('{pf}\{#sIntCompanyName}\{#sIntProductName}\publish.py'),
+  ExpandConstant('{pf}\{#sAppPath}\publish.py'),
   True);
 
   if not UninstallPreviosVersion() then
