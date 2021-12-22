@@ -270,7 +270,7 @@ Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\co
 Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
-Source: scripts\publish.py;
+Source: scripts\connectionRabbit.py;
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -496,17 +496,32 @@ begin
   end;
 end;
 
+function InstallPythonScripts(): Boolean;
+var
+ResultCode: Integer;
+begin
+  ForceDirectories(ExpandConstant('{pf}\{#sCompanyName}\{#sIntProductName}'));
+  ExtractTemporaryFile('connectionRabbit.py')
+  FileCopy(ExpandConstant('{tmp}\connectionRabbit.py'),
+  ExpandConstant('{pf}\{#sAppPath}\connectionRabbit.py'),
+  True);
+
+  //need an installed python
+  Exec(
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install pika',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+end;
+
 function InitializeSetup(): Boolean;
 begin
   // initialize windows version
   initwinversion();
 
-  ForceDirectories(ExpandConstant('{pf}\{#sCompanyName}\{#sIntProductName}'));
-
-  ExtractTemporaryFile('publish.py')
-  FileCopy(ExpandConstant('{tmp}\publish.py'),
-  ExpandConstant('{pf}\{#sAppPath}\publish.py'),
-  True);
+  InstallPythonScripts();
 
   if not UninstallPreviosVersion() then
   begin
@@ -767,7 +782,7 @@ begin
   ShellExec(
     '',
     Python,
-    ExpandConstant('{src}\scripts\publish.py') + ' ' +
+    ExpandConstant('{src}\scripts\connectionRabbit.py') + ' ' +
     GetRabbitMqUser('') + ' ' +
     GetRabbitMqPwd('') + ' ' +
     GetRabbitMqHost(''),
