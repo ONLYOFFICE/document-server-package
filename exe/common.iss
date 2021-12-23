@@ -776,7 +776,9 @@ begin
   ShellExec(
     '',
     Python,
-    ExpandConstant('{src}\scripts\connectionRabbit.py') + ' ' +
+    ('"' +
+    ExpandConstant('{pf}') +
+    '\{#sCompanyName}\{#sIntProductName}\connectionRabbit.py"') + ' ' +
     GetRabbitMqUser('') + ' ' +
     GetRabbitMqPwd('') + ' ' +
     GetRabbitMqHost(''),
