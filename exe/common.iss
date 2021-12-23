@@ -505,15 +505,6 @@ begin
   FileCopy(ExpandConstant('{tmp}\connectionRabbit.py'),
   ExpandConstant('{pf}\{#sAppPath}\connectionRabbit.py'),
   True);
-
-  //need an installed python
-  Exec(
-    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
-    'install pika',
-    '',
-    SW_SHOW,
-    EwWaitUntilTerminated,
-    ResultCode);
 end;
 
 function InitializeSetup(): Boolean;
@@ -771,13 +762,16 @@ begin
     Exit;
   end;
 
-  Exec(
-    Pip,
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
+  begin
+    Exec(
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install pika',
     '',
     SW_SHOW,
     EwWaitUntilTerminated,
     ResultCode);
+  end;
 
   ShellExec(
     '',
