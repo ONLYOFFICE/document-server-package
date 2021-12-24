@@ -496,17 +496,6 @@ begin
   end;
 end;
 
-function InstallPythonScripts(): Boolean;
-var
-ResultCode: Integer;
-begin
-  ForceDirectories(ExpandConstant('{pf}\{#sCompanyName}\{#sIntProductName}'));
-  ExtractTemporaryFile('connectionRabbit.py')
-  FileCopy(ExpandConstant('{tmp}\connectionRabbit.py'),
-  ExpandConstant('{pf}\{#sAppPath}\connectionRabbit.py'),
-  True);
-end;
-
 function InitializeSetup(): Boolean;
 begin
   // initialize windows version
@@ -525,6 +514,7 @@ begin
     vcredist2013('12');
     vcredist2015('14');
     python399('3.0.0');
+    ExtractTemporaryFile('connectionRabbit.py');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
@@ -773,24 +763,29 @@ begin
     ResultCode);
   end;
 
-  ShellExec(
-    '',
-    Python,
-    ('"' +
-    ExpandConstant('{pf}') +
-    '\{#sCompanyName}\{#sIntProductName}\connectionRabbit.py"') + ' ' +
-    GetRabbitMqUser('') + ' ' +
-    GetRabbitMqPwd('') + ' ' +
-    GetRabbitMqHost(''),
-    '',
-    SW_SHOW,
-    EwWaitUntilTerminated,
-    ResultCode);
+  if FileExists(ExpandConstant('{tmp}\connectionRabbit.py')) =  true then
+  begin  
+    ShellExec(
+      '',
+      Python,
+      (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
+      GetRabbitMqUser('') + ' ' +
+      GetRabbitMqPwd('') + ' ' +
+      GetRabbitMqHost('')),
+      '',
+      SW_SHOW,
+      EwWaitUntilTerminated,
+      ResultCode);
+  else
+      MsgBox('Failed to check parameters, ' +
+      'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+      Exit;
+  end;
 
   if ResultCode <> 0 then
   begin
     MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
-    'RabbitMq return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
+    'RabbitMq return error' +  #13#10 +
     'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
