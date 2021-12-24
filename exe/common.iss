@@ -763,8 +763,8 @@ begin
     ResultCode);
   end;
 
-  if FileExists(ExpandConstant('{tmp}\connectionRabbit.py')) =  true then
-  begin  
+  if FileExists(ExpandConstant('{tmp}\connectionRabbit.py')) = true then
+  begin
     ShellExec(
       '',
       Python,
