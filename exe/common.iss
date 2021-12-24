@@ -149,6 +149,10 @@
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
 
+#define PythonPath '{sd}\Python'
+#define Python str(PythonPath + "\python.exe")
+#define Pip str(PythonPath + "\scripts\pip.exe")
+
 [Setup]
 AppName                   ={#sAppName}
 AppId                     ={#sAppId}
@@ -727,14 +731,8 @@ end;
 function CheckRabbitMqConnection(): Boolean;
 var
   ResultCode: Integer;
-  PythonPath: String;
-  Python: String;
-  Pip: String;
 begin
   Result := true;
-  PythonPath := ExpandConstant('{sd}') + '\Python';
-  Python := PythonPath + '\python.exe';
-  Pip := PythonPath + '\scripts\pip.exe';
 
   ShellExec(
     '',
