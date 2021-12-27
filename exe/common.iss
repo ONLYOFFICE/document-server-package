@@ -503,7 +503,7 @@ function InitializeSetup(): Boolean;
 begin
   // initialize windows version
   initwinversion();
-
+  
   InstallPythonScripts();
 
   if not UninstallPreviosVersion() then
