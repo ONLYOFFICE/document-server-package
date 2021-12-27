@@ -127,7 +127,6 @@
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
-#define REDISCLI '{pf64}\Redis\redis-cli.exe'
 
 #define JSON '{app}\npm\json.exe'
 
