@@ -505,7 +505,7 @@ begin
   initwinversion();
   
   InstallPythonScripts();
-
+  
   if not UninstallPreviosVersion() then
   begin
     Abort();
