@@ -783,7 +783,6 @@ begin
   if ResultCode <> 0 then
   begin
     MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
-    'RabbitMq return error' +  #13#10 +
     'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
@@ -817,7 +816,6 @@ begin
   if ResultCode <> 0 then
   begin
     MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 +
-    'redis return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
     'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
