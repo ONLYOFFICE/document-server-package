@@ -505,7 +505,6 @@ begin
   initwinversion();
   
   InstallPythonScripts();
-  
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -516,8 +515,6 @@ begin
     // vcredist2010('10');
     vcredist2013('12');
     vcredist2015('14');
-    python399('3.0.0');
-    ExtractTemporaryFile('connectionRabbit.py');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
