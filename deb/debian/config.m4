@@ -16,9 +16,6 @@ db_fset M4_ONLYOFFICE_VALUE/cluster-mode seen true
 db_fset M4_ONLYOFFICE_VALUE/ds-port seen true
 db_fset M4_ONLYOFFICE_VALUE/docservice-port seen true
 db_fset M4_ONLYOFFICE_VALUE/example-port seen true
-db_fset M4_ONLYOFFICE_VALUE/jwt-enabled seen true
-db_fset M4_ONLYOFFICE_VALUE/jwt-secret seen true
-db_fset M4_ONLYOFFICE_VALUE/jwt-header seen true
 
 db_input medium M4_ONLYOFFICE_VALUE/db-type || true
 db_input medium M4_ONLYOFFICE_VALUE/db-host || true
@@ -33,6 +30,10 @@ db_go
 db_input medium M4_ONLYOFFICE_VALUE/rabbitmq-host || true
 db_input medium M4_ONLYOFFICE_VALUE/rabbitmq-user || true
 db_input medium M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
+
+db_input medium M4_ONLYOFFICE_VALUE/jwt-enabled || true
+db_input medium M4_ONLYOFFICE_VALUE/jwt-secret || true
+db_input medium M4_ONLYOFFICE_VALUE/jwt-header || true
 
 ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 db_input medium M4_ONLYOFFICE_VALUE/redis-host || true

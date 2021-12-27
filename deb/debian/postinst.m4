@@ -44,6 +44,10 @@ RABBITMQ_PWD=""
 
 REDIS_HOST=""
 
+JWT_ENABLED=""
+JWT_SECRET=""
+JWT_HEADER=""
+
 CLUSTER_MODE=""
 
 create_local_configs(){
