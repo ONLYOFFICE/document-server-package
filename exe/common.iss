@@ -794,17 +794,31 @@ var
   ResultCode: Integer;
 begin
   Result := true;
+
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
+  begin                                      
     Exec(
-    ExpandConstant('{#REDISCLI}'),
-    '-h ' + GetRedisHost('') + ' quit',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install iredis',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
+  Exec(
+    '>',
+    'iredis -h ' + GetRedisHost('') + ' quit',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'redis-cli return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 +
+    'redis return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 +
+    'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
 end;
