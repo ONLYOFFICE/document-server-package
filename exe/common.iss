@@ -709,12 +709,23 @@ begin
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pgcli') = false then
+  begin                                      
+    Exec(
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install pgcli',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
   Exec(
-    ExpandConstant('{#PSQL}'),
-    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    '>',
+    'pgcli -h ' + GetDbHost('') + '-u' + GetDbUser('') + ' -d' + GetDbName('') + ' -w',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
