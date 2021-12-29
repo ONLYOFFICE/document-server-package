@@ -274,6 +274,7 @@ Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DI
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 Source: scripts\connectionRabbit.py;
+Source: ..\pgsql\bin\psql.exe;                         DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -505,6 +506,10 @@ begin
   initwinversion();
   
   InstallPythonScripts();
+
+  ExtractTemporaryFile('connectionRabbit.py');
+  ExtractTemporaryFile('psql.exe');
+
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -709,20 +714,9 @@ begin
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
-  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pgcli') = false then
-  begin                                      
-    Exec(
-    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
-    'install pgcli',
-    '',
-    SW_SHOW,
-    EwWaitUntilTerminated,
-    ResultCode);
-  end;
-
   Exec(
-    '>',
-    'pgcli -h ' + GetDbHost('') + '-u' + GetDbUser('') + ' -d' + GetDbName('') + ' -w',
+    ExpandConstant('{tmp}\psql.exe'),
+    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w',
     '',
     SW_SHOW,
     EwWaitUntilTerminated,
