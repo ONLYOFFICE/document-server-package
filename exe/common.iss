@@ -273,7 +273,7 @@ Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\co
 Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
-Source: scripts\connectionRabbit.py;
+Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion
 Source: ..\pgsql\bin\*;                         DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
@@ -517,7 +517,7 @@ begin
   initwinversion();
   
   ExtractFiles();
-
+  
   if not UninstallPreviosVersion() then
   begin
     Abort();
