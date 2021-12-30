@@ -500,20 +500,23 @@ begin
   end;
 end;
 
-function InitializeSetup(): Boolean;
+function ExtractFiles(): Boolean;
 begin
-  // initialize windows version
-  initwinversion();
-  
-  InstallPythonScripts();
-
   ExtractTemporaryFile('connectionRabbit.py');
   ExtractTemporaryFile('psql.exe');
   ExtractTemporaryFile('libintl-8.dll');
   ExtractTemporaryFile('libpq.dll');
   ExtractTemporaryFile('ssleay32.dll');
   ExtractTemporaryFile('libeay32.dll');
-  ExtractTemporaryFile('libiconv-2.dll');
+  ExtractTemporaryFile('libiconv-2.dll')
+end;
+
+function InitializeSetup(): Boolean;
+begin
+  // initialize windows version
+  initwinversion();
+  
+  ExtractFiles();
 
   if not UninstallPreviosVersion() then
   begin
@@ -721,7 +724,7 @@ begin
 
   Exec(
     ExpandConstant('{tmp}\psql.exe'),
-    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w',
+    '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
     '',
     SW_SHOW,
     EwWaitUntilTerminated,
