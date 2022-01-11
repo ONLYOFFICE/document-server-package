@@ -274,7 +274,6 @@ Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DI
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion
-Source: ..\pgsql\bin\*;                         DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
