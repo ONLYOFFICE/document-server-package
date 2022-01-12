@@ -759,17 +759,55 @@ begin
   end;
 end;
 
-//function NextButtonClick(CurPageID: Integer): Boolean;
-//begin
-//  Result := true;
-//  if WizardSilent() = false then
-//  begin
-//    case CurPageID of
-////      DbPage.ID: Result := CheckDbConnection();
-////      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-////      RedisPage.ID: Result := CheckRedisConnection();
-//      wpReady: Result := DownloadDependency();
-//    end;
-//  end;
-//end;                                                     
+function ProgCheck(ProgName: String): Boolean;
+var
+  ProgCheckResult: Boolean;
+begin
+  ProgCheckResult := MsgBox('Do you want to install ' + ProgName + '?', mbConfirmation, MB_YESNO) = idYes;
+  if ProgCheckResult = True then
+  begin
+    case ProgName of
+      'PostgreSQL':
+        postgresql('9.5.4.0');
+      'RabbitMq':
+        rabbitmq('3.6.5');
+      'Redis':
+        redis('3.2.100');
+    end;
+  end;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := true;
+  if WizardSilent() = false then
+  begin
+    case CurPageID of
+     
+        DbPage.ID: begin 
+          if ProgCheck('PostgreSQL') = True then
+          begin
+            Result := CheckDbConnection();
+          end;
+        end;
+   
+        RabbitMqPage.ID: begin
+          if ProgCheck('RabbitMq') = True then
+          begin
+            Result := CheckRabbitMqConnection();
+          end;
+        end;
+
+        RedisPage.ID: begin
+          if ProgCheck('Redis') = True then 
+          begin
+            Result := CheckRedisConnection();
+          end;
+        end;
+
+        wpReady:
+          Result := DownloadDependency(CurPageID);
+    end;
+  end;
+end;                                                     
 
