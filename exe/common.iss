@@ -511,9 +511,6 @@ begin
     vcredist2013('12');
     vcredist2015('14');
   end;
-  //postgresql('9.5.4.0');
-  //rabbitmq('3.6.5');
-  //redis('3.2.100');
 
   Result := true;
 end;
