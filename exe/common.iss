@@ -262,15 +262,16 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 ;Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Files]
-Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
-Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall
-Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: scripts\connectionRabbit.py;                DestDir: "{app}"; Flags: ignoreversion; Components: Program
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -447,6 +448,18 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 ;#include "scripts\products\postgresql.iss"
 ;#include "scripts\products\rabbitmq.iss"
 ;#include "scripts\products\redis.iss"
+
+[Types]
+Name: full; Description: Full installation
+Name: compact; Description: Compact installation
+Name: custom; Description: Custom installation; Flags: iscustom
+ 
+
+[Components]
+Name: "Program"; Description: "Program Files"; Types: full compact custom; Flags: fixed
+Name: "Prerequisites"; Description: "Prerequisites"; Types: full
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMq"; Flags: checkablealone; Types: full
+Name: "Prerequisites\Redis"; Description: "Redis"; Flags: checkablealone; Types: full
 
 [Code]
 
