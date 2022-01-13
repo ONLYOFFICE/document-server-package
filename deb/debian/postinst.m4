@@ -289,7 +289,11 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 		mkdir -p "$DIR/../Data" #! 
 		mkdir -p "$DIR/fonts"
-		chown ds:ds -R "$DIR"
+		
+		# grand owner rights for home dir for ds user
+		chown ds:ds -R "$DIR"*
+		# set up read-only access to prevent modification ds's home directory
+		chmod a-w -R "$DIR"*
 
     #setup logrotate config rights
     chmod 644 ${CONF_DIR}/logrotate/*
