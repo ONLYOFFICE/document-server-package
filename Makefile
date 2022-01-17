@@ -70,6 +70,8 @@ NGINX_VER := nginx-1.21.3
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
 
+DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
+
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
 PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
 
@@ -192,6 +194,7 @@ COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf
 COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
+COMMON_DEPS += $(DS_MIME_TYPES)
 
 LINUX_DEPS += common/documentserver/logrotate/ds.conf
 
@@ -460,6 +463,10 @@ $(NGINX):
 	mv -f $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
 	rm -f $(NGINX_ZIP)
 	
+$(DS_MIME_TYPES):
+	$(TOUCH) $(DS_MIME_TYPES) && \
+	$(CURL) $(DS_MIME_TYPES) https://raw.githubusercontent.com/nginx/nginx/master/conf/mime.types
+
 $(PSQL):
 	$(CURL) $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
 	7z x -y -o. $(PSQL_ZIP) && \
