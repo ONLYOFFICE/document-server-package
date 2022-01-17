@@ -273,7 +273,7 @@ Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; 
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
-Name: "{app}\server\App_Data";        Permissions: service-modify 
+Name: "{app}\server\App_Data";        Permissions: service-modify
 Name: "{app}\server\App_Data\cache\files"; Permissions: service-modify
 Name: "{app}\server\App_Data\docbuilder"; Permissions: service-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
