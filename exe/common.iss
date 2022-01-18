@@ -446,8 +446,8 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\vcredist2013.iss"
 #include "scripts\products\vcredist2015.iss"
 ;#include "scripts\products\postgresql.iss"
-;#include "scripts\products\rabbitmq.iss"
-;#include "scripts\products\redis.iss"
+#include "scripts\products\rabbitmq.iss"
+#include "scripts\products\redis.iss"
 
 [Types]
 Name: full; Description: Full installation
@@ -458,8 +458,8 @@ Name: custom; Description: Custom installation; Flags: iscustom
 [Components]
 Name: "Program"; Description: "Program Files"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "Prerequisites"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMq"; Flags: checkablealone; Types: full
-Name: "Prerequisites\Redis"; Description: "Redis"; Flags: checkablealone; Types: full
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMq"; Flags: disablenouninstallwarning; Types: full; 
+Name: "Prerequisites\Redis"; Description: "Redis"; Flags: disablenouninstallwarning; Types: full;
 
 [Code]
 
@@ -772,16 +772,31 @@ begin
   end;
 end;
 
-//function NextButtonClick(CurPageID: Integer): Boolean;
-//begin
-//  Result := true;
-//  if WizardSilent() = false then
-//  begin
-//    case CurPageID of
-////      DbPage.ID: Result := CheckDbConnection();
-////      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-////      RedisPage.ID: Result := CheckRedisConnection();
-//      wpReady: Result := DownloadDependency();
-//    end;
-//  end;
-//end;                                                     
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := true;
+  if WizardSilent() = false then
+  begin
+    case CurPageID of
+        DbPage.ID:
+          Result := CheckDbConnection();
+        RabbitMqPage.ID:
+          Result := CheckRabbitMqConnection();
+        RedisPage.ID:
+          Result := CheckRedisConnection();
+        wpReady:
+          Result := DownloadDependency(CurPageID);
+        wpSelectComponents:
+        begin
+          if IsComponentSelected('Prerequisites\RabbitMq') then
+          begin
+            rabbitmq('3.6.5');
+          end;
+          if IsComponentSelected('Prerequisites\Redis') then
+          begin
+            redis('3.2.100');
+          end;
+        end;
+    end;
+  end;
+end;                                                     
