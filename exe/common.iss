@@ -264,8 +264,8 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
-Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
@@ -274,17 +274,17 @@ Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; 
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
-Name: "{app}\server\App_Data";        Permissions: users-modify
-Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
-Name: "{app}\server\App_Data\docbuilder"; Permissions: users-modify
+Name: "{app}\server\App_Data";        Permissions: service-modify
+Name: "{app}\server\App_Data\cache\files"; Permissions: service-modify
+Name: "{app}\server\App_Data\docbuilder"; Permissions: service-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{app}\fonts";                  Permissions: users-modify
-Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
-Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}";             Permissions: users-modify
-Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-modify
+Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: service-modify
+Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}";             Permissions: service-modify
+Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}\temp";        Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}\logs";        Permissions: service-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";
 
