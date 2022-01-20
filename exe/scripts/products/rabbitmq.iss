@@ -7,7 +7,7 @@ rabbitmq_size=5.3 MB
 
 [Code]
 const
-        rabbitmq_url = 'http://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.12/rabbitmq-server-3.9.12.exe';
+        rabbitmq_url = 'http://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_5/rabbitmq-server-3.6.5.exe';
 
 procedure rabbitmq(minVersion: string);
 begin

@@ -7,7 +7,7 @@ redis_size=5.9 MB
 
 [Code]
 const
-	redis_url = 'http://github.com/MSOpenTech/redis/releases/download/win-3.2.100/Redis-x64-3.2.100.msi';
+	redis_url = 'http://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi';
 
 procedure redis(minVersion: string);
 begin

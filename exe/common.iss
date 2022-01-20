@@ -458,8 +458,8 @@ Name: custom; Description: Custom installation; Flags: iscustom
 [Components]
 Name: "Program"; Description: "Program Files"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "Prerequisites"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMq"; Flags: disablenouninstallwarning; Types: full; 
-Name: "Prerequisites\Redis"; Description: "Redis"; Flags: disablenouninstallwarning; Types: full;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMq"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Redis"; Description: "Redis"; Flags: checkablealone; Types: full;
 
 [Code]
 
@@ -788,13 +788,13 @@ begin
           Result := DownloadDependency(CurPageID);
         wpSelectComponents:
         begin
-          if IsComponentSelected('Prerequisites\RabbitMq') then
-          begin
-            rabbitmq('3.6.5');
-          end;
           if IsComponentSelected('Prerequisites\Redis') then
           begin
             redis('3.2.100');
+          end;
+          if IsComponentSelected('Prerequisites\RabbitMq') then
+          begin
+            rabbitmq('3.6.5');
           end;
         end;
     end;
