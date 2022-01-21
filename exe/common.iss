@@ -273,17 +273,17 @@ Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; 
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
-Name: "{app}\server\App_Data";        Permissions: users-modify
-Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
-Name: "{app}\server\App_Data\docbuilder"; Permissions: users-modify
+Name: "{app}\server\App_Data";        Permissions: system-modify
+Name: "{app}\server\App_Data\cache\files"; Permissions: system-modify
+Name: "{app}\server\App_Data\docbuilder"; Permissions: system-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{app}\fonts";                  Permissions: users-modify
-Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
-Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}";             Permissions: users-modify
-Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-modify
+Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: system-modify
+Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: system-modify
+Name: "{#NGINX_SRV_DIR}";             Permissions: system-modify
+Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: system-modify
+Name: "{#NGINX_SRV_DIR}\temp";        Permissions: system-modify
+Name: "{#NGINX_SRV_DIR}\logs";        Permissions: system-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";
 
