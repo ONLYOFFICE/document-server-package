@@ -251,7 +251,7 @@ if [ "$IS_UPGRADE" = "true" ]; then
   JSON_BIN="$DIR/npm/json"
   JSON="$JSON_BIN -f $LOCAL_CONFIG"
 
-  if [[ -n "$($JSON services.CoAuthoring.sql)" ]]; then
+  if [ -f ${LOCAL_CONFIG} ] && [[ -n "$($JSON services.CoAuthoring.sql)" ]]; then
     #load_db_params
     DB_HOST=$($JSON services.CoAuthoring.sql.dbHost)
     DB_NAME=$($JSON services.CoAuthoring.sql.dbName)
@@ -299,7 +299,10 @@ if [ "$IS_UPGRADE" = "true" ]; then
         exit 1
     esac
   else
+    echo ""
+    echo "Update of document server ended with the problem of missing parameters for connecting to database"
     echo "You should reconfigure document server using script \"/usr/bin/documentserver-configure.sh\""
+    echo ""
   fi
 fi
 
