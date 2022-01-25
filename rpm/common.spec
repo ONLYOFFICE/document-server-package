@@ -300,8 +300,8 @@ if [ "$IS_UPGRADE" = "true" ]; then
     esac
   else
     echo ""
-    echo "Update of document server ended with the problem of missing parameters for connecting to database"
-    echo "You should reconfigure document server using script \"/usr/bin/documentserver-configure.sh\""
+    echo "Update of %{_package_name} ended with a problem"
+    echo "You should reconfigure the package using script \"/usr/bin/documentserver-configure.sh\""
     echo ""
   fi
 fi
