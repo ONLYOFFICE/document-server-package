@@ -777,7 +777,7 @@ begin
   Result := true;
   if WizardSilent() = false then
   begin
-    case CurPageID of
+  case CurPageID of
         DbPage.ID:
           Result := CheckDbConnection();
         RabbitMqPage.ID:
@@ -790,13 +790,18 @@ begin
         begin
           if IsComponentSelected('Prerequisites\Redis') then
           begin
-            redis('3.2.100');
+            redis('3.0.504');
           end;
           if IsComponentSelected('Prerequisites\RabbitMq') then
           begin
-            rabbitmq('3.6.5');
+            erlang('23.1');
+            rabbitmq('3.8.9');
+          end;
+          if IsComponentSelected('Prerequisites\PostreSQL') then
+          begin
+            postgresql('9.5.4.1');
           end;
         end;
     end;
   end;
-end;                                                     
+end;
