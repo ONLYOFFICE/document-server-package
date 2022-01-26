@@ -1,9 +1,9 @@
 ; http://support.microsoft.com/kb/239114
 
 [CustomMessages]
-redis_title=PostgreSQL
+redis_title=Redis
 
-redis_size=5.9 MB
+redis_size=6.5 MB
 
 [Code]
 const
@@ -11,14 +11,13 @@ const
 
 procedure redis(minVersion: string);
 begin
-	//check for postgresql binaries
 	if (FileExists(ExpandConstant('{pf64}{\}Redis{\}redis-server.exe')) <> True ) then
 		AddProduct('redis.msi',
 			'/qb',
 			CustomMessage('redis_title'),
 			CustomMessage('redis_size'),
 			redis_url,
-			false, false, false);
+			true, false, false);
 end;
 
 [Setup]
