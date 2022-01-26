@@ -17,7 +17,7 @@ begin
 			CustomMessage('erlang_title'),
 			CustomMessage('erlang_size'),
 			erlang_url,
-			true, false, false);
+			false, false, false);
 end;
 
 [Setup]

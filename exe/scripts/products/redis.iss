@@ -17,7 +17,7 @@ begin
 			CustomMessage('redis_title'),
 			CustomMessage('redis_size'),
 			redis_url,
-			true, false, false);
+			false, false, false);
 end;
 
 [Setup]
