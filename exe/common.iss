@@ -473,9 +473,9 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMq"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Redis"; Description: "Redis"; Flags: checkablealone; Types: full;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8.9"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Redis"; Description: "Redis 3.0.504"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 9.5.4.1"; Flags: checkablealone; Types: full; 
 
 [Code]
 
