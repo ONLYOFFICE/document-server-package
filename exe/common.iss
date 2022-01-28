@@ -252,6 +252,21 @@ ru.StartSrv=Запуск сервиса %1...
 en.Uninstall=Uninstall {#sAppName}
 ru.Uninstall=Удаление {#sAppName}
 
+en.Program=Program components
+ru.Program=Компоненты программы
+
+en.Prerequisites=Donwload prerequisites
+ru.Prerequisites=Загрузить необходимое ПО
+
+en.FullInstall=Full installation
+ru.FullInstall=Полная установка
+
+en.CompactInstall=Compact installation
+ru.CompactInstall=Компактная установка
+
+en.CustomInstall=Custom installtion
+ru.CustomInstall=Выборочная установка
+
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
@@ -450,16 +465,17 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\redis.iss"
 
 [Types]
-Name: full; Description: Full installation
-Name: compact; Description: Compact installation
-Name: custom; Description: Custom installation; Flags: iscustom
+Name: full; Description: {cm:FullInstall}
+Name: compact; Description: {cm:CompactInstall}
+Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
  
 
 [Components]
-Name: "Program"; Description: "Program Files"; Types: full compact custom; Flags: fixed
-Name: "Prerequisites"; Description: "Prerequisites"; Types: full
+Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
+Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMq"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Redis"; Description: "Redis"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL"; Flags: checkablealone; Types: full; 
 
 [Code]
 
