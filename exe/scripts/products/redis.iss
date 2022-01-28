@@ -1,7 +1,7 @@
 ; http://support.microsoft.com/kb/239114
 
 [CustomMessages]
-redis_title=Redis
+redis_title=Redis 3.0.504 x64
 
 redis_size=6.5 MB
 

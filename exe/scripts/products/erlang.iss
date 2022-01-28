@@ -1,7 +1,7 @@
 ; http://support.microsoft.com/kb/239114
 
 [CustomMessages]
-erlang_title=Erlang
+erlang_title=Erlang 23.1 x64
 
 erlang_size=90.3 MB
 
@@ -11,7 +11,7 @@ const
 
 procedure erlang(minVersion: string);
 begin
-	if (FileExists(ExpandConstant('{pf64}{\}erlang{\}erlang.exe')) <> True ) then
+	if (FileExists(ExpandConstant('{pf64}{\}erl-23.1{\}bin{\}erl.exe')) <> True ) then
 		AddProduct('erlang.exe',
 			'',
 			CustomMessage('erlang_title'),
