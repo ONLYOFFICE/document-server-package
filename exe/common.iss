@@ -777,7 +777,7 @@ begin
   Result := false;
   case PageID of
     DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostreSQL');
+      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
       Result := not IsComponentSelected('Prerequisites\RabbitMq');
     RedisPage.ID:
@@ -810,7 +810,7 @@ begin
             erlang('23.1');
             rabbitmq('3.8.9');
           end;
-          if IsComponentSelected('Prerequisites\PostreSQL') then
+          if IsComponentSelected('Prerequisites\PostgreSQL') then
           begin
             postgresql('9.5.4.1');
           end;
