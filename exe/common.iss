@@ -772,6 +772,19 @@ begin
   end;
 end;
 
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  Result := false;
+  case PageID of
+    DbPage.ID:
+      Result := not IsComponentSelected('Prerequisites\PostreSQL');
+    RabbitMqPage.ID:
+      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+    RedisPage.ID:
+      Result := not IsComponentSelected('Prerequisites\Redis');
+  end;
+end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
