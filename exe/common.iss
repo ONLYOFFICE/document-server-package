@@ -255,7 +255,7 @@ ru.Uninstall=Удаление {#sAppName}
 en.Program=Program components
 ru.Program=Компоненты программы
 
-en.Prerequisites=Donwload prerequisites
+en.Prerequisites=Download prerequisites
 ru.Prerequisites=Загрузить необходимое ПО
 
 en.FullInstall=Full installation
