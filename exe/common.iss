@@ -1,4 +1,4 @@
-﻿#ifndef sBrandingFolder
+#ifndef sBrandingFolder
   #define sBrandingFolder '..\branding'
 #endif
 
@@ -467,6 +467,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\postgresql.iss"
 #include "scripts\products\rabbitmq.iss"
 #include "scripts\products\redis.iss"
+#include "scripts\products\erlang.iss"
 #include "scripts\products\python399.iss"
 
 [Types]
@@ -820,7 +821,9 @@ begin
       SW_SHOW,
       EwWaitUntilTerminated,
       ResultCode);
+  end
   else
+  begin 
       MsgBox('Failed to check parameters, ' +
       'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
       Exit;
