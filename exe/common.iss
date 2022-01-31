@@ -255,6 +255,21 @@ ru.StartSrv=Запуск сервиса %1...
 en.Uninstall=Uninstall {#sAppName}
 ru.Uninstall=Удаление {#sAppName}
 
+en.Program=Program components
+ru.Program=Компоненты программы
+
+en.Prerequisites=Download prerequisites
+ru.Prerequisites=Загрузить необходимое ПО
+
+en.FullInstall=Full installation
+ru.FullInstall=Полная установка
+
+en.CompactInstall=Compact installation
+ru.CompactInstall=Компактная установка
+
+en.CustomInstall=Custom installtion
+ru.CustomInstall=Выборочная установка
+
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
@@ -265,16 +280,16 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 ;Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Files]
-Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
-Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall
-Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
-Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion
+Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -449,10 +464,24 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\vcredist2010.iss"
 #include "scripts\products\vcredist2013.iss"
 #include "scripts\products\vcredist2015.iss"
+#include "scripts\products\postgresql.iss"
+#include "scripts\products\rabbitmq.iss"
+#include "scripts\products\redis.iss"
+#include "scripts\products\erlang.iss"
 #include "scripts\products\python399.iss"
-;#include "scripts\products\postgresql.iss"
-;#include "scripts\products\rabbitmq.iss"
-;#include "scripts\products\redis.iss"
+
+[Types]
+Name: full; Description: {cm:FullInstall}
+Name: compact; Description: {cm:CompactInstall}
+Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
+ 
+
+[Components]
+Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
+Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8.9"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Redis"; Description: "Redis 3.0.504"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 9.5.4.1"; Flags: checkablealone; Types: full; 
 
 [Code]
 
@@ -529,6 +558,7 @@ begin
     // vcredist2010('10');
     vcredist2013('12');
     vcredist2015('14');
+    python399('3.0.0');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
@@ -753,7 +783,7 @@ begin
 
   ShellExec(
     '',
-    Python,
+    ExpandConstant('{#Python}'),
     '--version',
     '',
     SW_SHOW,
@@ -782,7 +812,7 @@ begin
   begin
     ShellExec(
       '',
-      Python,
+      ExpandConstant('{#Python}'),
       (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
       GetRabbitMqUser('') + ' ' +
       GetRabbitMqPwd('') + ' ' +
@@ -791,7 +821,9 @@ begin
       SW_SHOW,
       EwWaitUntilTerminated,
       ResultCode);
+  end
   else
+  begin 
       MsgBox('Failed to check parameters, ' +
       'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
       Exit;
@@ -838,20 +870,50 @@ begin
   end;
 end;
 
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  Result := false;
+  case PageID of
+    DbPage.ID:
+      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+    RabbitMqPage.ID:
+      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+    RedisPage.ID:
+      Result := not IsComponentSelected('Prerequisites\Redis');
+  end;
+end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
   if WizardSilent() = false then
   begin
     case CurPageID of
-        DbPage.ID:
-          Result := CheckDbConnection();
-        RabbitMqPage.ID:
-          Result := CheckRabbitMqConnection();
-        RedisPage.ID:
-          Result := CheckRedisConnection();
-        wpReady:
-          Result := DownloadDependency(CurPageID);
+      DbPage.ID:
+        Result := CheckDbConnection();
+      RabbitMqPage.ID:
+        Result := CheckRabbitMqConnection();
+      RedisPage.ID:
+        Result := CheckRedisConnection();
+      wpReady:
+        Result := DownloadDependency(CurPageID);
+      wpSelectComponents:
+      begin
+        if IsComponentSelected('Prerequisites\Redis') then
+        begin
+          redis('3.0.504');
+        end;
+        if IsComponentSelected('Prerequisites\RabbitMq') then
+        begin
+          erlang('23.1');
+          rabbitmq('3.8.9');
+        end;
+        if IsComponentSelected('Prerequisites\PostgreSQL') then
+        begin
+          postgresql('9.5.4.1');
+        end;
+      end;
     end;
   end;
 end;
+
