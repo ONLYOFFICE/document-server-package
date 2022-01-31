@@ -77,6 +77,7 @@
 #define REG_RABBITMQ_HOST     'RabbitMqHost'
 #define REG_RABBITMQ_USER     'RabbitMqUser'
 #define REG_RABBITMQ_PWD      'RabbitMqPwd'
+#define REG_RABBITMQ_PROTO    'RabbitMqProto'
 #define REG_REDIS_HOST        'RedisHost'
 #define REG_DS_PORT           'DsPort'
 #define REG_EXAMPLE_PORT      'ExamplePort'
@@ -127,8 +128,6 @@
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
-#define REDISCLI '{pf64}\Redis\redis-cli.exe'
-#define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define JSON '{app}\npm\json.exe'
 
@@ -149,6 +148,10 @@
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
+
+#define PythonPath '{sd}\Python'
+#define Python str(PythonPath + "\python.exe")
+#define Pip str(PythonPath + "\scripts\pip.exe")
 
 [Setup]
 AppName                   ={#sAppName}
@@ -314,6 +317,7 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial;
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
@@ -336,7 +340,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
@@ -463,6 +467,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\postgresql.iss"
 #include "scripts\products\rabbitmq.iss"
 #include "scripts\products\redis.iss"
+#include "scripts\products\python399.iss"
 
 [Types]
 Name: full; Description: {cm:FullInstall}
@@ -524,10 +529,23 @@ begin
   end;
 end;
 
+function ExtractFiles(): Boolean;
+begin
+  ExtractTemporaryFile('connectionRabbit.py');
+  ExtractTemporaryFile('psql.exe');
+  ExtractTemporaryFile('libintl-8.dll');
+  ExtractTemporaryFile('libpq.dll');
+  ExtractTemporaryFile('ssleay32.dll');
+  ExtractTemporaryFile('libeay32.dll');
+  ExtractTemporaryFile('libiconv-2.dll')
+end;
+
 function InitializeSetup(): Boolean;
 begin
   // initialize windows version
   initwinversion();
+  
+  ExtractFiles();
   
   if not UninstallPreviosVersion() then
   begin
@@ -590,6 +608,11 @@ end;
 function GetRabbitMqPwd(Param: String): String;
 begin
   Result := RabbitMqPage.Values[2];
+end;
+
+function GetRabbitMqProto(Param: String): String;
+begin
+  Result := RabbitMqPage.Values[3];
 end;
 
 function GetRedisHost(Param: String): String;
@@ -674,11 +697,13 @@ begin
   RabbitMqPage.Add('Host:', False);
   RabbitMqPage.Add('User:', False);
   RabbitMqPage.Add('Password:', True);
-
+  RabbitMqPage.Add('Protocol:', False);
+  
   RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
   RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-
+  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
+  
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
       'Redis In-Memory Database', 'Configure Redis Connection...',
@@ -734,11 +759,11 @@ begin
     False);
 
   Exec(
-    ExpandConstant('{#PSQL}'),
+    ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
@@ -753,17 +778,57 @@ var
   ResultCode: Integer;
 begin
   Result := true;
-    Exec(
-    ExpandConstant('{#RABBITMQCTL}'),
-    '-q list_queues',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+
+  ShellExec(
+    '',
+    Python,
+    '--version',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Python isn''t installed or unreachable, ' +
+    'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+    Exit;
+  end;
+
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
+  begin
+    Exec(
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install pika',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
+  if FileExists(ExpandConstant('{tmp}\connectionRabbit.py')) = true then
+  begin
+    ShellExec(
+      '',
+      Python,
+      (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
+      GetRabbitMqUser('') + ' ' +
+      GetRabbitMqPwd('') + ' ' +
+      GetRabbitMqHost('')),
+      '',
+      SW_SHOW,
+      EwWaitUntilTerminated,
+      ResultCode);
+  else
+      MsgBox('Failed to check parameters, ' +
+      'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+      Exit;
+  end;
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
+    'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
 end;
@@ -773,17 +838,30 @@ var
   ResultCode: Integer;
 begin
   Result := true;
+
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
+  begin                                      
     Exec(
-    ExpandConstant('{#REDISCLI}'),
-    '-h ' + GetRedisHost('') + ' --version',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install iredis',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
+  Exec(
+    '>',
+    'iredis -h ' + GetRedisHost('') + ' quit',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'redis-cli return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 +
+    'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
 end;
@@ -834,3 +912,4 @@ begin
     end;
   end;
 end;
+

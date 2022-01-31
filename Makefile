@@ -66,12 +66,14 @@ FONTS = common/fonts
 
 ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
 
-NGINX_VER := nginx-1.11.4
+NGINX_VER := nginx-1.21.3
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
 
-PSQL := $(DOCUMENTSERVER)/pgsql/bin/psql.exe
-PSQL_ZIP := postgresql-9.5.4-2-windows-x64-binaries.zip
+DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
+
+PSQL := $(DOCUMENTSERVER)/pgsql/bin
+PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
 
 NSSM_ZIP := nssm_x64.zip
 NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
@@ -192,6 +194,7 @@ COMMON_DEPS += common/documentserver/nginx/ds-ssl.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf.tmpl
 COMMON_DEPS += common/documentserver/nginx/ds.conf
 COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
+COMMON_DEPS += $(DS_MIME_TYPES)
 
 LINUX_DEPS += common/documentserver/logrotate/ds.conf
 
@@ -277,6 +280,7 @@ clean:
 		$(ISXDL)\
 		$(NGINX)\
 		$(NSSM)\
+		$(PSQL)\
 		$(DS_BIN_REPO)\
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
@@ -459,12 +463,17 @@ $(NGINX):
 	mv -f $(DOCUMENTSERVER)/$(NGINX_VER)/ $(NGINX)
 	rm -f $(NGINX_ZIP)
 	
+$(DS_MIME_TYPES):
+	$(TOUCH) $(DS_MIME_TYPES) && \
+	$(CURL) $(DS_MIME_TYPES) https://raw.githubusercontent.com/nginx/nginx/master/conf/mime.types
+
 $(PSQL):
 	$(CURL) $(PSQL_ZIP) http://get.enterprisedb.com/postgresql/$(PSQL_ZIP) && \
 	7z x -y -o. $(PSQL_ZIP) && \
-	mkdir -p $(DOCUMENTSERVER)/pgsql/bin && \
-	cp -rf -t $(DOCUMENTSERVER)/pgsql/bin  pgsql/bin/psql.exe  pgsql/bin/*.dll && \
-	rm -f $(PSQL_ZIP)
+	mkdir -p $(PSQL) && \
+	cp -rf -t $(PSQL)  pgsql/bin/psql.exe  pgsql/bin/*.dll && \
+	rm -f $(PSQL_ZIP) && \
+	rm -rf pgsql
 	
 $(DS_BIN): documentserver
 
