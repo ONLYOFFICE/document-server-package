@@ -884,31 +884,31 @@ begin
   Result := true;
   if WizardSilent() = false then
   begin
-  case CurPageID of
-        DbPage.ID:
-          Result := CheckDbConnection();
-        RabbitMqPage.ID:
-          Result := CheckRabbitMqConnection();
-        RedisPage.ID:
-          Result := CheckRedisConnection();
-        wpReady:
-          Result := DownloadDependency(CurPageID);
-        wpSelectComponents:
+    case CurPageID of
+      DbPage.ID:
+        Result := CheckDbConnection();
+      RabbitMqPage.ID:
+        Result := CheckRabbitMqConnection();
+      RedisPage.ID:
+        Result := CheckRedisConnection();
+      wpReady:
+        Result := DownloadDependency(CurPageID);
+      wpSelectComponents:
+      begin
+        if IsComponentSelected('Prerequisites\Redis') then
         begin
-          if IsComponentSelected('Prerequisites\Redis') then
-          begin
-            redis('3.0.504');
-          end;
-          if IsComponentSelected('Prerequisites\RabbitMq') then
-          begin
-            erlang('23.1');
-            rabbitmq('3.8.9');
-          end;
-          if IsComponentSelected('Prerequisites\PostgreSQL') then
-          begin
-            postgresql('9.5.4.1');
-          end;
+          redis('3.0.504');
         end;
+        if IsComponentSelected('Prerequisites\RabbitMq') then
+        begin
+          erlang('23.1');
+          rabbitmq('3.8.9');
+        end;
+        if IsComponentSelected('Prerequisites\PostgreSQL') then
+        begin
+          postgresql('9.5.4.1');
+        end;
+      end;
     end;
   end;
 end;
