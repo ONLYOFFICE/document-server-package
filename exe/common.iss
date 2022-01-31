@@ -557,6 +557,7 @@ begin
     // vcredist2010('10');
     vcredist2013('12');
     vcredist2015('14');
+    python399('3.0.0');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
@@ -781,7 +782,7 @@ begin
 
   ShellExec(
     '',
-    Python,
+    ExpandConstant('{#Python}'),
     '--version',
     '',
     SW_SHOW,
@@ -810,7 +811,7 @@ begin
   begin
     ShellExec(
       '',
-      Python,
+      ExpandConstant('{#Python}'),
       (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
       GetRabbitMqUser('') + ' ' +
       GetRabbitMqPwd('') + ' ' +
