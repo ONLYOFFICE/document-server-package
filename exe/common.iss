@@ -128,8 +128,6 @@
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
-#define REDISCLI '{pf64}\Redis\redis-cli.exe'
-#define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define JSON '{app}\npm\json.exe'
 
@@ -150,6 +148,10 @@
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
+
+#define PythonPath '{sd}\Python'
+#define Python str(PythonPath + "\python.exe")
+#define Pip str(PythonPath + "\scripts\pip.exe")
 
 [Setup]
 AppName                   ={#sAppName}
@@ -272,6 +274,7 @@ Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\co
 Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: users-modify
@@ -446,6 +449,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\vcredist2010.iss"
 #include "scripts\products\vcredist2013.iss"
 #include "scripts\products\vcredist2015.iss"
+#include "scripts\products\python399.iss"
 ;#include "scripts\products\postgresql.iss"
 ;#include "scripts\products\rabbitmq.iss"
 ;#include "scripts\products\redis.iss"
@@ -497,10 +501,23 @@ begin
   end;
 end;
 
+function ExtractFiles(): Boolean;
+begin
+  ExtractTemporaryFile('connectionRabbit.py');
+  ExtractTemporaryFile('psql.exe');
+  ExtractTemporaryFile('libintl-8.dll');
+  ExtractTemporaryFile('libpq.dll');
+  ExtractTemporaryFile('ssleay32.dll');
+  ExtractTemporaryFile('libeay32.dll');
+  ExtractTemporaryFile('libiconv-2.dll')
+end;
+
 function InitializeSetup(): Boolean;
 begin
   // initialize windows version
   initwinversion();
+  
+  ExtractFiles();
   
   if not UninstallPreviosVersion() then
   begin
@@ -714,11 +731,11 @@ begin
     False);
 
   Exec(
-    ExpandConstant('{#PSQL}'),
+    ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
@@ -733,17 +750,57 @@ var
   ResultCode: Integer;
 begin
   Result := true;
-    Exec(
-    ExpandConstant('{#RABBITMQCTL}'),
-    '-q list_queues',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+
+  ShellExec(
+    '',
+    Python,
+    '--version',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Python isn''t installed or unreachable, ' +
+    'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+    Exit;
+  end;
+
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
+  begin
+    Exec(
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install pika',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
+  if FileExists(ExpandConstant('{tmp}\connectionRabbit.py')) = true then
+  begin
+    ShellExec(
+      '',
+      Python,
+      (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
+      GetRabbitMqUser('') + ' ' +
+      GetRabbitMqPwd('') + ' ' +
+      GetRabbitMqHost('')),
+      '',
+      SW_SHOW,
+      EwWaitUntilTerminated,
+      ResultCode);
+  else
+      MsgBox('Failed to check parameters, ' +
+      'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+      Exit;
+  end;
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
+    'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
 end;
@@ -753,32 +810,48 @@ var
   ResultCode: Integer;
 begin
   Result := true;
+
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
+  begin                                      
     Exec(
-    ExpandConstant('{#REDISCLI}'),
-    '-h ' + GetRedisHost('') + ' --version',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install iredis',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
+  Exec(
+    '>',
+    'iredis -h ' + GetRedisHost('') + ' quit',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'redis-cli return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 +
+    'Check the connection settings and try again.', mbError, MB_OK);
     Result := false;
   end;
 end;
 
-//function NextButtonClick(CurPageID: Integer): Boolean;
-//begin
-//  Result := true;
-//  if WizardSilent() = false then
-//  begin
-//    case CurPageID of
-////      DbPage.ID: Result := CheckDbConnection();
-////      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-////      RedisPage.ID: Result := CheckRedisConnection();
-//      wpReady: Result := DownloadDependency();
-//    end;
-//  end;
-//end;                                                     
-
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := true;
+  if WizardSilent() = false then
+  begin
+    case CurPageID of
+        DbPage.ID:
+          Result := CheckDbConnection();
+        RabbitMqPage.ID:
+          Result := CheckRabbitMqConnection();
+        RedisPage.ID:
+          Result := CheckRedisConnection();
+        wpReady:
+          Result := DownloadDependency(CurPageID);
+    end;
+  end;
+end;
