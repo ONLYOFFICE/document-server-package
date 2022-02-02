@@ -887,14 +887,14 @@ function CheckPortOccupied(): Boolean;
 var
   ResultCode: Integer;
   I: Integer;
-  Ports : Array[0..1] of Integer;
+  Ports: Array[0..1] of Integer;
 begin
   if WizardSilent() = false then
   begin
     Ports[0] := 80;
     Ports[1] := 8080;
     for I := 0 to 2 do
-    begin  
+    begin
       Exec(
         ExpandConstant('{cmd}'),
         '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
