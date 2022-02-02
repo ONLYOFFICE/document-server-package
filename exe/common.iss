@@ -886,33 +886,32 @@ end;
 function CheckPortOccupied(): Boolean;
 var
   ResultCode: Integer;
-  I: integer;
-  Ports : Array[0..6] of Integer;
+  I: Integer;
+  Ports : Array[0..1] of Integer;
+  Dlina: Integer;
 begin
-  Ports[0] := 80;
-  Ports[1] := 443;
-  Ports[2] := 4369;
-  Ports[3] := 5432;
-  Ports[4] := 5672;
-  Ports[5] := 6379;
-  Ports[6] := 8080;
-  for I := 0 to 6 do
-  begin  
-    Exec(
-    ExpandConstant('{cmd}'),
-    '/C netstat -na | findstr' + ' /C:":' + IntToStr(Ports[I]) + ' "',
-    '',
-    0,
-    ewWaitUntilTerminated,
-    ResultCode);
-    if ResultCode <> 1 then 
-    begin
-      MsgBox('Port ' + IntToStr(Ports[I]) + ' is used', mbInformation, MB_OK);
-      Result := True; 
-    end
-    else
-    begin
-      Result := False;
+  if WizardSilent() = false then
+  begin
+    Ports[0] := 80;
+    Ports[1] := 8080;
+    for I := 0 to 2 do
+    begin  
+      Exec(
+        ExpandConstant('{cmd}'),
+        '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
+        '',
+        0,
+        ewWaitUntilTerminated,
+        ResultCode);
+      if ResultCode <> 1 then 
+      begin
+        MsgBox('Port ' + IntToStr(Ports[I]) + ' is in use. The installation will continue, but the operation of the application is not guaranteed.', mbInformation, MB_OK);
+        Result := true; 
+      end
+      else
+      begin
+        Result := false;
+      end;
     end;
   end;
 end;
