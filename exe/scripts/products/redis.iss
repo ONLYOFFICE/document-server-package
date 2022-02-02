@@ -1,17 +1,16 @@
 ; http://support.microsoft.com/kb/239114
 
 [CustomMessages]
-redis_title=PostgreSQL
+redis_title=Redis 3.0.504 x64
 
-redis_size=5.9 MB
+redis_size=6.5 MB
 
 [Code]
 const
-	redis_url = 'http://github.com/MSOpenTech/redis/releases/download/win-3.2.100/Redis-x64-3.2.100.msi';
+	redis_url = 'http://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi';
 
 procedure redis(minVersion: string);
 begin
-	//check for postgresql binaries
 	if (FileExists(ExpandConstant('{pf64}{\}Redis{\}redis-server.exe')) <> True ) then
 		AddProduct('redis.msi',
 			'/qb',

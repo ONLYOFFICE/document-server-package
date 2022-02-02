@@ -168,17 +168,37 @@ sed 's/linux.html/linux-rpm.html/g' -i "$DSE_NGINX_CONF/ds-example.conf"
 rm -rf "%{buildroot}"
 
 %files
-%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*/*
-%config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/*.json
-%config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
 
-%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/nginx/includes/*
-%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}/nginx/*.tmpl
+%defattr(440, ds, ds, 555)
+%{_localstatedir}/www/%{_ds_prefix}*/*
+%exclude %{_localstatedir}/www/%{_ds_prefix}/npm/json
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/converter
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/docbuilder
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/x2t
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
+
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/npm/json
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/converter
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/docbuilder
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/x2t
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
+
+%config %{_sysconfdir}/%{_ds_prefix}*/*.json
+%config %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
+
+%config %{_sysconfdir}/%{_ds_prefix}*/nginx/includes/*
+%config %{_sysconfdir}/%{_ds_prefix}/nginx/*.tmpl
 
 %config(noreplace) %{_sysconfdir}/%{_ds_prefix}/nginx/ds.conf
 
 %config %attr(644, root, root) %{_sysconfdir}/%{_ds_prefix}/logrotate/*
-%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
+%config %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
 
 %attr(-, root, root) %{_libdir}/*.so*
 %attr(-, root, root) %{_bindir}/documentserver-*.sh
@@ -187,15 +207,15 @@ rm -rf "%{buildroot}"
 %attr(-, root, root) %{_sysconfdir}/supervisord.d/*
 
 %dir
-%attr(-, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
+%attr(750, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}
 
-%attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
+%attr(750, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
 %attr(755, -, -) %{_localstatedir}/www/%{_ds_prefix}/../Data
 
 %if %{defined example}
-%attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
-%attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}-example
+%attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
+%attr(750, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
 
 %pre

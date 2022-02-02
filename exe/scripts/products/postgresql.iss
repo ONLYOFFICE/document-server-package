@@ -1,7 +1,7 @@
 ; http://support.microsoft.com/kb/239114
 
 [CustomMessages]
-postgresql_title=PostgreSQL
+postgresql_title=PostgreSQL 9.5.4.1 x64
 
 postgresql_size=62.0 MB
 
