@@ -888,7 +888,6 @@ var
   ResultCode: Integer;
   I: Integer;
   Ports : Array[0..1] of Integer;
-  Dlina: Integer;
 begin
   if WizardSilent() = false then
   begin
