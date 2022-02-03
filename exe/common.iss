@@ -910,7 +910,7 @@ begin
         0,
         ewWaitUntilTerminated,
         ResultCode);
-      if ResultCode <> 1 then 
+      if ResultCode <> 1 then
       begin
         MsgBox('Port ' + IntToStr(Ports[I]) +
         ' is in use. The installation will continue, but the operation' +
