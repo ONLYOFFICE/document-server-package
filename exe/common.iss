@@ -933,7 +933,7 @@ begin
       RedisPage.ID:
         Result := CheckRedisConnection();
       wpWelcome:
-        CheckPortOccupied();
+        Result := CheckPortOccupied();
       wpReady:
         Result := DownloadDependency(CurPageID);
       wpSelectComponents:
