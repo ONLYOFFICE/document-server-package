@@ -901,7 +901,7 @@ begin
     Ports[1] := 8080;
     Ports[2] := 3000;
     Ports[3] := StrToInt(GetDefaultPort(''));
-    for I := 0 to ArrayLength(Ports)-1 do
+    for I := 0 to ArrayLength(Ports) - 1 do
     begin
       Exec(
         ExpandConstant('{cmd}'),
