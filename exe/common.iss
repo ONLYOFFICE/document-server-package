@@ -892,10 +892,11 @@ function CheckPortOccupied(): Boolean;
 var
   ResultCode: Integer;
   I: Integer;
-  Ports: Array[0..1] of Integer;
+  Ports : Array[0..1] of Integer;
 begin
   if WizardSilent() = false then
   begin
+    Result := false;
     Ports[0] := 80;
     Ports[1] := 8080;
     for I := 0 to ArrayLength(Ports)-1 do
@@ -912,10 +913,6 @@ begin
         MsgBox('Port ' + IntToStr(Ports[I]) + ' is in use. The installation will continue, but the operation of the application is not guaranteed.', mbInformation, MB_OK);
         Result := true; 
       end
-      else
-      begin
-        Result := false;
-      end;
     end;
   end;
 end;
