@@ -892,7 +892,7 @@ function CheckPortOccupied(): Boolean;
 var
   ResultCode: Integer;
   I: Integer;
-  Ports : Array[0..1] of Integer;
+  Ports: Array[0..1] of Integer;
 begin
   if WizardSilent() = false then
   begin
