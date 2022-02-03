@@ -883,17 +883,22 @@ begin
   end;
 end;
 
+function ArrayLength(a: array of integer): Integer;
+begin
+  Result := GetArrayLength(a);
+end;
+
 function CheckPortOccupied(): Boolean;
 var
   ResultCode: Integer;
   I: Integer;
-  Ports: Array[0..1] of Integer;
+  Ports : Array[0..1] of Integer;
 begin
   if WizardSilent() = false then
   begin
     Ports[0] := 80;
     Ports[1] := 8080;
-    for I := 0 to 1 do
+    for I := 0 to ArrayLength(Ports)-1 do
     begin
       Exec(
         ExpandConstant('{cmd}'),
