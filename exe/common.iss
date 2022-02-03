@@ -912,7 +912,9 @@ begin
         ResultCode);
       if ResultCode <> 1 then 
       begin
-        MsgBox('Port ' + IntToStr(Ports[I]) + ' is in use. The installation will continue, but the operation of the application is not guaranteed.', mbInformation, MB_OK);
+        MsgBox('Port ' + IntToStr(Ports[I]) +
+        ' is in use. The installation will continue, but the operation' +
+        'of the application is not guaranteed.', mbInformation, MB_OK);
         Result := true; 
       end
     end;
