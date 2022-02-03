@@ -893,7 +893,7 @@ begin
   begin
     Ports[0] := 80;
     Ports[1] := 8080;
-    for I := 0 to 2 do
+    for I := 0 to 1 do
     begin
       Exec(
         ExpandConstant('{cmd}'),
