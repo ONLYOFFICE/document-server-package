@@ -33,7 +33,7 @@ Template: M4_ONLYOFFICE_VALUE/remove-db
 Type: boolean
 Default: false
 Description: Remove database?
- This operation will remove the database which contain all ONLYOFFICE data. It is recommended to take backup before removing the database.
+ This operation will remove the database which contain all M4_COMPANY_NAME data. It is recommended to take backup before removing the database.
 
 Template: M4_ONLYOFFICE_VALUE/cluster-mode
 Type: boolean
