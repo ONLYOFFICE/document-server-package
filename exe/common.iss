@@ -767,7 +767,7 @@ begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
       ExpandConstant('{cm:Redis}'), ExpandConstant('{cm:PackageConfigure}' + ' Redis...'),
       ExpandConstant('{cm:PackageConnection}') + ' Redis.');
-    RedisPage.Add(ExpandConstant('cm:Host'), False);
+    RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
     RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
   end;
