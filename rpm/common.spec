@@ -171,14 +171,6 @@ rm -rf "%{buildroot}"
 
 %defattr(440, ds, ds, 555)
 %{_localstatedir}/www/%{_ds_prefix}*/*
-%exclude %{_localstatedir}/www/%{_ds_prefix}/npm/json
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/converter
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/docbuilder
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/x2t
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
 
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/npm/json
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
