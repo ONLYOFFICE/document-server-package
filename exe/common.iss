@@ -849,8 +849,8 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Python isn''t installed or unreachable, ' +
-    'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+    MsgBox('Python' + ' ' + ExpandConstant('{cm:NotAvailable}') + ' ' + 
+    'RabbitMQ ' + ' ' + ExpandConstant('{cm:SkipValidtion}'), mbInformation, MB_OK);
     Exit;
   end;
 
@@ -881,15 +881,15 @@ begin
   end
   else
   begin 
-      MsgBox('Failed to check parameters, ' +
-      'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+      MsgBox(ExpandConstant('{cm:CheckFailed}') + ' ' +
+      'RabbitMQ ' + ExpandConstant('{cm:SkipValidation}'), mbInformation, MB_OK);
       Exit;
   end;
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
-    'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(ExpandConstant('{cm:CheckConnectionLabel1}') + ' ' + GetRabbitMqHost('') + ' ' + ExpandConstant('{cm:CheckConnectionLabel2}') + #13#10 +
+    ExpandConstant('{cm:CheckConnectionLabel5}'), mbError, MB_OK);
     Result := false;
   end;
 end;
