@@ -921,8 +921,8 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 +
-    'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(ExpandConstant('{cm:CheckConnectionLabel1}') + ' ' + GetRedisHost('') + ' ' + ExpandConstant('{cm:CheckConnectionLabel2}') + #13#10 +
+    ExpandConstant('{cm:CheckConnectionLabel5}'), mbError, MB_OK);
     Result := false;
   end;
 end;
