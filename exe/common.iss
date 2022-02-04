@@ -270,6 +270,42 @@ ru.CompactInstall=Компактная установка
 en.CustomInstall=Custom installtion
 ru.CustomInstall=Выборочная установка
 
+en.Postgre=PostgreSQL Database
+ru.Postgre=База данных PostgreSQL
+
+en.PostgreDb=Database:
+ru.PostgreDb=База данных:
+
+en.RabbitMq=RabbitMQ Messaging Broker
+ru.RabbitMq=Брокер обмена сообщениями RabbitMq
+
+en.Redis=Redis In-Memory Database
+ru.Redis=Хранилище структур данных Redis
+
+////////////////
+en.Host=Host:
+ru.Host=Хост:
+en.User=User:
+ru.User=Пользователь:
+en.Password=Password:
+ru.Password=Пароль:
+en.Protocol=Protocol
+ru.Protocol=Протокол
+en.PackageConfigure=Configure Connection to
+ru.PackageConfigure=Настройка соединения с
+en.PackageConnection=Specify a connection and click Next to connect to
+ru.PackageConnection=Укажите параметры подключения и нажмите «Далее» для подключения к
+en.CheckConnectionLabel1=Connection to
+ru.CheckConnectionLabel1=Соединение с
+en.CheckConnectionLabel2=failed!
+ru.CheckConnectionLabel2=не удалось!
+en.CheckConnectionLabel3=return
+ru.CheckConnectionLabel3=вернул
+en.CheckConnectionLabel4=code
+ru.CheckConnectionLabel4=код ошибки
+en.CheckConnectionLabel5=Check the connection settings and try again.
+ru.CheckConnectionLabel5=Проверьте настройки соединения и попробуйте снова.
+
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
@@ -681,12 +717,12 @@ end;
 procedure InitializeWizard;
 begin
   DbPage := CreateInputQueryPage(wpPreparing,
-    'PostgreSQL Database', 'Configure PostgreSQL Connection...',
-    'Please specify your PostgreSQL connection, then click Next.');
-  DbPage.Add('Host:', False);
-  DbPage.Add('User:', False);
-  DbPage.Add('Password:', True);
-  DbPage.Add('Database:', False);
+    ExpandConstant('{cm:Postgre}'), ExpandConstant('{cm:PackageConfigure}') + 'PostgreSQL...',
+    ExpandConstant('{cm:PackageConnection}') + ' PostgreSQL.');
+  DbPage.Add(ExpandConstant('{cm:Host}'), False);
+  DbPage.Add(ExpandConstant('{cm:User}'), False);
+  DbPage.Add(ExpandConstant('{cm:Password}'), True);
+  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
   DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
   DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
@@ -694,12 +730,12 @@ begin
   DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
-    'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
-    'Please specify your RabbitMQ connection, then click Next.');
-  RabbitMqPage.Add('Host:', False);
-  RabbitMqPage.Add('User:', False);
-  RabbitMqPage.Add('Password:', True);
-  RabbitMqPage.Add('Protocol:', False);
+    ExpandConstant('{cm:RabbitMq}'), ExpandConstant('{cm:PackageConfigure}') + 'RabbitMq...',
+    ExpandConstant('{cm:PackageConnection}') + 'RabbitMq.');
+  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
   
   RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
@@ -708,9 +744,9 @@ begin
   
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
-      'Redis In-Memory Database', 'Configure Redis Connection...',
-      'Please specify your Redis connection, then click Next.');
-    RedisPage.Add('Host:', False);
+      ExpandConstant('{cm:Redis}'), ExpandConstant('{cm:PackageConfigure}' + 'Redis...'),
+      ExpandConstant('{cm:PackageConnection}') + 'Redis.');
+    RedisPage.Add(ExpandConstant('cm:Host'), False);
 
     RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
   end;
@@ -770,7 +806,7 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetDbHost('') + ' failed!' + #13#10 + 'PSQL return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(ExpandConstant('{cm:CheckConnectionLabel1}') + ' ' + GetDbHost('') + ' ' + ExpandConstant('{cm:CheckConnectionLabel2}') + #13#10 + 'PSQL ' +ExpandConstant('{cm:CheckConnectionLabel3}') + ' ' + ExpandConstant('{cm:CheckConnectionLabel4}') + ' ' + IntToStr(ResultCode) +  #13#10 + ExpandConstant('{cm:CheckConnectionLabel5}'), mbError, MB_OK);
     Result := false;
   end;
 end;
