@@ -952,15 +952,14 @@ function CheckPortOccupied(): Boolean;
 var
   ResultCode: Integer;
   I: Integer;
-  Ports: Array[0..3] of Integer;
+  Ports: Array[0..2] of Integer;
 begin
   if WizardSilent() = false then
   begin
     Result := false;
-    Ports[0] := 80;
+    Ports[0] := StrToInt(GetDefaultPort(''));
     Ports[1] := 8080;
     Ports[2] := 3000;
-    Ports[3] := StrToInt(GetDefaultPort(''));
     for I := 0 to ArrayLength(Ports) - 1 do
     begin
       Exec(
