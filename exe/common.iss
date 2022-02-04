@@ -850,7 +850,7 @@ begin
   if ResultCode <> 0 then
   begin
     MsgBox('Python' + ' ' + ExpandConstant('{cm:NotAvailable}') + ' ' + 
-    'RabbitMQ ' + ' ' + ExpandConstant('{cm:SkipValidation}'), mbInformation, MB_OK);
+    ExpandConstant('{cm:SkipValidation}') + ' RabbitMQ', mbInformation, MB_OK);
     Exit;
   end;
 
@@ -882,7 +882,7 @@ begin
   else
   begin 
       MsgBox(ExpandConstant('{cm:CheckFailed}') + ' ' +
-      'RabbitMQ ' + ExpandConstant('{cm:SkipValidation}'), mbInformation, MB_OK);
+      ExpandConstant('{cm:SkipValidation}') + ' RabbitMQ', mbInformation, MB_OK);
       Exit;
   end;
 
