@@ -319,7 +319,7 @@ en.NotAvailable=isn''t installed or unreachable,
 ru.NotAvailable=не установлен или недоступен,
 
 en.SkipValidation=parameters validation will be skipped.
-ru.SkipValidation=проверка параметров будет пропущена.
+ru.SkipValidation=будет пропущена проверка параметров
 
 en.CheckFailed=Failed to check parameters,
 ru.CheckFailed=Ошибка проверки параметров
@@ -850,7 +850,7 @@ begin
   if ResultCode <> 0 then
   begin
     MsgBox('Python' + ' ' + ExpandConstant('{cm:NotAvailable}') + ' ' + 
-    'RabbitMQ ' + ' ' + ExpandConstant('{cm:SkipValidtion}'), mbInformation, MB_OK);
+    'RabbitMQ ' + ' ' + ExpandConstant('{cm:SkipValidation}'), mbInformation, MB_OK);
     Exit;
   end;
 
