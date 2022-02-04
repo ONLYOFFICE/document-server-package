@@ -282,6 +282,9 @@ ru.RabbitMq=Брокер обмена сообщениями RabbitMq
 en.Redis=Redis In-Memory Database
 ru.Redis=Хранилище структур данных Redis
 
+en.Port=Port
+ru.Port=Порт
+
 en.Host=Host
 ru.Host=Хост
 
@@ -969,7 +972,7 @@ begin
         ResultCode);
       if ResultCode <> 1 then
       begin
-        MsgBox(ExpandConstant('{cm:Host}') + ' ' + IntToStr(Ports[I]) + ' ' + ExpandConstant('{cm:UsePort}'), mbInformation, MB_OK);
+        MsgBox(ExpandConstant('{cm:Port}') + ' ' + IntToStr(Ports[I]) + ' ' + ExpandConstant('{cm:UsePort}'), mbInformation, MB_OK);
         Result := true; 
       end
     end;
