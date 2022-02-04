@@ -282,29 +282,50 @@ ru.RabbitMq=Брокер обмена сообщениями RabbitMq
 en.Redis=Redis In-Memory Database
 ru.Redis=Хранилище структур данных Redis
 
-////////////////
-en.Host=Host:
-ru.Host=Хост:
-en.User=User:
-ru.User=Пользователь:
-en.Password=Password:
-ru.Password=Пароль:
+en.Host=Host
+ru.Host=Хост
+
+en.User=User
+ru.User=Пользователь
+
+en.Password=Password
+ru.Password=Пароль
+
 en.Protocol=Protocol
 ru.Protocol=Протокол
+
 en.PackageConfigure=Configure Connection to
 ru.PackageConfigure=Настройка соединения с
+
 en.PackageConnection=Specify a connection and click Next to connect to
 ru.PackageConnection=Укажите параметры подключения и нажмите «Далее» для подключения к
+
 en.CheckConnectionLabel1=Connection to
 ru.CheckConnectionLabel1=Соединение с
+
 en.CheckConnectionLabel2=failed!
 ru.CheckConnectionLabel2=не удалось!
+
 en.CheckConnectionLabel3=return
 ru.CheckConnectionLabel3=вернул
+
 en.CheckConnectionLabel4=code
 ru.CheckConnectionLabel4=код ошибки
+
 en.CheckConnectionLabel5=Check the connection settings and try again.
 ru.CheckConnectionLabel5=Проверьте настройки соединения и попробуйте снова.
+
+en.NotAvailable=isn''t installed or unreachable,
+ru.NotAvailable=не установлен или недоступен,
+
+en.SkipValidation=parameters validation will be skipped.
+ru.SkipValidation=проверка параметров будет пропущена.
+
+en.CheckFailed=Failed to check parameters,
+ru.CheckFailed=Ошибка проверки параметров
+
+en.UsePort=is in use. The installation will continue, but the operation of the application is not guaranteed.
+ru.UsePort=используется. Инсталляция будет продолжена, но работа приложения не гарантируется.
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
