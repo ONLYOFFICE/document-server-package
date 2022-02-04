@@ -741,7 +741,7 @@ end;
 procedure InitializeWizard;
 begin
   DbPage := CreateInputQueryPage(wpPreparing,
-    ExpandConstant('{cm:Postgre}'), ExpandConstant('{cm:PackageConfigure}') + 'PostgreSQL...',
+    ExpandConstant('{cm:Postgre}'), ExpandConstant('{cm:PackageConfigure}') + ' PostgreSQL...',
     ExpandConstant('{cm:PackageConnection}') + ' PostgreSQL.');
   DbPage.Add(ExpandConstant('{cm:Host}'), False);
   DbPage.Add(ExpandConstant('{cm:User}'), False);
