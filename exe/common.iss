@@ -277,7 +277,7 @@ en.PostgreDb=Database:
 ru.PostgreDb=База данных:
 
 en.RabbitMq=RabbitMQ Messaging Broker
-ru.RabbitMq=Брокер обмена сообщениями RabbitMq
+ru.RabbitMq=Брокер обмена сообщениями RabbitMQ
 
 en.Redis=Redis In-Memory Database
 ru.Redis=Хранилище структур данных Redis
