@@ -300,8 +300,8 @@ ru.Protocol=Протокол
 en.PackageConfigure=Configure Connection to %1
 ru.PackageConfigure=Настройка соединения с %1
 
-en.PackageConnection=Specify a connection and click Next to connect to %1
-ru.PackageConnection=Укажите параметры подключения и нажмите «Далее» для подключения к %1
+en.PackageConnection=Please specify your %1 connection, then click Next.
+ru.PackageConnection=Укажите параметры подключения к %1 и нажмите «Далее»
 
 en.CheckConnection=Connection to %1 failed! %2 return code %3Check the connection settings and try again.
 ru.CheckConnection=Соединение с %1 не удалось! %2 вернул код ошибки %3Проверьте настройки соединения и попробуйте снова.
@@ -730,7 +730,7 @@ procedure InitializeWizard;
 begin
   DbPage := CreateInputQueryPage(wpPreparing,
     ExpandConstant('{cm:Postgre}'), ExpandConstant('{cm:PackageConfigure}') + ' PostgreSQL...',
-    ExpandConstant('{cm:PackageConnection}') + ' PostgreSQL.');
+    ExpandConstant('{cm:PackageConnection}') + ' PostgreSQL');
   DbPage.Add(ExpandConstant('{cm:Host}'), False);
   DbPage.Add(ExpandConstant('{cm:User}'), False);
   DbPage.Add(ExpandConstant('{cm:Password}'), True);
@@ -743,7 +743,7 @@ begin
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     ExpandConstant('{cm:RabbitMq}'), ExpandConstant('{cm:PackageConfigure}') + ' RabbitMq...',
-    ExpandConstant('{cm:PackageConnection}') + ' RabbitMq.');
+    ExpandConstant('{cm:PackageConnection}') + ' RabbitMq');
   RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
@@ -757,7 +757,7 @@ begin
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
       ExpandConstant('{cm:Redis}'), ExpandConstant('{cm:PackageConfigure}' + ' Redis...'),
-      ExpandConstant('{cm:PackageConnection}') + ' Redis.');
+      ExpandConstant('{cm:PackageConnection}') + ' Redis');
     RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
     RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
