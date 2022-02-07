@@ -840,8 +840,8 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Python' + ' ' + ExpandConstant('{cm:NotAvailable}') + ' ' + 
-    ExpandConstant('{cm:SkipValidation}') + ' RabbitMQ', mbInformation, MB_OK);
+    MsgBox(FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) + ' ' + 
+    FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']), mbInformation, MB_OK);
     Exit;
   end;
 
@@ -872,15 +872,14 @@ begin
   end
   else
   begin 
-      MsgBox(ExpandConstant('{cm:CheckFailed}') + ' ' +
-      ExpandConstant('{cm:SkipValidation}') + ' RabbitMQ', mbInformation, MB_OK);
-      Exit;
+    MsgBox(ExpandConstant('{cm:CheckFailed}') + ' ' +
+    FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']), mbInformation, MB_OK);
+    Exit;
   end;
 
   if ResultCode <> 0 then
   begin
-    MsgBox(ExpandConstant('{cm:CheckConnectionLabel1}') + ' ' + GetRabbitMqHost('') + ' ' + ExpandConstant('{cm:CheckConnectionLabel2}') + #13#10 +
-    ExpandConstant('{cm:CheckConnectionLabel5}'), mbError, MB_OK);
+    MsgBox(FmtMessage(ExpandConstant('{cm:CheckConnection}'), [GetRabbitMqHost(''), #13#10 + 'RabbitMQ', IntToStr(ResultCode) + '.' + #13#10]), mbError, MB_OK);
     Result := false;
   end;
 end;
