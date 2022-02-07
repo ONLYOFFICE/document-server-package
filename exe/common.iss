@@ -154,6 +154,7 @@
 #define Pip str(PythonPath + "\scripts\pip.exe")
 #define RabbitMq 'RabbitMQ'
 #define PostgreSQL 'PostgreSQL'
+#define Redis 'Redis'
 
 [Setup]
 AppName                   ={#sAppName}
@@ -764,8 +765,8 @@ begin
     RedisPage := CreateInputQueryPage(
       RabbitMqPage.ID,
       ExpandConstant('{cm:Redis}'),
-      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['Redis...']),
-      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['Redis']));
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
     RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
     RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
@@ -938,7 +939,7 @@ begin
     MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-        ([GetRedisHost(''), 'Redis', IntToStr(ResultCode) + '.'])),
+        ([GetRedisHost(''), '{#Redis}', IntToStr(ResultCode) + '.'])),
       mbError,
       MB_OK);
     Result := false;
