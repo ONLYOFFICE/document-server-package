@@ -891,7 +891,7 @@ begin
   Result := true;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
-  begin                                      
+  begin
     Exec(
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install iredis',
@@ -911,8 +911,7 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(ExpandConstant('{cm:CheckConnectionLabel1}') + ' ' + GetRedisHost('') + ' ' + ExpandConstant('{cm:CheckConnectionLabel2}') + #13#10 +
-    ExpandConstant('{cm:CheckConnectionLabel5}'), mbError, MB_OK);
+    MsgBox(FmtMessage(ExpandConstant('{cm:CheckConnection}'), [GetRedisHost(''), #13#10 + 'Redis', IntToStr(ResultCode) + '.' + #13#10]), mbError, MB_OK);
     Result := false;
   end;
 end;
