@@ -152,6 +152,7 @@
 #define PythonPath '{sd}\Python'
 #define Python str(PythonPath + "\python.exe")
 #define Pip str(PythonPath + "\scripts\pip.exe")
+#define RabbitMq 'RabbitMQ'
 
 [Setup]
 AppName                   ={#sAppName}
@@ -746,8 +747,8 @@ begin
   RabbitMqPage := CreateInputQueryPage(
     DbPage.ID,
     ExpandConstant('{cm:RabbitMq}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['RabbitMQ...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['RabbitMQ']));
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
   RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
@@ -853,7 +854,7 @@ begin
   begin
     MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
-      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']),
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
       mbInformation,
       MB_OK);
     Exit;
@@ -888,7 +889,7 @@ begin
   begin 
     MsgBox(
       ExpandConstant('{cm:CheckFailed}') + ' ' +
-      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']),
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
       mbInformation,
       MB_OK);
     Exit;
@@ -899,7 +900,7 @@ begin
     MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-        ([GetRabbitMqHost(''), #13#10 + 'RabbitMQ', IntToStr(ResultCode) + '.' + #13#10])),
+        ([GetRabbitMqHost(''), #13#10 + '{#RabbitMQ}', IntToStr(ResultCode) + '.' + #13#10])),
       mbError,
       MB_OK);
     Result := false;
