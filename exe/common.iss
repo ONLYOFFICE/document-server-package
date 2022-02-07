@@ -818,7 +818,13 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(FmtMessage(ExpandConstant('{cm:CheckConnection}'), [GetDbHost(''), #13#10 + 'PSQL', IntToStr(ResultCode) + '.' + #13#10]), mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+          [GetDbHost(''),
+          #13#10 + 'PSQL',
+          IntToStr(ResultCode) + '.' + #13#10]),
+      mbError, MB_OK);
     Result := false;
   end;
 end;
@@ -840,8 +846,10 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) + ' ' + 
-    FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']), mbInformation, MB_OK);
+    MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']),
+      mbInformation, MB_OK);
     Exit;
   end;
 
@@ -872,14 +880,20 @@ begin
   end
   else
   begin 
-    MsgBox(ExpandConstant('{cm:CheckFailed}') + ' ' +
-    FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']), mbInformation, MB_OK);
+    MsgBox(
+      ExpandConstant('{cm:CheckFailed}') + ' ' +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']),
+      mbInformation, MB_OK);
     Exit;
   end;
 
   if ResultCode <> 0 then
   begin
-    MsgBox(FmtMessage(ExpandConstant('{cm:CheckConnection}'), [GetRabbitMqHost(''), #13#10 + 'RabbitMQ', IntToStr(ResultCode) + '.' + #13#10]), mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        [GetRabbitMqHost(''), #13#10 + 'RabbitMQ', IntToStr(ResultCode) + '.' + #13#10]),
+      mbError, MB_OK);
     Result := false;
   end;
 end;
@@ -911,7 +925,11 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(FmtMessage(ExpandConstant('{cm:CheckConnection}'), [GetRedisHost(''), #13#10 + 'Redis', IntToStr(ResultCode) + '.' + #13#10]), mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        [GetRedisHost(''), #13#10 + 'Redis', IntToStr(ResultCode) + '.' + #13#10]),
+      mbError, MB_OK);
     Result := false;
   end;
 end;
@@ -957,7 +975,11 @@ begin
         ResultCode);
       if ResultCode <> 1 then
       begin
-        MsgBox(FmtMessage(ExpandConstant('{cm:UsePort}'), [IntToStr(Ports[I])]), mbInformation, MB_OK);
+        MsgBox(
+          FmtMessage(
+            ExpandConstant('{cm:UsePort}'),
+            [IntToStr(Ports[I])]),
+          mbInformation, MB_OK);
         Result := true; 
       end
     end;
