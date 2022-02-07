@@ -152,6 +152,9 @@
 #define PythonPath '{sd}\Python'
 #define Python str(PythonPath + "\python.exe")
 #define Pip str(PythonPath + "\scripts\pip.exe")
+#define RabbitMq 'RabbitMQ'
+#define PostgreSQL 'PostgreSQL'
+#define Redis 'Redis'
 
 [Setup]
 AppName                   ={#sAppName}
@@ -269,6 +272,54 @@ ru.CompactInstall=Компактная установка
 
 en.CustomInstall=Custom installtion
 ru.CustomInstall=Выборочная установка
+
+en.Postgre=PostgreSQL Database
+ru.Postgre=База данных PostgreSQL
+
+en.PostgreDb=Database:
+ru.PostgreDb=База данных:
+
+en.RabbitMq=RabbitMQ Messaging Broker
+ru.RabbitMq=Брокер обмена сообщениями RabbitMQ
+
+en.Redis=Redis In-Memory Database
+ru.Redis=Хранилище структур данных Redis
+
+en.Host=Host
+ru.Host=Хост
+
+en.Port=Port
+ru.Port=Порт
+
+en.User=User
+ru.User=Пользователь
+
+en.Password=Password
+ru.Password=Пароль
+
+en.Protocol=Protocol
+ru.Protocol=Протокол
+
+en.PackageConfigure=Configure Connection to %1
+ru.PackageConfigure=Настройка соединения с %1
+
+en.PackageConnection=Please specify your %1 connection, then click Next.
+ru.PackageConnection=Укажите параметры подключения к %1 и нажмите «Далее»
+
+en.CheckConnection=Connection to %1 failed! %n%2 return code %3%nCheck the connection settings and try again.
+ru.CheckConnection=Соединение с %1 не удалось! %n%2 вернул код ошибки %3%nПроверьте настройки соединения и попробуйте снова.
+
+en.NotAvailable=%1 isn't installed or unreachable,
+ru.NotAvailable=%1 не установлен или недоступен,
+
+en.SkipValidation=%1 parameters validation will be skipped.
+ru.SkipValidation=будет пропущена проверка параметров %1
+
+en.CheckFailed=Failed to check parameters,
+ru.CheckFailed=Ошибка проверки параметров
+
+en.UsePort=Port %1 is in use. The installation will continue, but the operation of the application is not guaranteed.
+ru.UsePort=Порт %1 используется. Инсталляция будет продолжена, но работа приложения не гарантируется.
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -680,26 +731,30 @@ end;
 
 procedure InitializeWizard;
 begin
-  DbPage := CreateInputQueryPage(wpPreparing,
-    'PostgreSQL Database', 'Configure PostgreSQL Connection...',
-    'Please specify your PostgreSQL connection, then click Next.');
-  DbPage.Add('Host:', False);
-  DbPage.Add('User:', False);
-  DbPage.Add('Password:', True);
-  DbPage.Add('Database:', False);
+  DbPage := CreateInputQueryPage(
+    wpPreparing,
+    ExpandConstant('{cm:Postgre}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
+  DbPage.Add(ExpandConstant('{cm:Host}'), False);
+  DbPage.Add(ExpandConstant('{cm:User}'), False);
+  DbPage.Add(ExpandConstant('{cm:Password}'), True);
+  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
   DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
   DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
   DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
   DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
-  RabbitMqPage := CreateInputQueryPage(DbPage.ID,
-    'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
-    'Please specify your RabbitMQ connection, then click Next.');
-  RabbitMqPage.Add('Host:', False);
-  RabbitMqPage.Add('User:', False);
-  RabbitMqPage.Add('Password:', True);
-  RabbitMqPage.Add('Protocol:', False);
+  RabbitMqPage := CreateInputQueryPage(
+    DbPage.ID,
+    ExpandConstant('{cm:RabbitMq}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
+  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
   
   RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
@@ -707,10 +762,12 @@ begin
   RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
   
   if IsCommercial then begin
-    RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
-      'Redis In-Memory Database', 'Configure Redis Connection...',
-      'Please specify your Redis connection, then click Next.');
-    RedisPage.Add('Host:', False);
+    RedisPage := CreateInputQueryPage(
+      RabbitMqPage.ID,
+      ExpandConstant('{cm:Redis}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
+    RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
     RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
   end;
@@ -770,7 +827,12 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetDbHost('') + ' failed!' + #13#10 + 'PSQL return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetDbHost(''), 'PSQL', IntToStr(ResultCode) + '.'])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -792,8 +854,11 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Python isn''t installed or unreachable, ' +
-    'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
+    MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
+      mbInformation,
+      MB_OK);
     Exit;
   end;
 
@@ -824,15 +889,22 @@ begin
   end
   else
   begin 
-      MsgBox('Failed to check parameters, ' +
-      'RabbitMQ parameters validation will be skipped.', mbInformation, MB_OK);
-      Exit;
+    MsgBox(
+      ExpandConstant('{cm:CheckFailed}') + ' ' +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
+      mbInformation,
+      MB_OK);
+    Exit;
   end;
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRabbitMqHost('') + ' failed!' + #13#10 +
-    'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetRabbitMqHost(''), '{#RabbitMQ}', IntToStr(ResultCode) + '.'])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -844,7 +916,7 @@ begin
   Result := true;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
-  begin                                      
+  begin
     Exec(
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install iredis',
@@ -864,8 +936,12 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 +
-    'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetRedisHost(''), '{#Redis}', IntToStr(ResultCode) + '.'])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -883,6 +959,45 @@ begin
   end;
 end;
 
+function ArrayLength(a: array of integer): Integer;
+begin
+  Result := GetArrayLength(a);
+end;
+
+function CheckPortOccupied(): Boolean;
+var
+  ResultCode: Integer;
+  I: Integer;
+  Ports: Array[0..2] of Integer;
+begin
+  if WizardSilent() = false then
+  begin
+    Result := false;
+    Ports[0] := StrToInt(GetDefaultPort(''));
+    Ports[1] := 8080;
+    Ports[2] := 3000;
+    for I := 0 to ArrayLength(Ports) - 1 do
+    begin
+      Exec(
+        ExpandConstant('{cmd}'),
+        '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
+        '',
+        0,
+        ewWaitUntilTerminated,
+        ResultCode);
+      if ResultCode <> 1 then
+      begin
+        MsgBox(
+          FmtMessage(
+            ExpandConstant('{cm:UsePort}'), [IntToStr(Ports[I])]),
+          mbInformation,
+          MB_OK);
+        Result := true; 
+      end
+    end;
+  end;
+end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
@@ -895,6 +1010,8 @@ begin
         Result := CheckRabbitMqConnection();
       RedisPage.ID:
         Result := CheckRedisConnection();
+      wpWelcome:
+        Result := CheckPortOccupied();
       wpReady:
         Result := DownloadDependency(CurPageID);
       wpSelectComponents:
