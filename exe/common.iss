@@ -826,9 +826,10 @@ begin
   begin
     MsgBox(
       FmtMessage(
-        ExpandConstant('{cm:CheckConnection}'), [GetDbHost(''), #13#10 +
-        'PSQL', IntToStr(ResultCode) + '.' + #13#10]),
-      mbError, MB_OK);
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetDbHost(''), #13#10 + 'PSQL', IntToStr(ResultCode) + '.' + #13#10])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -853,7 +854,8 @@ begin
     MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']),
-      mbInformation, MB_OK);
+      mbInformation,
+      MB_OK);
     Exit;
   end;
 
@@ -887,7 +889,8 @@ begin
     MsgBox(
       ExpandConstant('{cm:CheckFailed}') + ' ' +
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['RabbitMQ']),
-      mbInformation, MB_OK);
+      mbInformation,
+      MB_OK);
     Exit;
   end;
 
@@ -895,9 +898,10 @@ begin
   begin
     MsgBox(
       FmtMessage(
-        ExpandConstant('{cm:CheckConnection}'), [GetRabbitMqHost(''), #13#10 +
-        'RabbitMQ', IntToStr(ResultCode) + '.' + #13#10]),
-      mbError, MB_OK);
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetRabbitMqHost(''), #13#10 + 'RabbitMQ', IntToStr(ResultCode) + '.' + #13#10])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -931,9 +935,10 @@ begin
   begin
     MsgBox(
       FmtMessage(
-        ExpandConstant('{cm:CheckConnection}'), [GetRedisHost(''), #13#10 +
-        'Redis', IntToStr(ResultCode) + '.' + #13#10]),
-      mbError, MB_OK);
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetRedisHost(''), #13#10 + 'Redis', IntToStr(ResultCode) + '.' + #13#10])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -982,7 +987,8 @@ begin
         MsgBox(
           FmtMessage(
             ExpandConstant('{cm:UsePort}'), [IntToStr(Ports[I])]),
-          mbInformation, MB_OK);
+          mbInformation,
+          MB_OK);
         Result := true; 
       end
     end;
