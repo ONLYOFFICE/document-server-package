@@ -821,9 +821,9 @@ begin
     MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-          [GetDbHost(''),
-          #13#10 + 'PSQL',
-          IntToStr(ResultCode) + '.' + #13#10]),
+        [GetDbHost(''),
+        #13#10 + 'PSQL',
+        IntToStr(ResultCode) + '.' + #13#10]),
       mbError, MB_OK);
     Result := false;
   end;
