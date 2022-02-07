@@ -305,8 +305,8 @@ ru.PackageConfigure=Настройка соединения с %1
 en.PackageConnection=Please specify your %1 connection, then click Next.
 ru.PackageConnection=Укажите параметры подключения к %1 и нажмите «Далее»
 
-en.CheckConnection=Connection to %1 failed! %2 return code %3Check the connection settings and try again.
-ru.CheckConnection=Соединение с %1 не удалось! %2 вернул код ошибки %3Проверьте настройки соединения и попробуйте снова.
+en.CheckConnection=Connection to %1 failed! %n%2 return code %3%nCheck the connection settings and try again.
+ru.CheckConnection=Соединение с %1 не удалось! %n%2 вернул код ошибки %3%nПроверьте настройки соединения и попробуйте снова.
 
 en.NotAvailable=%1 isn't installed or unreachable,
 ru.NotAvailable=%1 не установлен или недоступен,
@@ -829,7 +829,7 @@ begin
     MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-        ([GetDbHost(''), #13#10 + 'PSQL', IntToStr(ResultCode) + '.' + #13#10])),
+        ([GetDbHost(''), 'PSQL', IntToStr(ResultCode) + '.'])),
       mbError,
       MB_OK);
     Result := false;
@@ -901,7 +901,7 @@ begin
     MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-        ([GetRabbitMqHost(''), #13#10 + '{#RabbitMQ}', IntToStr(ResultCode) + '.' + #13#10])),
+        ([GetRabbitMqHost(''), '{#RabbitMQ}', IntToStr(ResultCode) + '.'])),
       mbError,
       MB_OK);
     Result := false;
@@ -938,7 +938,7 @@ begin
     MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-        ([GetRedisHost(''), #13#10 + 'Redis', IntToStr(ResultCode) + '.' + #13#10])),
+        ([GetRedisHost(''), 'Redis', IntToStr(ResultCode) + '.'])),
       mbError,
       MB_OK);
     Result := false;
