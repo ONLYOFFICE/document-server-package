@@ -153,6 +153,7 @@
 #define Python str(PythonPath + "\python.exe")
 #define Pip str(PythonPath + "\scripts\pip.exe")
 #define RabbitMq 'RabbitMQ'
+#define PostgreSQL 'PostgreSQL'
 
 [Setup]
 AppName                   ={#sAppName}
@@ -732,8 +733,8 @@ begin
   DbPage := CreateInputQueryPage(
     wpPreparing,
     ExpandConstant('{cm:Postgre}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['PostgreSQL...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['PostgreSQL']));
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
   DbPage.Add(ExpandConstant('{cm:Host}'), False);
   DbPage.Add(ExpandConstant('{cm:User}'), False);
   DbPage.Add(ExpandConstant('{cm:Password}'), True);
