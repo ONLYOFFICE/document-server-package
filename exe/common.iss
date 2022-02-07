@@ -731,12 +731,8 @@ begin
   DbPage := CreateInputQueryPage(
     wpPreparing,
     ExpandConstant('{cm:Postgre}'),
-    FmtMessage(
-      ExpandConstant('{cm:PackageConfigure}'),
-      ['PostgreSQL...']),
-    FmtMessage(
-      ExpandConstant('{cm:PackageConnection}'),
-      ['PostgreSQL']));
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['PostgreSQL...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['PostgreSQL']));
   DbPage.Add(ExpandConstant('{cm:Host}'), False);
   DbPage.Add(ExpandConstant('{cm:User}'), False);
   DbPage.Add(ExpandConstant('{cm:Password}'), True);
@@ -747,8 +743,10 @@ begin
   DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
   DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
-  RabbitMqPage := CreateInputQueryPage(DbPage.ID,
-    ExpandConstant('{cm:RabbitMq}'), FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['RabbitMQ...']),
+  RabbitMqPage := CreateInputQueryPage(
+    DbPage.ID,
+    ExpandConstant('{cm:RabbitMq}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['RabbitMQ...']),
     FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['RabbitMQ']));
   RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
@@ -761,8 +759,10 @@ begin
   RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
   
   if IsCommercial then begin
-    RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
-      ExpandConstant('{cm:Redis}'), FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['Redis...']),
+    RedisPage := CreateInputQueryPage(
+      RabbitMqPage.ID,
+      ExpandConstant('{cm:Redis}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['Redis...']),
       FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['Redis']));
     RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
