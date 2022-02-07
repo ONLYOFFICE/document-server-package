@@ -957,7 +957,7 @@ begin
         ResultCode);
       if ResultCode <> 1 then
       begin
-        MsgBox(ExpandConstant('{cm:Port}') + ' ' + IntToStr(Ports[I]) + ' ' + ExpandConstant('{cm:UsePort}'), mbInformation, MB_OK);
+        MsgBox(FmtMessage(ExpandConstant('{cm:UsePort}'), [IntToStr(Ports[I])]), mbInformation, MB_OK);
         Result := true; 
       end
     end;
