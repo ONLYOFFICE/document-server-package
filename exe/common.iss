@@ -282,11 +282,11 @@ ru.RabbitMq=Брокер обмена сообщениями RabbitMq
 en.Redis=Redis In-Memory Database
 ru.Redis=Хранилище структур данных Redis
 
-en.Port=Port
-ru.Port=Порт
-
 en.Host=Host
 ru.Host=Хост
+
+en.Port=Port
+ru.Port=Порт
 
 en.User=User
 ru.User=Пользователь
@@ -297,38 +297,26 @@ ru.Password=Пароль
 en.Protocol=Protocol
 ru.Protocol=Протокол
 
-en.PackageConfigure=Configure Connection to
-ru.PackageConfigure=Настройка соединения с
+en.PackageConfigure=Configure Connection to %1
+ru.PackageConfigure=Настройка соединения с %1
 
-en.PackageConnection=Specify a connection and click Next to connect to
-ru.PackageConnection=Укажите параметры подключения и нажмите «Далее» для подключения к
+en.PackageConnection=Specify a connection and click Next to connect to %1
+ru.PackageConnection=Укажите параметры подключения и нажмите «Далее» для подключения к %1
 
-en.CheckConnectionLabel1=Connection to
-ru.CheckConnectionLabel1=Соединение с
+en.CheckConnection=Connection to %1 failed! %2 return code %3Check the connection settings and try again.
+ru.CheckConnection=Соединение с %1 не удалось! %2 вернул код ошибки %3Проверьте настройки соединения и попробуйте снова.
 
-en.CheckConnectionLabel2=failed!
-ru.CheckConnectionLabel2=не удалось!
+en.NotAvailable=%1 isn't installed or unreachable,
+ru.NotAvailable=%1 не установлен или недоступен,
 
-en.CheckConnectionLabel3=return
-ru.CheckConnectionLabel3=вернул
-
-en.CheckConnectionLabel4=code
-ru.CheckConnectionLabel4=код ошибки
-
-en.CheckConnectionLabel5=Check the connection settings and try again.
-ru.CheckConnectionLabel5=Проверьте настройки соединения и попробуйте снова.
-
-en.NotAvailable=isn''t installed or unreachable,
-ru.NotAvailable=не установлен или недоступен,
-
-en.SkipValidation=parameters validation will be skipped.
-ru.SkipValidation=будет пропущена проверка параметров
+en.SkipValidation=%1 parameters validation will be skipped.
+ru.SkipValidation=будет пропущена проверка параметров %1
 
 en.CheckFailed=Failed to check parameters,
 ru.CheckFailed=Ошибка проверки параметров
 
-en.UsePort=is in use. The installation will continue, but the operation of the application is not guaranteed.
-ru.UsePort=используется. Инсталляция будет продолжена, но работа приложения не гарантируется.
+en.UsePort=Port %1 is in use. The installation will continue, but the operation of the application is not guaranteed.
+ru.UsePort=Порт %1 используется. Инсталляция будет продолжена, но работа приложения не гарантируется.
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
