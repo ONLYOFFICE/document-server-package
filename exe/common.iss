@@ -818,7 +818,7 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(ExpandConstant('{cm:CheckConnectionLabel1}') + ' ' + GetDbHost('') + ' ' + ExpandConstant('{cm:CheckConnectionLabel2}') + #13#10 + 'PSQL ' +ExpandConstant('{cm:CheckConnectionLabel3}') + ' ' + ExpandConstant('{cm:CheckConnectionLabel4}') + ' ' + IntToStr(ResultCode) +  #13#10 + ExpandConstant('{cm:CheckConnectionLabel5}'), mbError, MB_OK);
+    MsgBox(FmtMessage(ExpandConstant('{cm:CheckConnection}'), [GetDbHost(''), #13#10 + 'PSQL', IntToStr(ResultCode) + '.' + #13#10]), mbError, MB_OK);
     Result := false;
   end;
 end;
