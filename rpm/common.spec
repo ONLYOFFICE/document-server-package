@@ -180,6 +180,9 @@ rm -rf "%{buildroot}"
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
+%if %{defined example}
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/example
+%endif
 
 %config %{_sysconfdir}/%{_ds_prefix}*/*.json
 %config %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
@@ -192,7 +195,7 @@ rm -rf "%{buildroot}"
 %config %attr(644, root, root) %{_sysconfdir}/%{_ds_prefix}/logrotate/*
 %config %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
 
-%attr(-, root, root) %{_libdir}/*.so*
+%attr(755, root, root) %{_libdir}/*.so*
 %attr(744, root, root) %{_bindir}/documentserver-*.sh
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
