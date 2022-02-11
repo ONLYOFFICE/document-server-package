@@ -96,6 +96,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 			db_set M4_ONLYOFFICE_VALUE/jwt-enabled select $JWT_ENABLED || true
 			JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 			db_set M4_ONLYOFFICE_VALUE/jwt-secret select $JWT_SECRET || true
+		fi
 	fi
 }
 
