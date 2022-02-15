@@ -112,7 +112,7 @@
 #define APPLICATION_NAME      str("APPLICATION_NAME=" + sCompanyName)
 #define NODE_SRV_ENV          str(NODE_ENV + ' ' + NODE_CONFIG_DIR + ' ' + NODE_DISABLE_COLORS + ' ' + APPLICATION_NAME)
 
-#define LOCAL_SERVICE 'Local Service'
+#define LOCAL_SERVICE 'NT Authority\LocalService'
 
 #define CONVERTER_SRV        'DsConverterSvc'
 #define CONVERTER_SRV_DISPLAY  str(sAppName + " Converter")
