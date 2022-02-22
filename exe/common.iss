@@ -408,7 +408,7 @@ Filename: "sc"; Parameters: "failure ""{#NGINX_SRV}"" actions= restart/60000/res
 
 Filename: "schtasks"; Parameters: "/Create /F /RU ""{#LOCAL_SERVICE}"" /SC DAILY /TN ""{#LogRotateTaskName}"" /TR ""{app}\bin\documentserver-log-rotate.bat"""; Flags: runhidden; StatusMsg: "{cm:AddRotateTask}"
 
-Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#NGINX_SRV_DESCR}"" program=""{#NGINX_SRV_DIR}\nginx.exe"" dir=in action=allow protocol=tcp localport={code:GetDefaultPort},{code:GetDefaultSecPort}"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#NGINX_SRV_DESCR}"" program=""{#NGINX_SRV_DIR}\nginx.exe"" dir=in action=allow protocol=tcp localport={code:GetDefaultPorts}"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
@@ -578,11 +578,11 @@ begin
   Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}');
 end;
 
-function GetDefaultSecPort(Param: String): String;
+function GetDefaultPorts(Param: String): String;
 begin
-  Result := '';
-  if (ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}') = '80') then begin
-    Result := '443';
+  Result := GetDefaultPort('');
+  if (GetDefaultPort('') = '80') then begin
+    Result := GetDefaultPort('') + ',' + '443';
   end;
 end;
 
