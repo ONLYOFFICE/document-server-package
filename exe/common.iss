@@ -581,8 +581,8 @@ end;
 function GetDefaultPorts(Param: String): String;
 begin
   Result := GetDefaultPort('');
-  if (GetDefaultPort('') = '80') then begin
-    Result := GetDefaultPort('') + ',' + '443';
+  if (Result = '80') then begin
+    Result := Result + ',' + '443';
   end;
 end;
 
