@@ -408,8 +408,7 @@ Filename: "sc"; Parameters: "failure ""{#NGINX_SRV}"" actions= restart/60000/res
 
 Filename: "schtasks"; Parameters: "/Create /F /RU ""{#LOCAL_SERVICE}"" /SC DAILY /TN ""{#LogRotateTaskName}"" /TR ""{app}\bin\documentserver-log-rotate.bat"""; Flags: runhidden; StatusMsg: "{cm:AddRotateTask}"
 
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#DOCSERVICE_SRV_DIR}\docservice.exe"" ""{#DOCSERVICE_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#NGINX_SRV_DESCR}"" program=""{#NGINX_SRV_DIR}\nginx.exe"" dir=in action=allow protocol=tcp localport={code:GetDefaultPort},{code:GetDefaultSecPort}"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
@@ -426,8 +425,7 @@ Filename: "{#NSSM}"; Parameters: "remove {#DOCSERVICE_SRV} confirm"; Flags: runh
 Filename: "schtasks"; Parameters: "/End /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /F /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 
-Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#DOCSERVICE_SRV_DIR}\docservice.exe"""; Flags: runhidden
-Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#NGINX_SRV_DIR}\nginx.exe"""; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""{#NGINX_SRV_DESCR}"""; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\sdkjs"
@@ -578,6 +576,14 @@ end;
 function GetDefaultPort(Param: String): String;
 begin
   Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}');
+end;
+
+function GetDefaultSecPort(Param: String): String;
+begin
+  Result := '';
+  if (ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}') = '80') then begin
+    Result := '443';
+  end;
 end;
 
 function GetDocServicePort(Param: String): String;
