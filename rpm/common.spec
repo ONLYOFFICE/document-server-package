@@ -198,8 +198,8 @@ rm -rf "%{buildroot}"
 %attr(755, root, root) %{_libdir}/*.so*
 %attr(744, root, root) %{_bindir}/documentserver-*.sh
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
-%attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
-%attr(-, root, root) %{_sysconfdir}/nginx/includes/*
+%attr(644, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
+%attr(644, root, root) %{_sysconfdir}/nginx/includes/*
 %attr(-, root, root) %{_sysconfdir}/supervisord.d/*
 
 %dir
