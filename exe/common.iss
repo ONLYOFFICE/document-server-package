@@ -359,8 +359,8 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#REPLACE}"; Parameters: """(set.\$secret_string.)[a-zA-z]*;"" ""$1{code:GetSecretString};"" ""{#NGINX_SRV_DIR}\conf\includes\ds-docservice.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS_DEFAULT} -e ""this.storage.fs.secretString = '{code:GetSecretString}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: """(set.\$secret_string.)[a-zA-z]*;"" ""$1{code:GetSecureLinkSecret};"" ""{#NGINX_SRV_DIR}\conf\includes\ds-docservice.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS_DEFAULT} -e ""this.storage.fs.secretString = '{code:GetSecureLinkSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -457,7 +457,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\service.pas"
 
 var
-  SECRET_STRING : String;
+  SECURE_LINK_SECRET : String;
 
 function UninstallPreviosVersion(): Boolean;
 var
@@ -808,10 +808,10 @@ begin
     Result[i] := CharSequence[Random(CharSequenceLength) + 1];
 end;
 
-function GetSecretString(Param: String): String;
+function GetSecureLinkSecret(Param: String): String;
 begin
-  if (SECRET_STRING = '') then begin
-    SECRET_STRING := GetRandomString('');
+  if (SECURE_LINK_SECRET = '') then begin
+    SECURE_LINK_SECRET := GetRandomString('');
   end;
-  Result := SECRET_STRING;
+  Result := SECURE_LINK_SECRET;
 end;
