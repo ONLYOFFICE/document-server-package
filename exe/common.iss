@@ -134,7 +134,6 @@
 #define JSON '{app}\npm\json.exe'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\local.json""'
-#define JSON_PARAMS_DEFAULT '-I -q -f ""{app}\config\default.json""'
 
 #define REPLACE '{app}\npm\replace.exe'
 
@@ -359,8 +358,7 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#REPLACE}"; Parameters: """(set.\$secret_string.).*;"" ""$1{code:GetSecureLinkSecret};"" ""{#NGINX_SRV_DIR}\conf\includes\ds-docservice.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS_DEFAULT} -e ""this.storage.fs.secretString = '{code:GetSecureLinkSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{app}\bin\documentserver-update-securelink.bat"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -455,9 +453,6 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 [Code]
 
 #include "scripts\service.pas"
-
-var
-  SECURE_LINK_SECRET : String;
 
 function UninstallPreviosVersion(): Boolean;
 var
@@ -794,24 +789,3 @@ end;
 //    end;
 //  end;
 //end;                                                     
-
-function GetRandomString(Param: String): String;
-var
-  SecretStringLength, i, CharSequenceLength: Integer;
-  CharSequence: String;
-begin
-  SecretStringLength := 20;
-  CharSequence := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  CharSequenceLength := Length(CharSequence);
-  SetLength(Result, SecretStringLength);
-  for i := 1 to SecretStringLength do
-    Result[i] := CharSequence[Random(CharSequenceLength) + 1];
-end;
-
-function GetSecureLinkSecret(Param: String): String;
-begin
-  if (SECURE_LINK_SECRET = '') then begin
-    SECURE_LINK_SECRET := GetRandomString('');
-  end;
-  Result := SECURE_LINK_SECRET;
-end;
