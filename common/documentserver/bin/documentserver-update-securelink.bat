@@ -1,8 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
-set "string=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-set "SECRET_STRING="
-for /L %%i in (1,1,20) do call :add
+set SECRET_STRING=%~1
+
+if not defined SECRET_STRING (
+  set "string=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+  for /L %%i in (1,1,20) do call :add
+)
 
 set "NGINX_CONF=..\nginx\conf\includes\ds-docservice.conf"
 set "DOCSERVICE_CONF=..\config\default.json"
