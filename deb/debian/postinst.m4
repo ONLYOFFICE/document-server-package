@@ -89,6 +89,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	JWT_SECRET="$RET"
 	db_get M4_ONLYOFFICE_VALUE/jwt-header || true
 	JWT_HEADER="$RET"
+
+	db_get M4_ONLYOFFICE_VALUE/secure_link_secret || true
+	SECURE_LINK_SECRET="$RET"
 }
 
 install_db() {
@@ -301,6 +304,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 		# generate allfonts.js and thumbnail
 		documentserver-generate-allfonts.sh true
+
+		# generate secure link
+		documentserver-update-securelink.sh -s ${SECURE_LINK_SECRET}
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$APP_DIR"
