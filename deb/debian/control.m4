@@ -31,8 +31,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 `  redis-tools,'
 ,)dnl
   supervisor(>= 3.0b2),
+  ttf-mscorefonts-installer,
   xvfb,
   zlib1g
-Recommends: ttf-mscorefonts-installer
+Recommends:
 Description: defn(`DEB[Summary]')
 defn(`DEB[Description]')
