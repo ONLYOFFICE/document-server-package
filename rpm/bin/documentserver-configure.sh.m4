@@ -22,8 +22,6 @@ JWT_ENABLED=${JWT_ENABLED:-false}
 JWT_SECRET=${JWT_SECRET:-secret}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
-SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
-
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
 create_local_configs(){
@@ -387,6 +385,6 @@ tune_local_configs
 setup_nginx
 
 # generate secure link
-documentserver-update-securelink.sh -s ${SECURE_LINK_SECRET}
+documentserver-update-securelink.sh
 
 restart_services
