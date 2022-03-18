@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_shlibdeps:
+
+override_dh_strip:
+	dh_strip -Xdocservice -Xconverter -Xmetrics -Xexample -Xjson
