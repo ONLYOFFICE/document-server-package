@@ -53,8 +53,17 @@ location ~* ^(\/cache\/files.*)(\/.*) {
   }
 }
 
-# Allow internal service only from 127.0.0.1
-location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info|internal)(\/.*)$ {
+# Allow "/internal" interface only from 127.0.0.1
+# Don't comment the section below for security purpose!
+ location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(internal)(\/.*)$ {
+  allow 127.0.0.1;
+  deny all;
+  proxy_pass http://docservice/$2$3;
+}
+
+# Allow "/info" interface only from 127.0.0.1 by default
+# Comment the section below to turn the info page on 
+location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
   proxy_pass http://docservice/$2$3;
