@@ -445,7 +445,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\msiproduct.iss"
 #include "scripts\products\vcredist2010.iss"
 #include "scripts\products\vcredist2013.iss"
-#include "scripts\products\vcredist2015.iss"
+#include "scripts\products\vcredist2022.iss"
 ;#include "scripts\products\postgresql.iss"
 ;#include "scripts\products\rabbitmq.iss"
 ;#include "scripts\products\redis.iss"
@@ -511,7 +511,7 @@ begin
   begin
     // vcredist2010('10');
     vcredist2013('12');
-    vcredist2015('14');
+    vcredist2022('14');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
