@@ -95,4 +95,4 @@ Description: Jwt authorization header:
 
 Template: M4_ONLYOFFICE_VALUE/secure_link_secret
 Type: string
-Description: Secret value of secure link:
+Description: Secret value for secure link:
