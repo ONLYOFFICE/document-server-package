@@ -23,8 +23,15 @@ BRANDING_DIR ?= ./branding
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-RPM_ARCH = x86_64
-DEB_ARCH = amd64
+UNAME_M ?= $(shell uname -m)
+ifeq ($(UNAME_M),x86_64)
+	RPM_ARCH := x86_64
+	DEB_ARCH := amd64
+endif
+ifneq ($(filter aarch%,$(UNAME_M)),)
+	RPM_ARCH := aarch64
+	DEB_ARCH := arm64
+endif
 
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
@@ -148,12 +155,14 @@ else
 		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
 		DEV_NULL := /dev/null
 	endif
-	UNAME_M := $(shell uname -m)
 	ifeq ($(UNAME_M),x86_64)
 		ARCHITECTURE := 64
 	endif
 	ifneq ($(filter %86,$(UNAME_M)),)
 		ARCHITECTURE := 32
+	endif
+	ifneq ($(filter aarch%,$(UNAME_M)),)
+		ARCHITECTURE := arm64
 	endif
 endif
 
@@ -251,6 +260,7 @@ M4_PARAMS += -D M4_SUPPORT_URL='$(SUPPORT_URL)'
 M4_PARAMS += -D M4_BRANDING_DIR='$(abspath $(BRANDING_DIR))'
 M4_PARAMS += -D M4_ONLYOFFICE_VALUE=$(ONLYOFFICE_VALUE)
 M4_PARAMS += -D M4_PLATFORM=$(PLATFORM)
+M4_PARAMS += -D M4_DEB_ARCH='$(DEB_ARCH)'
 M4_PARAMS += -D M4_NGINX_CONF='$(NGINX_CONF)'
 M4_PARAMS += -D M4_NGINX_LOG='$(NGINX_LOG)'
 M4_PARAMS += -D M4_DS_PREFIX='$(DS_PREFIX)'
@@ -449,7 +459,7 @@ deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-	cd deb/build && dpkg-buildpackage -b -uc -us
+	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
 
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
