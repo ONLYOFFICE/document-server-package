@@ -163,6 +163,7 @@ else
 	endif
 	ifneq ($(filter aarch%,$(UNAME_M)),)
 		ARCHITECTURE := arm64
+		PKG_TARGET := node10-linux-arm64
 	endif
 endif
 
@@ -373,7 +374,7 @@ endif
 
 	cd $(DOCUMENTSERVER)/npm && \
 		npm install && \
-		pkg ./node_modules/json -o json
+		pkg ./node_modules/json $(PKG_TARGET:%=-t %) -o json
 
 ifeq ($(PLATFORM),win)		
 	cd $(DOCUMENTSERVER)/npm && \
