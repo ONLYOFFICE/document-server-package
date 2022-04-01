@@ -278,6 +278,10 @@ apt-rpm:$(APT_RPM)
 
 rpm: $(RPM)
 
+rpm_aarch64 : TARGET = linux_arm64
+rpm_aarch64 : RPM_ARCH = aarch64
+rpm_aarch64 : $(RPM)
+
 deb: $(DEB)
 
 exe: $(EXE)
@@ -432,6 +436,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
 		--define '_ds_prefix $(DS_PREFIX)' \
 		--define '_binary_payload w7.xzdio' \
+		--target $(RPM_ARCH) \
 		$(PACKAGE_NAME).spec
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
