@@ -54,7 +54,7 @@ location ~* ^(\/cache\/files.*)(\/.*) {
 }
 
 # Allow "/internal" interface only from 127.0.0.1
-# Don't comment the section below for security purpose!
+# Don't comment out the section below for the security reason!
  location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(internal)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
@@ -62,7 +62,8 @@ location ~* ^(\/cache\/files.*)(\/.*) {
 }
 
 # Allow "/info" interface only from 127.0.0.1 by default
-# Comment the section below to turn the info page on 
+# Comment out lines allow 127.0.0.1; and deny all; 
+# of below section to turn on the info page
 location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
