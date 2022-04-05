@@ -27,10 +27,12 @@ UNAME_M ?= $(shell uname -m)
 ifeq ($(UNAME_M),x86_64)
 	RPM_ARCH := x86_64
 	DEB_ARCH := amd64
+	TAR_ARCH := x86_64
 endif
 ifneq ($(filter aarch%,$(UNAME_M)),)
 	RPM_ARCH := aarch64
 	DEB_ARCH := arm64
+	TAR_ARCH := aarch64
 endif
 
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
@@ -45,7 +47,7 @@ APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
-TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION).tar.gz
+TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(TAR_ARCH).tar.gz
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
