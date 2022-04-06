@@ -80,7 +80,7 @@ NGINX := $(DOCUMENTSERVER)/nginx
 DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
 
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
-PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
+PSQL_ZIP := postgresql-10.20-2-windows-x64-binaries.zip
 
 NSSM_ZIP := nssm_x64.zip
 NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
