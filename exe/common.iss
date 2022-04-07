@@ -651,7 +651,7 @@ end;
 
 procedure InitializeWizard;
 begin
-  DownloadPage := CreateInputQueryPage(
+  DownloadPage := CreateDownloadPage(
                     SetupMessage(msgWizardPreparing),
                     SetupMessage(msgPreparingDesc),
                     @OnDownloadProgress);
