@@ -809,10 +809,14 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 var
   ResultCode: Integer;
   ArrayPackages: TStringList;
+  i: Integer;
 begin
   Result := true;
   if WizardSilent() = false then
   begin
+    ArrayPackages := TStringList.Create;
+    ArrayPackages.Add('vcredist_x64_2015-2022.exe');
+    ArrayPackages.Add('vcredist_x64_2013.exe');
     case CurPageID of
       wpReady: 
       begin
@@ -821,19 +825,23 @@ begin
           DownloadPage.Clear;
           DownloadPage.Add(
             'https://aka.ms/vs/17/release/vc_redist.x64.exe',
-            'vcredist_x64_2015-2022.exe', '');
+            ArrayPackages[1], '');
           DownloadPage.Add(
             'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
-            'vcredist_x64_2013.exe', '');
+            ArrayPackages[0], '');
           DownloadPage.Show;
           DownloadPage.Download;
-          Exec(
+
+          for i := 0 to ArrayPackages.Count-1 do begin
+            Exec(
             '>',
-            ExpandConstant('{tmp}') + '\vcredist_x64_2015-2022.exe /passive /norestart',
+            ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + ' /passive /norestart',
             '',
             SW_SHOW,
             EwWaitUntilTerminated,
             ResultCode);
+          end;
+
           DownloadPage.Hide;
         end;
       end;
