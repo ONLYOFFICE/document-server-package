@@ -799,6 +799,7 @@ var
   i: Integer;
 begin
   Result := true;
+
   ArrayCodes := TStringList.Create;
   //vcredist2022
   ArrayCodes.Add('{A181A302-3F6D-4BAD-97A8-A426A6499D78}');
@@ -809,12 +810,13 @@ begin
   
   for i := 0 to ArrayCodes.Count-1 do begin
     Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
+    if RegKeyExists(HKLM, Path) then
+    begin
+      Result := false;
+    end;
   end;
     
-  if RegKeyExists(HKLM, Path) then
-  begin
-    Result := false;
-  end;
+  
 end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
@@ -829,12 +831,14 @@ begin
     ArrayPackages.Add('vcredist_x64_2015-2022.exe');
     ArrayPackages.Add('vcredist_x64_2013.exe');
     ArrayPackages.Add('python-3.9.9-amd64.exe');
+
     case CurPageID of
       wpReady: 
       begin
         if CheckPackages() then
         begin
           DownloadPage.Clear;
+
           DownloadPage.Add(
             'https://aka.ms/vs/17/release/vc_redist.x64.exe',
             ArrayPackages[2], '');
@@ -844,6 +848,7 @@ begin
           DownloadPage.Add(
             'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
             ArrayPackages[0], '');
+
           DownloadPage.Show;
           DownloadPage.Download;
 
