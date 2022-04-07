@@ -791,16 +791,26 @@ begin
   end;
 end;
 
-function checkVCRedist2022(): Boolean;
+function CheckPackages(): Boolean;
 var
   UpgradeCode: String;
   Path: String;
+  ArrayCodes: TStringList;
+  i: Integer;
 begin
-
   Result := true;
-  //x64
-  UpgradeCode := '{A181A302-3F6D-4BAD-97A8-A426A6499D78}'; 
-  Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + UpgradeCode  
+  ArrayCodes := TStringList.Create;
+  //vcredist2022
+  ArrayCodes.Add('{A181A302-3F6D-4BAD-97A8-A426A6499D78}');
+  //vcredist2013
+  ArrayCodes.Add('{929FBD26-9020-399B-9A7A-751D61F0B942}');
+  //python 3.9.9
+  ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
+  
+  for i := 0 to ArrayCodes.Count-1 do begin
+    Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
+  end;
+    
   if RegKeyExists(HKLM, Path) then
   begin
     Result := false;
@@ -822,17 +832,17 @@ begin
     case CurPageID of
       wpReady: 
       begin
-        if checkVCRedist2022(ArrayPackages) then
+        if CheckPackages() then
         begin
           DownloadPage.Clear;
           DownloadPage.Add(
             'https://aka.ms/vs/17/release/vc_redist.x64.exe',
             ArrayPackages[2], '');
           DownloadPage.Add(
-            'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
+            'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
             ArrayPackages[1], '');
           DownloadPage.Add(
-            'http://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
+            'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
             ArrayPackages[0], '');
           DownloadPage.Show;
           DownloadPage.Download;
