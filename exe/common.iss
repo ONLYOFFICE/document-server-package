@@ -796,6 +796,7 @@ var
   UpgradeCode: String;
   Path: String;
 begin
+
   Result := true;
   //x64
   UpgradeCode := '{A181A302-3F6D-4BAD-97A8-A426A6499D78}'; 
@@ -817,17 +818,21 @@ begin
     ArrayPackages := TStringList.Create;
     ArrayPackages.Add('vcredist_x64_2015-2022.exe');
     ArrayPackages.Add('vcredist_x64_2013.exe');
+    ArrayPackages.Add('python-3.9.9-amd64.exe');
     case CurPageID of
       wpReady: 
       begin
-        if checkVCRedist2022() then
+        if checkVCRedist2022(ArrayPackages) then
         begin
           DownloadPage.Clear;
           DownloadPage.Add(
             'https://aka.ms/vs/17/release/vc_redist.x64.exe',
-            ArrayPackages[1], '');
+            ArrayPackages[2], '');
           DownloadPage.Add(
             'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
+            ArrayPackages[1], '');
+          DownloadPage.Add(
+            'http://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
             ArrayPackages[0], '');
           DownloadPage.Show;
           DownloadPage.Download;
