@@ -452,6 +452,9 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
 [Code]
 
+var
+  DownloadPage: TDownloadWizardPage;
+
 #include "scripts\service.pas"
 
 function UninstallPreviosVersion(): Boolean;
@@ -510,8 +513,8 @@ begin
   if WizardSilent() = false then
   begin
     // vcredist2010('10');
-    vcredist2013('12');
-    vcredist2022('14');
+    //vcredist2013('12');
+    //vcredist2022('14');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
@@ -639,8 +642,20 @@ begin
   end;
 end;
 
+function OnDownloadProgress(const Url, FileName: String; const Progress, ProgressMax: Int64): Boolean;
+begin
+  if Progress = ProgressMax then
+    Log(Format('Successfully downloaded file to {tmp}: %s', [FileName]));
+  Result := true;
+end;
+
 procedure InitializeWizard;
 begin
+  DownloadPage := CreateDownloadPage(
+                    SetupMessage(msgWizardPreparing),
+                    SetupMessage(msgPreparingDesc),
+                    @OnDownloadProgress);
+
   DbPage := CreateInputQueryPage(wpPreparing,
     'PostgreSQL Database', 'Configure PostgreSQL Connection...',
     'Please specify your PostgreSQL connection, then click Next.');
@@ -776,17 +791,53 @@ begin
   end;
 end;
 
-//function NextButtonClick(CurPageID: Integer): Boolean;
-//begin
-//  Result := true;
-//  if WizardSilent() = false then
-//  begin
-//    case CurPageID of
-////      DbPage.ID: Result := CheckDbConnection();
-////      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-////      RedisPage.ID: Result := CheckRedisConnection();
-//      wpReady: Result := DownloadDependency();
-//    end;
-//  end;
-//end;                                                     
+function checkVCRedist2022(): Boolean;
+var
+  UpgradeCode: String;
+  Path: String;
+begin
+  Result := true;
+  //x64
+  UpgradeCode := '{A181A302-3F6D-4BAD-97A8-A426A6499D78}'; 
+  Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + UpgradeCode  
+  if RegKeyExists(HKLM, Path) then
+  begin
+    Result := false;
+  end;
+end;
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  ResultCode: Integer;
+  ArrayPackages: TStringList;
+begin
+  Result := true;
+  if WizardSilent() = false then
+  begin
+    case CurPageID of
+      wpReady: 
+      begin
+        if checkVCRedist2022() then
+        begin
+          DownloadPage.Clear;
+          DownloadPage.Add(
+            'https://aka.ms/vs/17/release/vc_redist.x64.exe',
+            'vcredist_x64_2015-2022.exe', '');
+          DownloadPage.Add(
+            'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
+            'vcredist_x64_2013.exe', '');
+          DownloadPage.Show;
+          DownloadPage.Download;
+          Exec(
+            '>',
+            ExpandConstant('{tmp}') + '\vcredist_x64_2015-2022.exe /passive /norestart',
+            '',
+            SW_SHOW,
+            EwWaitUntilTerminated,
+            ResultCode);
+          DownloadPage.Hide;
+        end;
+      end;
+    end;
+  end;
+end;                                                     
 
