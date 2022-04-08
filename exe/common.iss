@@ -789,12 +789,42 @@ begin
   end;
 end;
 
+function CheckPackages(i : Integer): Integer;
+var
+  Path: String;
+  ArrayCodes: TStringList;
+begin
+  Result := 0;
+
+  ArrayCodes := TStringList.Create;
+  //vcredist2022
+  ArrayCodes.Add('{A181A302-3F6D-4BAD-97A8-A426A6499D78}');
+  //vcredist2013
+  ArrayCodes.Add('{929FBD26-9020-399B-9A7A-751D61F0B942}');
+  //python 3.9.9
+  ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
+
+  for i := i to ArrayCodes.Count - 1 do begin
+    Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
+    if not RegKeyExists(HKLM, Path) then
+    begin
+      Result := i + 1;
+      Exit;
+    end;
+  end;
+end;
+
 procedure InstallPackages;
 var
   ResultCode: Integer;
   ArrayPackages: TStringList;
   i: Integer;
 begin
+    ArrayPackages := TStringList.Create;
+    ArrayPackages.Add('vcredist_x64_2015-2022.exe');
+    ArrayPackages.Add('vcredist_x64_2013.exe');
+    ArrayPackages.Add('python-3.9.9-amd64.exe');
+
   for i := 0 to ArrayPackages.Count - 1 do begin
     DownloadPage.Clear;
     case CheckPackages(i) of
@@ -826,41 +856,12 @@ begin
 
   end;
 end;
-function CheckPackages(i : Integer): Integer;
-var
-  Path: String;
-  ArrayCodes: TStringList;
-begin
-  Result := 0;
-
-  ArrayCodes := TStringList.Create;
-  //vcredist2022
-  ArrayCodes.Add('{A181A302-3F6D-4BAD-97A8-A426A6499D78}');
-  //vcredist2013
-  ArrayCodes.Add('{929FBD26-9020-399B-9A7A-751D61F0B942}');
-  //python 3.9.9
-  ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
-
-  for i := i to ArrayCodes.Count - 1 do begin
-    Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
-    if not RegKeyExists(HKLM, Path) then
-    begin
-      Result := i + 1;
-      Exit;
-    end;
-  end;
-end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
   if WizardSilent() = false then
   begin
-    ArrayPackages := TStringList.Create;
-    ArrayPackages.Add('vcredist_x64_2015-2022.exe');
-    ArrayPackages.Add('vcredist_x64_2013.exe');
-    ArrayPackages.Add('python-3.9.9-amd64.exe');
-
     case CurPageID of
       wpReady: InstallPackages();
     end;
