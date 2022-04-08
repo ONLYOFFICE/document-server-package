@@ -804,16 +804,17 @@ begin
   ArrayCodes.Add('{929FBD26-9020-399B-9A7A-751D61F0B942}');
   //python 3.9.9
   ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
-  
+
   for i := i to ArrayCodes.Count-1 do begin
     Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
     if not RegKeyExists(HKLM, Path) then
     begin
-      Result := i+1;
+      Result := i + 1;
       Exit;
     end;
   end;
 end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
   ResultCode: Integer;
@@ -832,7 +833,7 @@ begin
       wpReady:
       begin
         for i := 0 to ArrayPackages.Count-1 do begin
-        DownloadPage.Clear; 
+        DownloadPage.Clear;
           case CheckPackages(i) of
             1:
             begin
@@ -870,5 +871,5 @@ begin
       end;
     end;
   end;
-end;                                                     
+end;
 
