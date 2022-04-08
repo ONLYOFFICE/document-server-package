@@ -789,6 +789,43 @@ begin
   end;
 end;
 
+procedure InstallPackages;
+var
+  ResultCode: Integer;
+  ArrayPackages: TStringList;
+  i: Integer;
+begin
+  for i := 0 to ArrayPackages.Count - 1 do begin
+    DownloadPage.Clear;
+    case CheckPackages(i) of
+      1:
+        DownloadPage.Add(
+        'https://aka.ms/vs/17/release/vc_redist.x64.exe',
+        ArrayPackages[i], '');
+      2:
+        DownloadPage.Add(
+        'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
+        ArrayPackages[i], '');
+      3:
+        DownloadPage.Add(
+        'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
+        ArrayPackages[i], '');
+    end;
+
+    DownloadPage.Show;
+    DownloadPage.Download;
+    DownloadPage.Hide;
+
+    Exec(
+    '>',
+    ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + ' /passive /norestart',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  end;
+end;
 function CheckPackages(i : Integer): Integer;
 var
   Path: String;
@@ -815,10 +852,6 @@ begin
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
-var
-  ResultCode: Integer;
-  ArrayPackages: TStringList;
-  i: Integer;
 begin
   Result := true;
   if WizardSilent() = false then
@@ -829,39 +862,7 @@ begin
     ArrayPackages.Add('python-3.9.9-amd64.exe');
 
     case CurPageID of
-      wpReady:
-      begin
-        for i := 0 to ArrayPackages.Count - 1 do begin
-        DownloadPage.Clear;
-          case CheckPackages(i) of
-            1:
-              DownloadPage.Add(
-              'https://aka.ms/vs/17/release/vc_redist.x64.exe',
-              ArrayPackages[i], '');
-            2:
-              DownloadPage.Add(
-              'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
-              ArrayPackages[i], '');
-            3:
-              DownloadPage.Add(
-              'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
-              ArrayPackages[i], '');
-          end;
-
-          DownloadPage.Show;
-          DownloadPage.Download;
-          DownloadPage.Hide;
-
-          Exec(
-            '>',
-             ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + ' /passive /norestart',
-            '',
-            SW_SHOW,
-            EwWaitUntilTerminated,
-            ResultCode);
-
-        end;
-      end;
+      wpReady: InstallPackages();
     end;
   end;
 end;
