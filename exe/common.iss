@@ -789,14 +789,13 @@ begin
   end;
 end;
 
-function CheckPackages(): Integer;
+function CheckPackages(i : Integer): Integer;
 var
   UpgradeCode: String;
   Path: String;
   ArrayCodes: TStringList;
-  i: Integer;
 begin
-  //Result := true;
+  Result := 0;
 
   ArrayCodes := TStringList.Create;
   //vcredist2022
@@ -806,14 +805,14 @@ begin
   //python 3.9.9
   ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
   
-  for i := 0 to ArrayCodes.Count-1 do begin
+  for i := i to ArrayCodes.Count-1 do begin
     Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
     if not RegKeyExists(HKLM, Path) then
     begin
-      Result := i;
+      Result := i+1;
+      Exit;
     end;
   end;
-
 end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
@@ -832,42 +831,42 @@ begin
     case CurPageID of
       wpReady:
       begin
+        for i := 0 to ArrayPackages.Count-1 do begin
         DownloadPage.Clear; 
-        case CheckPackages() of
-          0:
-            begin
-              DownloadPage.Add(
-              'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
-              ArrayPackages[0], '');
-            end;
-          1:
+          case CheckPackages(i) of
+            1:
             begin
               DownloadPage.Add(
               'https://aka.ms/vs/17/release/vc_redist.x64.exe',
-              ArrayPackages[2], '');
+              ArrayPackages[i], '');
             end;
-          2:
+            2:
             begin
               DownloadPage.Add(
               'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
-              ArrayPackages[1], '');
+              ArrayPackages[i], '');
             end;
-        end;
-        DownloadPage.Show;
-        DownloadPage.Download;
+            3:
+            begin
+              DownloadPage.Add(
+              'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
+              ArrayPackages[i], '');
+            end;
+          end;
 
-        for i := 0 to ArrayPackages.Count-1 do begin
-            Exec(
+          DownloadPage.Show;
+          DownloadPage.Download;
+          DownloadPage.Hide;
+
+          Exec(
             '>',
-            ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + ' /passive /norestart',
+             ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + ' /passive /norestart',
             '',
             SW_SHOW,
             EwWaitUntilTerminated,
             ResultCode);
+
         end;
-
-        DownloadPage.Hide;
-
       end;
     end;
   end;
