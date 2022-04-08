@@ -835,23 +835,17 @@ begin
         DownloadPage.Clear;
           case CheckPackages(i) of
             1:
-            begin
               DownloadPage.Add(
               'https://aka.ms/vs/17/release/vc_redist.x64.exe',
               ArrayPackages[i], '');
-            end;
             2:
-            begin
               DownloadPage.Add(
               'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
               ArrayPackages[i], '');
-            end;
             3:
-            begin
               DownloadPage.Add(
               'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
               ArrayPackages[i], '');
-            end;
           end;
 
           DownloadPage.Show;
