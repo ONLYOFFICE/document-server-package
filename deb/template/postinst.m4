@@ -92,6 +92,10 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 	db_get M4_ONLYOFFICE_VALUE/secure_link_secret || true
 	SECURE_LINK_SECRET="$RET"
+	if [ ! -f $LOCAL_CONFIG ] && [ -z $JWT_SECRET ]; then
+		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+		db_set M4_ONLYOFFICE_VALUE/jwt-secret select $JWT_SECRET || true
+	fi
 }
 
 install_db() {
@@ -268,8 +272,8 @@ case "$1" in
 		# add nginx user to M4_ONLYOFFICE_VALUE group to allow access nginx to M4_ONLYOFFICE_VALUE log dir
 		adduser --quiet www-data ds
 
-		create_local_configs
 		read_saved_params
+		create_local_configs
 		install_db
 		save_db_params
 		save_rabbitmq_params
