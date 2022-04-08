@@ -40,7 +40,6 @@ location ~* ^(\/cache\/files.*)(\/.*) {
   alias M4_DS_FILES/App_Data$1;
   add_header Content-Disposition "attachment; filename*=UTF-8''$arg_filename";
 
-  set $secret_string verysecretstring;
   secure_link $arg_md5,$arg_expires;
   secure_link_md5 "$secure_link_expires$uri$secret_string";
 

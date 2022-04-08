@@ -23,7 +23,7 @@ while [ "$1" != "" ]; do
 	shift
 done
 
-NGINX_CONF=/etc/nginx/includes/ds-docservice.conf
+NGINX_CONF=/etc/nginx/conf.d/ds.conf
 DOCSERVICE_CONF=/etc/M4_DS_PREFIX/default.json
 JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${DOCSERVICE_CONF}"
 
