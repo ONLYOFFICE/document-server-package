@@ -33,6 +33,8 @@ sed "s,\(set \+\$secret_string\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF
 
 ${JSON} -I -e "this.storage.fs.secretString = '${SECURE_LINK_SECRET}'"
 
+echo M4_PACKAGE_NAME M4_COMPANY_NAME/secure_link_secret select ${SECURE_LINK_SECRET} | sudo debconf-set-selections
+
 supervisorctl restart ds:docservice
 supervisorctl restart ds:converter
 service nginx reload
