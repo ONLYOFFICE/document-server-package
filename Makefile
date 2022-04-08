@@ -23,24 +23,31 @@ BRANDING_DIR ?= ./branding
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-RPM_ARCH = x86_64
-DEB_ARCH = amd64
+UNAME_M ?= $(shell uname -m)
+ifeq ($(UNAME_M),x86_64)
+	RPM_ARCH := x86_64
+	DEB_ARCH := amd64
+	TAR_ARCH := x86_64
+endif
+ifneq ($(filter aarch%,$(UNAME_M)),)
+	RPM_ARCH := aarch64
+	DEB_ARCH := arm64
+	TAR_ARCH := aarch64
+endif
 
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
-DEB_BUILD_DIR = deb
 EXE_BUILD_DIR = exe
 
 APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
-DEB_PACKAGE_DIR = $(DEB_BUILD_DIR)
 TAR_PACKAGE_DIR = $(PWD)
 
 APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
-DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
+DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
-TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION).tar.gz
+TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(TAR_ARCH).tar.gz
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -73,7 +80,7 @@ NGINX := $(DOCUMENTSERVER)/nginx
 DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
 
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
-PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
+PSQL_ZIP := postgresql-10.20-2-windows-x64-binaries.zip
 
 NSSM_ZIP := nssm_x64.zip
 NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
@@ -150,12 +157,15 @@ else
 		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
 		DEV_NULL := /dev/null
 	endif
-	UNAME_P := $(shell uname -p)
-	ifeq ($(UNAME_P),x86_64)
+	ifeq ($(UNAME_M),x86_64)
 		ARCHITECTURE := 64
 	endif
-	ifneq ($(filter %86,$(UNAME_P)),)
+	ifneq ($(filter %86,$(UNAME_M)),)
 		ARCHITECTURE := 32
+	endif
+	ifneq ($(filter aarch%,$(UNAME_M)),)
+		ARCHITECTURE := arm64
+		PKG_TARGET := node10-linux-arm64
 	endif
 endif
 
@@ -176,15 +186,20 @@ ISCC_PARAMS +=	//DENABLE_SIGNING=1
 endif
 ISCC_PARAMS +=	//S"byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com \$$f"
 
-DEB_DEPS += deb/debian/changelog
-DEB_DEPS += deb/debian/config
-DEB_DEPS += deb/debian/control
-DEB_DEPS += deb/debian/copyright
-DEB_DEPS += deb/debian/postinst
-DEB_DEPS += deb/debian/postrm
-DEB_DEPS += deb/debian/templates
-DEB_DEPS += deb/debian/$(PACKAGE_NAME).install
-DEB_DEPS += deb/debian/$(PACKAGE_NAME).links
+DEB_DEPS += deb/build/debian/source/format
+DEB_DEPS += deb/build/debian/changelog
+DEB_DEPS += deb/build/debian/compat
+DEB_DEPS += deb/build/debian/config
+DEB_DEPS += deb/build/debian/control
+DEB_DEPS += deb/build/debian/copyright
+DEB_DEPS += deb/build/debian/postinst
+DEB_DEPS += deb/build/debian/postrm
+DEB_DEPS += deb/build/debian/prerm
+DEB_DEPS += deb/build/debian/rules
+DEB_DEPS += deb/build/debian/templates
+DEB_DEPS += deb/build/debian/triggers
+DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).install
+DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).links
 
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
@@ -248,6 +263,7 @@ M4_PARAMS += -D M4_SUPPORT_URL='$(SUPPORT_URL)'
 M4_PARAMS += -D M4_BRANDING_DIR='$(abspath $(BRANDING_DIR))'
 M4_PARAMS += -D M4_ONLYOFFICE_VALUE=$(ONLYOFFICE_VALUE)
 M4_PARAMS += -D M4_PLATFORM=$(PLATFORM)
+M4_PARAMS += -D M4_DEB_ARCH='$(DEB_ARCH)'
 M4_PARAMS += -D M4_NGINX_CONF='$(NGINX_CONF)'
 M4_PARAMS += -D M4_NGINX_LOG='$(NGINX_LOG)'
 M4_PARAMS += -D M4_DS_PREFIX='$(DS_PREFIX)'
@@ -264,6 +280,10 @@ apt-rpm:$(APT_RPM)
 
 rpm: $(RPM)
 
+rpm_aarch64 : TARGET = linux_arm64
+rpm_aarch64 : RPM_ARCH = aarch64
+rpm_aarch64 : $(RPM)
+
 deb: $(DEB)
 
 exe: $(EXE)
@@ -271,8 +291,12 @@ exe: $(EXE)
 tar: $(TAR)
 
 clean:
-	rm -rf $(DEB_PACKAGE_DIR)/*.deb\
-		$(DEB_PACKAGE_DIR)/../*.changes\
+	rm -rf \
+		deb/build \
+		deb/*.buildinfo \
+		deb/*.changes \
+		deb/*.ddeb \
+		deb/*.deb \
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
@@ -286,12 +310,9 @@ clean:
 		$(DOCUMENTSERVER_EXAMPLE)\
 		$(DS_BIN)\
 		$(FONTS)\
-		$(DEB_DEPS)\
 		$(COMMON_DEPS)\
 		$(LINUX_DEPS_CLEAN)\
 		$(WIN_DEPS)\
-		deb/debian/$(PACKAGE_NAME)\
-		deb/debian/$(PACKAGE_NAME).*\
 		documentserver\
 		documentserver-example
 		
@@ -359,7 +380,7 @@ endif
 
 	cd $(DOCUMENTSERVER)/npm && \
 		npm install && \
-		pkg ./node_modules/json -o json
+		pkg ./node_modules/json $(PKG_TARGET:%=-t %) -o json
 
 ifeq ($(PLATFORM),win)		
 	cd $(DOCUMENTSERVER)/npm && \
@@ -417,6 +438,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
 		--define '_ds_prefix $(DS_PREFIX)' \
 		--define '_binary_payload w7.xzdio' \
+		--target $(RPM_ARCH) \
 		$(PACKAGE_NAME).spec
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
@@ -435,17 +457,20 @@ endif
 
 common/documentserver/nginx/ds.conf: common/documentserver/nginx/ds.conf.tmpl
 
-deb/debian/$(PACKAGE_NAME).install : deb/debian/package.install
-	mv -f $< $@
+deb/build/debian/% : deb/template/%
+	mkdir -pv $(@D) && cp -fv $< $@
 
-deb/debian/$(PACKAGE_NAME).links : deb/debian/package.links
-	mv -f $< $@
+deb/build/debian/% : deb/template/%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+
+deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+
+$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
 
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
-
-$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-	cd deb && dpkg-buildpackage -b -uc -us --changes-option=-u.
 
 $(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
 

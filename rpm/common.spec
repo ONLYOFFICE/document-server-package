@@ -7,7 +7,6 @@ Group: Applications/Internet
 URL: %{_publisher_url}
 Vendor: %{_publisher_name}
 Packager: %{_publisher_name} <%{_support_mail}>
-BuildArch: x86_64
 AutoReq: no
 AutoProv: no
 
@@ -168,34 +167,50 @@ sed 's/linux.html/linux-rpm.html/g' -i "$DSE_NGINX_CONF/ds-example.conf"
 rm -rf "%{buildroot}"
 
 %files
-%attr(-, ds, ds) %{_localstatedir}/www/%{_ds_prefix}*/*
-%config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/*.json
-%config %attr(440, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
 
-%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/nginx/includes/*
-%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}/nginx/*.tmpl
+%defattr(440, ds, ds, 555)
+%{_localstatedir}/www/%{_ds_prefix}*/*
+
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/npm/json
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/DocService/docservice
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/converter
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/docbuilder
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/x2t
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
+%if %{defined example}
+%attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/example
+%endif
+
+%config %{_sysconfdir}/%{_ds_prefix}*/*.json
+%config %{_sysconfdir}/%{_ds_prefix}*/log4js/*.json
+
+%config %{_sysconfdir}/%{_ds_prefix}*/nginx/includes/*
+%config %{_sysconfdir}/%{_ds_prefix}/nginx/*.tmpl
 
 %config(noreplace) %{_sysconfdir}/%{_ds_prefix}/nginx/ds.conf
 
 %config %attr(644, root, root) %{_sysconfdir}/%{_ds_prefix}/logrotate/*
-%config %attr(-, ds, ds) %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
+%config %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
 
-%attr(-, root, root) %{_libdir}/*.so*
-%attr(-, root, root) %{_bindir}/documentserver-*.sh
+%attr(755, root, root) %{_libdir}/*.so*
+%attr(744, root, root) %{_bindir}/documentserver-*.sh
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
-%attr(-, root, root) %{_sysconfdir}/nginx/*
+%attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
+%attr(-, root, root) %{_sysconfdir}/nginx/includes/*
 %attr(-, root, root) %{_sysconfdir}/supervisord.d/*
 
 %dir
-%attr(-, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
+%attr(750, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}
 
-%attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
+%attr(750, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
 %attr(755, -, -) %{_localstatedir}/www/%{_ds_prefix}/../Data
 
 %if %{defined example}
-%attr(-, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
-%attr(-, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}-example
+%attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
+%attr(750, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}-example
 %endif
 
 %pre
@@ -251,52 +266,59 @@ if [ "$IS_UPGRADE" = "true" ]; then
   JSON_BIN="$DIR/npm/json"
   JSON="$JSON_BIN -f $LOCAL_CONFIG"
 
-  #load_db_params
-  DB_HOST=$($JSON services.CoAuthoring.sql.dbHost)
-  DB_NAME=$($JSON services.CoAuthoring.sql.dbName)
-  DB_USER=$($JSON services.CoAuthoring.sql.dbUser)
-  DB_PWD=$($JSON services.CoAuthoring.sql.dbPass)
-  DB_TYPE=$($JSON services.CoAuthoring.sql.type)
-  DB_PORT=$($JSON services.CoAuthoring.sql.dbPort)
+  if [ -f ${LOCAL_CONFIG} ] && [[ -n "$($JSON services.CoAuthoring.sql)" ]]; then
+    #load_db_params
+    DB_HOST=$($JSON services.CoAuthoring.sql.dbHost)
+    DB_NAME=$($JSON services.CoAuthoring.sql.dbName)
+    DB_USER=$($JSON services.CoAuthoring.sql.dbUser)
+    DB_PWD=$($JSON services.CoAuthoring.sql.dbPass)
+    DB_TYPE=$($JSON services.CoAuthoring.sql.type)
+    DB_PORT=$($JSON services.CoAuthoring.sql.dbPort)
 
-  case $DB_TYPE in
-    postgres)
-      echo -n "Trying to establish PostgreSQL connection... "
-      command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
-      CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
-      if [ -n "$DB_PWD" ]; then
-        export PGPASSWORD=$DB_PWD
-      fi
-      PSQL="psql -q $CONNECTION_PARAMS"
-      $PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-      echo "OK"
+    case $DB_TYPE in
+      postgres)
+        echo -n "Trying to establish PostgreSQL connection... "
+        command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
+        CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
+        if [ -n "$DB_PWD" ]; then
+          export PGPASSWORD=$DB_PWD
+        fi
+        PSQL="psql -q $CONNECTION_PARAMS"
+        $PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+        echo "OK"
 
-      echo -n "Updating PostgreSQL database... "
-      $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
-      $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
-      echo "OK"
-      ;;
+        echo -n "Updating PostgreSQL database... "
+        $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/removetbl.sql" >/dev/null 2>&1
+        $PSQL -d "$DB_NAME" -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
+        echo "OK"
+        ;;
 
-    mysql)
-      echo -n "Trying to database MySQL connection... "
-      command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
-      MYSQL="mysql -h$DB_HOST -u$DB_USER"
-      if [ -n "$DB_PWD" ]; then
-        MYSQL="$MYSQL -p$DB_PWD"
-      fi
-      $MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
-      echo "OK"
+      mysql)
+        echo -n "Trying to database MySQL connection... "
+        command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
+        MYSQL="mysql -h$DB_HOST -u$DB_USER"
+        if [ -n "$DB_PWD" ]; then
+          MYSQL="$MYSQL -p$DB_PWD"
+        fi
+        $MYSQL -e ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
+        echo "OK"
 
-      echo -n "Updating MYSQL database... "
-      $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/removetbl.sql"
-      $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql"
-      echo "OK"
-      ;;
+        echo -n "Updating MYSQL database... "
+        $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/removetbl.sql"
+        $MYSQL "$DB_NAME" < "$DIR/server/schema/mysql/createdb.sql"
+        echo "OK"
+        ;;
 
-    *)
-      echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
-      exit 1
-  esac
+      *)
+        echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+        exit 1
+    esac
+  else
+    echo ""
+    echo "Update of %{_package_name} ended with a problem"
+    echo "You should reconfigure the package using script \"/usr/bin/documentserver-configure.sh\""
+    echo ""
+  fi
 fi
 
 # generate allfonts.js and thumbnail

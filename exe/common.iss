@@ -112,7 +112,7 @@
 #define APPLICATION_NAME      str("APPLICATION_NAME=" + sCompanyName)
 #define NODE_SRV_ENV          str(NODE_ENV + ' ' + NODE_CONFIG_DIR + ' ' + NODE_DISABLE_COLORS + ' ' + APPLICATION_NAME)
 
-#define LOCAL_SERVICE 'Local Service'
+#define LOCAL_SERVICE 'NT Authority\LocalService'
 
 #define CONVERTER_SRV        'DsConverterSvc'
 #define CONVERTER_SRV_DISPLAY  str(sAppName + " Converter")
@@ -358,6 +358,8 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
+Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:SECURE_LINK_SECRET}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
 
@@ -408,8 +410,7 @@ Filename: "sc"; Parameters: "failure ""{#NGINX_SRV}"" actions= restart/60000/res
 
 Filename: "schtasks"; Parameters: "/Create /F /RU ""{#LOCAL_SERVICE}"" /SC DAILY /TN ""{#LogRotateTaskName}"" /TR ""{app}\bin\documentserver-log-rotate.bat"""; Flags: runhidden; StatusMsg: "{cm:AddRotateTask}"
 
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#DOCSERVICE_SRV_DIR}\docservice.exe"" ""{#DOCSERVICE_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#NGINX_SRV_DESCR}"" program=""{#NGINX_SRV_DIR}\nginx.exe"" dir=in action=allow protocol=tcp localport={code:GetDefaultPorts}"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
@@ -426,8 +427,7 @@ Filename: "{#NSSM}"; Parameters: "remove {#DOCSERVICE_SRV} confirm"; Flags: runh
 Filename: "schtasks"; Parameters: "/End /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /F /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 
-Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#DOCSERVICE_SRV_DIR}\docservice.exe"""; Flags: runhidden
-Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#NGINX_SRV_DIR}\nginx.exe"""; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""{#NGINX_SRV_DESCR}"""; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\sdkjs"
@@ -445,7 +445,7 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\msiproduct.iss"
 #include "scripts\products\vcredist2010.iss"
 #include "scripts\products\vcredist2013.iss"
-#include "scripts\products\vcredist2015.iss"
+#include "scripts\products\vcredist2022.iss"
 ;#include "scripts\products\postgresql.iss"
 ;#include "scripts\products\rabbitmq.iss"
 ;#include "scripts\products\redis.iss"
@@ -511,7 +511,7 @@ begin
   begin
     // vcredist2010('10');
     vcredist2013('12');
-    vcredist2015('14');
+    vcredist2022('14');
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
@@ -578,6 +578,14 @@ end;
 function GetDefaultPort(Param: String): String;
 begin
   Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}');
+end;
+
+function GetDefaultPorts(Param: String): String;
+begin
+  Result := GetDefaultPort('');
+  if (Result = '80') then begin
+    Result := Result + ',' + '443';
+  end;
 end;
 
 function GetDocServicePort(Param: String): String;

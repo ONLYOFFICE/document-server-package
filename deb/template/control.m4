@@ -6,7 +6,7 @@ Maintainer: M4_PUBLISHER_NAME <M4_SUPPORT_MAIL>
 Build-Depends: debhelper (>= 8.0.0)
 
 Package: M4_PACKAGE_NAME
-Architecture: amd64
+Architecture: M4_DEB_ARCH
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
   adduser,
   ca-certificates,
