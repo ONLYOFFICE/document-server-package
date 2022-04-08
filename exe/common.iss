@@ -804,7 +804,7 @@ begin
   //python 3.9.9
   ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
 
-  for i := i to ArrayCodes.Count-1 do begin
+  for i := i to ArrayCodes.Count - 1 do begin
     Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
     if not RegKeyExists(HKLM, Path) then
     begin
@@ -831,7 +831,7 @@ begin
     case CurPageID of
       wpReady:
       begin
-        for i := 0 to ArrayPackages.Count-1 do begin
+        for i := 0 to ArrayPackages.Count - 1 do begin
         DownloadPage.Clear;
           case CheckPackages(i) of
             1:
