@@ -789,14 +789,14 @@ begin
   end;
 end;
 
-function CheckPackages(): Boolean;
+function CheckPackages(): Integer;
 var
   UpgradeCode: String;
   Path: String;
   ArrayCodes: TStringList;
   i: Integer;
 begin
-  Result := true;
+  //Result := true;
 
   ArrayCodes := TStringList.Create;
   //vcredist2022
@@ -808,13 +808,12 @@ begin
   
   for i := 0 to ArrayCodes.Count-1 do begin
     Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
-    if RegKeyExists(HKLM, Path) then
+    if not RegKeyExists(HKLM, Path) then
     begin
-      Result := false;
+      Result := i;
     end;
   end;
-    
-  
+
 end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
@@ -831,26 +830,33 @@ begin
     ArrayPackages.Add('python-3.9.9-amd64.exe');
 
     case CurPageID of
-      wpReady: 
+      wpReady:
       begin
-        if CheckPackages() then
-        begin
-          DownloadPage.Clear;
+        DownloadPage.Clear; 
+        case CheckPackages() of
+          0:
+            begin
+              DownloadPage.Add(
+              'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
+              ArrayPackages[0], '');
+            end;
+          1:
+            begin
+              DownloadPage.Add(
+              'https://aka.ms/vs/17/release/vc_redist.x64.exe',
+              ArrayPackages[2], '');
+            end;
+          2:
+            begin
+              DownloadPage.Add(
+              'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
+              ArrayPackages[1], '');
+            end;
+        end;
+        DownloadPage.Show;
+        DownloadPage.Download;
 
-          DownloadPage.Add(
-            'https://aka.ms/vs/17/release/vc_redist.x64.exe',
-            ArrayPackages[2], '');
-          DownloadPage.Add(
-            'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
-            ArrayPackages[1], '');
-          DownloadPage.Add(
-            'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
-            ArrayPackages[0], '');
-
-          DownloadPage.Show;
-          DownloadPage.Download;
-
-          for i := 0 to ArrayPackages.Count-1 do begin
+        for i := 0 to ArrayPackages.Count-1 do begin
             Exec(
             '>',
             ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + ' /passive /norestart',
@@ -858,10 +864,10 @@ begin
             SW_SHOW,
             EwWaitUntilTerminated,
             ResultCode);
-          end;
-
-          DownloadPage.Hide;
         end;
+
+        DownloadPage.Hide;
+
       end;
     end;
   end;
