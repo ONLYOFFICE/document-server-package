@@ -791,7 +791,6 @@ end;
 
 function CheckPackages(i : Integer): Integer;
 var
-  UpgradeCode: String;
   Path: String;
   ArrayCodes: TStringList;
 begin
