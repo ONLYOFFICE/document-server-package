@@ -29,6 +29,10 @@ JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${DOCSERVICE_CONF}"
 
 SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
 
+if [ -e $NGINX_CONF ] && ! grep -q secret_string $NGINX_CONF; then
+	sed '/server_tokens/a \ \ set $secret_string verysecretstring;' -i $NGINX_CONF
+fi
+
 sed "s,\(set \+\$secret_string\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF}
 
 ${JSON} -I -e "this.storage.fs.secretString = '${SECURE_LINK_SECRET}'"
