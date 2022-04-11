@@ -821,11 +821,13 @@ begin
     for j := i to ArrayCodes.Count - 1 do begin
       Result := 0;
       Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[j];
+
       if not RegKeyExists(HKLM, Path) then
       begin
-        Result := j + 1;   
+        Result := j + 1;
+        Break;   
       end;
-
+    end;
       case Result of
         1:
           DownloadPage.Add(
@@ -851,7 +853,6 @@ begin
       SW_SHOW,
       EwWaitUntilTerminated,
       ResultCode);
-    end;
   end;
 end;
 
