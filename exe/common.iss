@@ -789,71 +789,69 @@ begin
   end;
 end;
 
-function CheckPackages(i : Integer): Integer;
-var
-  Path: String;
-  ArrayCodes: TStringList;
-begin
-  Result := 0;
-
-  ArrayCodes := TStringList.Create;
-  //vcredist2022
-  ArrayCodes.Add('{A181A302-3F6D-4BAD-97A8-A426A6499D78}');
-  //vcredist2013
-  ArrayCodes.Add('{929FBD26-9020-399B-9A7A-751D61F0B942}');
-  //python 3.9.9
-  ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
-
-  for i := i to ArrayCodes.Count - 1 do begin
-    Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[i];
-    if not RegKeyExists(HKLM, Path) then
-    begin
-      Result := i + 1;
-      Exit;
-    end;
-  end;
-end;
-
-procedure InstallPackages;
+function InstallPackages(): Integer;
 var
   ResultCode: Integer;
   ArrayPackages: TStringList;
+  ArrayCodes: TStringList;
   i: Integer;
+  j: Integer;
+  Params: String;
+  Path: String;
 begin
     ArrayPackages := TStringList.Create;
+    ArrayCodes := TStringList.Create
+    Params := ' /passive /norestart';
+    
+
+    //vcredist 2015-2022
     ArrayPackages.Add('vcredist_x64_2015-2022.exe');
+    ArrayCodes.Add('{A181A302-3F6D-4BAD-97A8-A426A6499D78}');
+    //vcredist 2013
     ArrayPackages.Add('vcredist_x64_2013.exe');
+    ArrayCodes.Add('{929FBD26-9020-399B-9A7A-751D61F0B942}');
+    //python 3.9.9
     ArrayPackages.Add('python-3.9.9-amd64.exe');
+    ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
 
   for i := 0 to ArrayPackages.Count - 1 do begin
+
     DownloadPage.Clear;
-    case CheckPackages(i) of
-      1:
-        DownloadPage.Add(
-        'https://aka.ms/vs/17/release/vc_redist.x64.exe',
-        ArrayPackages[i], '');
-      2:
-        DownloadPage.Add(
-        'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
-        ArrayPackages[i], '');
-      3:
-        DownloadPage.Add(
-        'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
-        ArrayPackages[i], '');
+
+    for j := i to ArrayCodes.Count - 1 do begin
+      Result := 0;
+      Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[j];
+      if not RegKeyExists(HKLM, Path) then
+      begin
+        Result := j + 1;   
+      end;
+
+      case Result of
+        1:
+          DownloadPage.Add(
+          'https://aka.ms/vs/17/release/vc_redist.x64.exe',
+          ArrayPackages[j], '');
+        2:
+          DownloadPage.Add(
+          'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
+          ArrayPackages[j], '');
+        3:
+          DownloadPage.Add(
+          'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
+          ArrayPackages[j], '');
+      end;
+      DownloadPage.Show;
+      DownloadPage.Download;
+      DownloadPage.Hide;
+
+      Exec(
+      '>',
+      ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + Params,
+      '',
+      SW_SHOW,
+      EwWaitUntilTerminated,
+      ResultCode);
     end;
-
-    DownloadPage.Show;
-    DownloadPage.Download;
-    DownloadPage.Hide;
-
-    Exec(
-    '>',
-    ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + ' /passive /norestart',
-    '',
-    SW_SHOW,
-    EwWaitUntilTerminated,
-    ResultCode);
-
   end;
 end;
 
