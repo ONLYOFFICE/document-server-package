@@ -230,6 +230,9 @@ save_jwt_params(){
 setup_nginx(){
    DS_CONF=$CONF_DIR/nginx/ds.conf
   
+  [ ! -e $DS_CONF ] && cp -f ${DS_CONF}.tmpl ${DS_CONF}
+  [ ! -e /etc/nginx/conf.d/ds.conf ] && ln -s ${DS_CONF} /etc/nginx/conf.d/ds.conf
+
   db_get M4_ONLYOFFICE_VALUE/ds-port || true
   DS_PORT="$RET"
   
