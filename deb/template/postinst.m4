@@ -91,7 +91,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	JWT_HEADER="$RET"
 
 	db_get M4_ONLYOFFICE_VALUE/secure_link_secret || true
-	SECURE_LINK_SECRET="$RET"
+	SECURE_LINK_SECRET=${RET:-$(pwgen -s 20)}
+	[ -z "$RET" ] && db_set M4_ONLYOFFICE_VALUE/secure_link_secret string ${SECURE_LINK_SECRET}
+
 	if [ ! -f $LOCAL_CONFIG ] && [ -z $JWT_SECRET ]; then
 		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 		db_set M4_ONLYOFFICE_VALUE/jwt-secret select $JWT_SECRET || true
