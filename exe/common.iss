@@ -501,11 +501,9 @@ begin
     Abort();
   end;
 
-  Dependency_AddVC2015To2022;
-
   if WizardSilent() = false then
   begin
-    // vcredist2010('10');
+    vcredist2022;
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
