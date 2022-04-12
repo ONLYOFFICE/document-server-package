@@ -327,7 +327,6 @@ setup_nginx(){
   DS_CONF=$NGINX_CONF_DIR/ds.conf
 
   cp -f ${DS_CONF_TMPL} ${DS_CONF}
-  ln -s ${DS_CONF} /etc/nginx/conf.d/ds.conf
   sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
 
   # check if ipv6 supported otherwise remove it from nginx config
