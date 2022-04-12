@@ -443,12 +443,6 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\fileversion.iss"
 
 #include "scripts\products\msiproduct.iss"
-;#include "scripts\products\vcredist2010.iss"
-;#include "scripts\products\vcredist2013.iss"
-;#include "scripts\products\vcredist2022.iss"
-;#include "scripts\products\postgresql.iss"
-;#include "scripts\products\rabbitmq.iss"
-;#include "scripts\products\redis.iss"
 
 [Code]
 
@@ -642,9 +636,9 @@ end;
 procedure InitializeWizard;
 begin
   Dependency_DownloadPage := CreateDownloadPage(
-                              SetupMessage(msgWizardPreparing),
-                              SetupMessage(msgPreparingDesc),
-                              nil);
+    SetupMessage(msgWizardPreparing),
+    SetupMessage(msgPreparingDesc),
+    nil);
 
   DbPage := CreateInputQueryPage(wpPreparing,
     'PostgreSQL Database', 'Configure PostgreSQL Connection...',
