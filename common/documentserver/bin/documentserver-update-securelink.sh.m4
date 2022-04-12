@@ -5,7 +5,7 @@ while [ "$1" != "" ]; do
 
 		-s | --secret_string )
 			if [ "$2" != "" ]; then
-				SECURE_LINK_SECRET=$(echo "$2" | awk '{print toupper($0)}');
+				SECURE_LINK_SECRET=$2
 				shift
 			fi
 		;;
