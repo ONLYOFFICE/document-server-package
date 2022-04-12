@@ -261,6 +261,11 @@ case "$1" in
 esac
 
 if [ "$IS_UPGRADE" = "true" ]; then
+  NGINX_CONF=/etc/M4_DS_PREFIX/nginx/ds.conf
+  if [ -e $NGINX_CONF ] && ! grep -q secret_string $NGINX_CONF; then
+	  sed '/server_tokens/a \ \ set $secret_string verysecretstring;' -i $NGINX_CONF
+  fi
+
   DIR="/var/www/%{_ds_prefix}"
   LOCAL_CONFIG="/etc/%{_ds_prefix}/local.json"
   JSON_BIN="$DIR/npm/json"
