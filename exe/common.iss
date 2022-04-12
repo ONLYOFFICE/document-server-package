@@ -443,17 +443,14 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 #include "scripts\products\fileversion.iss"
 
 #include "scripts\products\msiproduct.iss"
-#include "scripts\products\vcredist2010.iss"
-#include "scripts\products\vcredist2013.iss"
-#include "scripts\products\vcredist2022.iss"
+;#include "scripts\products\vcredist2010.iss"
+;#include "scripts\products\vcredist2013.iss"
+;#include "scripts\products\vcredist2022.iss"
 ;#include "scripts\products\postgresql.iss"
 ;#include "scripts\products\rabbitmq.iss"
 ;#include "scripts\products\redis.iss"
 
 [Code]
-
-var
-  DownloadPage: TDownloadWizardPage;
 
 #include "scripts\service.pas"
 
@@ -509,7 +506,9 @@ begin
   begin
     Abort();
   end;
- 
+
+  Dependency_AddVC2015To2022;
+
   if WizardSilent() = false then
   begin
     // vcredist2010('10');
@@ -640,19 +639,12 @@ begin
   end;
 end;
 
-function OnDownloadProgress(const Url, FileName: String; const Progress, ProgressMax: Int64): Boolean;
-begin
-  if Progress = ProgressMax then
-    Log(Format('Successfully downloaded file to {tmp}: %s', [FileName]));
-  Result := true;
-end;
-
 procedure InitializeWizard;
 begin
-  DownloadPage := CreateDownloadPage(
-                    SetupMessage(msgWizardPreparing),
-                    SetupMessage(msgPreparingDesc),
-                    @OnDownloadProgress);
+  Dependency_DownloadPage := CreateDownloadPage(
+                              SetupMessage(msgWizardPreparing),
+                              SetupMessage(msgPreparingDesc),
+                              nil);
 
   DbPage := CreateInputQueryPage(wpPreparing,
     'PostgreSQL Database', 'Configure PostgreSQL Connection...',
@@ -789,80 +781,14 @@ begin
   end;
 end;
 
-procedure InstallPackages();
-var
-  ResultCode: Integer;
-  ArrayPackages: TStringList;
-  ArrayCodes: TStringList;
-  Params: String;
-  Path: String;
-  i: Integer;
-  j: Integer;
-  Index: Integer;
-begin
-  Params := ' /passive /norestart';
-  ArrayPackages := TStringList.Create;
-  ArrayCodes := TStringList.Create
-
-  //vcredist 2015-2022
-  ArrayPackages.Add('vcredist_x64_2015-2022.exe');
-  ArrayCodes.Add('{A181A302-3F6D-4BAD-97A8-A426A6499D78}');
-  //vcredist 2013
-  ArrayPackages.Add('vcredist_x64_2013.exe');
-  ArrayCodes.Add('{929FBD26-9020-399B-9A7A-751D61F0B942}');
-  //python 3.9.9
-  ArrayPackages.Add('python-3.9.9-amd64.exe');
-  ArrayCodes.Add('{5B4B8687-6FD2-4002-A109-CC428BC53026}');
-
-  for i := 0 to ArrayPackages.Count - 1 do begin
-    DownloadPage.Clear;
-    for j := i to ArrayCodes.Count - 1 do begin
-      Index := 0;
-      Path := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ArrayCodes[j];
-      if not RegKeyExists(HKLM, Path) then
-      begin
-        Index := j + 1;
-        Break;
-      end;
-    end;
-
-    case Index of
-      1:
-        DownloadPage.Add(
-        'https://aka.ms/vs/17/release/vc_redist.x64.exe',
-        ArrayPackages[j], '');
-      2:
-        DownloadPage.Add(
-        'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe',
-        ArrayPackages[j], '');
-      3:
-        DownloadPage.Add(
-        'https://www.python.org/ftp/python/3.9.9/python-3.9.9-amd64.exe',
-        ArrayPackages[j], '');
-    end;
-
-    DownloadPage.Show;
-    DownloadPage.Download;
-    DownloadPage.Hide;
-
-    Exec(
-    '>',
-    ExpandConstant('{tmp}') + '\' + ArrayPackages[i] + Params,
-    '',
-    SW_SHOW,
-    EwWaitUntilTerminated,
-    ResultCode);
-  end;
-end;
-
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
   if WizardSilent() = false then
   begin
-    case CurPageID of
-      wpReady: InstallPackages();
-    end;
+    //case CurPageID of
+    //  wpReady: InstallPackages();
+    //end;
   end;
 end;
 
