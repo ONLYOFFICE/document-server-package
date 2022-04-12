@@ -23,21 +23,16 @@ while [ "$1" != "" ]; do
 	shift
 done
 
-NGINX_CONF=/etc/nginx/conf.d/ds.conf
+NGINX_CONF=/etc/M4_DS_PREFIX/nginx/ds.conf
 DOCSERVICE_CONF=/etc/M4_DS_PREFIX/default.json
 JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${DOCSERVICE_CONF}"
 
 SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
 
-if [ -e $NGINX_CONF ] && ! grep -q secret_string $NGINX_CONF; then
-	sed '/server_tokens/a \ \ set $secret_string verysecretstring;' -i $NGINX_CONF
-fi
-
 sed "s,\(set \+\$secret_string\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF}
-
 ${JSON} -I -e "this.storage.fs.secretString = '${SECURE_LINK_SECRET}'"
 
-[ -x "$(command -v debconf-set-selections)" ] && echo M4_PACKAGE_NAME M4_COMPANY_NAME/secure_link_secret select ${SECURE_LINK_SECRET} | sudo debconf-set-selections
+[ -x "$(command -v debconf-set-selections)" ] && echo M4_PACKAGE_NAME M4_ONLYOFFICE_VALUE/secure_link_secret string ${SECURE_LINK_SECRET} | debconf-set-selections
 
 supervisorctl restart ds:docservice
 supervisorctl restart ds:converter
