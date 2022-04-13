@@ -256,8 +256,8 @@ setup_nginx(){
     mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
   fi
 
-  if [ -e $DS_CONF ] && ! grep -q secret_string $DS_CONF; then
-	  sed '/server_tokens/a \ \ set $secret_string verysecretstring;' -i $DS_CONF
+  if [ -e $DS_CONF ] && ! grep -q secure_link_secret $DS_CONF; then
+	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
 
   if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then

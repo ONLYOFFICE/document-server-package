@@ -41,7 +41,7 @@ location ~* ^(\/cache\/files.*)(\/.*) {
   add_header Content-Disposition "attachment; filename*=UTF-8''$arg_filename";
 
   secure_link $arg_md5,$arg_expires;
-  secure_link_md5 "$secure_link_expires$uri$secret_string";
+  secure_link_md5 "$secure_link_expires$uri$secure_link_secret";
 
   if ($secure_link = "") {
     return 403;
