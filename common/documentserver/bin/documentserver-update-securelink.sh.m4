@@ -24,13 +24,13 @@ while [ "$1" != "" ]; do
 done
 
 NGINX_CONF=/etc/M4_DS_PREFIX/nginx/ds.conf
-DOCSERVICE_CONF=/etc/M4_DS_PREFIX/default.json
-JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${DOCSERVICE_CONF}"
+LOCAL_CONF=/etc/M4_DS_PREFIX/local.json
+JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${LOCAL_CONF}"
 
 SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
 
 sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF}
-${JSON} -I -e "this.storage.fs.secretString = '${SECURE_LINK_SECRET}'"
+${JSON} -I -e 'this.storage={fs: {secretString: "'${SECURE_LINK_SECRET}'" }}'
 
 [ -x "$(command -v debconf-set-selections)" ] && echo M4_PACKAGE_NAME M4_ONLYOFFICE_VALUE/secure_link_secret string ${SECURE_LINK_SECRET} | debconf-set-selections >/dev/null 2>&1
 
