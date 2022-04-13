@@ -253,6 +253,21 @@ ru.StartSrv=Запуск сервиса %1...
 en.Uninstall=Uninstall {#sAppName}
 ru.Uninstall=Удаление {#sAppName}
 
+en.Program=Program components
+ru.Program=Компоненты программы
+
+en.Prerequisites=Download prerequisites
+ru.Prerequisites=Загрузить необходимое ПО
+
+en.FullInstall=Full installation
+ru.FullInstall=Полная установка
+
+en.CompactInstall=Compact installation
+ru.CompactInstall=Компактная установка
+
+en.CustomInstall=Custom installtion
+ru.CustomInstall=Выборочная установка
+
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
@@ -444,6 +459,18 @@ Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
 #include "scripts\products\msiproduct.iss"
 
+[Types]
+Name: full; Description: {cm:FullInstall}
+Name: compact; Description: {cm:CompactInstall}
+Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
+ 
+[Components]
+Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
+Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8.9"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Redis"; Description: "Redis 3.0.504"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 9.5.4.1"; Flags: checkablealone; Types: full; 
+
 [Code]
 
 #include "scripts\service.pas"
@@ -503,13 +530,6 @@ begin
 
   if WizardSilent() = false then
   begin
-    vcredist2022;
-    vcredist2013;
-    python399;
-    rabbitmq;
-    redis;
-    postgresql;
-    erlang;
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');
@@ -779,14 +799,80 @@ begin
   end;
 end;
 
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  Result := false;
+  case PageID of
+    DbPage.ID:
+      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+    RabbitMqPage.ID:
+      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+    RedisPage.ID:
+      Result := not IsComponentSelected('Prerequisites\Redis');
+  end;
+end;
+
+
+function ArrayLength(a: array of integer): Integer;
+begin
+  Result := GetArrayLength(a);
+end;
+function CheckPortOccupied(): Boolean;
+var
+  ResultCode: Integer;
+  I: Integer;
+  Ports: Array[0..2] of Integer;
+begin
+  if WizardSilent() = false then
+  begin
+    Result := false;
+    Ports[0] := StrToInt(GetDefaultPort(''));
+    Ports[1] := 8080;
+    Ports[2] := 3000;
+    for I := 0 to ArrayLength(Ports) - 1 do
+    begin
+      Exec(
+        ExpandConstant('{cmd}'),
+        '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
+        '',
+        0,
+        ewWaitUntilTerminated,
+        ResultCode);
+      if ResultCode <> 1 then
+      begin
+        MsgBox(
+          FmtMessage(
+            ExpandConstant('{cm:UsePort}'), [IntToStr(Ports[I])]),
+          mbInformation,
+          MB_OK);
+        Result := true; 
+      end
+    end;
+  end;
+end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
   if WizardSilent() = false then
   begin
-    //case CurPageID of
-    //  wpReady: InstallPackages();
-    //end;
+    case CurPageID of
+      wpSelectComponents:
+      begin
+        if IsComponentSelected('Prerequisites\Redis') then
+        begin
+          redis;
+        end;
+        if IsComponentSelected('Prerequisites\RabbitMq') then
+        begin
+          erlang;
+          rabbitmq;
+        end;
+        if IsComponentSelected('Prerequisites\PostgreSQL') then
+        begin
+          postgresql;
+        end;
+      end;
+    end;
   end;
 end;
 
