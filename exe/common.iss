@@ -799,20 +799,6 @@ begin
   end;
 end;
 
-function ShouldSkipPage(PageID: Integer): Boolean;
-begin
-  Result := false;
-  case PageID of
-    DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
-    RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    RedisPage.ID:
-      Result := not IsComponentSelected('Prerequisites\Redis');
-  end;
-end;
-
-
 function ArrayLength(a: array of integer): Integer;
 begin
   Result := GetArrayLength(a);
@@ -850,6 +836,7 @@ begin
     end;
   end;
 end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
