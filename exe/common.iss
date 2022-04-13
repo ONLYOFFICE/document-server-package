@@ -504,6 +504,12 @@ begin
   if WizardSilent() = false then
   begin
     vcredist2022;
+    vcredist2013;
+    python399;
+    rabbitmq;
+    redis;
+    postgresql;
+    erlang;
   end;
   //postgresql('9.5.4.0');
   //rabbitmq('3.6.5');

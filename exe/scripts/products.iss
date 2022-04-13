@@ -74,19 +74,15 @@ var
   TempValue: String;
 begin
   DependencyCount := GetArrayLength(Dependency_List);
-
   if DependencyCount > 0 then begin
     Dependency_DownloadPage.Show;
-
     for DependencyIndex := 0 to DependencyCount - 1 do begin
       if Dependency_List[DependencyIndex].URL <> '' then begin
         Dependency_DownloadPage.Clear;
         Dependency_DownloadPage.Add(Dependency_List[DependencyIndex].URL, Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Checksum);
-
         Retry := True;
         while Retry do begin
           Retry := False;
-
           try
             Dependency_DownloadPage.Download;
           except
@@ -108,12 +104,10 @@ begin
         end;
       end;
     end;
-
     if Result = '' then begin
       for DependencyIndex := 0 to DependencyCount - 1 do begin
         Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
         Dependency_DownloadPage.SetProgress(DependencyIndex + 1, DependencyCount + 1);
-
         while True do begin
           ResultCode := 0;
           if ShellExec('', ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
@@ -136,7 +130,6 @@ begin
               break;
             end;
           end;
-
           case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
             IDABORT: begin
               Result := Dependency_List[DependencyIndex].Title;
@@ -147,12 +140,10 @@ begin
             end;
           end;
         end;
-
         if Result <> '' then begin
           break;
         end;
       end;
-
       if NeedsRestart then begin
         TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + WizardDirValue + '" /GROUP="' + WizardGroupValue + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
         if WizardNoIcons then begin
@@ -161,7 +152,6 @@ begin
         RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', TempValue);
       end;
     end;
-
     Dependency_DownloadPage.Hide;
   end;
 end;
@@ -253,7 +243,7 @@ end;
 
 procedure rabbitmq;
 begin
-  if (FileExists(ExpandConstant('{pf64}{\}RabbitMQ Server{\}rabbitmq_server-3.8.9{\}sbin{\}rabbitmq-server.bat')) <> True ) then
+  if (FileExists(ExpandConstant('{pf64}{\}RabbitMQ Server{\}rabbitmq_server-3.8.9{\}sbin{\}rabbitmq-server.bat')) <> True) then begin
     Dependency_Add(
       'rabbitmq-server.exe',
       '',
@@ -269,7 +259,7 @@ end;
 
 procedure redis;
 begin
-  if (FileExists(ExpandConstant('{pf64}{\}Redis{\}redis-server.exe')) <> True ) then
+  if (FileExists(ExpandConstant('{pf64}{\}Redis{\}redis-server.exe')) <> True) then begin
     Dependency_Add('redis.msi',
       '\qb',
       'Redis 3.0.504 x64',
@@ -284,7 +274,7 @@ end;
 
 procedure postgresql;
 begin
-  if (CompareVersion(FileVersion(ExpandConstant('{pf64}{\}postgresql{\}9.5{\}bin{\}postgres.exe')), minVersion) < 0) then
+  if (FileExists(ExpandConstant('{pf64}{\}postgresql{\}9.5{\}bin{\}postgres.exe')) <> True) then begin
     Dependency_Add('postgresql.exe',
       '--unattendedmodeui minimal',
       'PostgreSQL 9.5.4.1 x64',
@@ -299,7 +289,7 @@ end;
 
 procedure erlang;
 begin
-  if (FileExists(ExpandConstant('{pf64}{\}erl-23.1{\}bin{\}erl.exe')) <> True ) then
+  if (FileExists(ExpandConstant('{pf64}{\}erl-23.1{\}bin{\}erl.exe')) <> True ) then begin
     Dependency_Add('erlang.exe',
       '',
       'Erlang 23.1 x64',
