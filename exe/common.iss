@@ -151,6 +151,9 @@
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
 
+#define public Dependency_NoExampleSetup
+#include "InnoDependencyInstaller\CodeDependencies.iss"
+ 
 [Setup]
 AppName                   ={#sAppName}
 AppId                     ={#sAppId}
@@ -450,7 +453,6 @@ Name: "Prerequisites\vcredist2013"; Description: "Visual C++ 2013 Redistributabl
 Name: "Prerequisites\vcredist2022"; Description: "Visual C++ 2015-2022 Redistributable"; Flags: checkablealone; Types: full;
 
 [Code]
-
 function UninstallPreviosVersion(): Boolean;
 var
   UninstallerPath: String;
@@ -496,14 +498,10 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  // initialize windows version
-  initwinversion();
-  
   if not UninstallPreviosVersion() then
   begin
     Abort();
   end;
- 
   Result := true;
 end;
 
