@@ -470,6 +470,8 @@ Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8.9"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Redis"; Description: "Redis 3.0.504"; Flags: checkablealone; Types: full;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 9.5.4.1"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\vcredist2013"; Description: "Visual C++ 2013"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\vcredist2022"; Description: "Visual C++ 2022"; Flags: checkablealone; Types: full;
 
 [Code]
 
@@ -857,6 +859,14 @@ begin
         if IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
           postgresql;
+        end;
+        if IsComponentSelected('Prerequisites\vcredist2013') then
+        begin
+          vcredist2013;
+        end;
+        if IsComponentSelected('Prerequisites\vcredist2022') then
+        begin
+          vcredist2022;
         end;
       end;
     end;
