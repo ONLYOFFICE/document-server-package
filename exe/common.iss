@@ -470,8 +470,8 @@ Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8.9"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Redis"; Description: "Redis 3.0.504"; Flags: checkablealone; Types: full;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 9.5.4.1"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\vcredist2013"; Description: "Visual C++ 2013"; Flags: checkablealone; Types: full;
-Name: "Prerequisites\vcredist2022"; Description: "Visual C++ 2022"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\vcredist2013"; Description: "Visual C++ 2013 Redistributable"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\vcredist2022"; Description: "Visual C++ 2015-2022 Redistributable"; Flags: checkablealone; Types: full;
 
 [Code]
 
@@ -529,13 +529,6 @@ begin
   begin
     Abort();
   end;
-
-  if WizardSilent() = false then
-  begin
-  end;
-  //postgresql('9.5.4.0');
-  //rabbitmq('3.6.5');
-  //redis('3.2.100');
 
   Result := true;
 end;
@@ -847,6 +840,7 @@ begin
     case CurPageID of
       wpSelectComponents:
       begin
+      
         if IsComponentSelected('Prerequisites\Redis') then
         begin
           redis;
@@ -872,4 +866,3 @@ begin
     end;
   end;
 end;
-

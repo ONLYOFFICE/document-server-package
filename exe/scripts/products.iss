@@ -21,8 +21,7 @@ var
   Dependency: TDependency_Entry;
   DependencyCount: Integer;
 begin
-  Dependency_Memo := Dependency_Memo + #13#10 + '%1' + Title;
-
+  Dependency_DownloadPage.Clear;
   Dependency.Filename := Filename;
   Dependency.Parameters := Parameters;
   Dependency.Title := Title;
@@ -215,7 +214,7 @@ begin
     Dependency_Add(
       'vcredist2013' + Dependency_ArchSuffix + '.exe',
       '/passive /norestart',
-      'Visual C++ 2013 Update 5 Redistributable' + Dependency_ArchTitle,
+      'Visual C++ 2013 Redistributable',
       Dependency_String(
         'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe',
         'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe'),
@@ -260,12 +259,13 @@ end;
 procedure redis;
 begin
   if (FileExists(ExpandConstant('{pf64}{\}Redis{\}redis-server.exe')) <> True) then begin
-    Dependency_Add('redis.msi',
-      '\qb',
+    Dependency_Add(
+      'redis.msi',
+      '/qb',
       'Redis 3.0.504 x64',
       Dependency_String(
         '',
-        'http://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'),
+        'http://github.com/MSOpenTech/redis/releases/download/win-3.2.100/Redis-x64-3.2.100.msi'),
       '',
       False,
       False);
@@ -291,8 +291,8 @@ procedure erlang;
 begin
   if (FileExists(ExpandConstant('{pf64}{\}erl-23.1{\}bin{\}erl.exe')) <> True ) then begin
     Dependency_Add('erlang.exe',
+      'Erlang 23.1',
       '',
-      'Erlang 23.1 x64',
       Dependency_String(
         '',
         'http://erlang.org/download/otp_win64_23.1.exe'),
