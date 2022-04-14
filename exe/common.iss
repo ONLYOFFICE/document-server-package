@@ -840,7 +840,6 @@ begin
     case CurPageID of
       wpSelectComponents:
       begin
-      
         if IsComponentSelected('Prerequisites\Redis') then
         begin
           redis;
