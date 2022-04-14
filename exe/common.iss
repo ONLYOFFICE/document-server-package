@@ -450,15 +450,6 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
-; shared code for installing the products
-#include "scripts\products.iss"
-; helper functions
-#include "scripts\products\stringversion.iss"
-#include "scripts\products\winversion.iss"
-#include "scripts\products\fileversion.iss"
-
-#include "scripts\products\msiproduct.iss"
-
 [Types]
 Name: full; Description: {cm:FullInstall}
 Name: compact; Description: {cm:CompactInstall}
@@ -529,7 +520,7 @@ begin
   begin
     Abort();
   end;
-
+ 
   Result := true;
 end;
 
