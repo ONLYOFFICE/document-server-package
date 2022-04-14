@@ -241,21 +241,6 @@ ru.StartSrv=Запуск сервиса %1...
 en.Uninstall=Uninstall {#sAppName}
 ru.Uninstall=Удаление {#sAppName}
 
-en.Program=Program components
-ru.Program=Компоненты программы
-
-en.Prerequisites=Download prerequisites
-ru.Prerequisites=Загрузить необходимое ПО
-
-en.FullInstall=Full installation
-ru.FullInstall=Полная установка
-
-en.CompactInstall=Compact installation
-ru.CompactInstall=Компактная установка
-
-en.CustomInstall=Custom installtion
-ru.CustomInstall=Выборочная установка
-
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
