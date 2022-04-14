@@ -450,7 +450,6 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
-
 ; shared code for installing the products
 #include "scripts\products.iss"
 ; helper functions
