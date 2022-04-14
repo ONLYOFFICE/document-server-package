@@ -78,7 +78,10 @@ begin
     for DependencyIndex := 0 to DependencyCount - 1 do begin
       if Dependency_List[DependencyIndex].URL <> '' then begin
         Dependency_DownloadPage.Clear;
-        Dependency_DownloadPage.Add(Dependency_List[DependencyIndex].URL, Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Checksum);
+        Dependency_DownloadPage.Add(
+        Dependency_List[DependencyIndex].URL,
+        Dependency_List[DependencyIndex].Filename,
+        Dependency_List[DependencyIndex].Checksum);
         Retry := True;
         while Retry do begin
           Retry := False;
@@ -144,11 +147,29 @@ begin
         end;
       end;
       if NeedsRestart then begin
-        TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + WizardDirValue + '" /GROUP="' + WizardGroupValue + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
+        TempValue := '"' +
+        ExpandConstant('{srcexe}') +
+        '" /restart=1 /LANG="' +
+        ExpandConstant('{language}') +
+        '" /DIR="'
+        + WizardDirValue +
+        '" /GROUP="' +
+        WizardGroupValue +
+        '" /TYPE="' +
+        WizardSetupType(False) +
+        '" /COMPONENTS="' +
+        WizardSelectedComponents(False) +
+        '" /TASKS="' +
+        WizardSelectedTasks(False) +
+        '"';
         if WizardNoIcons then begin
           TempValue := TempValue + ' /NOICONS';
         end;
-        RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', TempValue);
+        RegWriteStringValue(
+        HKA,
+        'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce',
+        '{#SetupSetting("AppName")}',
+        TempValue);
       end;
     end;
     Dependency_DownloadPage.Hide;
