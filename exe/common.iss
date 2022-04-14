@@ -438,20 +438,6 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
-[Types]
-Name: full; Description: {cm:FullInstall}
-Name: compact; Description: {cm:CompactInstall}
-Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
- 
-[Components]
-Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
-Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8.9"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Redis"; Description: "Redis 3.0.504"; Flags: checkablealone; Types: full;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 9.5.4.1"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\vcredist2013"; Description: "Visual C++ 2013 Redistributable"; Flags: checkablealone; Types: full;
-Name: "Prerequisites\vcredist2022"; Description: "Visual C++ 2015-2022 Redistributable"; Flags: checkablealone; Types: full;
-
 [Code]
 function UninstallPreviosVersion(): Boolean;
 var
@@ -626,11 +612,6 @@ end;
 
 procedure InitializeWizard;
 begin
-  Dependency_DownloadPage := CreateDownloadPage(
-    SetupMessage(msgWizardPreparing),
-    SetupMessage(msgPreparingDesc),
-    nil);
-
   DbPage := CreateInputQueryPage(wpPreparing,
     'PostgreSQL Database', 'Configure PostgreSQL Connection...',
     'Please specify your PostgreSQL connection, then click Next.');
@@ -766,74 +747,16 @@ begin
   end;
 end;
 
-function ArrayLength(a: array of integer): Integer;
-begin
-  Result := GetArrayLength(a);
-end;
-function CheckPortOccupied(): Boolean;
-var
-  ResultCode: Integer;
-  I: Integer;
-  Ports: Array[0..2] of Integer;
-begin
-  if WizardSilent() = false then
-  begin
-    Result := false;
-    Ports[0] := StrToInt(GetDefaultPort(''));
-    Ports[1] := 8080;
-    Ports[2] := 3000;
-    for I := 0 to ArrayLength(Ports) - 1 do
-    begin
-      Exec(
-        ExpandConstant('{cmd}'),
-        '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
-        '',
-        0,
-        ewWaitUntilTerminated,
-        ResultCode);
-      if ResultCode <> 1 then
-      begin
-        MsgBox(
-          FmtMessage(
-            ExpandConstant('{cm:UsePort}'), [IntToStr(Ports[I])]),
-          mbInformation,
-          MB_OK);
-        Result := true; 
-      end
-    end;
-  end;
-end;
-
-function NextButtonClick(CurPageID: Integer): Boolean;
-begin
-  Result := true;
-  if WizardSilent() = false then
-  begin
-    case CurPageID of
-      wpSelectComponents:
-      begin
-        if IsComponentSelected('Prerequisites\Redis') then
-        begin
-          redis;
-        end;
-        if IsComponentSelected('Prerequisites\RabbitMq') then
-        begin
-          erlang;
-          rabbitmq;
-        end;
-        if IsComponentSelected('Prerequisites\PostgreSQL') then
-        begin
-          postgresql;
-        end;
-        if IsComponentSelected('Prerequisites\vcredist2013') then
-        begin
-          vcredist2013;
-        end;
-        if IsComponentSelected('Prerequisites\vcredist2022') then
-        begin
-          vcredist2022;
-        end;
-      end;
-    end;
-  end;
-end;
+//function NextButtonClick(CurPageID: Integer): Boolean;
+//begin
+//  Result := true;
+//  if WizardSilent() = false then
+//  begin
+//    case CurPageID of
+////      DbPage.ID: Result := CheckDbConnection();
+////      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
+////      RedisPage.ID: Result := CheckRedisConnection();
+//      wpReady: Result := DownloadDependency();
+//    end;
+//  end;
+//end;
