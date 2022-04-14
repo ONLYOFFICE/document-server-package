@@ -201,21 +201,6 @@ ShowLanguageDialog        = no
 SignTool=byparam $p
 #endif
 
-; supported languages
-#include "scripts\lang\english.iss"
-#include "scripts\lang\russian.iss"
-; #include "scripts\lang\german.iss"
-; #include "scripts\lang\french.iss"
-; #include "scripts\lang\italian.iss"
-; #include "scripts\lang\dutch.iss"
-
-; #ifdef UNICODE
-; #include "scripts\lang\chinese.iss"
-; #include "scripts\lang\polish.iss"
-; #include "scripts\lang\russian.iss"
-; #include "scripts\lang\japanese.iss"
-; #endif
-
 [CustomMessages]
 en.AddRotateTask=Adding scheduled tasks...
 ru.AddRotateTask=Добавление задачи в планировщик...
@@ -450,13 +435,6 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
-; shared code for installing the products
-#include "scripts\products.iss"
-; helper functions
-#include "scripts\products\stringversion.iss"
-#include "scripts\products\winversion.iss"
-#include "scripts\products\fileversion.iss"
-
 [Types]
 Name: full; Description: {cm:FullInstall}
 Name: compact; Description: {cm:CompactInstall}
@@ -472,8 +450,6 @@ Name: "Prerequisites\vcredist2013"; Description: "Visual C++ 2013 Redistributabl
 Name: "Prerequisites\vcredist2022"; Description: "Visual C++ 2015-2022 Redistributable"; Flags: checkablealone; Types: full;
 
 [Code]
-
-#include "scripts\service.pas"
 
 function UninstallPreviosVersion(): Boolean;
 var
