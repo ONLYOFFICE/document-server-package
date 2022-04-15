@@ -473,16 +473,17 @@ begin
   begin
     Abort();
   end;
-
+ 
   if WizardSilent() = false then
   begin
-    Dependency_AddVC2013;;
+    Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
   end;
 
   Result := true;
 end;
-  var
+
+var
   DbPage: TInputQueryWizardPage;
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
