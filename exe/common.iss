@@ -151,6 +151,9 @@
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
 
+#define public Dependency_NoExampleSetup
+#include "InnoDependencyInstaller\CodeDependencies.iss"
+
 [Setup]
 AppName                   ={#sAppName}
 AppId                     ={#sAppId}
@@ -200,21 +203,6 @@ ShowLanguageDialog        = no
 #ifdef ENABLE_SIGNING
 SignTool=byparam $p
 #endif
-
-; supported languages
-#include "scripts\lang\english.iss"
-#include "scripts\lang\russian.iss"
-; #include "scripts\lang\german.iss"
-; #include "scripts\lang\french.iss"
-; #include "scripts\lang\italian.iss"
-; #include "scripts\lang\dutch.iss"
-
-; #ifdef UNICODE
-; #include "scripts\lang\chinese.iss"
-; #include "scripts\lang\polish.iss"
-; #include "scripts\lang\russian.iss"
-; #include "scripts\lang\japanese.iss"
-; #endif
 
 [CustomMessages]
 en.AddRotateTask=Adding scheduled tasks...
@@ -435,25 +423,7 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
-; shared code for installing the products
-#include "scripts\products.iss"
-; helper functions
-#include "scripts\products\stringversion.iss"
-#include "scripts\products\winversion.iss"
-#include "scripts\products\fileversion.iss"
-
-#include "scripts\products\msiproduct.iss"
-#include "scripts\products\vcredist2010.iss"
-#include "scripts\products\vcredist2013.iss"
-#include "scripts\products\vcredist2022.iss"
-;#include "scripts\products\postgresql.iss"
-;#include "scripts\products\rabbitmq.iss"
-;#include "scripts\products\redis.iss"
-
 [Code]
-
-#include "scripts\service.pas"
-
 function UninstallPreviosVersion(): Boolean;
 var
   UninstallerPath: String;
@@ -499,9 +469,6 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  // initialize windows version
-  initwinversion();
-  
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -509,13 +476,9 @@ begin
  
   if WizardSilent() = false then
   begin
-    // vcredist2010('10');
-    vcredist2013('12');
-    vcredist2022('14');
+    Dependency_AddVC2013;
+    Dependency_AddVC2015To2022;
   end;
-  //postgresql('9.5.4.0');
-  //rabbitmq('3.6.5');
-  //redis('3.2.100');
 
   Result := true;
 end;
