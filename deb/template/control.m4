@@ -6,7 +6,7 @@ Maintainer: M4_PUBLISHER_NAME <M4_SUPPORT_MAIL>
 Build-Depends: debhelper (>= 8.0.0)
 
 Package: M4_PACKAGE_NAME
-Architecture: amd64
+Architecture: M4_DEB_ARCH
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
   adduser,
   ca-certificates,
@@ -31,8 +31,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 `  redis-tools,'
 ,)dnl
   supervisor(>= 3.0b2),
+  ttf-mscorefonts-installer,
   xvfb,
   zlib1g
-Recommends: ttf-mscorefonts-installer
+Recommends:
 Description: defn(`DEB[Summary]')
 defn(`DEB[Description]')

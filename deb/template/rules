@@ -9,4 +9,8 @@ export DH_VERBOSE=1
 override_dh_shlibdeps:
 
 override_dh_strip:
+<<<<<<< HEAD
 	dh_strip -Xdocservice -Xconverter -Xmetrics -Xexample -Xjson
+=======
+	dh_strip -Xdocservice -Xconverter -Xmetrics -Xexample -Xjson -Xcore.node
+>>>>>>> origin/release/v7.1.0
