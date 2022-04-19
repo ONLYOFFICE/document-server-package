@@ -23,8 +23,17 @@ BRANDING_DIR ?= ./branding
 PACKAGE_NAME := $(COMPANY_NAME_LOW)-$(PRODUCT_NAME_LOW)
 PACKAGE_VERSION := $(PRODUCT_VERSION)-$(BUILD_NUMBER)
 
-RPM_ARCH = x86_64
-DEB_ARCH = amd64
+UNAME_M ?= $(shell uname -m)
+ifeq ($(UNAME_M),x86_64)
+	RPM_ARCH := x86_64
+	DEB_ARCH := amd64
+	TAR_ARCH := x86_64
+endif
+ifneq ($(filter aarch%,$(UNAME_M)),)
+	RPM_ARCH := aarch64
+	DEB_ARCH := arm64
+	TAR_ARCH := aarch64
+endif
 
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
@@ -38,7 +47,7 @@ APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
 DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
-TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION).tar.gz
+TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(TAR_ARCH).tar.gz
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -71,7 +80,11 @@ NGINX := $(DOCUMENTSERVER)/nginx
 DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
 
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
+<<<<<<< HEAD
 PSQL_ZIP := postgresql-10.18-1-windows-x64-binaries.zip
+=======
+PSQL_ZIP := postgresql-10.20-2-windows-x64-binaries.zip
+>>>>>>> origin/release/v7.1.0
 
 NSSM_ZIP := nssm_x64.zip
 NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
@@ -148,12 +161,19 @@ else
 		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
 		DEV_NULL := /dev/null
 	endif
+<<<<<<< HEAD
 	UNAME_M := $(shell uname -m)
+=======
+>>>>>>> origin/release/v7.1.0
 	ifeq ($(UNAME_M),x86_64)
 		ARCHITECTURE := 64
 	endif
 	ifneq ($(filter %86,$(UNAME_M)),)
 		ARCHITECTURE := 32
+	endif
+	ifneq ($(filter aarch%,$(UNAME_M)),)
+		ARCHITECTURE := arm64
+		PKG_TARGET := node10-linux-arm64
 	endif
 endif
 
@@ -251,6 +271,7 @@ M4_PARAMS += -D M4_SUPPORT_URL='$(SUPPORT_URL)'
 M4_PARAMS += -D M4_BRANDING_DIR='$(abspath $(BRANDING_DIR))'
 M4_PARAMS += -D M4_ONLYOFFICE_VALUE=$(ONLYOFFICE_VALUE)
 M4_PARAMS += -D M4_PLATFORM=$(PLATFORM)
+M4_PARAMS += -D M4_DEB_ARCH='$(DEB_ARCH)'
 M4_PARAMS += -D M4_NGINX_CONF='$(NGINX_CONF)'
 M4_PARAMS += -D M4_NGINX_LOG='$(NGINX_LOG)'
 M4_PARAMS += -D M4_DS_PREFIX='$(DS_PREFIX)'
@@ -266,6 +287,10 @@ all: rpm deb apt-rpm
 apt-rpm:$(APT_RPM)
 
 rpm: $(RPM)
+
+rpm_aarch64 : TARGET = linux_arm64
+rpm_aarch64 : RPM_ARCH = aarch64
+rpm_aarch64 : $(RPM)
 
 deb: $(DEB)
 
@@ -363,7 +388,7 @@ endif
 
 	cd $(DOCUMENTSERVER)/npm && \
 		npm install && \
-		pkg ./node_modules/json -o json
+		pkg ./node_modules/json $(PKG_TARGET:%=-t %) -o json
 
 ifeq ($(PLATFORM),win)		
 	cd $(DOCUMENTSERVER)/npm && \
@@ -421,6 +446,7 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
 		--define '_ds_prefix $(DS_PREFIX)' \
 		--define '_binary_payload w7.xzdio' \
+		--target $(RPM_ARCH) \
 		$(PACKAGE_NAME).spec
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
@@ -449,7 +475,11 @@ deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+<<<<<<< HEAD
 	cd deb/build && dpkg-buildpackage -b -uc -us
+=======
+	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
+>>>>>>> origin/release/v7.1.0
 
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss

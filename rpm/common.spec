@@ -7,7 +7,6 @@ Group: Applications/Internet
 URL: %{_publisher_url}
 Vendor: %{_publisher_name}
 Packager: %{_publisher_name} <%{_support_mail}>
-BuildArch: x86_64
 AutoReq: no
 AutoProv: no
 
@@ -353,18 +352,6 @@ fi
 
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
-fi
-
-# check msttcore-fonts-installer
-rpm -qa | grep msttcore-fonts-installer > msttcore-fonts-out
-OUTFILESIZE=$(stat -c%s "msttcore-fonts-out")
-MAXOUTSIZE=1
-if [ "$OUTFILESIZE" -le "$MAXOUTSIZE" ]
-then
-  echo "The package msttcore-fonts-installer not found"
-  echo "You can install it with the commands:"
-  echo "    # yum install cabextract xorg-x11-font-utils"
-  echo "    # rpm -i https://deac-ams.dl.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
 fi
 
 %transfiletriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
