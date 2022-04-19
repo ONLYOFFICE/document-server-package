@@ -253,7 +253,7 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
@@ -262,17 +262,17 @@ Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; 
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
-Name: "{app}\server\App_Data";        Permissions: users-modify
-Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
-Name: "{app}\server\App_Data\docbuilder"; Permissions: users-modify
+Name: "{app}\server\App_Data";        Permissions: service-modify
+Name: "{app}\server\App_Data\cache\files"; Permissions: service-modify
+Name: "{app}\server\App_Data\docbuilder"; Permissions: service-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{app}\fonts";                  Permissions: users-modify
-Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
-Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}";             Permissions: users-modify
-Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-modify
+Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: service-modify
+Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}";             Permissions: service-modify
+Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}\temp";        Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}\logs";        Permissions: service-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";
 
@@ -347,6 +347,8 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:SECURE_LINK_SECRET}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
+Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
