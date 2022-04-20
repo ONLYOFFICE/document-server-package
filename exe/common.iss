@@ -934,7 +934,7 @@ var
 begin
   if WizardSilent() = false then
   begin
-    Result := true;
+    Result := false;
     Ports[0] := StrToInt(GetDefaultPort(''));
     Ports[1] := 8080;
     Ports[2] := 3000;
