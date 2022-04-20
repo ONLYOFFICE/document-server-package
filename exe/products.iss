@@ -1,5 +1,5 @@
 [Code]
-procedure Dependency_AddErglang;
+procedure Dependency_AddErlang;
 begin
   if not (FileExists(ExpandConstant('{pf}{\}erl-23.1{\}bin{\}erl.exe'))) then
   begin
