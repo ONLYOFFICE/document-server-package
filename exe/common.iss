@@ -559,6 +559,7 @@ begin
   ExtractTemporaryFile('ssleay32.dll');
   ExtractTemporaryFile('libeay32.dll');
   ExtractTemporaryFile('libiconv-2.dll')
+end;
 
 function InitializeSetup(): Boolean;
 begin
