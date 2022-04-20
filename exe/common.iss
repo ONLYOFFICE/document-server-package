@@ -580,6 +580,9 @@ begin
     Dependency_AddPython3;
   end;
 
+  Result := true;
+end;
+
 var
   DbPage: TInputQueryWizardPage;
   RabbitMqPage: TInputQueryWizardPage;
