@@ -17,7 +17,7 @@
 #endif
 
 #ifndef sProductName
-  #define sProductName        'DocumentServer'
+  #define sProductName        'DocumentServer-EE'
 #endif
 
 #ifndef sIntProductName
@@ -158,7 +158,7 @@
 
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
-
+#include "products.iss"
 [Setup]
 AppName                   ={#sAppName}
 AppId                     ={#sAppId}
@@ -320,14 +320,14 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs; Components: Program
-Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
-Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
-Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
-Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
-Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
-Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
-Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+;Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
+;Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+;Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+;Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+;Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+;Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
+;Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+;Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
 
 [Dirs]
@@ -550,22 +550,10 @@ begin
   end;
 end;
 
-function ExtractFiles(): Boolean;
-begin
-  ExtractTemporaryFile('connectionRabbit.py');
-  ExtractTemporaryFile('psql.exe');
-  ExtractTemporaryFile('libintl-8.dll');
-  ExtractTemporaryFile('libpq.dll');
-  ExtractTemporaryFile('ssleay32.dll');
-  ExtractTemporaryFile('libeay32.dll');
-  ExtractTemporaryFile('libiconv-2.dll')
-end;
-
 function InitializeSetup(): Boolean;
 begin
-  
-  ExtractFiles();
-  
+  ExtractTemporaryFile('connectionRabbit.py');
+
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -575,6 +563,7 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
+    python399;
   end;
 
   Result := true;
@@ -911,14 +900,18 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
-  case PageID of
-    DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
-    RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    RedisPage.ID:
-      Result := not IsComponentSelected('Prerequisites\Redis');
+  if PageID = DbPage.ID then
+  begin
+    Result := not IsComponentSelected('Prerequisites\PostgreSQL');
   end;
+  if PageID = RabbitMqPage.ID then
+  begin
+    Result := not IsComponentSelected('Prerequisites\RabbitMq');
+  end;
+  if PageID = RedisPage.ID then
+  begin
+    Result := not IsComponentSelected('Prerequisites\Redis');
+  end;     
 end;
 
 function ArrayLength(a: array of integer): Integer;
@@ -934,7 +927,7 @@ var
 begin
   if WizardSilent() = false then
   begin
-    Result := false;
+    Result := true;
     Ports[0] := StrToInt(GetDefaultPort(''));
     Ports[1] := 8080;
     Ports[2] := 3000;
@@ -965,34 +958,38 @@ begin
   Result := true;
   if WizardSilent() = false then
   begin
-    case CurPageID of
-      DbPage.ID:
-        Result := CheckDbConnection();
-      RabbitMqPage.ID:
-        Result := CheckRabbitMqConnection();
-      RedisPage.ID:
-        Result := CheckRedisConnection();
-      wpWelcome:
-        Result := CheckPortOccupied();
-      wpReady:
-        Result := DownloadDependency(CurPageID);
-      wpSelectComponents:
-      begin
-        if IsComponentSelected('Prerequisites\Redis') then
+    if CurPageID = DbPage.ID then
+    begin
+      Result := CheckDbConnection();
+    end;
+    if CurPageID = RabbitMqPage.ID then
+    begin
+      Result := CheckRabbitMqConnection();
+    end;
+    if CurPageID = RedisPage.ID then
+    begin
+      Result := CheckRedisConnection();
+    end;
+    if CurPageID = wpWelcome then
+    begin
+      Result := CheckPortOccupied();
+    end;
+    if CurPageID = wpSelectComponents then
+    begin
+      if IsComponentSelected('Prerequisites\Redis') then
         begin
-          redis('3.0.504');
+          redis;
         end;
         if IsComponentSelected('Prerequisites\RabbitMq') then
         begin
-          erlang('23.1');
-          rabbitmq('3.8.9');
+          erlang;
+          rabbitmq;
         end;
         if IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
-          postgresql('9.5.4.1');
+          postgresql;
         end;
-      end;
     end;
-  end;
+      end;
 end;
 
