@@ -951,6 +951,8 @@ end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
+  Result := true;
+  if WizardSilent() = false then
   begin
     case CurPageID of
       DbPage.ID:
