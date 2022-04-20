@@ -556,7 +556,9 @@ begin
   ExtractTemporaryFile('psql.exe');
   ExtractTemporaryFile('libintl-8.dll');
   ExtractTemporaryFile('libpq.dll');
-  ExtractTemporaryFile('libiconv-2.dll')
+  ExtractTemporaryFile('libiconv-2.dll');
+  ExtractTemporaryFile('libcrypto-1_1-x64.dll');
+  ExtractTemporaryFile('libssl-1_1-x64.dll');
 end;
 
 function InitializeSetup(): Boolean;
