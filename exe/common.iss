@@ -550,9 +550,18 @@ begin
   end;
 end;
 
-function InitializeSetup(): Boolean;
+function : Boolean;
 begin
   ExtractTemporaryFile('connectionRabbit.py');
+  ExtractTemporaryFile('psql.exe');
+  ExtractTemporaryFile('libintl-8.dll');
+  ExtractTemporaryFile('libpq.dll');
+  ExtractTemporaryFile('libiconv-2.dll')
+end;
+
+function InitializeSetup(): Boolean;
+begin
+  ExtractFiles();
 
   if not UninstallPreviosVersion() then
   begin
@@ -563,7 +572,7 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
-    python399;
+    Dependency_AddPython3;
   end;
 
   Result := true;
@@ -963,22 +972,20 @@ begin
         Result := CheckRedisConnection();
       wpWelcome:
         Result := CheckPortOccupied();
-      wpReady:
-        Result := DownloadDependency(CurPageID);
       wpSelectComponents:
       begin
         if IsComponentSelected('Prerequisites\Redis') then
         begin
-          redis('3.0.504');
+          Dependency_AddRedis;
         end;
         if IsComponentSelected('Prerequisites\RabbitMq') then
         begin
-          erlang('23.1');
-          rabbitmq('3.8.9');
+          Dependency_AddErglang;
+          Dependency_AddRabbitMq('3.8.9');
         end;
         if IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
-          postgresql('9.5.4.1');
+          Dependency_AddPostgreSQL;
         end;
       end;
     end;
