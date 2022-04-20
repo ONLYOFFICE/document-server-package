@@ -981,7 +981,7 @@ begin
         if IsComponentSelected('Prerequisites\RabbitMq') then
         begin
           Dependency_AddErglang;
-          Dependency_AddRabbitMq('3.8.9');
+          Dependency_AddRabbitMq;
         end;
         if IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
