@@ -550,7 +550,7 @@ begin
   end;
 end;
 
-function : Boolean;
+function ExtractFiles(): Boolean;
 begin
   ExtractTemporaryFile('connectionRabbit.py');
   ExtractTemporaryFile('psql.exe');
