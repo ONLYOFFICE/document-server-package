@@ -549,7 +549,6 @@ begin
     end;
   end;
 end;
-
 function ExtractFiles(): Boolean;
 begin
   ExtractTemporaryFile('connectionRabbit.py');
