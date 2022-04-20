@@ -556,15 +556,18 @@ begin
   ExtractTemporaryFile('psql.exe');
   ExtractTemporaryFile('libintl-8.dll');
   ExtractTemporaryFile('libpq.dll');
-  ExtractTemporaryFile('ssleay32.dll');
-  ExtractTemporaryFile('libeay32.dll');
+  ExtractTemporaryFile('libcrypto-1_1-x64.dll');
+  ExtractTemporaryFile('libssl-1_1-x64.dll');
   ExtractTemporaryFile('libiconv-2.dll')
 end;
 
 function InitializeSetup(): Boolean;
 begin
+  // initialize windows version
+  initwinversion();
+  
   ExtractFiles();
-
+  
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -576,9 +579,6 @@ begin
     Dependency_AddVC2015To2022;
     Dependency_AddPython3;
   end;
-
-  Result := true;
-end;
 
 var
   DbPage: TInputQueryWizardPage;
