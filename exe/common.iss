@@ -17,7 +17,7 @@
 #endif
 
 #ifndef sProductName
-  #define sProductName        'DocumentServer-EE'
+  #define sProductName        'DocumentServer'
 #endif
 
 #ifndef sIntProductName
@@ -320,14 +320,14 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs; Components: Program
-;Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
-;Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
-;Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
-;Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
-;Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
-;Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
-;Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
-;Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
 
 [Dirs]
@@ -900,18 +900,14 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
-  if PageID = DbPage.ID then
-  begin
-    Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+  case PageID of
+    DbPage.ID:
+      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+    RabbitMqPage.ID:
+      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+    RedisPage.ID:
+      Result := not IsComponentSelected('Prerequisites\Redis');
   end;
-  if PageID = RabbitMqPage.ID then
-  begin
-    Result := not IsComponentSelected('Prerequisites\RabbitMq');
-  end;
-  if PageID = RedisPage.ID then
-  begin
-    Result := not IsComponentSelected('Prerequisites\Redis');
-  end;     
 end;
 
 function ArrayLength(a: array of integer): Integer;
@@ -955,41 +951,35 @@ end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
-  Result := true;
-  if WizardSilent() = false then
   begin
-    if CurPageID = DbPage.ID then
-    begin
-      Result := CheckDbConnection();
-    end;
-    if CurPageID = RabbitMqPage.ID then
-    begin
-      Result := CheckRabbitMqConnection();
-    end;
-    if CurPageID = RedisPage.ID then
-    begin
-      Result := CheckRedisConnection();
-    end;
-    if CurPageID = wpWelcome then
-    begin
-      Result := CheckPortOccupied();
-    end;
-    if CurPageID = wpSelectComponents then
-    begin
-      if IsComponentSelected('Prerequisites\Redis') then
+    case CurPageID of
+      DbPage.ID:
+        Result := CheckDbConnection();
+      RabbitMqPage.ID:
+        Result := CheckRabbitMqConnection();
+      RedisPage.ID:
+        Result := CheckRedisConnection();
+      wpWelcome:
+        Result := CheckPortOccupied();
+      wpReady:
+        Result := DownloadDependency(CurPageID);
+      wpSelectComponents:
+      begin
+        if IsComponentSelected('Prerequisites\Redis') then
         begin
-          redis;
+          redis('3.0.504');
         end;
         if IsComponentSelected('Prerequisites\RabbitMq') then
         begin
-          erlang;
-          rabbitmq;
+          erlang('23.1');
+          rabbitmq('3.8.9');
         end;
         if IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
-          postgresql;
+          postgresql('9.5.4.1');
         end;
-    end;
       end;
+    end;
+  end;
 end;
 
