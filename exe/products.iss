@@ -80,7 +80,12 @@ var
   Version: String;
 begin
   Version := '3.9.9';
-  if not IsMsiProductInstalled(Dependency_String('{B0D35164-DCE0-5CD6-B3AE-55F0AE08E42E}', '{0D8FFA35-4E68-56AE-9C6D-7B33F2B22892}'), StrToInt(Version)) then begin
+  if not IsMsiProductInstalled(
+           Dependency_String(
+            '{B0D35164-DCE0-5CD6-B3AE-55F0AE08E42E}',
+            '{0D8FFA35-4E68-56AE-9C6D-7B33F2B22892}'),
+            StrToInt(Version)) then 
+  begin
     Dependency_Add(
       'python ' + Version + Dependency_ArchSuffix + '.exe',
       'PrependPath=1 DefaultJustForMeTargetDir=' + ExpandConstant('{sd}') + '\Python  /passive /norestart',
