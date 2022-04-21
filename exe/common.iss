@@ -563,8 +563,7 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  // initialize windows version
-  
+ 
   ExtractFiles();
   
   if not UninstallPreviosVersion() then
