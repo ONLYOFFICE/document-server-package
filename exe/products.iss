@@ -9,7 +9,7 @@ begin
       'Erlang 23.1 x64',
       Dependency_String(
         '',
-        'http://erlang.org/download/otp_win64_23.1.exe'
+        'https://erlang.org/download/otp_win64_23.1.exe'
       ),
       '',
       False,
@@ -28,7 +28,7 @@ begin
       'RabbitMQ 3.8.9 ',
       Dependency_String(
         '',
-        'http://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'
+        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'
       ),
       '',
       False,
@@ -47,7 +47,7 @@ begin
       'Redis 3.0.504 x64',
       Dependency_String(
         '',
-        'http://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'
+        'https://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'
       ),
       '',
       False,
@@ -66,7 +66,7 @@ begin
       'PostgreSQL 9.5.4.1 x64',
       Dependency_String(
         '',
-        'http://get.enterprisedb.com/postgresql/postgresql-9.5.4-1-windows-x64.exe'
+        'https://get.enterprisedb.com/postgresql/postgresql-9.5.4-1-windows-x64.exe'
         ),
       '',
       False,
