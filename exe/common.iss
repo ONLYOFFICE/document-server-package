@@ -564,7 +564,6 @@ end;
 function InitializeSetup(): Boolean;
 begin
   // initialize windows version
-  initwinversion();
   
   ExtractFiles();
   
