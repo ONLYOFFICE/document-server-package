@@ -7,15 +7,18 @@ if not defined SECURE_LINK_SECRET (
   for /L %%i in (1,1,20) do call :add
 )
 
-set "NGINX_CONF=..\nginx\conf\includes\ds-docservice.conf"
-set "DOCSERVICE_CONF=..\config\default.json"
-set "JSON=json.exe -I -q -f"
+set "NGINX_CONF=..\nginx\conf\ds.conf"
+set "DOCSERVICE_CONF=..\config\local.json"
+set "JSON=json.exe -q -f"
 set "REPLACE=replace.exe"
 set "NPM_PATH=..\npm"
 
 pushd %NPM_PATH%
-  %JSON% %DOCSERVICE_CONF% -e "this.storage.fs.secretString = '%SECURE_LINK_SECRET%'"
-  %REPLACE% "(set.\$secret_string.).*;" "$1%SECURE_LINK_SECRET%;" %NGINX_CONF%
+  if exist %NGINX_CONF% (
+    >nul find "secure_link_secret" %NGINX_CONF% && (echo:) || (%REPLACE% "(server_tokens.*;\s)" "$1  set $secure_link_secret verysecretstring;" %NGINX_CONF%)
+  )
+  %JSON% %DOCSERVICE_CONF% -I -e "this.storage={fs: {secretString: "'%SECURE_LINK_SECRET%'" }}"
+  %REPLACE% "(set.\$secure_link_secret.).*;" "$1%SECURE_LINK_SECRET%;" %NGINX_CONF%
 popd
 
 net stop DsDocServiceSvc
