@@ -39,12 +39,16 @@ end;
 
 procedure Dependency_AddRedis;
 begin
-  if not (FileExists(ExpandConstant('{pf}{\}Redis{\}redis-server.exe'))) then
+  if not IsMsiProductInstalled(
+           Dependency_String(
+            '',
+            '{6E927557-4447-4348-AE9C-4B2EA64BDA17}'),
+            StrToInt(Version)) then 
   begin
     Dependency_Add(
       'redis.msi',
       '/qb',
-      'Redis 3.0.504 x64',
+      'Redis 3 x64',
       Dependency_String(
         '',
         'http://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'
@@ -73,7 +77,7 @@ begin
     Dependency_Add(
       'postgresql.exe',
       '--unattendedmodeui minimal',
-      'PostgreSQL 9.5.4.1 x64',
+      'PostgreSQL 9.5 x64',
       Dependency_String(
         '',
         'http://get.enterprisedb.com/postgresql/postgresql-9.5.4-1-windows-x64.exe'
