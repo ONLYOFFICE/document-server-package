@@ -57,8 +57,18 @@ begin
 end;
 
 procedure Dependency_AddPostgreSQL;
+var
+  ResultCode: Integer;
 begin
-  if not RegKeyExists(HKLM,'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PostgreSQL') then
+  Exec(
+    '>',
+    'reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ /f "PostgreSQL"',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
   begin
     Dependency_Add(
       'postgresql.exe',
