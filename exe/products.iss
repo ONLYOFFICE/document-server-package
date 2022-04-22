@@ -1,7 +1,7 @@
 [Code]
 procedure Dependency_AddErlang;
 begin
-  if not (FileExists(ExpandConstant('{pf}{\}erl-23.1{\}bin{\}erl.exe'))) then
+  if CheckPreviosVersion('Erlang') = True then
   begin
     Dependency_Add(
       'erlang.exe',
@@ -20,7 +20,7 @@ end;
 
 procedure Dependency_AddRabbitMq;
 begin
-  if not (FileExists(ExpandConstant('{pf}{\}RabbitMQ Server{\}rabbitmq_server-3.8.9{\}sbin{\}rabbitmq-server.bat'))) then
+  if CheckPreviosVersion('RabbitMq') = True then
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
@@ -64,15 +64,7 @@ procedure Dependency_AddPostgreSQL;
 var
   ResultCode: Integer;
 begin
-  Exec(
-    '>',
-    'reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ /f "PostgreSQL"',
-    '',
-    SW_HIDE,
-    EwWaitUntilTerminated,
-    ResultCode);
-
-  if ResultCode <> 0 then
+  if CheckPreviosVersion('PostgreSQL') = True then
   begin
     Dependency_Add(
       'postgresql.exe',
@@ -115,4 +107,26 @@ begin
   end;
 end;
 
+function CheckPreviosVersion(String: Package): Boolean;
+begin
+  Result := True;
+  Exec(
+    '>',
+    'reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ /f "' + Package +'"',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+  Exec(
+    '>',
+    'reg query HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\ /f "' + Package +'"',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+  if ResultCode <> 0 then
+  begin
+    Result := False;  
+  end;
+end;
 [Setup]
