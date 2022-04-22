@@ -58,7 +58,7 @@ end;
 
 procedure Dependency_AddPostgreSQL;
 begin
-  if not (FileExists(ExpandConstant('{pf64}{\}postgresql{\}9.5{\}bin{\}postgres.exe'))) then
+  if not RegKeyExists(HKLM,'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PostgreSQL') then
   begin
     Dependency_Add(
       'postgresql.exe',
