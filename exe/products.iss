@@ -1,8 +1,8 @@
 [Code]
 procedure Dependency_AddErlang;
 begin
-  if CheckPreviosVersion('Erlang') = True then
-  begin
+  //if (CheckPreviosVersion('Erlang') True) then
+  //begin
     Dependency_Add(
       'erlang.exe',
       '',
@@ -15,13 +15,13 @@ begin
       False,
       False
     );
-  end;
+  //end;
 end;
 
 procedure Dependency_AddRabbitMq;
 begin
-  if CheckPreviosVersion('RabbitMq') = True then
-  begin
+  //if CheckPreviosVersion('RabbitMq') = True then
+  //begin
     Dependency_Add(
       'rabbitmq-server.exe',
       '',
@@ -34,7 +34,7 @@ begin
       False,
       False
     );
-  end;
+  //end;
 end;
 
 procedure Dependency_AddRedis;
@@ -43,7 +43,7 @@ begin
            Dependency_String(
             '',
             '{6E927557-4447-4348-AE9C-4B2EA64BDA17}'),
-            StrToInt(Version)) then 
+            3) then 
   begin
     Dependency_Add(
       'redis.msi',
@@ -64,8 +64,8 @@ procedure Dependency_AddPostgreSQL;
 var
   ResultCode: Integer;
 begin
-  if CheckPreviosVersion('PostgreSQL') = True then
-  begin
+  //if CheckPreviosVersion('PostgreSQL') = True then
+  //begin
     Dependency_Add(
       'postgresql.exe',
       '--unattendedmodeui minimal',
@@ -78,7 +78,7 @@ begin
       False,
       False
     );
-  end;
+  //end;
 end;
 
 procedure Dependency_AddPython3;
@@ -107,9 +107,10 @@ begin
   end;
 end;
 
-function CheckPreviosVersion(String: Package): Boolean;
-begin
-  Result := True;
+function CheckPreviosVersion(Package: String): Boolean;
+var
+  ResultCode: Integer;
+begin                       
   Exec(
     '>',
     'reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ /f "' + Package +'"',
@@ -124,9 +125,5 @@ begin
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
-  if ResultCode <> 0 then
-  begin
-    Result := False;  
-  end;
 end;
 [Setup]
