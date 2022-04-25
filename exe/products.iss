@@ -1,5 +1,5 @@
 [Code]
-function CheckPreviosVersion(Package: String): Boolean;
+function IsInstalled(Package: String): Boolean;
 var
   ResultCode: Integer;
   RegString: TStringList;
@@ -26,7 +26,7 @@ end;
 
 procedure Dependency_AddErlang;
 begin
-  if (CheckPreviosVersion('Erlang') = True) then
+  if (IsInstalled('Erlang') = True) then
   begin
     Dependency_Add(
       'erlang.exe',
@@ -34,7 +34,7 @@ begin
       'Erlang 23 x64',
       Dependency_String(
         '',
-        'http://erlang.org/download/otp_win64_23.1.exe'),
+        'https://erlang.org/download/otp_win64_23.1.exe'),
       '',
       False,
       False);
@@ -43,7 +43,7 @@ end;
 
 procedure Dependency_AddRabbitMq;
 begin
-  if CheckPreviosVersion('RabbitMq') = True then
+  if IsInstalled('RabbitMq') = True then
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
@@ -51,7 +51,7 @@ begin
       'RabbitMQ 3.8 ',
       Dependency_String(
         '',
-        'http://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'),
+        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'),
       '',
       False,
       False);
@@ -62,7 +62,7 @@ procedure Dependency_AddPostgreSQL;
 var
   ResultCode: Integer;
 begin
-  if CheckPreviosVersion('PostgreSQL') = True then
+  if IsInstalled('PostgreSQL') = True then
   begin
     Dependency_Add(
       'postgresql.exe',
@@ -70,7 +70,7 @@ begin
       'PostgreSQL 9.5 x64',
       Dependency_String(
         '',
-        'http://get.enterprisedb.com/postgresql/postgresql-9.5.4-1-windows-x64.exe'),
+        'https://get.enterprisedb.com/postgresql/postgresql-9.5.4-1-windows-x64.exe'),
       '',
       False,
       False);
@@ -94,7 +94,7 @@ begin
       'Redis ' + Version + 'x64',
       Dependency_String(
         '',
-        'http://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'),
+        'https://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'),
       '',
       False,
       False);
@@ -118,8 +118,8 @@ begin
         ExpandConstant('{sd}') + '\Python  /passive /norestart',
       'Python ' + Version + Dependency_ArchTitle,
       Dependency_String(
-        'http://www.python.org/ftp/python/' + Version + '/python-' + Version + '.exe',
-        'http://www.python.org/ftp/python/' + Version + '/python-' + Version + '-amd64.exe'),
+        'https://www.python.org/ftp/python/' + Version + '/python-' + Version + '.exe',
+        'https://www.python.org/ftp/python/' + Version + '/python-' + Version + '-amd64.exe'),
       '',
       False,
       False);
