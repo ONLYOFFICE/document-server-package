@@ -986,7 +986,7 @@ begin
           Dependency_AddErlang;
           Dependency_AddRabbitMq;
         end;
-        if IsComponentSelected('Prerequisites\PostgreSQL') then
+        if not IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
           Dependency_AddPostgreSQL;
         end;
