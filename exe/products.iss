@@ -24,9 +24,63 @@ begin
   end;
 end;
 
+function IsRabbitMqInstalled(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := False;
+  Exec(
+    '>',
+    'reg query HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\ /f RabbitMQ /e',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+  if ResultCode <> 0 then
+  begin
+    Result := True;  
+  end;
+end;
+
+function IsPostgreSQLInstalled(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := False;
+  Exec(
+    '>',
+    'reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ | findstr "PostgreSQL.[0-9].[0-9]$"',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+  if ResultCode <> 0 then
+  begin
+    Result := True;  
+  end;
+end;
+
+function IsErlangInstalled(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := False;
+  Exec(
+    '>',
+    'reg query HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\ | findstr "Erlang.OTP.[0-9]*"',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+  if ResultCode <> 0 then
+  begin
+    Result := True;  
+  end;
+end;
+
 procedure Dependency_AddErlang;
 begin
-  if (IsInstalled('Erlang') = True) then
+  if IsErlangInstalled = False then
   begin
     Dependency_Add(
       'erlang.exe',
@@ -43,7 +97,7 @@ end;
 
 procedure Dependency_AddRabbitMq;
 begin
-  if IsInstalled('RabbitMq') = True then
+  if IsRabbitMqInstalled() = False then
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
@@ -62,7 +116,7 @@ procedure Dependency_AddPostgreSQL;
 var
   ResultCode: Integer;
 begin
-  if IsInstalled('PostgreSQL') = True then
+  if IsPostgreSQLInstalled() = False then
   begin
     Dependency_Add(
       'postgresql.exe',
