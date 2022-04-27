@@ -8,7 +8,6 @@ var
 begin
   Result := False;
   RegString := 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\';
-
   case Package of
     'RabbitMQ': Parameter := 'RabbitMQ$';
     'Erlang': Parameter := 'Erlang.OTP.[0-9]*';
@@ -19,13 +18,13 @@ begin
     end;
   end;
   Exec(
-    '>',
-    'reg query' + RegString + '"' + Parameter + '"',
+    'cmd.exe',
+    '/c reg query ' + RegString + ' | findstr "' + Parameter + '"',
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
-  if ResultCode <> 0 then
+  if ResultCode = 1 then
   begin
     Result := True;  
   end; 
