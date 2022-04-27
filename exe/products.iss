@@ -1,37 +1,26 @@
 [Code]
 function IsInstalled(Package: String): Boolean;
 var
+  RegString: String;
+  Parameter: String;
   ResultCode: Integer;
-  RegString: TStringList;
   i: Integer;
 begin
-  Result := True;
-  RegString := TstringList.Create;
-  RegString.Add('HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\');
-  RegString.Add('HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\');
-  for i := 0 to RegString.Count - 1 do begin 
-    Exec(
-      '>',
-      'reg query' + RegString[i] + '/f "' + Package +'"',
-      '',
-      SW_HIDE,
-      EwWaitUntilTerminated,
-      ResultCode);
-    if ResultCode <> 0 then
+  Result := False;
+  RegString := 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\';
+
+  case Package of
+    'RabbitMQ': Parameter := 'RabbitMQ$';
+    'Erlang': Parameter := 'Erlang.OTP.[0-9]*';
+    'PostgreSQL':
     begin
-      Result := False;  
+      Parameter := 'PostgreSQL.[0-9].[0-9]$';
+      RegString := 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\';
     end;
   end;
-end;
-
-function IsRabbitMqInstalled(): Boolean;
-var
-  ResultCode: Integer;
-begin
-  Result := False;
   Exec(
     '>',
-    'reg query HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\ /f RabbitMQ /e',
+    'reg query' + RegString + '"' + Parameter + '"',
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
@@ -39,48 +28,12 @@ begin
   if ResultCode <> 0 then
   begin
     Result := True;  
-  end;
-end;
-
-function IsPostgreSQLInstalled(): Boolean;
-var
-  ResultCode: Integer;
-begin
-  Result := False;
-  Exec(
-    '>',
-    'reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ | findstr "PostgreSQL.[0-9].[0-9]$"',
-    '',
-    SW_HIDE,
-    EwWaitUntilTerminated,
-    ResultCode);
-  if ResultCode <> 0 then
-  begin
-    Result := True;  
-  end;
-end;
-
-function IsErlangInstalled(): Boolean;
-var
-  ResultCode: Integer;
-begin
-  Result := False;
-  Exec(
-    '>',
-    'reg query HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\ | findstr "Erlang.OTP.[0-9]*"',
-    '',
-    SW_HIDE,
-    EwWaitUntilTerminated,
-    ResultCode);
-  if ResultCode <> 0 then
-  begin
-    Result := True;  
-  end;
+  end; 
 end;
 
 procedure Dependency_AddErlang;
 begin
-  if IsErlangInstalled = False then
+  if IsInstalled('Erlang') = True then
   begin
     Dependency_Add(
       'erlang.exe',
@@ -97,7 +50,7 @@ end;
 
 procedure Dependency_AddRabbitMq;
 begin
-  if IsRabbitMqInstalled() = False then
+  if IsInstalled('RabbitMQ') = True then
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
@@ -116,7 +69,7 @@ procedure Dependency_AddPostgreSQL;
 var
   ResultCode: Integer;
 begin
-  if IsPostgreSQLInstalled() = False then
+  if IsInstalled('PostgreSQL') = True then
   begin
     Dependency_Add(
       'postgresql.exe',
