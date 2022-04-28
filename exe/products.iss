@@ -4,7 +4,6 @@ var
   RegString: String;
   Parameter: String;
   ResultCode: Integer;
-  i: Integer;
 begin
   Result := False;
   RegString := 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\';
