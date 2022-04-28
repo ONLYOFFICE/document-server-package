@@ -76,7 +76,7 @@ begin
     Dependency_Add(
       'postgresql.exe',
       '--unattendedmodeui minimal',
-      'PostgreSQL 9.5 x64',
+      'PostgreSQL 10.2 x64',
       Dependency_String(
         '',
         'https://sbp.enterprisedb.com/getfile.jsp?fileid=1258024'),
