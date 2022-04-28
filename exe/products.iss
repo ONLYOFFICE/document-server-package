@@ -1,32 +1,41 @@
 [Code]
 function IsInstalled(Package: String): Boolean;
 var
+  RegString: String;
+  Parameter: String;
   ResultCode: Integer;
-  RegString: TStringList;
   i: Integer;
 begin
-  Result := True;
-  RegString := TstringList.Create;
-  RegString.Add('HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\');
-  RegString.Add('HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\');
-  for i := 0 to RegString.Count - 1 do begin 
-    Exec(
-      '>',
-      'reg query' + RegString[i] + '/f "' + Package +'"',
-      '',
-      SW_HIDE,
-      EwWaitUntilTerminated,
-      ResultCode);
-    if ResultCode <> 0 then
+  Result := False;
+  RegString := 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\';
+
+  case Package of
+    'RabbitMQ': Parameter := 'RabbitMQ$';
+    'Erlang': Parameter := 'Erlang.OTP.[0-9]*';
+    'PostgreSQL':
     begin
-      Result := False;  
+      Parameter := 'PostgreSQL.[0-9].[0-9]$';
+      RegString := 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\';
     end;
+  end;
+
+  Exec(
+    'cmd.exe',
+    '/c reg query ' + RegString + ' | findstr "' + Parameter + '"',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode = 1 then
+  begin
+    Result := True;
   end;
 end;
 
 procedure Dependency_AddErlang;
 begin
-  if (IsInstalled('Erlang') = True) then
+  if IsInstalled('Erlang') = True then
   begin
     Dependency_Add(
       'erlang.exe',
@@ -43,12 +52,12 @@ end;
 
 procedure Dependency_AddRabbitMq;
 begin
-  if IsInstalled('RabbitMq') = True then
+  if IsInstalled('RabbitMQ') = True then
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
       '',
-      'RabbitMQ 3.8 ',
+      'RabbitMQ 3.8',
       Dependency_String(
         '',
         'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'),
@@ -70,7 +79,7 @@ begin
       'PostgreSQL 9.5 x64',
       Dependency_String(
         '',
-        'https://get.enterprisedb.com/postgresql/postgresql-9.5.4-1-windows-x64.exe'),
+        'https://sbp.enterprisedb.com/getfile.jsp?fileid=1258024'),
       '',
       False,
       False);
@@ -86,7 +95,7 @@ begin
            Dependency_String(
             '',
             '{05410198-7212-4FC4-B7C8-AFEFC3DA0FBC}'),
-            StrToInt(Version)) then 
+            StrToInt(Version)) then
   begin
     Dependency_Add(
       'redis.msi',
