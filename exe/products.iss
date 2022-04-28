@@ -79,7 +79,7 @@ begin
       'PostgreSQL 9.5 x64',
       Dependency_String(
         '',
-        'https://get.enterprisedb.com/postgresql/postgresql-9.5.4-1-windows-x64.exe'),
+        'https://sbp.enterprisedb.com/getfile.jsp?fileid=1258024'),
       '',
       False,
       False);
