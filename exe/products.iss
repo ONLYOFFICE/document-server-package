@@ -8,6 +8,7 @@ var
 begin
   Result := False;
   RegString := 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\';
+
   case Package of
     'RabbitMQ': Parameter := 'RabbitMQ$';
     'Erlang': Parameter := 'Erlang.OTP.[0-9]*';
@@ -17,6 +18,7 @@ begin
       RegString := 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\';
     end;
   end;
+
   Exec(
     'cmd.exe',
     '/c reg query ' + RegString + ' | findstr "' + Parameter + '"',
@@ -24,10 +26,11 @@ begin
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
+
   if ResultCode = 1 then
   begin
-    Result := True;  
-  end; 
+    Result := True;
+  end;
 end;
 
 procedure Dependency_AddErlang;
@@ -54,7 +57,7 @@ begin
     Dependency_Add(
       'rabbitmq-server.exe',
       '',
-      'RabbitMQ 3.8 ',
+      'RabbitMQ 3.8',
       Dependency_String(
         '',
         'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'),
@@ -92,7 +95,7 @@ begin
            Dependency_String(
             '',
             '{05410198-7212-4FC4-B7C8-AFEFC3DA0FBC}'),
-            StrToInt(Version)) then 
+            StrToInt(Version)) then
   begin
     Dependency_Add(
       'redis.msi',
