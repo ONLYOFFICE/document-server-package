@@ -503,7 +503,7 @@ Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags:
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 9.5"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
 
 [Code]
 
