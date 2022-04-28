@@ -13,7 +13,7 @@ begin
     'Erlang': Parameter := 'Erlang.OTP.[0-9]*';
     'PostgreSQL':
     begin
-      Parameter := 'PostgreSQL.[0-9].[0-9]$';
+      Parameter := '/r /C:"PostgreSQL [0-9].*[^a-zA-Z]$';
       RegString := 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\';
     end;
   end;
