@@ -159,6 +159,7 @@
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
 #include "products.iss"
+
 [Setup]
 AppName                   ={#sAppName}
 AppId                     ={#sAppId}
