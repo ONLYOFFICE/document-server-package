@@ -1,7 +1,7 @@
 [Code]
 function IsInstalled(Package: String): Boolean;
 var
-  RegString: String;
+  RegString: String; 
   Parameter: String;
   ResultCode: Integer;
   i: Integer;
