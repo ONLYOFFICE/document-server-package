@@ -1,41 +1,43 @@
+#define Registry32 "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\"
+#define Registry64 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\'
+
 [Code]
-function IsInstalled(Package: String): Boolean;
-var
-  RegString: String; 
-  Parameter: String;
+function IsInstalled(Regex: String; RegistryPath: String): Boolean;
+var 
   ResultCode: Integer;
-  i: Integer;
 begin
-  Result := False;
-  RegString := 'HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\';
-
-  case Package of
-    'RabbitMQ': Parameter := 'RabbitMQ$';
-    'Erlang': Parameter := 'Erlang.OTP.[0-9]*';
-    'PostgreSQL':
-    begin
-      Parameter := 'PostgreSQL.[0-9].[0-9]$';
-      RegString := 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\';
-    end;
-  end;
-
+  Result := True;
   Exec(
     'cmd.exe',
-    '/c reg query ' + RegString + ' | findstr "' + Parameter + '"',
+    '/c reg query ' + RegistryPath + ' | findstr /R /C:"' + Regex + '"',
     '',
     SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
-
-  if ResultCode = 1 then
+  if ResultCode <> 0 then
   begin
-    Result := True;
+    Result := False;
   end;
+end;
+
+function IsRabbitMQInstalled(): Boolean;
+begin
+  Result := IsInstalled('RabbitMQ$', '{#Registry32}');
+end;
+
+function IsErlangInstalled(): Boolean;
+begin
+  Result := IsInstalled('Erlang OTP [0-9]*', '{#Registry32}');
+end;
+
+function IsPostgreSQLInstalled(): Boolean;
+begin
+  Result := IsInstalled('PostgreSQL [0-9].*[^a-zA-Z]$', '{#Registry64}');
 end;
 
 procedure Dependency_AddErlang;
 begin
-  if IsInstalled('Erlang') = True then
+  if IsErlangInstalled() = False then
   begin
     Dependency_Add(
       'erlang.exe',
@@ -52,7 +54,7 @@ end;
 
 procedure Dependency_AddRabbitMq;
 begin
-  if IsInstalled('RabbitMQ') = True then
+  if IsRabbitMQInstalled() = False then
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
@@ -71,7 +73,7 @@ procedure Dependency_AddPostgreSQL;
 var
   ResultCode: Integer;
 begin
-  if IsInstalled('PostgreSQL') = True then
+  if IsPostgreSQLInstalled() = False then
   begin
     Dependency_Add(
       'postgresql.exe',
