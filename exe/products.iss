@@ -1,5 +1,5 @@
 #define Registry32 "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\"
-#define Registry64 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\'
+#define Registry64 "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\"
 
 [Code]
 function IsInstalled(Regex: String; RegistryPath: String): Boolean;
