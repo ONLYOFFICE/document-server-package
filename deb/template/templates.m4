@@ -85,7 +85,6 @@ Description: Enable jwt for M4_PRODUCT_NAME?
 
 Template: M4_ONLYOFFICE_VALUE/jwt-secret
 Type: string
-Default: secret
 Description: Jwt secret:
 
 Template: M4_ONLYOFFICE_VALUE/jwt-header

@@ -77,6 +77,7 @@
 #define REG_RABBITMQ_HOST     'RabbitMqHost'
 #define REG_RABBITMQ_USER     'RabbitMqUser'
 #define REG_RABBITMQ_PWD      'RabbitMqPwd'
+#define REG_RABBITMQ_PROTO    'RabbitMqProto'
 #define REG_REDIS_HOST        'RedisHost'
 #define REG_DS_PORT           'DsPort'
 #define REG_EXAMPLE_PORT      'ExamplePort'
@@ -111,7 +112,7 @@
 #define APPLICATION_NAME      str("APPLICATION_NAME=" + sCompanyName)
 #define NODE_SRV_ENV          str(NODE_ENV + ' ' + NODE_CONFIG_DIR + ' ' + NODE_DISABLE_COLORS + ' ' + APPLICATION_NAME)
 
-#define LOCAL_SERVICE 'Local Service'
+#define LOCAL_SERVICE 'NT Authority\LocalService'
 
 #define CONVERTER_SRV        'DsConverterSvc'
 #define CONVERTER_SRV_DISPLAY  str(sAppName + " Converter")
@@ -144,11 +145,15 @@
 #define NGINX_DS_CONF '{app}\nginx\conf\ds.conf'
 #define NGINX_DS_TMPL '{app}\nginx\conf\ds.conf.tmpl'
 #define NGINX_DS_SSL_TMPL '{app}\nginx\conf\ds-ssl.conf.tmpl'
+#define NGINX_SRV_ENV 'OPENSSL_CONF=openssl\openssl.conf'
 
 #define LICENSE_PATH str("{commonappdata}\" + sIntCompanyName + "\Data")
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
+
+#define public Dependency_NoExampleSetup
+#include "InnoDependencyInstaller\CodeDependencies.iss"
 
 [Setup]
 AppName                   ={#sAppName}
@@ -200,21 +205,6 @@ ShowLanguageDialog        = no
 SignTool=byparam $p
 #endif
 
-; supported languages
-#include "scripts\lang\english.iss"
-#include "scripts\lang\russian.iss"
-; #include "scripts\lang\german.iss"
-; #include "scripts\lang\french.iss"
-; #include "scripts\lang\italian.iss"
-; #include "scripts\lang\dutch.iss"
-
-; #ifdef UNICODE
-; #include "scripts\lang\chinese.iss"
-; #include "scripts\lang\polish.iss"
-; #include "scripts\lang\russian.iss"
-; #include "scripts\lang\japanese.iss"
-; #endif
-
 [CustomMessages]
 en.AddRotateTask=Adding scheduled tasks...
 ru.AddRotateTask=Добавление задачи в планировщик...
@@ -264,7 +254,7 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
@@ -273,17 +263,17 @@ Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; 
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
-Name: "{app}\server\App_Data";        Permissions: users-modify
-Name: "{app}\server\App_Data\cache\files"; Permissions: users-modify
-Name: "{app}\server\App_Data\docbuilder"; Permissions: users-modify
+Name: "{app}\server\App_Data";        Permissions: service-modify
+Name: "{app}\server\App_Data\cache\files"; Permissions: service-modify
+Name: "{app}\server\App_Data\docbuilder"; Permissions: service-modify
 Name: "{app}\sdkjs";                  Permissions: users-modify
 Name: "{app}\fonts";                  Permissions: users-modify
-Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: users-modify
-Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}";             Permissions: users-modify
-Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\temp";        Permissions: users-modify
-Name: "{#NGINX_SRV_DIR}\logs";        Permissions: users-modify
+Name: "{#CONVERTER_SRV_LOG_DIR}";     Permissions: service-modify
+Name: "{#DOCSERVICE_SRV_LOG_DIR}";    Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}";             Permissions: service-modify
+Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}\temp";        Permissions: service-modify
+Name: "{#NGINX_SRV_DIR}\logs";        Permissions: service-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";
 
@@ -298,6 +288,7 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial;
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
@@ -320,7 +311,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = 'amqp://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
@@ -355,6 +346,10 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
+Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:SECURE_LINK_SECRET}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
+Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -391,6 +386,7 @@ Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} ""{#NGINX_SRV_DIR}\nginx"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} DisplayName {#NGINX_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
+Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppEnvironmentExtra {#NGINX_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppRotateFiles 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppRotateOnline 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppRotateBytes {#LOG_ROTATE_BYTES}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
@@ -406,8 +402,7 @@ Filename: "sc"; Parameters: "failure ""{#NGINX_SRV}"" actions= restart/60000/res
 
 Filename: "schtasks"; Parameters: "/Create /F /RU ""{#LOCAL_SERVICE}"" /SC DAILY /TN ""{#LogRotateTaskName}"" /TR ""{app}\bin\documentserver-log-rotate.bat"""; Flags: runhidden; StatusMsg: "{cm:AddRotateTask}"
 
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#DOCSERVICE_SRV_DIR}\docservice.exe"" ""{#DOCSERVICE_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
-Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram ""{#NGINX_SRV_DIR}\nginx.exe"" ""{#NGINX_SRV_DESCR}"" ENABLE ALL"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#NGINX_SRV_DESCR}"" program=""{#NGINX_SRV_DIR}\nginx.exe"" dir=in action=allow protocol=tcp localport={code:GetDefaultPorts}"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
@@ -424,8 +419,7 @@ Filename: "{#NSSM}"; Parameters: "remove {#DOCSERVICE_SRV} confirm"; Flags: runh
 Filename: "schtasks"; Parameters: "/End /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /F /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 
-Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#DOCSERVICE_SRV_DIR}\docservice.exe"""; Flags: runhidden
-Filename: {sys}\netsh.exe; Parameters: "firewall delete allowedprogram program=""{#NGINX_SRV_DIR}\nginx.exe"""; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""{#NGINX_SRV_DESCR}"""; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\sdkjs"
@@ -433,25 +427,7 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
-; shared code for installing the products
-#include "scripts\products.iss"
-; helper functions
-#include "scripts\products\stringversion.iss"
-#include "scripts\products\winversion.iss"
-#include "scripts\products\fileversion.iss"
-
-#include "scripts\products\msiproduct.iss"
-#include "scripts\products\vcredist2010.iss"
-#include "scripts\products\vcredist2013.iss"
-#include "scripts\products\vcredist2015.iss"
-;#include "scripts\products\postgresql.iss"
-;#include "scripts\products\rabbitmq.iss"
-;#include "scripts\products\redis.iss"
-
 [Code]
-
-#include "scripts\service.pas"
-
 function UninstallPreviosVersion(): Boolean;
 var
   UninstallerPath: String;
@@ -497,9 +473,6 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  // initialize windows version
-  initwinversion();
-  
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -507,13 +480,9 @@ begin
  
   if WizardSilent() = false then
   begin
-    // vcredist2010('10');
-    vcredist2013('12');
-    vcredist2015('14');
+    Dependency_AddVC2013;
+    Dependency_AddVC2015To2022;
   end;
-  //postgresql('9.5.4.0');
-  //rabbitmq('3.6.5');
-  //redis('3.2.100');
 
   Result := true;
 end;
@@ -563,6 +532,11 @@ begin
   Result := RabbitMqPage.Values[2];
 end;
 
+function GetRabbitMqProto(Param: String): String;
+begin
+  Result := RabbitMqPage.Values[3];
+end;
+
 function GetRedisHost(Param: String): String;
 begin
   Result := RedisPage.Values[0];
@@ -571,6 +545,14 @@ end;
 function GetDefaultPort(Param: String): String;
 begin
   Result := ExpandConstant('{param:DS_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DS_PORT}|80}}');
+end;
+
+function GetDefaultPorts(Param: String): String;
+begin
+  Result := GetDefaultPort('');
+  if (Result = '80') then begin
+    Result := Result + ',' + '443';
+  end;
 end;
 
 function GetDocServicePort(Param: String): String;
@@ -645,11 +627,13 @@ begin
   RabbitMqPage.Add('Host:', False);
   RabbitMqPage.Add('User:', False);
   RabbitMqPage.Add('Password:', True);
-
+  RabbitMqPage.Add('Protocol:', False);
+  
   RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
   RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-
+  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
+  
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
       'Redis In-Memory Database', 'Configure Redis Connection...',

@@ -48,8 +48,11 @@ echo -n Generating presentation themes, please wait...
 
 echo Done
 
-#Remove gzipped fonts
-rm -f $DIR/fonts/*.gz $DIR/sdkjs/common/AllFonts.js.gz
+#Remove gzipped files
+rm -f \
+  $DIR/fonts/*.gz \
+  $DIR/sdkjs/common/AllFonts.js.gz \
+  $DIR/sdkjs/slide/themes/themes.js.gz
 
 #Restart web-site and converter
 if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
