@@ -255,7 +255,7 @@ setup_nginx(){
 	  ln -s $DS_CONF /etc/nginx/conf.d/ds.conf
   fi
   
-  ln -s $CONF_DIR/nginx/includes/ds-0maintain.conf /etc/nginx/includes/ds-0maintain.conf  
+  ln -s $CONF_DIR/nginx/includes/ds-0maintain.conf $NGINX_INCLUDES/ds-0maintain.conf  
 
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
