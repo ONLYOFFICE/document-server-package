@@ -1,7 +1,6 @@
 #!/bin/bash
   
 NGINX_INCLUDES="/etc/nginx/includes/"
-ONLYOFFICE_INCLUDES="/etc/onlyoffice/documentserver-example/nginx/includes/"
 SERVER_URL=http://localhost:8000/healthcheck
 
 while [ "$STATUS" != "200" ]
