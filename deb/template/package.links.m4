@@ -5,6 +5,7 @@ etc/M4_DS_PREFIX/nginx/includes/ds-docservice.conf etc/nginx/includes/ds-docserv
 etc/M4_DS_PREFIX/nginx/includes/ds-letsencrypt.conf etc/nginx/includes/ds-letsencrypt.conf
 etc/M4_DS_PREFIX/nginx/includes/http-common.conf etc/nginx/includes/http-common.conf
 etc/M4_DS_PREFIX/nginx/includes/ds-mime.types.conf etc/nginx/includes/ds-mime.types.conf
+etc/M4_DS_PREFIX/nginx/includes/ds-0maintain.conf etc/nginx/includes/ds-0maintain.conf 
 
 etc/M4_DS_PREFIX/supervisor/ds-converter.conf etc/supervisor/conf.d/ds-converter.conf
 etc/M4_DS_PREFIX/supervisor/ds-docservice.conf etc/supervisor/conf.d/ds-docservice.conf
