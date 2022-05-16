@@ -254,10 +254,6 @@ setup_nginx(){
   if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
 	  ln -s $DS_CONF /etc/nginx/conf.d/ds.conf
   fi
-  
-  if [ ! -e /etc/nginx/includes/ds-0maintain.conf ]; then 
-    ln -s $CONF_DIR/nginx/includes/ds-0maintain.conf $NGINX_INCLUDES/ds-0maintain.conf
-  fi  
 
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
@@ -324,7 +320,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		service supervisor restart >/dev/null 2>&1
                 
                 # pass healthcheck and then restart nginx
-		documentserver-maintain-remove.sh true
+		documentserver-wait-config.sh true
 		
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 	;;
