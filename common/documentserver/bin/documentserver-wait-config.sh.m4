@@ -18,7 +18,7 @@ Timeout_monitor_pid=$!
 NGINX_INCLUDES="/etc/nginx/includes/"
 SERVER_URL=http://localhost:8000/healthcheck
 
-echo "DocumentServer is starts, please wait ..."
+echo "DocumentServer is starting up, please wait ..."
 
 while [ "$STATUS" != "200" ]
 do
