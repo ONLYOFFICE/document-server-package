@@ -23,6 +23,7 @@ DIR="/var/www/M4_DS_PREFIX"
 LOG_DIR="/var/log/M4_DS_PREFIX"
 APP_DIR="/var/lib/M4_DS_PREFIX"
 CONF_DIR="/etc/M4_DS_PREFIX"
+NGINX_INCLUDES="/etc/nginx/includes"
 LOCAL_CONFIG=${CONF_DIR}/local.json
 EXAMPLE_CONFIG=${CONF_DIR}-example/local.json
 JSON_BIN="$DIR/npm/json"
@@ -259,6 +260,7 @@ setup_nginx(){
 		
   rm -f /etc/nginx/sites-enabled/default
 
+  service nginx restart >/dev/null 2>&1
 }
 
 case "$1" in
@@ -314,9 +316,11 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		# call db_stop to prevent installation hang
 		db_stop
 
-		# restart dependent services
+		# restart supervisor
 		service supervisor restart >/dev/null 2>&1
-		service nginx restart >/dev/null 2>&1
+
+		# pass healthcheck and then restart nginx
+                documentserver-wait-config.sh true
 		
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 	;;
