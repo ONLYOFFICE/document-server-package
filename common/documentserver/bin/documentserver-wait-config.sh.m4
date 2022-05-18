@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Timeout=300 # 5 minutes
+Timeout=300 # Seconds
 
 # this block will be activated after 5 minutes 
 # only if main script didn't exit with 0.
@@ -19,17 +19,16 @@ Timeout_monitor_pid=$!
 
 NGINX_INCLUDES="/etc/nginx/includes/"
 SERVER_URL=http://localhost:8000/healthcheck
-TIMER=5
+COUNT=5
 
-echo "DocumentServer starting up, please wait while health check passes..."
+echo "DocumentServer starting up, please wait ..."
 
-while [ $TIMER -ne 230 ] && [ "$STATUS" != "200" ]
+while [ $COUNT != 230 ] && [ "$STATUS" != "200" ]
 do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}\n" $SERVER_URL)
-  TIMER=$(( $TIMER + 5 ))
+  COUNT=$(( $COUNT + 5 ))
   sleep 5
 done
-echo "Healthcheck passed, DocumentServer is up and ready"
 
   # back nginx config links to default condition
   rm -f ${NGINX_INCLUDES}ds-0maintenance.conf
