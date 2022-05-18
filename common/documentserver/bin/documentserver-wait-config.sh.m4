@@ -2,6 +2,8 @@
 
 Timeout=300 # 5 minutes
 
+# this block will be activated after 5 minutes 
+# only if main script didn't exit with 0.
 function timeout_monitor() {
    sleep "$Timeout"
    echo "Timeout: healthcheck didn't passed"
