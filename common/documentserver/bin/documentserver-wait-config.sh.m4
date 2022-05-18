@@ -7,7 +7,7 @@ Timeout=300 # 5 minutes
 function timeout_monitor() {
    sleep "$Timeout"
    echo "Timeout: healthcheck didn't passed"
-   rm -f ${NGINX_INCLUDES}ds-0maintains.conf
+   rm -f ${NGINX_INCLUDES}ds-0maintenance.conf
    service nginx reload >/dev/null 2>&1
    kill "$1"
 }
@@ -32,7 +32,7 @@ done
 echo "Healthcheck passed, DocumentServer is up and ready"
 
   # back nginx config links to default condition
-  rm -f ${NGINX_INCLUDES}ds-0maintains.conf
+  rm -f ${NGINX_INCLUDES}ds-0maintenance.conf
   service nginx reload >/dev/null 2>&1
  
   # kill timeout monitor when terminating:
