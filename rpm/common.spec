@@ -351,6 +351,9 @@ if systemctl is-active --quiet supervisord; then
   systemctl restart supervisord >/dev/null 2>&1
 fi
 
+# healthcheck and then reload nginx
+documentserver-wait-config.sh true
+
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
