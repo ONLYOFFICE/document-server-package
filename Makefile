@@ -133,7 +133,7 @@ else
 		DS_ROOT := /var/www/$(DS_PREFIX)
 		DS_FILES := /var/lib/$(DS_PREFIX)
 		DS_EXAMLE := /var/www/$(DS_PREFIX)-example
-		DS_MAINTENANCE:= ../var/www/onlyoffice/documentserver/maintenance
+		DS_MAINTENANCE:= ../var/www/$(DS_PREFIX)/maintenance
 		DEV_NULL := /dev/null
 	endif
 	ifeq ($(UNAME_S),Darwin)
