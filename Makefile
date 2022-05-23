@@ -110,6 +110,7 @@ ifeq ($(OS),Windows_NT)
 	DS_ROOT := ..
 	DS_FILES := ../server
 	DS_EXAMLE := ../example
+        DS_MAINTENANCE:= ../maintenance
 	DEV_NULL := nul
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		ARCHITECTURE := 64
@@ -132,6 +133,7 @@ else
 		DS_ROOT := /var/www/$(DS_PREFIX)
 		DS_FILES := /var/lib/$(DS_PREFIX)
 		DS_EXAMLE := /var/www/$(DS_PREFIX)-example
+		DS_MAINTENANCE:= ../var/www/onlyoffice/documentserver/maintenance
 		DEV_NULL := /dev/null
 	endif
 	ifeq ($(UNAME_S),Darwin)
