@@ -1,5 +1,5 @@
 location ~ ^(\/welcome\/.*)$ {
   expires 365d;
-  alias /var/www/onlyoffice/documentserver/home/maintenance/$1;
+  alias M4_DS_MAINTENANCE$1;
   index maintenance.html;
 }
