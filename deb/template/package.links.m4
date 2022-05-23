@@ -1,5 +1,6 @@
 etc/M4_DS_PREFIX/logrotate/ds.conf etc/logrotate.d/ds.conf
 
+etc/M4_DS_PREFIX/nginx/includes/ds-0maintenance.conf etc/nginx/includes/ds-0maintenance.conf
 etc/M4_DS_PREFIX/nginx/includes/ds-common.conf etc/nginx/includes/ds-common.conf
 etc/M4_DS_PREFIX/nginx/includes/ds-docservice.conf etc/nginx/includes/ds-docservice.conf
 etc/M4_DS_PREFIX/nginx/includes/ds-letsencrypt.conf etc/nginx/includes/ds-letsencrypt.conf
