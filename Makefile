@@ -148,6 +148,7 @@ else
 		DS_ROOT := /var/www/onlyoffice/documentserver/
 		DS_FILES := /var/lib/onlyoffice/documentserver/
 		DS_EXAMLE := /var/www/onlyoffice/documentserver-example
+                DS_MAINTENANCE := /var/www/onlyoffice/documentserver/maintenance
 		DEV_NULL := /dev/null
 	endif
 	UNAME_M := $(shell uname -m)
