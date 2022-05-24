@@ -1,4 +1,3 @@
-
 rem This script in checking document-server status, and after check passed removing maintenance page
 
 @echo off
