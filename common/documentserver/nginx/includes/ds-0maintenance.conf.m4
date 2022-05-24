@@ -1,3 +1,5 @@
+# maintenance nginx config
+
 location /index.html {
   expires 365d;
   root M4_DS_MAINTENANCE;
