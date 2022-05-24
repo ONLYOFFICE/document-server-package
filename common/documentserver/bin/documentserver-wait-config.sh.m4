@@ -12,6 +12,7 @@ do
   TIMER=$(( $TIMER + 5 ))
   sleep 5
 done
+echo "DocumentServer is ready"
 
   # back nginx config links to default condition
   rm -f ${NGINX_INCLUDES}ds-0maintenance.conf
