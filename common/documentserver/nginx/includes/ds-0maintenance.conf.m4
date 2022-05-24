@@ -1,5 +1,9 @@
-location ~ ^(\/welcome\/.*)$ {
+location /index.html {
   expires 365d;
-  alias M4_DS_MAINTENANCE$1;
+  root M4_DS_MAINTENANCE;
   index index.html;
 }
+
+rewrite ^/$ /index.html;
+rewrite ^/welcome/(.+)$ /index.html;
+rewrite ^/welcome$ /index.html;
