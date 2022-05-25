@@ -10,7 +10,7 @@ common/documentserver*/**/*.conf
 common/documentserver*/nginx/*.tmpl
 /common/documentserver/bin/*.sh
 common/documentserver/config
-#common/documentserver/home
+common/documentserver/home
 common/documentserver-example/config
 common/documentserver-example/home
 common/fonts
