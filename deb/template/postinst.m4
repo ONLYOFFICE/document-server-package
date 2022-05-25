@@ -253,7 +253,8 @@ setup_nginx(){
   # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
   # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
 		
-  rm -f /etc/nginx/sites-enabled/default 
+  rm -f /etc/nginx/sites-enabled/default
+
   service nginx restart >/dev/null 2>&1
 }
 
