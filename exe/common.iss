@@ -159,6 +159,7 @@
 
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
+#include "products.iss"
 
 [Setup]
 AppName                   ={#sAppName}
@@ -496,6 +497,19 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
+[Types]
+Name: full; Description: {cm:FullInstall}
+Name: compact; Description: {cm:CompactInstall}
+Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
+ 
+
+[Components]
+Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
+Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
+
 [Code]
 function UninstallPreviosVersion(): Boolean;
 var
@@ -546,13 +560,16 @@ begin
   ExtractTemporaryFile('psql.exe');
   ExtractTemporaryFile('libintl-8.dll');
   ExtractTemporaryFile('libpq.dll');
-  ExtractTemporaryFile('ssleay32.dll');
-  ExtractTemporaryFile('libeay32.dll');
+  ExtractTemporaryFile('libcrypto-1_1-x64.dll');
+  ExtractTemporaryFile('libssl-1_1-x64.dll');
   ExtractTemporaryFile('libiconv-2.dll')
 end;
 
 function InitializeSetup(): Boolean;
 begin
+ 
+  ExtractFiles();
+  
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -562,6 +579,7 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
+    Dependency_AddPython3;
   end;
 
   Result := true;
@@ -969,22 +987,20 @@ begin
         Result := CheckRedisConnection();
       wpWelcome:
         Result := CheckPortOccupied();
-      wpReady:
-        Result := DownloadDependency(CurPageID);
       wpSelectComponents:
       begin
         if IsComponentSelected('Prerequisites\Redis') then
         begin
-          redis('3.0.504');
+          Dependency_AddRedis;
         end;
         if IsComponentSelected('Prerequisites\RabbitMq') then
         begin
-          erlang('23.1');
-          rabbitmq('3.8.9');
+          Dependency_AddErlang;
+          Dependency_AddRabbitMq;
         end;
-        if IsComponentSelected('Prerequisites\PostgreSQL') then
+        if not IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
-          postgresql('9.5.4.1');
+          Dependency_AddPostgreSQL;
         end;
       end;
     end;
