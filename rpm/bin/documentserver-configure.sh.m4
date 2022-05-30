@@ -19,7 +19,7 @@ DS_PORT=${DS_PORT:-80}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 
 JWT_ENABLED=${JWT_ENABLED:-false}
-JWT_SECRET=${JWT_SECRET:-secret}
+JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }

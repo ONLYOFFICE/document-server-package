@@ -2,7 +2,7 @@
 
 NGINX_CONF=/etc/nginx/includes/ds-docservice.conf
 DOCSERVICE_CONF=/etc/M4_DS_PREFIX/default.json
-JSON="json -q -f ${DOCSERVICE_CONF}"
+JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${DOCSERVICE_CONF}"
 
 SECRET_STRING=$(pwgen -s 20)
 
