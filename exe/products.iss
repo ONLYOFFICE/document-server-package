@@ -116,7 +116,7 @@ procedure Dependency_AddPython3;
 var
   Version: String;
 begin
-  Version := '3.9';
+  Version := '3.9.0';
   if not IsMsiProductInstalled(
            Dependency_String(
             '{B0D35164-DCE0-5CD6-B3AE-55F0AE08E42E}',
