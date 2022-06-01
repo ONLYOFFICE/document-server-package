@@ -71,8 +71,6 @@ DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
 FONTS = common/fonts
 
-ISXDL = $(EXE_BUILD_DIR)/scripts/isxdl/isxdl.dll
-
 NGINX_VER := nginx-1.21.3
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
@@ -301,7 +299,6 @@ clean:
 		$(RPM_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
 		$(EXE_BUILD_DIR)/*.exe\
-		$(ISXDL)\
 		$(NGINX)\
 		$(NSSM)\
 		$(PSQL)\
@@ -472,16 +469,12 @@ $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-e
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
 
-$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(ISXDL) $(NGINX) $(PSQL) $(NSSM)
+$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(NGINX) $(PSQL) $(NSSM)
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
 	tar -czf $(TAR) $(PRODUCT_SHORT_NAME_LOW)-snap
 
-$(ISXDL):
-	$(TOUCH) $(ISXDL) && \
-	$(CURL) $(ISXDL) https://raw.githubusercontent.com/jrsoftware/ispack/is-5_6_1/isxdlfiles/isxdl.dll
-	
 $(NGINX):
 	$(CURL) $(NGINX_ZIP) http://nginx.org/download/$(NGINX_ZIP) && \
 	7z x -y -o$(DOCUMENTSERVER) $(NGINX_ZIP) && \
