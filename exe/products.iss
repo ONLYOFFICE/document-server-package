@@ -119,7 +119,7 @@ var
   SemVer: String;
 begin
   Version := '3.9';
-  Patch := '10';
+  Patch := '.10';
   SemVer := Version + Patch;
   if not IsMsiProductInstalled(
            Dependency_String(
