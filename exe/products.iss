@@ -116,6 +116,7 @@ procedure Dependency_AddPython3;
 var
   Version: String;
   Patch: String;
+  SemVer: String;
 begin
   Version := '3.9';
   Patch := '10';
