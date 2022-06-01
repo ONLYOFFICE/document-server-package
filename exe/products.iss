@@ -115,8 +115,9 @@ end;
 procedure Dependency_AddPython3;
 var
   Version: String;
+  VersionLink: String;
 begin
-  Version := '3.9.0';
+  Version := '3.9';
   if not IsMsiProductInstalled(
            Dependency_String(
             '{B0D35164-DCE0-5CD6-B3AE-55F0AE08E42E}',
@@ -129,8 +130,8 @@ begin
         ExpandConstant('{sd}') + '\Python  /passive /norestart',
       'Python ' + Version + Dependency_ArchTitle,
       Dependency_String(
-        'https://www.python.org/ftp/python/' + Version + '/python-' + Version + '.exe',
-        'https://www.python.org/ftp/python/' + Version + '/python-' + Version + '-amd64.exe'),
+        'https://www.python.org/ftp/python/3.9.10/python-3.9.10.exe',
+        'https://www.python.org/ftp/python/3.9.10/python-3.9.10-amd64.exe'),
       '',
       False,
       False);
