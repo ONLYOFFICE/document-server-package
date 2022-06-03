@@ -102,13 +102,13 @@ save_activemq_params(){
 	fi
 
 	case "${AMQP_SERVER_PROTO}" in
-      amqp+ssl|amqps)
-        $JSON -e "this.activemq.connectOptions.transport = 'tls'"
-        ;;
-      *)
-        $JSON -e "delete this.activemq.connectOptions.transport"
-        ;;
-    esac 
+		amqp+ssl|amqps)
+			$JSON -e "this.activemq.connectOptions.transport = 'tls'"
+		;;
+		*)
+			$JSON -e "delete this.activemq.connectOptions.transport"
+		;;
+	esac 
 }
 
 save_redis_params(){
