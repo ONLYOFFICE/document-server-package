@@ -90,10 +90,6 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	db_get M4_ONLYOFFICE_VALUE/jwt-header || true
 	JWT_HEADER="$RET"
 
-	db_get M4_ONLYOFFICE_VALUE/secure_link_secret || true
-	SECURE_LINK_SECRET=${RET:-$(pwgen -s 20)}
-	[ -z "$RET" ] && db_set M4_ONLYOFFICE_VALUE/secure_link_secret ${SECURE_LINK_SECRET}
-
 	if [ ! -f $LOCAL_CONFIG ] && [ -z $JWT_SECRET ]; then
 		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 		db_set M4_ONLYOFFICE_VALUE/jwt-secret select $JWT_SECRET || true
@@ -232,7 +228,14 @@ save_jwt_params(){
 setup_nginx(){
    DS_CONF=$CONF_DIR/nginx/ds.conf
   
-  [ ! -e $DS_CONF ] && cp -f ${DS_CONF}.tmpl ${DS_CONF}
+  if [ ! -e $DS_CONF ]; then
+	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
+	  
+	  # generate secure link
+	  documentserver-update-securelink.sh -s $(pwgen -s 20)
+  elif [ -e $DS_CONF ] && ! grep -q secure_link_secret $DS_CONF; then
+	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
+  fi
 
   db_get M4_ONLYOFFICE_VALUE/ds-port || true
   DS_PORT="$RET"
@@ -254,10 +257,6 @@ setup_nginx(){
   # install nginx config
   if [ -d /etc/nginx/conf.d ] && [ -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
     mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
-  fi
-
-  if [ -e $DS_CONF ] && ! grep -q secure_link_secret $DS_CONF; then
-	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
 
   if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
@@ -316,9 +315,6 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 		# generate allfonts.js and thumbnail
 		documentserver-generate-allfonts.sh true
-
-		# generate secure link
-		documentserver-update-securelink.sh -s ${SECURE_LINK_SECRET}
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$APP_DIR"
