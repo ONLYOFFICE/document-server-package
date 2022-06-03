@@ -7,7 +7,7 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
-AMQP_SERVER_PROTOCOL=${AMQP_SERVER_PROTOCOL:-amqp}
+AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
 MYSQL=""
@@ -101,7 +101,7 @@ save_activemq_params(){
 		$JSON -e "delete this.activemq.connectOptions.password"
 	fi
 
-	case "${AMQP_SERVER_PROTOCOL}" in
+	case "${AMQP_SERVER_PROTO}" in
       amqp+ssl|amqps)
         $JSON -e "this.activemq.connectOptions.transport = 'tls'"
         ;;
@@ -195,7 +195,7 @@ parse_amqp_url(){
   # extract the path (if any)
   local path="$(echo $url | grep / | cut -d/ -f2-)"
 
-  AMQP_SERVER_PROTOCOL=${proto%://}
+  AMQP_SERVER_PROTO=${proto%://}
   AMQP_SERVER_HOST=$host
   AMQP_SERVER_PORT=$port
   AMQP_SERVER_HOST_PORT_PATH=$hostport$path
@@ -223,7 +223,7 @@ input_amqp_params(){
 	read -e -p "Host: " -i "$AMQP_SERVER_HOST_PORT_PATH" AMQP_SERVER_HOST_PORT_PATH
 	read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
 	read -e -p "Password: " -s AMQP_SERVER_PWD
-	AMQP_SERVER_URL=$AMQP_SERVER_PROTOCOL://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
+	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
 	echo
 }
 
