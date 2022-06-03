@@ -63,10 +63,10 @@ Default: localhost
 Description: Redis host:
 
 ,)dnl
-Template: M4_ONLYOFFICE_VALUE/amqp-proto
+Template: M4_ONLYOFFICE_VALUE/rabbitmq-proto
 Type: string
 Default: amqp
-Description: AMQP protocol:
+Description: RABBITMQ protocol:
 
 Template: M4_ONLYOFFICE_VALUE/rabbitmq-host
 Type: string
