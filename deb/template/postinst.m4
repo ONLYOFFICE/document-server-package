@@ -38,6 +38,7 @@ DB_USER=""
 DB_PWD=""
 DB_NAME=""
 
+RABBITMQ_PROTOCOL=""
 RABBITMQ_HOST=""
 RABBITMQ_USER=""
 RABBITMQ_PWD=""
@@ -68,6 +69,8 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/db-name || true
 	DB_NAME="$RET"
 
+	db_get M4_ONLYOFFICE_VALUE/rabbitmq-protocol || true
+	RABBITMQ_PROTOCOL="$RET"
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-host || true
 	RABBITMQ_HOST="$RET"
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-user || true
@@ -173,7 +176,7 @@ save_db_params(){
 
 save_rabbitmq_params(){
   $JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-  $JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
+  $JSON -e "this.rabbitmq.url = '$RABBITMQ_PROTOCOL://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
 save_redis_params(){

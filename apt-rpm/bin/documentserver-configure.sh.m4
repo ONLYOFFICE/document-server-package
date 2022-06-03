@@ -7,6 +7,7 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
+AMQP_SERVER_PROTOCOL=${AMQP_SERVER_PROTOCOL:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
 MYSQL=""
@@ -185,6 +186,7 @@ parse_amqp_url(){
   # extract the path (if any)
   local path="$(echo $url | grep / | cut -d/ -f2-)"
 
+  AMQP_SERVER_PROTOCOL=${proto%://}
   AMQP_SERVER_HOST=$host
   AMQP_SERVER_PORT=$port
   AMQP_SERVER_HOST_PORT_PATH=$hostport$path
@@ -231,7 +233,7 @@ input_amqp_params(){
 	read -e -p "Password []: " -s USER_INPUT
 	AMQP_SERVER_PWD=${USER_INPUT:-${AMQP_SERVER_PWD}}
 
- 	AMQP_SERVER_URL=amqp://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
+ 	AMQP_SERVER_URL=$AMQP_SERVER_PROTOCOL://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
 
 
 	echo
