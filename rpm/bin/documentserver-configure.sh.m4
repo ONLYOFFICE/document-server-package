@@ -100,6 +100,15 @@ save_activemq_params(){
 	else
 		$JSON -e "delete this.activemq.connectOptions.password"
 	fi
+
+	case "${AMQP_SERVER_PROTOCOL}" in
+      amqp+ssl|amqps)
+        $JSON -e "this.activemq.connectOptions.transport = 'tls'"
+        ;;
+      *)
+        $JSON -e "delete this.activemq.connectOptions.transport"
+        ;;
+    esac 
 }
 
 save_redis_params(){
