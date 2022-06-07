@@ -406,4 +406,7 @@ tune_local_configs
 
 setup_nginx
 
+# generate secure link
+documentserver-update-securelink.sh
+
 restart_services
