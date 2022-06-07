@@ -25,6 +25,8 @@ case "$1" in
             echo "Stopping documentserver services..."
             supervisorctl stop ds:*
         fi
+        
+        unlink /etc/nginx/conf.d/ds.conf
     ;;
 
     failed-upgrade)
