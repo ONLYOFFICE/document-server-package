@@ -515,8 +515,7 @@ begin
 end;
 
 function GetDbHost(Param: String): String;
-begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');  
+  Result := ReadValues('');
 end;
 
 function GetDbPort(Param: String): String;
@@ -526,17 +525,17 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbUser');
+  Result := DbPage.Values[1];
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbPass');
+  Result := DbPage.Values[2];
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbName');
+  Result := DbPage.Values[3];
 end;
 
 function GetRabbitMqHost(Param: String): String;
