@@ -515,7 +515,7 @@ begin
 end;
 
 function GetDbHost(Param: String): String;
-  Result := ReadValues('');
+  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
 end;
 
 function GetDbPort(Param: String): String;
@@ -525,42 +525,42 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := DbPage.Values[1];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbUser');
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := DbPage.Values[2];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbPass');
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := DbPage.Values[3];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbName');
 end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[0];
+  Result := ReadValues('');
 end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[1];
+  Result := ReadValues('');
 end;
 
 function GetRabbitMqPwd(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[2];
+  //Result := ReadValues('');
 end;
 
 function GetRabbitMqProto(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[3];
+  //Result := ReadValues('this.rabbitmq.url');
 end;
 
 function GetRedisHost(Param: String): String;
 begin
-  Result := RedisPage.Values[0];
+  Result := ReadValues('this.services.CoAuthoring.redis.host');
 end;
 
 function GetDefaultPort(Param: String): String;
@@ -578,7 +578,7 @@ end;
 
 function GetDocServicePort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DOCSERVICE_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DOCSERVICE_PORT}|8000}}');
+  Result := ReadValues('this.services.CoAuthoring.server.port');
 end;
 
 function GetExamplePort(Param: String): String;
