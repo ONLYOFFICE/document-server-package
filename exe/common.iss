@@ -492,23 +492,31 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
-function GetDbHost(Param: String): String;
+function ReadValues(Param: String): String;
 var
   TmpFileName, ExecStdout: AnsiString;
   ResultCode: integer;
+  Params: String;
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
+  //Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "C:\Program Files\ONLYOFFICE\DocumentServer\config\local.json" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
+  Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "' + ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
-    '/C ' + '{#JSON}' + ' ' + '{#JSON_PARAMS}' + ' ' + '-e console.log(this.services.CoAuthoring.sql.dbHost) > ' + '"' + TmpFileName + '"',
+    Params,
     '',
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
   if LoadStringFromFile(TmpFileName, ExecStdout) then begin
-    MsgBox(ExecStdout, mbInformation, MB_OK);
+    Result := ExecStdout;
   end;
   DeleteFile(TmpFileName);
+end;
+
+function GetDbHost(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');  
 end;
 
 function GetDbPort(Param: String): String;
@@ -518,17 +526,17 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := DbPage.Values[1];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbUser');
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := DbPage.Values[2];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbPass');
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := DbPage.Values[3];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbName');
 end;
 
 function GetRabbitMqHost(Param: String): String;
