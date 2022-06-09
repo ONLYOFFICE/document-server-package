@@ -237,7 +237,7 @@ setup_nginx(){
 	  # generate secure link
 	  documentserver-update-securelink.sh -s $(pwgen -s 20)
   elif ! grep -q secure_link_secret $DS_CONF; then
-	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
+	  sed '/\[::\]:80/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
 
   db_get M4_ONLYOFFICE_VALUE/ds-port || true
