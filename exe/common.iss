@@ -541,13 +541,16 @@ begin
 end;
 
 function GetRabbitMqHost(Param: String): String;
+var
+  out: String;
 begin
-  Result := ReadValues('');
+  out := ReadValues('');
+
 end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  Result := ReadValues('');
+  //Result := ReadValues('');
 end;
 
 function GetRabbitMqPwd(Param: String): String;
