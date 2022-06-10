@@ -327,9 +327,9 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token===undefined)this.services.CoAuthoring.token={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={{request:{{}}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.browser = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.inbox = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.outbox = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.browser = {code:GetJwtEnabledBrowser}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.inbox = {code:GetJwtEnabledRequestInbox}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.outbox = {code:GetJwtEnabledRequestInboxOutbox}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={{inbox:{{},outbox:{{},session: {{} };"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.inbox.string = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -508,13 +508,15 @@ begin
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
-  if LoadStringFromFile(TmpFileName, ExecStdout) then begin
+  if LoadStringFromFile(TmpFileName, ExecStdout) then
+  begin
     Result := ExecStdout;
   end;
   DeleteFile(TmpFileName);
 end;
 
 function GetDbHost(Param: String): String;
+begin
   Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
 end;
 
@@ -587,36 +589,51 @@ begin
 end;
 
 function GetLicensePath(Param: String): String;
-var
-  LicensePath: String;
-begin
-  LicensePath := ExpandConstant('{param:LICENSE_PATH|{reg:HKLM\{#sAppRegPath},{#REG_LICENSE_PATH}|{#LICENSE_PATH}\license.lic}}');
-  StringChangeEx(LicensePath, '\', '/', True);
-  Result := LicensePath;
+  Result := ReadValues('this.license.license_file');
 end;
 
 function GetFontsPath(Param: String): String;
-var
-  FontPath: String;
-begin
-  FontPath := ExpandConstant('{param:FONTS_PATH|{reg:HKLM\{#sAppRegPath},{#REG_FONTS_PATH}|{fonts}}}');
-  StringChangeEx(FontPath, '\', '/', True);
-  Result := FontPath;
+  Result := ReadValues('this.services.CoAuthoring.utils.utils_common_fontdir');
 end;
 
-function GetJwtEnabled(Param: String): String;
+function GetJwtEnabledBrowser(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#sAppRegPath},{#REG_JWT_ENABLED}|false}}');
+  Result := ReadValues('this.services.CoAuthoring.token.enable.browser');
 end;
 
-function GetJwtSecret(Param: String): String;
+function GetJwtEnabledRequestInbox(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}|secret}}');
+  Result := ReadValues('this.services.CoAuthoring.token.enable.request.inbox');
 end;
 
-function GetJwtHeader(Param: String): String;
+function GetJwtEnabledRequestInboxOutbox(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_HEADER|{reg:HKLM\{#sAppRegPath},{#REG_JWT_HEADER}|Authorization}}');
+  Result := ReadValues('this.services.CoAuthoring.token.enable.request.outbox');
+end;
+
+function GetJwtSecretInbox(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.token.enable.browser');
+end;
+
+function GetJwtSecretOutbox(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.token.enable.request.inbox');
+end;
+
+function GetJwtSecretSession(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.token.enable.request.outbox');
+end;
+
+function GetJwtHeaderInbox(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.token.inbox.header');
+end;
+
+function GetJwtHeaderOutbox(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.token.outbox.header');
 end;
 
 function IsCommercial: Boolean;
