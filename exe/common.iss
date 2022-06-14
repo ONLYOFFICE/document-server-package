@@ -548,7 +548,7 @@ var
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
   //Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "C:\Program Files\ONLYOFFICE\DocumentServer\config\local.json" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
-  Params := '/C ' + 'for /f "token=1 delims=://" %a in ("amqp://guest:jopa@localhost") do echo %a > ' + '"' + TmpFileName + '""';
+  Params := '/C ' + 'for /f "token=1 delims=://" %a in ("amqp://guest:guest@localhost") do echo %a > ' + '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
