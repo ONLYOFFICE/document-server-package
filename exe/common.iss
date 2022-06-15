@@ -540,7 +540,7 @@ begin
   Result := ReadValues('this.services.CoAuthoring.sql.dbName');
 end;
 
-function ParseRabbitMqParams(): String;
+function ParseRabbitMqParams(Token: Integer; Delims: String; Url: String): String;
 var
   TmpFileName, ExecStdout: AnsiString;
   ResultCode: integer;
@@ -548,7 +548,7 @@ var
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
   //Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "C:\Program Files\ONLYOFFICE\DocumentServer\config\local.json" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
-  Params := '/C ' + 'for /f "token=1 delims=://" %a in ("amqp://guest:guest@localhost") do echo %a > ' + '"' + TmpFileName + '""';
+  Params := '/C "for /f "tokens=' + IntToStr(Token) +' delims=' + Delims + '" %a in ("' + Url + '") do echo %a > ' + '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
@@ -565,7 +565,7 @@ end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := ParseRabbitMqParams();
+  Result := ParseRabbitMqParams(1,'://', ReadValues('this.rabbitmq.url')); 
 end;
 
 function GetRabbitMqUser(Param: String): String;
