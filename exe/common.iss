@@ -499,8 +499,12 @@ var
   Params: String;
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
-  //Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "C:\Program Files\ONLYOFFICE\DocumentServer\config\local.json" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
-  Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "' + ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
+  Params := '/C ""' +
+  ExpandConstant('{#JSON}') +
+  '" -I -q -f "' +
+  ExpandConstant('{app}\config\local.json') +
+  '" -e console.log(' + Param + ') > ' +
+  '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
@@ -547,8 +551,12 @@ var
   Params: String;
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
-  //Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "C:\Program Files\ONLYOFFICE\DocumentServer\config\local.json" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
-  Params := '/C "for /f "tokens=' + IntToStr(Token) +' delims=' + Delims + '" %a in ("' + Url + '") do echo %a > ' + '"' + TmpFileName + '""';
+  Params := '/C "for /f "tokens=' +
+  IntToStr(Token) +
+  ' delims=' +
+  Delims +
+  " %a in ("amqp://guest:guest@localhost") do echo %a > ' +
+  '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
@@ -570,17 +578,17 @@ end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  //Result := ReadValues('');
+  Result := ParseRabbitMqParams(2,'://', ReadValues('this.rabbitmq.url')); 
 end;
 
 function GetRabbitMqPwd(Param: String): String;
 begin
-  //Result := ReadValues('');
+  Result := ParseRabbitMqParams(3,'*@', ReadValues('this.rabbitmq.url')); 
 end;
 
 function GetRabbitMqProto(Param: String): String;
 begin
-  //Result := ReadValues('this.rabbitmq.url');
+  Result := ParseRabbitMqParams(4,'@', ReadValues('this.rabbitmq.url'));
 end;
 
 function GetRedisHost(Param: String): String;
