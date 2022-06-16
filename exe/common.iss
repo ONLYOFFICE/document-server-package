@@ -564,12 +564,12 @@ end;
 function InitializeSetup(): Boolean;
 begin
  
-  ExtractFiles();
+  //ExtractFiles();
   
-  if not UninstallPreviosVersion() then
+  (*if not UninstallPreviosVersion() then
   begin
     Abort();
-  end;
+  end;*)
  
   if WizardSilent() = false then
   begin
@@ -586,9 +586,31 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
+function ReadValues(Param: String): String;
+var
+  TmpFileName, ExecStdout: AnsiString;
+  ResultCode: integer;
+  Params: String;
+begin
+  TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
+  //Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "C:\Program Files\ONLYOFFICE\DocumentServer\config\local.json" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
+  Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "' + ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
+  Exec(
+    'cmd.exe',
+    Params,
+    '',
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+  if LoadStringFromFile(TmpFileName, ExecStdout) then begin
+    Result := ExecStdout;
+  end;
+  DeleteFile(TmpFileName);
+end;
+
 function GetDbHost(Param: String): String;
 begin
-  Result := DbPage.Values[0];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');  
 end;
 
 function GetDbPort(Param: String): String;
@@ -598,22 +620,45 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := DbPage.Values[1];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbUser');
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := DbPage.Values[2];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbPass');
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := DbPage.Values[3];
+  Result := ReadValues('this.services.CoAuthoring.sql.dbName');
+end;
+
+function ParseRabbitMqParams(Token: String; Delims: String; Url: String): String;
+var
+  TmpFileName: String;
+  ExecStdout: AnsiString;
+  ResultCode: integer;
+  Params: String;
+begin
+  TmpFileName := ExpandConstant('{tmp}') + '\strings1.txt';
+  Params := '/C "for /f "tokens=' + Token + ' delims=' + Delims + '" %a in ("amqp://guest:guest@localhost") do echo %a > ' + '"' + TmpFileName + '""';
+  Exec(
+    'cmd.exe',
+    Params,
+    '',
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+  if LoadStringFromFile(TmpFileName, ExecStdout) then
+  begin
+    Result := ExecStdout;
+  end;
+  DeleteFile(TmpFileName);
 end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[0];
+  Result := ParseRabbitMqParams('1','://', ReadValues('this.rabbitmq.url')); 
 end;
 
 function GetRabbitMqUser(Param: String): String;
@@ -909,18 +954,6 @@ begin
   end;
 end;
 
-function ShouldSkipPage(PageID: Integer): Boolean;
-begin
-  Result := false;
-  case PageID of
-    DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
-    RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    RedisPage.ID:
-      Result := not IsComponentSelected('Prerequisites\Redis');
-  end;
-end;
 
 function ArrayLength(a: array of integer): Integer;
 begin
@@ -957,40 +990,6 @@ begin
           MB_OK);
         Result := true; 
       end
-    end;
-  end;
-end;
-
-function NextButtonClick(CurPageID: Integer): Boolean;
-begin
-  Result := true;
-  if WizardSilent() = false then
-  begin
-    case CurPageID of
-      DbPage.ID:
-        Result := CheckDbConnection();
-      RabbitMqPage.ID:
-        Result := CheckRabbitMqConnection();
-      RedisPage.ID:
-        Result := CheckRedisConnection();
-      wpWelcome:
-        Result := CheckPortOccupied();
-      wpSelectComponents:
-      begin
-        if IsComponentSelected('Prerequisites\Redis') then
-        begin
-          Dependency_AddRedis;
-        end;
-        if IsComponentSelected('Prerequisites\RabbitMq') then
-        begin
-          Dependency_AddErlang;
-          Dependency_AddRabbitMq;
-        end;
-        if IsComponentSelected('Prerequisites\PostgreSQL') then
-        begin
-          Dependency_AddPostgreSQL;
-        end;
-      end;
     end;
   end;
 end;
