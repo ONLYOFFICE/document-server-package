@@ -492,6 +492,11 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
+function GetDbHost(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
+end;
+
 function ReadValues(Param: String): String;
 var
   TmpFileName, ExecStdout: AnsiString;
@@ -517,11 +522,6 @@ begin
     Result := ExecStdout;
   end;
   DeleteFile(TmpFileName);
-end;
-
-function GetDbHost(Param: String): String;
-begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
 end;
 
 function GetDbPort(Param: String): String;
