@@ -926,15 +926,15 @@ begin
   Result := false;
   if PageID = DbPage.ID then
   begin
-    Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+    Result := IsComponentSelected('Prerequisites\PostgreSQL');
   end;
   if PageID = RabbitMqPage.ID then
   begin
-  Result := not IsComponentSelected('Prerequisites\RabbitMq');
+    Result := IsComponentSelected('Prerequisites\RabbitMq');
   end;
   if PageID = RedisPage.ID then
   begin
-  Result := not IsComponentSelected('Prerequisites\Redis');
+    Result := IsComponentSelected('Prerequisites\Redis');
   end;
 end;
 
