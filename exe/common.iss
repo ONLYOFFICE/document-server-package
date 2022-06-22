@@ -924,13 +924,17 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
-  case PageID of
-    DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
-    RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    RedisPage.ID:
-      Result := not IsComponentSelected('Prerequisites\Redis');
+  if PageID = DbPage.ID then
+  begin
+    Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+  end;
+  if PageID = RabbitMqPage.ID then
+  begin
+  Result := not IsComponentSelected('Prerequisites\RabbitMq');
+  end;
+  if PageID = RedisPage.ID then
+  begin
+  Result := not IsComponentSelected('Prerequisites\Redis');
   end;
 end;
 
