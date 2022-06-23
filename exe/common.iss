@@ -926,15 +926,15 @@ begin
   Result := false;
   if PageID = DbPage.ID then
   begin
-    Result := IsComponentSelected('Prerequisites\PostgreSQL');
+    Result := IsComponentSelected('Prerequisites\PostgreSQL') and CheckDbConnection();
   end;
   if PageID = RabbitMqPage.ID then
   begin
-    Result := IsComponentSelected('Prerequisites\RabbitMq');
+    Result := IsComponentSelected('Prerequisites\RabbitMq') and CheckRabbitMqConnection();
   end;
   if PageID = RedisPage.ID then
   begin
-    Result := IsComponentSelected('Prerequisites\Redis');
+    Result := IsComponentSelected('Prerequisites\Redis') and CheckRedisConnection();
   end;
 end;
 
@@ -983,12 +983,6 @@ begin
   if WizardSilent() = false then
   begin
     case CurPageID of
-      DbPage.ID:
-        Result := CheckDbConnection();
-      RabbitMqPage.ID:
-        Result := CheckRabbitMqConnection();
-      RedisPage.ID:
-        Result := CheckRedisConnection();
       wpWelcome:
         Result := CheckPortOccupied();
       wpSelectComponents:
