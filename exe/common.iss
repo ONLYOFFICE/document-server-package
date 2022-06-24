@@ -552,11 +552,7 @@ var
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
   Params := '/C "for /f "tokens=' +
-  IntToStr(Token) +
-  ' delims=' +
-  Delims +
-  " %a in ("amqp://guest:guest@localhost") do echo %a > ' +
-  '"' + TmpFileName + '""';
+  IntToStr(Token) + ' delims=' + Delims + '" %a in ("amqp://guest:guest@localhost") do echo %a > ' + '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
