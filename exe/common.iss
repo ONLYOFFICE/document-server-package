@@ -69,6 +69,8 @@
   #define sAppRegPath        str("Software\" + sIntCompanyName + "\" + sIntProductName)
 #endif
 
+#define REG_DS_PORT           'DsPort'
+
 #define iconsExe            'projicons.exe'
 
 #ifndef sAppVerShort
@@ -82,8 +84,6 @@
 #ifndef sAppVersion
   #define sAppVersion         str(sAppVerShort + '.' + sAppBuildNumber)
 #endif
-
-#define REG_DS_PORT           'DsPort'
 
 #ifndef sDbDefValue
   #define sDbDefValue         'onlyoffice'
