@@ -237,14 +237,14 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
-Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
-Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+;Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
+;Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
+;Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+;Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+;Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+;Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
+;Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+;Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify
@@ -458,10 +458,7 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
-function GetDbHost(Param: String): String;
-begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
-end;
+
 
 function ReadValues(Param: String): String;
 var
@@ -488,6 +485,11 @@ begin
     Result := ExecStdout;
   end;
   DeleteFile(TmpFileName);
+end;
+
+function GetDbHost(Param: String): String;
+begin
+  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
 end;
 
 function GetDbPort(Param: String): String;
@@ -578,16 +580,14 @@ end;
 
 function GetExamplePort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#sAppRegPath},{#REG_EXAMPLE_PORT}|3000}}');
+  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#sAppRegPath},|3000}}');
 end;
 
 function GetLicensePath(Param: String): String;
-begin
   Result := ReadValues('this.license.license_file');
 end;
 
 function GetFontsPath(Param: String): String;
-begin
   Result := ReadValues('this.services.CoAuthoring.utils.utils_common_fontdir');
 end;
 
@@ -649,10 +649,10 @@ begin
   DbPage.Add('Password:', True);
   DbPage.Add('Database:', False);
 
-  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
+  DbPage.Values[0] := GetDbHost;
+  DbPage.Values[1] := GetDbUser;
+  DbPage.Values[2] := GetDbPwd;
+  DbPage.Values[3] := GetDbName;
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
@@ -662,10 +662,10 @@ begin
   RabbitMqPage.Add('Password:', True);
   RabbitMqPage.Add('Protocol:', False);
   
-  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
-  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
-  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
+  RabbitMqPage.Values[0] := GetRabbitMqHost;
+  RabbitMqPage.Values[1] := GetRabbitMqUser;
+  RabbitMqPage.Values[2] := GetRabbitMqPwd;
+  RabbitMqPage.Values[3] := GetRabbitMqProto;
   
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
@@ -673,7 +673,7 @@ begin
       'Please specify your Redis connection, then click Next.');
     RedisPage.Add('Host:', False);
 
-    RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+    RedisPage.Values[0] := GetRedisHost;
   end;
 
 end;
