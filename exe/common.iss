@@ -582,10 +582,12 @@ begin
 end;
 
 function GetLicensePath(Param: String): String;
+begin
   Result := ReadValues('this.license.license_file');
 end;
 
 function GetFontsPath(Param: String): String;
+begin
   Result := ReadValues('this.services.CoAuthoring.utils.utils_common_fontdir');
 end;
 
