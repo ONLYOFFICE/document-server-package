@@ -439,10 +439,10 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  if not UninstallPreviosVersion() then
+  (*if not UninstallPreviosVersion() then
   begin
     Abort();
-  end;
+  end;*)
  
   if WizardSilent() = false then
   begin
@@ -458,19 +458,19 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
-
-
 function ReadValues(Param: String): String;
 var
   TmpFileName, ExecStdout: AnsiString;
   ResultCode: integer;
   Params: String;
 begin
+  ExtractTemporaryFile('{app}\npm\json.exe');
+  ExtractTemporaryFile('local.json');
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
   Params := '/C ""' +
-  ExpandConstant('{#JSON}') +
+  ExpandConstant('{tmp}\json.exe') +
   '" -I -q -f "' +
-  ExpandConstant('{app}\config\local.json') +
+  ExpandConstant('{tmp}\local.json') +
   '" -e console.log(' + Param + ') > ' +
   '"' + TmpFileName + '""';
   Exec(
