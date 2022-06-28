@@ -584,6 +584,7 @@ begin
 end;
 
 function GetLicensePath(Param: String): String;
+begin
   Result := ReadValues('this.license.license_file');
 end;
 
