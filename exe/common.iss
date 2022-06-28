@@ -83,6 +83,8 @@
   #define sAppVersion         str(sAppVerShort + '.' + sAppBuildNumber)
 #endif
 
+#define REG_DS_PORT           'DsPort'
+
 #ifndef sDbDefValue
   #define sDbDefValue         'onlyoffice'
 #endif
