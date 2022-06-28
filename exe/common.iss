@@ -295,7 +295,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthori
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={{request:{{}}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.enable.browser===undefined)this.services.CoAuthoring.token.enable.browser = {code:GetJwtEnabledBrowser}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.enable.request.inbox===undefined)this.services.CoAuthoring.token.enable.request.inbox = {code:GetJwtEnabledRequestInbox}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.enable.request.outbox===undefined)this.services.CoAuthoring.token.enable.request.outbox = {code:GetJwtEnabledRequestInboxOutbox}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.enable.request.outbox===undefined)this.services.CoAuthoring.token.enable.request.outbox = {code:GetJwtEnabledRequestOutbox}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={{inbox:{{},outbox:{{},session: {{} };"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.secret.inbox.string===undefined)this.services.CoAuthoring.secret.inbox.string = '{code:GetJwtSecretInbox}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -589,6 +589,7 @@ begin
 end;
 
 function GetFontsPath(Param: String): String;
+begin
   Result := ReadValues('this.services.CoAuthoring.utils.utils_common_fontdir');
 end;
 
@@ -650,10 +651,10 @@ begin
   DbPage.Add('Password:', True);
   DbPage.Add('Database:', False);
 
-  DbPage.Values[0] := GetDbHost;
-  DbPage.Values[1] := GetDbUser;
-  DbPage.Values[2] := GetDbPwd;
-  DbPage.Values[3] := GetDbName;
+  DbPage.Values[0] := GetDbHost('');
+  DbPage.Values[1] := GetDbUser('');
+  DbPage.Values[2] := GetDbPwd('');
+  DbPage.Values[3] := GetDbName('');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
@@ -663,10 +664,10 @@ begin
   RabbitMqPage.Add('Password:', True);
   RabbitMqPage.Add('Protocol:', False);
   
-  RabbitMqPage.Values[0] := GetRabbitMqHost;
-  RabbitMqPage.Values[1] := GetRabbitMqUser;
-  RabbitMqPage.Values[2] := GetRabbitMqPwd;
-  RabbitMqPage.Values[3] := GetRabbitMqProto;
+  RabbitMqPage.Values[0] := GetRabbitMqHost('');
+  RabbitMqPage.Values[1] := GetRabbitMqUser('');
+  RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+  RabbitMqPage.Values[3] := GetRabbitMqProto('');
   
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
@@ -674,7 +675,7 @@ begin
       'Please specify your Redis connection, then click Next.');
     RedisPage.Add('Host:', False);
 
-    RedisPage.Values[0] := GetRedisHost;
+    RedisPage.Values[0] := GetRedisHost('');
   end;
 
 end;
