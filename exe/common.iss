@@ -331,6 +331,9 @@ Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DI
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
+Source: data\vcredist\vcredist_2022_x64.exe; DestDir: {app}; Flags: deleteafterinstall; \
+  AfterInstall: installVCRedist(ExpandConstant('{app}\vcredist_2022_x64.exe'), ExpandConstant('{cm:InstallAdditionalComponents}')); \
+  Check: not checkVCRedist2022;
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify

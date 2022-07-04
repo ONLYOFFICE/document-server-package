@@ -141,4 +141,26 @@ begin
   end;
 end;
 
+function checkVCRedist2022(): Boolean;
+var
+  upgradecode: String;
+begin
+  if Is64BitInstallMode then
+    upgradecode := '{36F68A90-239C-34DF-B58C-64B30153CE35}' //x64
+  else
+    upgradecode := '{65E5BD06-6392-3027-8C26-853107D3CF1A}'; //x86
+  Result :=  msiproductupgrade(upgradecode, '14.30');
+end;
+
+procedure installVCRedist(FileName, LabelCaption: String);
+var
+  Params:    String;
+  ErrorCode: Integer;
+begin
+  if Length(LabelCaption) > 0 then WizardForm.StatusLabel.Caption := LabelCaption;
+  Params := '/quiet /norestart';
+  ShellExec('', FileName, Params, '', SW_SHOW, ewWaitUntilTerminated, ErrorCode);
+  WizardForm.StatusLabel.Caption := SetupMessage(msgStatusExtractFiles);
+end;
+
 [Setup]
