@@ -24,7 +24,7 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
   libxtst6,
   logrotate,
   nginx-extras (>= 1.3.13),
-  postgresql-client (>= 9.1) | mysql-client | mariadb-client,
+  postgresql-client (>= 9.1) | mysql-client | mysql-community-client | mariadb-client,
   pwgen,
 ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 `  redis-tools,'

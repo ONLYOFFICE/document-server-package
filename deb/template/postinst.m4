@@ -101,11 +101,11 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 install_db() {
 	if [ -z $DB_TYPE ]; then
-		if dpkg -l postgresql-client >/dev/null 2>&1; then
+		if dpkg -s postgresql-client &>/dev/null; then
 			DB_TYPE="postgres"
-		elif dpkg -l mysql-client >/dev/null 2>&1; then
+		elif dpkg -s mysql-client &>/dev/null || dpkg -s mysql-community-client &>/dev/null; then
 			DB_TYPE="mysql"
-		elif dpkg -l mariadb-client >/dev/null 2>&1; then
+		elif dpkg -s mariadb-client &>/dev/null; then
 			DB_TYPE="mariadb"
 		fi
 		
