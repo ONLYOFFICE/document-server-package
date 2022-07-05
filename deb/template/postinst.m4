@@ -101,16 +101,17 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 install_db() {
 	if [ -z $DB_TYPE ]; then
-		if dpkg -s postgresql-client &>/dev/null; then
+		if dpkg -l | grep -q postgresql-client; then
 			DB_TYPE="postgres"
-		elif dpkg -s mysql-client &>/dev/null || dpkg -s mysql-community-client &>/dev/null; then
+		elif dpkg -l | grep -q mysql-client || dpkg -l | grep -q mysql-community-client; then
 			DB_TYPE="mysql"
-		elif dpkg -s mariadb-client &>/dev/null; then
+		elif dpkg -l | grep -q mariadb-client; then
 			DB_TYPE="mariadb"
 		fi
-		
-		db_set M4_ONLYOFFICE_VALUE/db-type select $DB_TYPE || true
+
+		db_set M4_ONLYOFFICE_VALUE/db-type $DB_TYPE || true
 	fi
+
 	case $DB_TYPE in
 		"postgres")
 			install_postges
