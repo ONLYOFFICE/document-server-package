@@ -17,7 +17,7 @@
 #endif
 
 #ifndef sProductName
-  #define sProductName        'DocumentServer'
+  #define sProductName        'DocumentServer-EE'
 #endif
 
 #ifndef sIntProductName
@@ -929,7 +929,7 @@ begin
       Result := not IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
       Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    RedisPage.ID:
+    IsCommercial:
       Result := not IsComponentSelected('Prerequisites\Redis');
   end;
 end;
