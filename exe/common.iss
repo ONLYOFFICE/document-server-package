@@ -17,7 +17,7 @@
 #endif
 
 #ifndef sProductName
-  #define sProductName        'DocumentServer-EE'
+  #define sProductName        'DocumentServer'
 #endif
 
 #ifndef sIntProductName
