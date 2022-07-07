@@ -1,8 +1,6 @@
 Template: M4_ONLYOFFICE_VALUE/db-type
-Type: select
-Choices: postgres, mariadb, mysql
-Default: postgres
-Description: Choose database type:
+Type: string
+Description: Choose database type (postgres, mariadb, mysql):
 
 Template: M4_ONLYOFFICE_VALUE/db-host
 Type: string
