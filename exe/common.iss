@@ -955,7 +955,7 @@ begin
     begin
       Exec(
         ExpandConstant('{cmd}'),
-        '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
+        '/C netstat -aon | findstr :' + IntToStr(Ports[I]) + ' "',
         '',
         0,
         ewWaitUntilTerminated,
