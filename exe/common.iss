@@ -929,13 +929,8 @@ begin
       Result := not IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
       Result := not IsComponentSelected('Prerequisites\RabbitMq');
-  end;
-  if IsCommercial() then
-  begin
-    if PageID = RedisPage.ID then
-    begin
-      Result := not IsComponentSelected('Prerequisites\Redis');
-    end;
+  else
+    Result := not IsComponentSelected('Prerequisites\Redis')
   end;
 end;
 
@@ -1006,13 +1001,8 @@ begin
           Dependency_AddPostgreSQL;
         end;
       end;
-    end;
-    if IsCommercial() then
-    begin
-      if CurPageID = RedisPage.ID then 
-      begin
+      else
         Result := CheckRedisConnection();
-      end;
     end;
   end;
 end;
