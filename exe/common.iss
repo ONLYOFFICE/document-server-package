@@ -929,8 +929,13 @@ begin
       Result := not IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
       Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    IsCommercial:
+  end;
+  if IsCommercial() then
+  begin
+    if PageID = RedisPage.ID then
+    begin
       Result := not IsComponentSelected('Prerequisites\Redis');
+    end;
   end;
 end;
 
