@@ -983,8 +983,6 @@ begin
         Result := CheckDbConnection();
       RabbitMqPage.ID:
         Result := CheckRabbitMqConnection();
-      RedisPage.ID:
-        Result := CheckRedisConnection();
       wpWelcome:
         Result := CheckPortOccupied();
       wpSelectComponents:
@@ -1002,6 +1000,13 @@ begin
         begin
           Dependency_AddPostgreSQL;
         end;
+      end;
+    end;
+    if IsCommercial() then
+    begin
+      if CurPageID = RedisPage.ID then 
+      begin
+        Result := CheckRedisConnection();
       end;
     end;
   end;
