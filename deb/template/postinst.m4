@@ -245,14 +245,11 @@ setup_nginx(){
   
   if [ ! -e $DS_CONF ]; then
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
-     if (( ${#CHECK_PLATFORM} >= 12 ));
-     then
-       # genetate secure link if platform = Docker
-       echo "This is container"
+     if grep -q docker /proc/1/cgroup; then
+       # genetate secure link for docker container
        documentserver-update-securelink.sh -s $(pwgen -s 20) false
      else
-       # generate secure link
-       echo "This is not container"
+       # generate secure link for others platforms
        documentserver-update-securelink.sh -s $(pwgen -s 20) true
      fi
   elif ! grep -q secure_link_secret $DS_CONF; then
