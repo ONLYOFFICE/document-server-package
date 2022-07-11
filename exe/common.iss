@@ -921,6 +921,17 @@ begin
   end;
 end;
 
+function isRedisPage(CurPageID: Integer): Boolean;
+begin
+  if IsCommercial then
+  begin
+    if CurPageID = RedisPage.ID then
+    begin
+      Result := true;
+    end;
+  end;
+end;
+
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
@@ -930,9 +941,8 @@ begin
     RabbitMqPage.ID:
       Result := not IsComponentSelected('Prerequisites\RabbitMq');
   else
-    if IsCommercial then
+    if isRedisPage(PageID) then
     begin
-      PageID := RedisPage.ID;
       Result := not IsComponentSelected('Prerequisites\Redis');
     end;
   end;
@@ -1006,12 +1016,9 @@ begin
         end;
       end;
     else
-      if IsCommercial then
+      if isRedisPage(CurPageID) then
       begin
-        if CurPageID = RedisPage.ID then
-        begin
-          Result := CheckRedisConnection();
-        end;
+        Result := CheckRedisConnection();
       end;
     end;
   end;
