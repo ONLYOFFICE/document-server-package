@@ -245,9 +245,9 @@ setup_nginx(){
   
   if [ ! -e $DS_CONF ]; then
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
-         
+
 	  # generate secure link
-	  documentserver-update-securelink.sh -s $(pwgen -s 20) true
+	  documentserver-update-securelink.sh -s $(pwgen -s 20) true  
   elif ! grep -q secure_link_secret $DS_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
