@@ -242,7 +242,7 @@ save_jwt_params(){
 
 setup_nginx(){
    DS_CONF=$CONF_DIR/nginx/ds.conf
-
+  
   if [ ! -e $DS_CONF ]; then
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
 	  
