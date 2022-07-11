@@ -507,7 +507,7 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
 
 [Code]
@@ -929,8 +929,8 @@ begin
       Result := not IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
       Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    RedisPage.ID:
-      Result := not IsComponentSelected('Prerequisites\Redis');
+  else if PageID = RedisPage.ID then
+    Result := not IsComponentSelected('Prerequisites\Redis');
   end;
 end;
 
@@ -955,7 +955,7 @@ begin
     begin
       Exec(
         ExpandConstant('{cmd}'),
-        '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
+        '/C netstat -aon | findstr :' + IntToStr(Ports[I]) + ' "',
         '',
         0,
         ewWaitUntilTerminated,
@@ -983,8 +983,6 @@ begin
         Result := CheckDbConnection();
       RabbitMqPage.ID:
         Result := CheckRabbitMqConnection();
-      RedisPage.ID:
-        Result := CheckRedisConnection();
       wpWelcome:
         Result := CheckPortOccupied();
       wpSelectComponents:
@@ -1003,6 +1001,8 @@ begin
           Dependency_AddPostgreSQL;
         end;
       end;
+    else if CurPageID = RedisPage.ID then
+      Result := CheckRedisConnection();
     end;
   end;
 end;
