@@ -38,6 +38,7 @@ DB_USER=""
 DB_PWD=""
 DB_NAME=""
 
+RABBITMQ_PROTO=""
 RABBITMQ_HOST=""
 RABBITMQ_USER=""
 RABBITMQ_PWD=""
@@ -68,6 +69,8 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/db-name || true
 	DB_NAME="$RET"
 
+	db_get M4_ONLYOFFICE_VALUE/rabbitmq-proto || true
+	RABBITMQ_PROTO="$RET"
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-host || true
 	RABBITMQ_HOST="$RET"
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-user || true
@@ -97,6 +100,18 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 }
 
 install_db() {
+	if [ -z $DB_TYPE ]; then
+		if dpkg -l | grep -q postgresql-client; then
+			DB_TYPE="postgres"
+		elif dpkg -l | grep -q mysql-client || dpkg -l | grep -q mysql-community-client; then
+			DB_TYPE="mysql"
+		elif dpkg -l | grep -q mariadb-client; then
+			DB_TYPE="mariadb"
+		fi
+
+		db_set M4_ONLYOFFICE_VALUE/db-type $DB_TYPE || true
+	fi
+
 	case $DB_TYPE in
 		"postgres")
 			install_postges
@@ -173,7 +188,7 @@ save_db_params(){
 
 save_rabbitmq_params(){
   $JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-  $JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
+  $JSON -e "this.rabbitmq.url = '$RABBITMQ_PROTO://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
 save_redis_params(){
