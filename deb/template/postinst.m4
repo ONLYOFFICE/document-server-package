@@ -248,7 +248,6 @@ setup_nginx(){
 
           # generate secure link 
           documentserver-update-securelink.sh -s $(pwgen -s 20)
-     fi
   elif ! grep -q secure_link_secret $DS_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
