@@ -1,10 +1,5 @@
 #!/bin/sh
 
-ONLYOFFICE_DATA_CONTAINER=false
-if [ "$3" != "" ]; then
-   ONLYOFFICE_DATA_CONTAINER=$3
-fi
-
 while [ "$1" != "" ]; do
 	case $1 in
 
@@ -14,6 +9,14 @@ while [ "$1" != "" ]; do
 				shift
 			fi
 		;;
+
+                -r | --restart )
+                        if [ "$2" != "" ]; then
+                                ONLYOFFICE_DATA_CONTAINER=$2
+                                shift
+                        fi
+                ;;
+
 
 		-? | -h | --help )
 			echo "  Usage $0 [PARAMETER] [[PARAMETER], ...]"
@@ -31,7 +34,6 @@ done
 NGINX_CONF=/etc/M4_DS_PREFIX/nginx/ds.conf
 LOCAL_CONF=/etc/M4_DS_PREFIX/local.json
 JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${LOCAL_CONF}"
-DOCKER_CHECK=$(grep -q docker /proc/1/cgroup)
 
 SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
 
