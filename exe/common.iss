@@ -17,7 +17,7 @@
 #endif
 
 #ifndef sProductName
-  #define sProductName        'DocumentServer-EE'
+  #define sProductName        'DocumentServer'
 #endif
 
 #ifndef sIntProductName
@@ -568,7 +568,7 @@ end;
 function InitializeSetup(): Boolean;
 begin
  
-  //ExtractFiles();
+  ExtractFiles();
   
   if not UninstallPreviosVersion() then
   begin
