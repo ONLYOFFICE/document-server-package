@@ -12,7 +12,7 @@ while [ "$1" != "" ]; do
 
                 -r | --restart )
                         if [ "$2" != "" ]; then
-                                ONLYOFFICE_DATA_CONTAINER=$2
+                                RESTART_CONDITION=$2
                                 shift
                         fi
                 ;;
@@ -40,7 +40,7 @@ SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
 sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF}
 ${JSON} -I -e 'this.storage={fs: {secretString: "'${SECURE_LINK_SECRET}'" }}' && chown ds:ds $LOCAL_CONF
 
-if [ "$ONLYOFFICE_DATA_CONTAINER" != "false" ]; then
+if [ "$RESTART_CONDITION" != "false" ]; then
    supervisorctl restart ds:docservice
    supervisorctl restart ds:converter
 fi
