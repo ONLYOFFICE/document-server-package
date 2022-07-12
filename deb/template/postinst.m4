@@ -335,11 +335,22 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		chown ds:ds -R "$APP_DIR"
 		chown ds:ds -R "$APP_DIR-example"
 
+		if [ -d /etc/M4_DS_PREFIX/supervisor ]; then
+			rm -rf /etc/M4_DS_PREFIX*/supervisor
+			supervisorctl update
+		fi
+
 		# call db_stop to prevent installation hang
 		db_stop
 
 		# restart dependent services
-		service supervisor restart >/dev/null 2>&1
+		systemctl daemon-reload >/dev/null 2>&1
+		for SVC in M4_PACKAGE_SERVICES; do
+			if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+				systemctl enable $SVC >/dev/null 2>&1
+				systemctl restart $SVC >/dev/null 2>&1
+			fi
+		done
 		service nginx restart >/dev/null 2>&1
 		
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"

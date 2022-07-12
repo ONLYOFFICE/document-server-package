@@ -54,7 +54,6 @@ clean_ds_files() {
 	  rm -f /etc/nginx/conf.d/ds.conf
     fi
 
-	supervisorctl update >/dev/null 2>&1
 	service nginx reload >/dev/null 2>&1
 }
 

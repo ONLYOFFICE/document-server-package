@@ -56,6 +56,6 @@ rm -f \
 
 #Restart web-site and converter
 if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
- supervisorctl restart ds:docservice
- supervisorctl restart ds:converter
+ systemctl restart ds-docservice
+ systemctl restart ds-converter
 fi
