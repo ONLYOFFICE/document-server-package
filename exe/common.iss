@@ -1007,7 +1007,7 @@ begin
         begin
           Dependency_AddPostgreSQL;
         end;
-        if not IsComponentSelected('Prerequisites\Certbot') then
+        if IsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
