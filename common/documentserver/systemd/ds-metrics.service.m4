@@ -3,11 +3,13 @@ Description=Docs Metrics
 After=network.target syslog.target
 
 [Service]
-Type=simple
+Type=exec
 User=ds
 Group=ds
 WorkingDirectory=/var/www/M4_DS_PREFIX/server/Metrics
-ExecStart=/bin/sh -c '/var/www/M4_DS_PREFIX/server/Metrics/metrics ./config/config.js >>/var/log/M4_DS_PREFIX/metrics/out.log 2>>/var/log/M4_DS_PREFIX/metrics/err.log'
+ExecStart=/bin/sh -c 'exec /var/www/M4_DS_PREFIX/server/Metrics/metrics ./config/config.js \
+>>/var/log/M4_DS_PREFIX/metrics/out.log \
+2>>/var/log/M4_DS_PREFIX/metrics/err.log'
 Environment=NODE_DISABLE_COLORS=1
 
 Restart=always
