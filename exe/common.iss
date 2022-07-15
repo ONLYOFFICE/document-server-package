@@ -509,7 +509,7 @@ Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Certbot"; Description: "Certbot win32"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
 
 [Code]
 function UninstallPreviosVersion(): Boolean;
