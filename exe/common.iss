@@ -464,15 +464,17 @@ var
   ResultCode: integer;
   Params: String;
 begin
-  ExtractTemporaryFile('{app}\npm\json.exe');
-  ExtractTemporaryFile('local.json');
+  //ExtractTemporaryFile('json.exe');
+  //ExtractTemporaryFile('local.json');
+
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
-  Params := '/C ""' +
+  Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "' + ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
+  (*Params := '/C ""' +
   ExpandConstant('{tmp}\json.exe') +
   '" -I -q -f "' +
   ExpandConstant('{tmp}\local.json') +
   '" -e console.log(' + Param + ') > ' +
-  '"' + TmpFileName + '""';
+  '"' + TmpFileName + '""';*)
   Exec(
     'cmd.exe',
     Params,
@@ -517,10 +519,14 @@ var
   TmpFileName, ExecStdout: AnsiString;
   ResultCode: integer;
   Params: String;
+  Amqp: String;
+  int: Integer;
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
+  Amqp := 'amqp://guest:guest@localhost';
+  int := CompareStr(Amqp, ReadValues('this.rabbitmq.url'));
   Params := '/C "for /f "tokens=' +
-  IntToStr(Token) + ' delims=' + Delims + '" %a in ("amqp://guest:guest@localhost") do echo %a > ' + '"' + TmpFileName + '""';
+  IntToStr(Token) + ' delims=' + Delims + '" %a in ("' + ReadValues('this.rabbitmq.url') + '") do echo %a > ' + '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
