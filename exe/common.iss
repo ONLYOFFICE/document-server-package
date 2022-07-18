@@ -69,7 +69,23 @@
   #define sAppRegPath        str("Software\" + sIntCompanyName + "\" + sIntProductName)
 #endif
 
+#define REG_LICENSE_PATH      'LicensePath'
+#define REG_DB_HOST           'DbHost'
+#define REG_DB_USER           'DbUser'
+#define REG_DB_PWD            'DbPwd'
+#define REG_DB_NAME           'DbName'
+#define REG_RABBITMQ_HOST     'RabbitMqHost'
+#define REG_RABBITMQ_USER     'RabbitMqUser'
+#define REG_RABBITMQ_PWD      'RabbitMqPwd'
+#define REG_RABBITMQ_PROTO    'RabbitMqProto'
+#define REG_REDIS_HOST        'RedisHost'
 #define REG_DS_PORT           'DsPort'
+#define REG_EXAMPLE_PORT      'ExamplePort'
+#define REG_DOCSERVICE_PORT   'DocServicePort'
+#define REG_FONTS_PATH        'FontsPath'
+#define REG_JWT_ENABLED       'JwtEnabled'
+#define REG_JWT_SECRET        'JwtSecret'
+#define REG_JWT_HEADER        'JwtHeader'
 
 #define iconsExe            'projicons.exe'
 
@@ -237,14 +253,14 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
-;Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
-;Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
-;Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-;Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-;Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-;Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-;Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-;Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify
@@ -263,6 +279,24 @@ Name: "{#LICENSE_PATH}";
 
 [Icons]
 Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
+
+[Registry]
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}"; Check: not IsStringEmpty(ExpandConstant('{param:DOCSERVICE_PORT}'));
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_FONTS_PATH}"; ValueData: "{code:GetFontsPath}"; Check: not IsStringEmpty(ExpandConstant('{param:FONTS_PATH}'));
+;Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_ENABLED}"; ValueData: "{code:GetJwtEnabled}"; Check: not IsStringEmpty(ExpandConstant('{param:JWT_ENABLED}'));
+;Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_SECRET}"; ValueData: "{code:GetJwtSecret}";  Check: not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}'));
+;Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT_HEADER}"; ValueData: "{code:GetJwtHeader}"; Check: not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}'));
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
@@ -458,23 +492,21 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
+
+
 function ReadValues(Param: String): String;
 var
   TmpFileName, ExecStdout: AnsiString;
+  UnicodeStr : String;
   ResultCode: integer;
   Params: String;
 begin
-  //ExtractTemporaryFile('json.exe');
-  //ExtractTemporaryFile('local.json');
-
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
-  Params := '/C ""' + ExpandConstant('{#JSON}') + '" -I -q -f "' + ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
-  (*Params := '/C ""' +
-  ExpandConstant('{tmp}\json.exe') +
+  //UnicodeStr := String(ExecStdOut);
+  Params := '/C echo | set /p ""' +
+  ExpandConstant('{#JSON}') +
   '" -I -q -f "' +
-  ExpandConstant('{tmp}\local.json') +
-  '" -e console.log(' + Param + ') > ' +
-  '"' + TmpFileName + '""';*)
+  ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
@@ -484,7 +516,9 @@ begin
     ResultCode);
   if LoadStringFromFile(TmpFileName, ExecStdout) then
   begin
-    Result := ExecStdout;
+    //StringChangeEx(UnicodeStr, '#10', '', True);
+    UnicodeStr := String(ExecStdOut);
+    Result := UnicodeStr;
   end;
   DeleteFile(TmpFileName);
 end;
@@ -519,14 +553,14 @@ var
   TmpFileName, ExecStdout: AnsiString;
   ResultCode: integer;
   Params: String;
-  Amqp: String;
-  int: Integer;
+  Temp: AnsiString;
+  Temp2: String;
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
-  Amqp := 'amqp://guest:guest@localhost';
-  int := CompareStr(Amqp, ReadValues('this.rabbitmq.url'));
-  Params := '/C "for /f "tokens=' +
-  IntToStr(Token) + ' delims=' + Delims + '" %a in ("' + ReadValues('this.rabbitmq.url') + '") do echo %a > ' + '"' + TmpFileName + '""';
+  Temp := 'amqp://guest:guest@localhost';
+  Temp2 := ReadValues('this.rabbitmq.url');
+  Result := IntToStr(CompareText(Temp, Temp2));
+  Params := '/C ""for /f "tokens=' + IntToStr(Token) + ' delims=' + Delims + '" %a in ("' + Temp + '") do echo %a > ' + '"' + TmpFileName + '"""';
   Exec(
     'cmd.exe',
     Params,
@@ -586,7 +620,7 @@ end;
 
 function GetExamplePort(Param: String): String;
 begin
-  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#sAppRegPath},|3000}}');
+  Result := ExpandConstant('{param:EXAMPLE_PORT|{reg:HKLM\{#sAppRegPath},{#REG_EXAMPLE_PORT}|3000}}');
 end;
 
 function GetLicensePath(Param: String): String;
@@ -657,10 +691,10 @@ begin
   DbPage.Add('Password:', True);
   DbPage.Add('Database:', False);
 
-  DbPage.Values[0] := GetDbHost('');
-  DbPage.Values[1] := GetDbUser('');
-  DbPage.Values[2] := GetDbPwd('');
-  DbPage.Values[3] := GetDbName('');
+  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
+  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
+  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
   RabbitMqPage := CreateInputQueryPage(DbPage.ID,
     'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
@@ -670,10 +704,10 @@ begin
   RabbitMqPage.Add('Password:', True);
   RabbitMqPage.Add('Protocol:', False);
   
-  RabbitMqPage.Values[0] := GetRabbitMqHost('');
-  RabbitMqPage.Values[1] := GetRabbitMqUser('');
-  RabbitMqPage.Values[2] := GetRabbitMqPwd('');
-  RabbitMqPage.Values[3] := GetRabbitMqProto('');
+  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
+  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
+  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
+  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
   
   if IsCommercial then begin
     RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
@@ -681,7 +715,7 @@ begin
       'Please specify your Redis connection, then click Next.');
     RedisPage.Add('Host:', False);
 
-    RedisPage.Values[0] := GetRedisHost('');
+    RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
   end;
 
 end;
