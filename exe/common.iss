@@ -281,16 +281,6 @@ Name: "{#LICENSE_PATH}";
 Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
 
 [Registry]
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}"; Check: not IsStringEmpty(ExpandConstant('{param:DOCSERVICE_PORT}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_FONTS_PATH}"; ValueData: "{code:GetFontsPath}"; Check: not IsStringEmpty(ExpandConstant('{param:FONTS_PATH}'));
@@ -473,10 +463,10 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  (*if not UninstallPreviosVersion() then
+  if not UninstallPreviosVersion() then
   begin
     Abort();
-  end;*)
+  end;
  
   if WizardSilent() = false then
   begin
@@ -492,8 +482,6 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
-
-
 function ReadValues(Param: String): String;
 var
   TmpFileName, TmpFileName2, ExecStdout: AnsiString;
@@ -501,13 +489,14 @@ var
   ResultCode: integer;
   Params: String;
 begin
-  TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
-  TmpFileName2 := ExpandConstant('{tmp}') + '\strings1.txt';
-  //UnicodeStr := String(ExecStdOut);
+  TmpFileName := ExpandConstant('{tmp}') + '\temp.txt';
+  TmpFileName2 := ExpandConstant('{tmp}') + '\temp2.txt';
   Params := '/C ""' +
-  ExpandConstant('{#JSON}') +
-  '" -I -q -f "' +
-  ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
+    ExpandConstant('{#JSON}') +
+    '" -I -q -f "' +
+    ExpandConstant('{app}\config\local.json') +
+    '" -e console.log(' + Param + ') > ' +
+    '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
     Params,
@@ -525,8 +514,6 @@ begin
     ResultCode);
   if LoadStringFromFile(TmpFileName, ExecStdout) then
   begin
-    //StringChangeEx(UnicodeStr, '#10', '', True);
-    UnicodeStr := String(ExecStdOut);
     Result := UnicodeStr;
   end;
   DeleteFile(TmpFileName);
