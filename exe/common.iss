@@ -496,17 +496,26 @@ var
 
 function ReadValues(Param: String): String;
 var
-  TmpFileName, ExecStdout: AnsiString;
+  TmpFileName, TmpFileName2, ExecStdout: AnsiString;
   UnicodeStr : String;
   ResultCode: integer;
   Params: String;
 begin
   TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
+  TmpFileName2 := ExpandConstant('{tmp}') + '\strings1.txt';
   //UnicodeStr := String(ExecStdOut);
-  Params := '/C echo | set /p ""' +
+  Params := '/C ""' +
   ExpandConstant('{#JSON}') +
   '" -I -q -f "' +
   ExpandConstant('{app}\config\local.json') + '" -e console.log(' + Param + ') > ' + '"' + TmpFileName + '""';
+  Exec(
+    'cmd.exe',
+    Params,
+    '',
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+  Params := '/C <"'+ TmpFileName + '">"' + TmpFileName2 + '" (for /f %a in (''more'') do @<nul set/p="%a")'
   Exec(
     'cmd.exe',
     Params,
