@@ -499,8 +499,7 @@ begin
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
-  Params := '/C <"'+ TmpFileName + '">"' +
-    TmpFileName2 +
+  Params := '/C <"'+ TmpFileName + '">"' + TmpFileName2 +
     '" (for /f %a in (''more'') do @<nul set/p="%a")';
   Exec(
     'cmd.exe',
