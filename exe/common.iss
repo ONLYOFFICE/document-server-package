@@ -498,8 +498,7 @@ begin
     ResultCode);
   Exec(
     'cmd.exe',
-    '/C <"'+ TmpFileName + '">"' + TmpFileName2 +
-      '" (for /f %a in (''more'') do @<nul set/p="%a")',
+    '/C <"' + TmpFileName + '">"' + TmpFileName2 + '" (for /f %a in (''more'') do @<nul set/p="%a")',
     '',
     SW_HIDE,
     ewWaitUntilTerminated,
@@ -509,6 +508,7 @@ begin
     Result := ExecStdout;
   end;
   DeleteFile(TmpFileName);
+  DeleteFile(TmpFileName2);
 end;
 
 function GetDbHost(Param: String): String;
@@ -547,7 +547,7 @@ begin
     '/C ""for /f "tokens=' + IntToStr(Token) +
       ' delims=' + Delims +
       '" %a in ("' + ReadValues('this.rabbitmq.url') + '")' +
-      ' do echo %a > ' + '"' + TmpFileName + '"""',
+      ' do echo %a > ' + '"' + TmpFileName + '""',
     '',
     SW_HIDE,
     ewWaitUntilTerminated,
