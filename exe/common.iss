@@ -498,7 +498,8 @@ begin
     ResultCode);
   Exec(
     'cmd.exe',
-    '/C <"' + TmpFileName + '">"' + TmpFileName2 + '" (for /f %a in (''more'') do @<nul set/p="%a")',
+    '/C <"' + TmpFileName + '">"' + TmpFileName2 +
+      '" (for /f %a in (''more'') do @<nul set/p="%a")',
     '',
     SW_HIDE,
     ewWaitUntilTerminated,
