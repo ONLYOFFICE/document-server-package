@@ -480,37 +480,33 @@ var
 function ReadValues(Param: String): String;
 var
   TmpFileName, TmpFileName2, ExecStdout: AnsiString;
-  UnicodeStr : String;
   ResultCode: integer;
-  Params: String;
 begin
-  TmpFileName := ExpandConstant('{tmp}') + '\temp.txt';
+  TmpFileName := ExpandConstant('{tmp}') + '\temp1.txt';
   TmpFileName2 := ExpandConstant('{tmp}') + '\temp2.txt';
-  Params := '/C ""' +
-    ExpandConstant('{#JSON}') +
-    '" -I -q -f "' +
-    ExpandConstant('{app}\config\local.json') +
-    '" -e console.log(' + Param + ') > ' +
-    '"' + TmpFileName + '""';
   Exec(
     'cmd.exe',
-    Params,
+    '/C ""' +
+      ExpandConstant('{#JSON}') +
+      '" -I -q -f "' +
+      ExpandConstant('{app}\config\local.json') +
+      '" -e console.log(' + Param + ') > ' +
+      '"' + TmpFileName + '""',
     '',
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
-  Params := '/C <"'+ TmpFileName + '">"' + TmpFileName2 +
-    '" (for /f %a in (''more'') do @<nul set/p="%a")';
   Exec(
     'cmd.exe',
-    Params,
+    '/C <"'+ TmpFileName + '">"' + TmpFileName2 +
+      '" (for /f %a in (''more'') do @<nul set/p="%a")',
     '',
     SW_HIDE,
     ewWaitUntilTerminated,
     ResultCode);
   if LoadStringFromFile(TmpFileName, ExecStdout) then
   begin
-    Result := UnicodeStr;
+    Result := ExecStdout;
   end;
   DeleteFile(TmpFileName);
 end;
@@ -544,18 +540,14 @@ function ParseRabbitMqParams(Token: Integer; Delims: String; Url: String): Strin
 var
   TmpFileName, ExecStdout: AnsiString;
   ResultCode: integer;
-  Params: String;
-  Temp: AnsiString;
-  Temp2: String;
 begin
-  TmpFileName := ExpandConstant('{tmp}') + '\strings.txt';
-  Temp := 'amqp://guest:guest@localhost';
-  Temp2 := ReadValues('this.rabbitmq.url');
-  Result := IntToStr(CompareText(Temp, Temp2));
-  Params := '/C ""for /f "tokens=' + IntToStr(Token) + ' delims=' + Delims + '" %a in ("' + Temp + '") do echo %a > ' + '"' + TmpFileName + '"""';
+  TmpFileName := ExpandConstant('{tmp}') + '\temp.txt';
   Exec(
     'cmd.exe',
-    Params,
+    '/C ""for /f "tokens=' + IntToStr(Token) +
+      ' delims=' + Delims +
+      '" %a in ("' + ReadValues('this.rabbitmq.url') + '")' +
+      ' do echo %a > ' + '"' + TmpFileName + '"""',
     '',
     SW_HIDE,
     ewWaitUntilTerminated,
