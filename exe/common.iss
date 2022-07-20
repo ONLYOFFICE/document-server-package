@@ -641,17 +641,17 @@ end;
 
 function GetJwtSecretInbox(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.token.enable.browser');
+  Result := ReadValues('this.services.CoAuthoring.secret.inbox.string');
 end;
 
 function GetJwtSecretOutbox(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.token.enable.request.inbox');
+  Result := ReadValues('this.services.CoAuthoring.secret.outbox.string');
 end;
 
 function GetJwtSecretSession(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.token.enable.request.outbox');
+  Result := ReadValues('this.services.CoAuthoring.secret.session.string');
 end;
 
 function GetJwtHeaderInbox(Param: String): String;
