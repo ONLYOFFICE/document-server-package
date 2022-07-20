@@ -28,7 +28,7 @@
         postrotate
             for SVC in M4_PACKAGE_SERVICES; do
                 if [ -e /usr/lib/systemd/system/$SVC.service ]; then
-                    systemctl restart $SVC > /dev/null
+                    service $SVC restart > /dev/null
                 fi
             done
         endscript

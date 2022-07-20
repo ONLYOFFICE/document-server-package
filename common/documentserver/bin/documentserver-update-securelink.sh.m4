@@ -32,6 +32,6 @@ SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
 sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF}
 ${JSON} -I -e 'this.storage={fs: {secretString: "'${SECURE_LINK_SECRET}'" }}' && chown ds:ds $LOCAL_CONF
 
-systemctl restart ds-docservice
-systemctl restart ds-converter
+service ds-docservice restart 
+service ds-converter restart 
 service nginx reload

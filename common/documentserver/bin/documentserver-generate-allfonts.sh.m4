@@ -56,6 +56,6 @@ rm -f \
 
 #Restart web-site and converter
 if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
- systemctl restart ds-docservice
- systemctl restart ds-converter
+ service ds-docservice restart
+ service ds-converter restart
 fi

@@ -69,7 +69,13 @@ mkdir -p "$HOME_DIR/fonts"
 
 #install systemd services
 mkdir -p %{buildroot}/usr/lib/systemd/system
-cp %{_builddir}/../../../common/documentserver/systemd/*.service %{buildroot}/usr/lib/systemd/system
+cp %{_builddir}/../../../common/documentserver/systemd/*.service %{buildroot}/etc/init.d
+
+#install init.d services
+mkdir -p %{buildroot}/etc/init.d
+cp %{_builddir}/../../../common/documentserver/init.d/ds-converter /etc/init.d
+cp %{_builddir}/../../../common/documentserver/init.d/ds-docservice /etc/init.d
+cp %{_builddir}/../../../common/documentserver/init.d/ds-metrics /etc/init.d
 
 #install nginx config
 DS_NGINX_CONF=$CONF_DIR/nginx/
@@ -107,6 +113,9 @@ mkdir -p "${DATA_DIR}-example/files/"
 
 #install example systemd services
 cp %{_builddir}/../../../common/documentserver-example/systemd/*.service %{buildroot}/usr/lib/systemd/system
+
+#install example init.d services
+cp %{_builddir}/../../../common/documentserver-example/init.d/ds-example /etc/init.d
 
 #install nginx config
 DSE_NGINX_CONF=${CONF_DIR}-example/nginx/includes/
@@ -179,6 +188,7 @@ rm -rf "%{buildroot}"
 %attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
 %attr(-, root, root) %{_sysconfdir}/nginx/includes/*
 %attr(-, root, root) /usr/lib/systemd/system/*
+%attr(-, root, root) /etc/init.d/*
 
 %dir
 %attr(750, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}

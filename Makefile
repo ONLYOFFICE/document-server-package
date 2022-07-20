@@ -224,12 +224,19 @@ DEB_DEPS += deb/build/debian/ds-example.service
 LINUX_DEPS += common/documentserver/systemd/ds-converter.service
 LINUX_DEPS += common/documentserver/systemd/ds-docservice.service
 LINUX_DEPS += common/documentserver/systemd/ds-metrics.service
-
-LINUX_DEPS_CLEAN += common/documentserver/systemd/*.service
-
 LINUX_DEPS += common/documentserver-example/systemd/ds-example.service
 
+LINUX_DEPS_CLEAN += common/documentserver/init.d/*.service
 LINUX_DEPS_CLEAN += common/documentserver-example/systemd/*.service
+
+LINUX_DEPS += common/documentserver/init.d/ds-converter
+LINUX_DEPS += common/documentserver/init.d/ds-docservice
+LINUX_DEPS += common/documentserver/init.d/ds-metrics
+LINUX_DEPS += common/documentserver-example/init.d/ds-example
+
+LINUX_DEPS_CLEAN += common/documentserver/init.d/ds-converter
+LINUX_DEPS_CLEAN += common/documentserver/init.d/ds-docservice
+LINUX_DEPS_CLEAN += common/documentserver/init.d/ds-metrics
 
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 

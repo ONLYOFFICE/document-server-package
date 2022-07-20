@@ -23,7 +23,7 @@ case "$1" in
         echo "Stopping documentserver services..."
         for SVC in M4_PACKAGE_SERVICES; do
             if [ -e /usr/lib/systemd/system/$SVC.service ]; then
-                systemctl stop $SVC
+                service $SVC stop
             fi
         done
         
