@@ -216,17 +216,12 @@ LINUX_DEPS += common/documentserver/logrotate/ds.conf
 #Prevent copy old artifacts
 LINUX_DEPS_CLEAN += common/documentserver/logrotate/*.conf
 
-DEB_DEPS += deb/build/debian/ds-converter.service
-DEB_DEPS += deb/build/debian/ds-docservice.service
-DEB_DEPS += deb/build/debian/ds-metrics.service
-DEB_DEPS += deb/build/debian/ds-example.service
-
 LINUX_DEPS += common/documentserver/systemd/ds-converter.service
 LINUX_DEPS += common/documentserver/systemd/ds-docservice.service
 LINUX_DEPS += common/documentserver/systemd/ds-metrics.service
 LINUX_DEPS += common/documentserver-example/systemd/ds-example.service
 
-LINUX_DEPS_CLEAN += common/documentserver/init.d/*.service
+LINUX_DEPS_CLEAN += common/documentserver/systemd/*.service
 LINUX_DEPS_CLEAN += common/documentserver-example/systemd/*.service
 
 LINUX_DEPS += common/documentserver/init.d/ds-converter
@@ -237,6 +232,7 @@ LINUX_DEPS += common/documentserver-example/init.d/ds-example
 LINUX_DEPS_CLEAN += common/documentserver/init.d/ds-converter
 LINUX_DEPS_CLEAN += common/documentserver/init.d/ds-docservice
 LINUX_DEPS_CLEAN += common/documentserver/init.d/ds-metrics
+LINUX_DEPS_CLEAN += common/documentserver-example/init.d/ds-example
 
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
@@ -308,7 +304,6 @@ clean:
 		deb/*.changes \
 		deb/*.ddeb \
 		deb/*.deb \
-		deb/*.service \
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
@@ -473,9 +468,6 @@ deb/build/debian/% : deb/template/%
 
 deb/build/debian/% : deb/template/%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
-
-deb/build/debian/% : common/documentserver*/systemd/%.m4
-	mkdir -pv $(@D) && cp -fv $< $@
 
 deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@

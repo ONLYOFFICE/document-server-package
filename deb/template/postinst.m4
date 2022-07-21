@@ -346,6 +346,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		# restart dependent services
 		for SVC in M4_PACKAGE_SERVICES; do
 			if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+    			systemctl enable $SVC >/dev/null 2>&1
 				service $SVC restart >/dev/null 2>&1
 			fi
 		done
