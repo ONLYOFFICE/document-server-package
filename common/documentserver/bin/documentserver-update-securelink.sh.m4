@@ -10,6 +10,14 @@ while [ "$1" != "" ]; do
 			fi
 		;;
 
+                -r | --restart )
+                        if [ "$2" != "" ]; then
+                                RESTART_CONDITION=$2
+                                shift
+                        fi
+                ;;
+
+
 		-? | -h | --help )
 			echo "  Usage $0 [PARAMETER] [[PARAMETER], ...]"
 			echo "    Parameters:"
@@ -32,6 +40,9 @@ SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(pwgen -s 20)}
 sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF}
 ${JSON} -I -e 'this.storage={fs: {secretString: "'${SECURE_LINK_SECRET}'" }}' && chown ds:ds $LOCAL_CONF
 
-service ds-docservice restart 
-service ds-converter restart 
+if [ "$RESTART_CONDITION" != "false" ]; then
+   service ds-converter restart 
+   service ds-converter restart 
+fi
+
 service nginx reload
