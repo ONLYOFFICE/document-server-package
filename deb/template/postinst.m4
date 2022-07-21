@@ -338,7 +338,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 		if [ -d /etc/M4_DS_PREFIX/supervisor ]; then
 			rm -rf /etc/M4_DS_PREFIX*/supervisor
-			supervisorctl update
+			supervisorctl update 2>/dev/null || true
 		fi
 
 		# call db_stop to prevent installation hang
