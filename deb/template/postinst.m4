@@ -332,6 +332,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		documentserver-generate-allfonts.sh true
 
 		chown ds:ds -R "$LOG_DIR"
+		chown ds:ds -R "$LOG_DIR-example"
 		chown ds:ds -R "$APP_DIR"
 		chown ds:ds -R "$APP_DIR-example"
 

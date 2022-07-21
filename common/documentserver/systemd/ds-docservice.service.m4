@@ -4,7 +4,7 @@ After=network.target syslog.target redis-server.service ds-metrics.service
 Wants=redis-server.service ds-metrics.service
 
 [Service]
-Type=exec
+Type=simple
 User=ds
 Group=ds
 WorkingDirectory=/var/www/M4_DS_PREFIX/server/DocService

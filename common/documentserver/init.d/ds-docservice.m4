@@ -1,12 +1,12 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides:          ds-docservice
-# Required-Stop:     $remote_fs $network $named
-# Required-Stop:	 $remote_fs $network $named
-# Default-Start:     2 3 5
-# Default-Stop:		 0 1 6
-# Short-Description: Docs Docservice
+# Provides:			ds-docservice
+# Required-Stop:		$remote_fs $network $named
+# Required-Stop:		$remote_fs $network $named
+# Default-Start:		2 3 5
+# Default-Stop:		0 1 6
+# Short-Description:	Docs Docservice
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin

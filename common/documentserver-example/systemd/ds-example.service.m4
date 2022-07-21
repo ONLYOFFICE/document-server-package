@@ -3,7 +3,7 @@ Description=Docs Example
 After=network.target syslog.target
 
 [Service]
-Type=exec
+Type=simple
 User=ds
 Group=ds
 WorkingDirectory=/var/www/M4_DS_PREFIX-example
