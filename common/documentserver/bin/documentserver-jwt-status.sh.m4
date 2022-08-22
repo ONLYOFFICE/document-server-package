@@ -27,10 +27,5 @@ do
 			fi
 			break
 		fi
-	else
-		echo "JWT SECRET validation failed with an error"
-		echo "You can reconfigure the package using the command"
-		echo "dpkg-reconfigure M4_PACKAGE_NAME"
 	fi
 done
-#NODE_CONFIG_DIR #NODE_ENV
