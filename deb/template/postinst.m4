@@ -94,8 +94,11 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	JWT_HEADER="$RET"
 
 	if [ ! -f $LOCAL_CONFIG ] && [ -z $JWT_SECRET ]; then
+		JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
 		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
 		db_set M4_ONLYOFFICE_VALUE/jwt-secret select $JWT_SECRET || true
+	elif [ $JWT_ENABLED = "false" ]; then
+		JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT with debconf template M4_ONLYOFFICE_VALUE/jwt-enabled and configure your custom JWT key with M4_ONLYOFFICE_VALUE/jwt-secret"
 	fi
 }
 
@@ -343,6 +346,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		service nginx restart >/dev/null 2>&1
 		
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
+		echo "$JWT_MESSAGE"
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)
