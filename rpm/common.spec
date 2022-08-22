@@ -271,6 +271,11 @@ if [ "$IS_UPGRADE" = "true" ]; then
   JSON_BIN="$DIR/npm/json"
   JSON="$JSON_BIN -f $LOCAL_CONFIG"
 
+  JWT_ENABLED=$($JSON services.CoAuthoring.token.enable.request.inbox)
+  if [ $JWT_ENABLED = "false" ]; then
+		JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT in ${LOCAL_CONFIG} in services.CoAuthoring.token.enable and configure your custom JWT key in services.CoAuthoring.secret"
+	fi
+
   if [ -f ${LOCAL_CONFIG} ] && [[ -n "$($JSON services.CoAuthoring.sql)" ]]; then
     #load_db_params
     DB_HOST=$($JSON services.CoAuthoring.sql.dbHost)
@@ -358,6 +363,8 @@ fi
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
+
+echo "$JWT_MESSAGE"
 
 %transfiletriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
 %{_bindir}/documentserver-generate-allfonts.sh true

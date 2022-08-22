@@ -22,6 +22,7 @@ DS_PORT=${DS_PORT:-80}
 JWT_ENABLED=${JWT_ENABLED:-false}
 JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
+JWT_MESSAGE="Since v7.2.0 we've enabled JWT with random key by default. You can lookup this key in ${LOCAL_CONFIG} in services.CoAuthoring.secret param or enabled your custom JWT key"
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
@@ -399,3 +400,5 @@ setup_nginx
 documentserver-update-securelink.sh
 
 restart_services
+
+echo $JWT_MESSAGE
