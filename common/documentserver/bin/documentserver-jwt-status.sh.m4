@@ -1,13 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
 CONF_DIR="/etc/M4_DS_PREFIX"
 DIR="/var/www/M4_DS_PREFIX"
 
-LOCAL_CONFIG=${CONF_DIR}/local.json
-DEFAULT_CONFIG=${CONF_DIR}/default.json
-Configs=($LOCAL_CONFIG $DEFAULT_CONFIG)
+LOCAL_CONFIG="${CONF_DIR}/local.json"
+DEFAULT_CONFIG="${CONF_DIR}/default.json"
+Configs=("$LOCAL_CONFIG" "$DEFAULT_CONFIG")
 
 JSON_BIN="$DIR/npm/json"
 
