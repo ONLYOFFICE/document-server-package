@@ -273,8 +273,8 @@ if [ "$IS_UPGRADE" = "true" ]; then
 
   JWT_ENABLED=$($JSON services.CoAuthoring.token.enable.request.inbox)
   if [ $JWT_ENABLED = "false" ]; then
-		JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT in ${LOCAL_CONFIG} in services.CoAuthoring.token.enable and configure your custom JWT key in services.CoAuthoring.secret"
-	fi
+    JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT in ${LOCAL_CONFIG} in services.CoAuthoring.token.enable and configure your custom JWT key in services.CoAuthoring.secret"
+  fi
 
   if [ -f ${LOCAL_CONFIG} ] && [[ -n "$($JSON services.CoAuthoring.sql)" ]]; then
     #load_db_params
