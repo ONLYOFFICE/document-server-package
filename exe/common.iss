@@ -714,7 +714,10 @@ begin
   begin;
     if ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}}}') = '' then
     begin;
-      MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
+      if WizardSilent() = false then
+      begin;
+        MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
+      end;
     end;
   end;
 end;
