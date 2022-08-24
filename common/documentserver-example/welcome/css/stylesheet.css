@@ -88,6 +88,29 @@ a:hover {
     width: 1120px;
 }
 
+.notice_block{
+    margin: 0 auto;
+    padding: 64px 0;
+    width: 1120px;
+    margin-top: 64px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    padding: 40px 32px;
+    background: #f9f9f9;
+}
+
+.notice_text {
+    font-size: 16px;
+    line-height: 160%;
+    margin: 0;
+    padding-bottom: 0px;
+    
+}
+
+.notice_text span {
+    font-style: italic;
+}
+
 .content-block p {
     font-size: 16px;
     line-height: 160%;
@@ -214,6 +237,9 @@ footer {
         width: 55vw;
     }
     .content-block {
+        width: 90.6vw;
+    }
+    .notice_block  {
         width: 90.6vw;
     }
     header img {

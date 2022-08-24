@@ -239,6 +239,9 @@ ru.InstallSrv=Установка сервиса %1...
 en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
 ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' что бы удалить ей, или 'Отменить' что бы выйти из программы инсталляции.
 
+en.EnableJWT=JWT is enabled by default. A random secret is generated automatically. The secret is available in %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, in services.CoAuthoring.secret.browser.string parameter.
+ru.EnableJWT=JWT включен по умолчанию. Случайный секрет генерируется автоматически. Секрет доступен в %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, параметр services.CoAuthoring.secret.browser.string
+
 en.RemoveDb=Removing database...
 ru.RemoveDb=Удаление базы данных...
 
@@ -507,10 +510,14 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
 
 [Code]
+var
+  JWTSecret: String;
+
 function UninstallPreviosVersion(): Boolean;
 var
   UninstallerPath: String;
@@ -681,14 +688,48 @@ begin
   Result := FontPath;
 end;
 
+function RandomString(StringLen:Integer):String;
+var
+  str: String;
+begin
+  str := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ0123456789';
+  Result := '';
+  repeat
+    Result := Result + str[Random(Length(str)) + 1];
+  until(Length(Result) = StringLen)
+end;
+
+function SetJWTRandomString(Param: String): String;
+begin
+  if JWTSecret = '' then
+  begin;
+    JWTSecret := RandomString(30);
+  end;
+  Result := JWTSecret;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+  begin;
+    if ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}}}') = '' then
+    begin;
+      if WizardSilent() = false then
+      begin;
+        MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
+      end;
+    end;
+  end;
+end;
+
 function GetJwtEnabled(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#sAppRegPath},{#REG_JWT_ENABLED}|false}}');
+  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#sAppRegPath},{#REG_JWT_ENABLED}|true}}');
 end;
 
 function GetJwtSecret(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}|secret}}');
+  Result := ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}|{code:SetJWTRandomString}}}');
 end;
 
 function GetJwtHeader(Param: String): String;
@@ -929,8 +970,14 @@ begin
       Result := not IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
       Result := not IsComponentSelected('Prerequisites\RabbitMq');
-    RedisPage.ID:
-      Result := not IsComponentSelected('Prerequisites\Redis');
+  else
+    if IsCommercial then
+    begin
+      if PageID = RedisPage.ID then
+      begin
+        Result := not IsComponentSelected('Prerequisites\Redis');
+      end;
+    end;
   end;
 end;
 
@@ -955,7 +1002,7 @@ begin
     begin
       Exec(
         ExpandConstant('{cmd}'),
-        '/C netstat -na | findstr'+' /C:":' + IntToStr(Ports[I]) + ' "',
+        '/C netstat -aon | findstr :' + IntToStr(Ports[I]) + ' "',
         '',
         0,
         ewWaitUntilTerminated,
@@ -983,8 +1030,6 @@ begin
         Result := CheckDbConnection();
       RabbitMqPage.ID:
         Result := CheckRabbitMqConnection();
-      RedisPage.ID:
-        Result := CheckRedisConnection();
       wpWelcome:
         Result := CheckPortOccupied();
       wpSelectComponents:
@@ -1001,6 +1046,18 @@ begin
         if not IsComponentSelected('Prerequisites\PostgreSQL') then
         begin
           Dependency_AddPostgreSQL;
+        end;
+        if IsComponentSelected('Prerequisites\Certbot') then
+        begin
+          Dependency_AddCertbot;
+        end;
+      end;
+    else
+      if IsCommercial then
+      begin
+        if CurPageID = RedisPage.ID then
+        begin
+          Result := CheckRedisConnection();
         end;
       end;
     end;

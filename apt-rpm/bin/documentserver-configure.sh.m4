@@ -19,7 +19,11 @@ DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 
-JWT_ENABLED=${JWT_ENABLED:-false}
+if [ ! -f $LOCAL_CONFIG ] && [ -z $JWT_SECRET ]; then
+	JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
+fi
+
+JWT_ENABLED=${JWT_ENABLED:-true}
 JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
@@ -412,3 +416,5 @@ setup_nginx
 documentserver-update-securelink.sh
 
 restart_services
+
+echo $JWT_MESSAGE
