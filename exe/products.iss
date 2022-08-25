@@ -35,6 +35,11 @@ begin
   Result := IsInstalled('PostgreSQL [0-9].*[^a-zA-Z]$', '{#Registry64}');
 end;
 
+function IsCertbotInstalled(): Boolean;
+begin
+  Result := IsInstalled('Certbot$', '{#Registry32}');
+end;
+
 procedure Dependency_AddErlang;
 begin
   if IsErlangInstalled() = False then
@@ -135,6 +140,23 @@ begin
       Dependency_String(
         'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '.exe',
         'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '-amd64.exe'),
+      '',
+      False,
+      False);
+  end;
+end;
+
+procedure Dependency_AddCertbot;
+begin
+  if IsCertbotInstalled() = False then
+  begin
+    Dependency_Add(
+      'certbot.exe',
+      '/S',
+      'Certbot beta win32',
+      Dependency_String(
+        '',
+        'https://dl.eff.org/certbot-beta-installer-win32.exe'),
       '',
       False,
       False);
