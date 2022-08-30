@@ -128,8 +128,6 @@
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
-#define REDISCLI '{pf64}\Redis\redis-cli.exe'
-#define RABBITMQCTL '{pf64}\RabbitMQ Server\rabbitmq_server-3.6.5\sbin\rabbitmqctl.bat'
 
 #define JSON '{app}\npm\json.exe'
 
@@ -152,8 +150,16 @@
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
 
+#define PythonPath '{sd}\Python'
+#define Python str(PythonPath + "\python.exe")
+#define Pip str(PythonPath + "\scripts\pip.exe")
+#define RabbitMq 'RabbitMQ'
+#define PostgreSQL 'PostgreSQL'
+#define Redis 'Redis'
+
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
+#include "products.iss"
 
 [Setup]
 AppName                   ={#sAppName}
@@ -245,6 +251,69 @@ ru.StartSrv=Запуск сервиса %1...
 en.Uninstall=Uninstall {#sAppName}
 ru.Uninstall=Удаление {#sAppName}
 
+en.Program=Program components
+ru.Program=Компоненты программы
+
+en.Prerequisites=Download prerequisites
+ru.Prerequisites=Загрузить необходимое ПО
+
+en.FullInstall=Full installation
+ru.FullInstall=Полная установка
+
+en.CompactInstall=Compact installation
+ru.CompactInstall=Компактная установка
+
+en.CustomInstall=Custom installtion
+ru.CustomInstall=Выборочная установка
+
+en.Postgre=PostgreSQL Database
+ru.Postgre=База данных PostgreSQL
+
+en.PostgreDb=Database:
+ru.PostgreDb=База данных:
+
+en.RabbitMq=RabbitMQ Messaging Broker
+ru.RabbitMq=Брокер обмена сообщениями RabbitMQ
+
+en.Redis=Redis In-Memory Database
+ru.Redis=Хранилище структур данных Redis
+
+en.Host=Host
+ru.Host=Хост
+
+en.Port=Port
+ru.Port=Порт
+
+en.User=User
+ru.User=Пользователь
+
+en.Password=Password
+ru.Password=Пароль
+
+en.Protocol=Protocol
+ru.Protocol=Протокол
+
+en.PackageConfigure=Configure Connection to %1
+ru.PackageConfigure=Настройка соединения с %1
+
+en.PackageConnection=Please specify your %1 connection, then click Next.
+ru.PackageConnection=Укажите параметры подключения к %1 и нажмите «Далее»
+
+en.CheckConnection=Connection to %1 failed! %n%2 return code %3%nCheck the connection settings and try again.
+ru.CheckConnection=Соединение с %1 не удалось! %n%2 вернул код ошибки %3%nПроверьте настройки соединения и попробуйте снова.
+
+en.NotAvailable=%1 isn't installed or unreachable,
+ru.NotAvailable=%1 не установлен или недоступен,
+
+en.SkipValidation=%1 parameters validation will be skipped.
+ru.SkipValidation=будет пропущена проверка параметров %1
+
+en.CheckFailed=Failed to check parameters,
+ru.CheckFailed=Ошибка проверки параметров
+
+en.UsePort=Port %1 is in use. The installation will continue, but the operation of the application is not guaranteed.
+ru.UsePort=Порт %1 используется. Инсталляция будет продолжена, но работа приложения не гарантируется.
+
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
@@ -255,15 +324,16 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 ;Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Files]
-Source: ..\common\documentserver\home\*;            DestDir: {app}; Excludes: "*local.json"; Flags: ignoreversion recursesubdirs;
-Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
-Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
-Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
-Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall
+Source: ..\common\documentserver\home\*;            DestDir: {app}; Excludes: "*local.json"; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
+Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
+Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify
@@ -415,6 +485,20 @@ Type: filesandordirs; Name: "{app}\fonts"
 Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
+[Types]
+Name: full; Description: {cm:FullInstall}
+Name: compact; Description: {cm:CompactInstall}
+Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
+ 
+
+[Components]
+Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
+Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
+
 [Code]
 var
   JWTSecret: String;
@@ -466,8 +550,22 @@ begin
   end;
 end;
 
+function ExtractFiles(): Boolean;
+begin
+  ExtractTemporaryFile('connectionRabbit.py');
+  ExtractTemporaryFile('psql.exe');
+  ExtractTemporaryFile('libintl-8.dll');
+  ExtractTemporaryFile('libpq.dll');
+  ExtractTemporaryFile('libcrypto-1_1-x64.dll');
+  ExtractTemporaryFile('libssl-1_1-x64.dll');
+  ExtractTemporaryFile('libiconv-2.dll')
+end;
+
 function InitializeSetup(): Boolean;
 begin
+ 
+  ExtractFiles();
+  
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -477,6 +575,7 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
+    Dependency_AddPython3;
   end;
 
   Result := true;
@@ -819,26 +918,30 @@ end;
 
 procedure InitializeWizard;
 begin
-  DbPage := CreateInputQueryPage(wpPreparing,
-    'PostgreSQL Database', 'Configure PostgreSQL Connection...',
-    'Please specify your PostgreSQL connection, then click Next.');
-  DbPage.Add('Host:', False);
-  DbPage.Add('User:', False);
-  DbPage.Add('Password:', True);
-  DbPage.Add('Database:', False);
+  DbPage := CreateInputQueryPage(
+    wpPreparing,
+    ExpandConstant('{cm:Postgre}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
+  DbPage.Add(ExpandConstant('{cm:Host}'), False);
+  DbPage.Add(ExpandConstant('{cm:User}'), False);
+  DbPage.Add(ExpandConstant('{cm:Password}'), True);
+  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
   DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
   DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
   DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
   DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
-  RabbitMqPage := CreateInputQueryPage(DbPage.ID,
-    'RabbitMQ Messaging Broker', 'Configure RabbitMQ Connection...',
-    'Please specify your RabbitMQ connection, then click Next.');
-  RabbitMqPage.Add('Host:', False);
-  RabbitMqPage.Add('User:', False);
-  RabbitMqPage.Add('Password:', True);
-  RabbitMqPage.Add('Protocol:', False);
+  RabbitMqPage := CreateInputQueryPage(
+    DbPage.ID,
+    ExpandConstant('{cm:RabbitMq}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
+  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
   
   RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
@@ -846,10 +949,12 @@ begin
   RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
   
   if IsCommercial then begin
-    RedisPage := CreateInputQueryPage(RabbitMqPage.ID,
-      'Redis In-Memory Database', 'Configure Redis Connection...',
-      'Please specify your Redis connection, then click Next.');
-    RedisPage.Add('Host:', False);
+    RedisPage := CreateInputQueryPage(
+      RabbitMqPage.ID,
+      ExpandConstant('{cm:Redis}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
+    RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
     RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
   end;
@@ -900,16 +1005,21 @@ begin
     False);
 
   Exec(
-    ExpandConstant('{#PSQL}'),
+    ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetDbHost('') + ' failed!' + #13#10 + 'PSQL return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetDbHost(''), 'PSQL', IntToStr(ResultCode) + '.'])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -919,17 +1029,69 @@ var
   ResultCode: Integer;
 begin
   Result := true;
-    Exec(
-    ExpandConstant('{#RABBITMQCTL}'),
-    '-q list_queues',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+
+  ShellExec(
+    '',
+    ExpandConstant('{#Python}'),
+    '--version',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'rabbitmqctl return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
+      mbInformation,
+      MB_OK);
+    Exit;
+  end;
+
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
+  begin
+    Exec(
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install pika',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
+  if FileExists(ExpandConstant('{tmp}\connectionRabbit.py')) = true then
+  begin
+    ShellExec(
+      '',
+      ExpandConstant('{#Python}'),
+      (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
+      GetRabbitMqUser('') + ' ' +
+      GetRabbitMqPwd('') + ' ' +
+      GetRabbitMqHost('')),
+      '',
+      SW_SHOW,
+      EwWaitUntilTerminated,
+      ResultCode);
+  end
+  else
+  begin 
+    MsgBox(
+      ExpandConstant('{cm:CheckFailed}') + ' ' +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
+      mbInformation,
+      MB_OK);
+    Exit;
+  end;
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetRabbitMqHost(''), '{#RabbitMQ}', IntToStr(ResultCode) + '.'])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
@@ -939,32 +1101,137 @@ var
   ResultCode: Integer;
 begin
   Result := true;
+
+  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
+  begin
     Exec(
-    ExpandConstant('{#REDISCLI}'),
-    '-h ' + GetRedisHost('') + ' --version',
-    '', 
-    SW_HIDE,
-    ewWaitUntilTerminated,
+    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
+    'install iredis',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
+    ResultCode);
+  end;
+
+  Exec(
+    '>',
+    'iredis -h ' + GetRedisHost('') + ' quit',
+    '',
+    SW_SHOW,
+    EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox('Connection to ' + GetRedisHost('') + ' failed!' + #13#10 + 'redis-cli return ' + IntToStr(ResultCode)+ ' code.' +  #13#10 + 'Check the connection settings and try again.', mbError, MB_OK);
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:CheckConnection}'),
+        ([GetRedisHost(''), '{#Redis}', IntToStr(ResultCode) + '.'])),
+      mbError,
+      MB_OK);
     Result := false;
   end;
 end;
 
-//function NextButtonClick(CurPageID: Integer): Boolean;
-//begin
-//  Result := true;
-//  if WizardSilent() = false then
-//  begin
-//    case CurPageID of
-////      DbPage.ID: Result := CheckDbConnection();
-////      RabbitMqPage.ID: Result := CheckRabbitMqConnection();
-////      RedisPage.ID: Result := CheckRedisConnection();
-//      wpReady: Result := DownloadDependency();
-//    end;
-//  end;
-//end;                                                     
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  Result := false;
+  case PageID of
+    DbPage.ID:
+      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+    RabbitMqPage.ID:
+      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+  else
+    if IsCommercial then
+    begin
+      if PageID = RedisPage.ID then
+      begin
+        Result := not IsComponentSelected('Prerequisites\Redis');
+      end;
+    end;
+  end;
+end;
+
+function ArrayLength(a: array of integer): Integer;
+begin
+  Result := GetArrayLength(a);
+end;
+
+function CheckPortOccupied(): Boolean;
+var
+  ResultCode: Integer;
+  I: Integer;
+  Ports: Array[0..2] of Integer;
+begin
+  if WizardSilent() = false then
+  begin
+    Result := true;
+    Ports[0] := StrToInt(GetDefaultPort(''));
+    Ports[1] := 8080;
+    Ports[2] := 3000;
+    for I := 0 to ArrayLength(Ports) - 1 do
+    begin
+      Exec(
+        ExpandConstant('{cmd}'),
+        '/C netstat -aon | findstr :' + IntToStr(Ports[I]) + ' "',
+        '',
+        0,
+        ewWaitUntilTerminated,
+        ResultCode);
+      if ResultCode <> 1 then
+      begin
+        MsgBox(
+          FmtMessage(
+            ExpandConstant('{cm:UsePort}'), [IntToStr(Ports[I])]),
+          mbInformation,
+          MB_OK);
+        Result := true; 
+      end
+    end;
+  end;
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := true;
+  if WizardSilent() = false then
+  begin
+    case CurPageID of
+      DbPage.ID:
+        Result := CheckDbConnection();
+      RabbitMqPage.ID:
+        Result := CheckRabbitMqConnection();
+      wpWelcome:
+        Result := CheckPortOccupied();
+      wpSelectComponents:
+      begin
+        if IsComponentSelected('Prerequisites\Redis') then
+        begin
+          Dependency_AddRedis;
+        end;
+        if IsComponentSelected('Prerequisites\RabbitMq') then
+        begin
+          Dependency_AddErlang;
+          Dependency_AddRabbitMq;
+        end;
+        if not IsComponentSelected('Prerequisites\PostgreSQL') then
+        begin
+          Dependency_AddPostgreSQL;
+        end;
+        if IsComponentSelected('Prerequisites\Certbot') then
+        begin
+          Dependency_AddCertbot;
+        end;
+      end;
+    else
+      if IsCommercial then
+      begin
+        if CurPageID = RedisPage.ID then
+        begin
+          Result := CheckRedisConnection();
+        end;
+      end;
+    end;
+  end;
+end;
 

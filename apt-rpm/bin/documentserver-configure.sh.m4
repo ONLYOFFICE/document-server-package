@@ -7,6 +7,7 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
+AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
 MYSQL=""
@@ -18,7 +19,11 @@ DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 
-JWT_ENABLED=${JWT_ENABLED:-false}
+if [ -z $JWT_SECRET ] && [ -z $JWT_ENABLED ]; then
+	JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
+fi
+
+JWT_ENABLED=${JWT_ENABLED:-true}
 JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
@@ -185,6 +190,7 @@ parse_amqp_url(){
   # extract the path (if any)
   local path="$(echo $url | grep / | cut -d/ -f2-)"
 
+  AMQP_SERVER_PROTO=${proto%://}
   AMQP_SERVER_HOST=$host
   AMQP_SERVER_PORT=$port
   AMQP_SERVER_HOST_PORT_PATH=$hostport$path
@@ -231,7 +237,7 @@ input_amqp_params(){
 	read -e -p "Password []: " -s USER_INPUT
 	AMQP_SERVER_PWD=${USER_INPUT:-${AMQP_SERVER_PWD}}
 
- 	AMQP_SERVER_URL=amqp://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
+ 	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
 
 
 	echo
@@ -406,4 +412,9 @@ tune_local_configs
 
 setup_nginx
 
+# generate secure link
+documentserver-update-securelink.sh
+
 restart_services
+
+echo $JWT_MESSAGE

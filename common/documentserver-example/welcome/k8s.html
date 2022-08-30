@@ -22,7 +22,7 @@
     *
     -->
 
-    <title>ONLYOFFICE Docs {{OFFICIAL_PRODUCT_NAME}}</title>
+    <title>ONLYOFFICE Docs Developer Edition</title>
     <link href="css/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:900,800,700,600,500,400,300&subset=latin,cyrillic-ext,cyrillic,latin-ext" />
     <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
@@ -33,38 +33,26 @@
             <img src="css/logo.svg" alt="ONLYOFFICE">
         </a>
     </header>
-    <div>
-        <div class="gray-block">
-            <div class="content-block">
-                <h1 class="orange-text">ONLYOFFICE Docs {{OFFICIAL_PRODUCT_NAME}} installed</h1>
-                <p>To edit office documents and collaborate, integrate ONLYOFFICE Docs into your sync&share app.</p>
-                <h2>Integration options</h2>
-                <div class="links-block">
-                    <a href="https://www.onlyoffice.com/collaboration-platform.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">ONLYOFFICE Groups</a>|
-                    <a href="https://www.onlyoffice.com/all-connectors.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">Connectors for 3rd party apps</a>|
-                    <a href="https://api.onlyoffice.com/editors/basic" target="_blank">Integration API for developers</a>
-                </div>
+    <div class="gray-block">
+        <div class="content-block">
+            <h1 class="orange-text">ONLYOFFICE Docs Developer Edition installed</h1>
+            <p>To edit office documents and collaborate, integrate ONLYOFFICE Docs into your sync&share app.</p>
+            <h2>Integration options</h2>
+            <div class="links-block">
+                <a href="https://www.onlyoffice.com/collaboration-platform.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">ONLYOFFICE Groups</a>|
+                <a href="https://www.onlyoffice.com/all-connectors.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">Connectors for 3rd party apps</a>|
+                <a href="https://api.onlyoffice.com/editors/basic" target="_blank">Integration API for developers</a>
             </div>
         </div>
-    </div>
-    <div class="notice_block">
-        <h1>Starting from version 7.2,  JWT is enabled by default.</h1> <br>
-        <p class="notice_text">A random secret is generated automatically if a custom secret has not been added during installation.<br>The secret is available in - <em>%ProgramFiles%\ONLYOFFICE\DocumentServer\config\<b>local.json</b></em></p>        
-        <p class="notice_text">in - <em>services.CoAuthoring.secret.browser.string</em> parameter.</p>
-        <p class="notice_text">If you want to replace the default secret with a custom key, read the <a href="https://api.onlyoffice.com/editors/signature/">documentation.</a></p>
     </div>
     <div>
         <div class="content-block">
             <h1>Testing before integration</h1>
-            <p>Use the integrated test example, a simple doc management system, to check if the editors are running correctly.</p>
-            <h3>Start test example:</h3>
-            <pre>net start DsExampleSvc</pre>
-            <h3>Add it to the autostart:</h3>
-            <pre>sc config DsExampleSvc start=auto</pre>
             <p>If you already installed test example, access it here:</p>
             <a href="/example/">
                 <div class="button">GO TO TEST EXAMPLE</div>
             </a>
+            <p></p>
             <p>Please do NOT use a test example on your own server without proper code modifications. It is intended for testing purposes only and must be disabled before launching the editors into production.</p>
         </div>
     </div>
@@ -77,7 +65,7 @@
                 For commercial versions, contact us <a href="https://helpdesk.onlyoffice.com/" target="_blank">here</a>.
             </p>
             <h1>ONLYOFFICE Docs editions</h1>
-            <p>Want to know what else we’ve got? 
+            <p>Want to know what else we’ve got?
                 <a href="https://www.onlyoffice.com/compare-editions.aspx" target="_blank">Compare editions</a>
             </p>
             <footer>© Ascensio Systems SIA 2021. All rights reserved.</footer>

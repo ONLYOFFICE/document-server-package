@@ -1,8 +1,6 @@
 Template: M4_ONLYOFFICE_VALUE/db-type
-Type: select
-Choices: postgres, mariadb, mysql
-Default: postgres
-Description: Choose database type:
+Type: string
+Description: Choose database type (postgres, mariadb, mysql):
 
 Template: M4_ONLYOFFICE_VALUE/db-host
 Type: string
@@ -63,6 +61,11 @@ Default: localhost
 Description: Redis host:
 
 ,)dnl
+Template: M4_ONLYOFFICE_VALUE/rabbitmq-proto
+Type: string
+Default: amqp
+Description: RABBITMQ protocol:
+
 Template: M4_ONLYOFFICE_VALUE/rabbitmq-host
 Type: string
 Default: localhost
@@ -80,7 +83,7 @@ Description: RabbitMQ password:
 
 Template: M4_ONLYOFFICE_VALUE/jwt-enabled
 Type: boolean
-Default: false
+Default: true
 Description: Enable jwt for M4_PRODUCT_NAME?
 
 Template: M4_ONLYOFFICE_VALUE/jwt-secret

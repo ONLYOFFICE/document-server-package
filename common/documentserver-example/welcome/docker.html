@@ -45,6 +45,13 @@
             </div>
         </div>
     </div>
+    <div class="notice_block">
+        <h1>Starting from version 7.2,  JWT is enabled by default.</h1> <br>
+        <p class="notice_text">A random secret is generated automatically if a custom secret has not been added during installation. To obtain the default secret, run this command:</p>
+        <pre> sudo docker exec $(sudo docker ps -a -q) /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'</span></pre>
+        <p class="notice_text notice_margin">You can replace the default secret with a custom key using Docker env.</p>
+        <p class="notice_text notice_margin">More information about JWT in the <a href="https://api.onlyoffice.com/editors/signature/">documentation.</a></p>
+    </div>
     <div>
         <div class="content-block">
             <h1>Testing before integration</h1>
