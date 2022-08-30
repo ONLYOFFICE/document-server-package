@@ -233,6 +233,9 @@ ru.InstallSrv=Установка сервиса %1...
 en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
 ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' что бы удалить ей, или 'Отменить' что бы выйти из программы инсталляции.
 
+en.EnableJWT=JWT is enabled by default. A random secret is generated automatically. The secret is available in %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, in services.CoAuthoring.secret.browser.string parameter.
+ru.EnableJWT=JWT включен по умолчанию. Случайный секрет генерируется автоматически. Секрет доступен в %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, параметр services.CoAuthoring.secret.browser.string
+
 en.RemoveDb=Removing database...
 ru.RemoveDb=Удаление базы данных...
 
@@ -252,7 +255,7 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 ;Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Files]
-Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs;
+Source: ..\common\documentserver\home\*;            DestDir: {app}; Excludes: "*local.json"; Flags: ignoreversion recursesubdirs;
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
 Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Permissions: users-modify
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
@@ -413,6 +416,13 @@ Type: files; Name: "{app}\server\FileConverter\bin\font_selection.bin"
 Type: files; Name: "{app}\server\FileConverter\bin\AllFonts.js"
 
 [Code]
+var
+  JWTSecret: String;
+  IsLocalExists: Boolean;
+  DbPage: TInputQueryWizardPage;
+  RabbitMqPage: TInputQueryWizardPage;
+  RedisPage: TInputQueryWizardPage;
+
 function UninstallPreviosVersion(): Boolean;
 var
   UninstallerPath: String;
@@ -462,7 +472,7 @@ begin
   begin
     Abort();
   end;
- 
+  
   if WizardSilent() = false then
   begin
     Dependency_AddVC2013;
@@ -471,11 +481,6 @@ begin
 
   Result := true;
 end;
-
-var
-  DbPage: TInputQueryWizardPage;
-  RabbitMqPage: TInputQueryWizardPage;
-  RedisPage: TInputQueryWizardPage;
 
 function ReadValues(Param: String): String;
 var
@@ -514,7 +519,12 @@ end;
 
 function GetDbHost(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.sql.dbHost');
+  end else begin
+    Result := DbPage.Values[0];
+  end;
 end;
 
 function GetDbPort(Param: String): String;
@@ -524,17 +534,32 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbUser');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.sql.dbUser');
+  end else begin
+    Result := DbPage.Values[1];
+  end;
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbPass');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.sql.dbPass');
+  end else begin
+    Result := DbPage.Values[2];
+  end;
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.sql.dbName');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.sql.dbName');
+  end else begin
+    Result := DbPage.Values[3];
+  end;
 end;
 
 function ParseRabbitMqParams(Token: Integer; Delims: String; Url: String): String;
@@ -562,27 +587,52 @@ end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := ParseRabbitMqParams(1,'://', ReadValues('this.rabbitmq.url')); 
+  if IsLocalExists then
+  begin
+    Result := ParseRabbitMqParams(1,'://', ReadValues('this.rabbitmq.url'));
+  end else begin
+    Result := RabbitMqPage.Values[0];
+  end;
 end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  Result := ParseRabbitMqParams(2,'://', ReadValues('this.rabbitmq.url')); 
+  if IsLocalExists then
+  begin
+    Result := ParseRabbitMqParams(2,'://', ReadValues('this.rabbitmq.url'));
+  end else begin
+    Result := RabbitMqPage.Values[1];
+  end;
 end;
 
 function GetRabbitMqPwd(Param: String): String;
 begin
-  Result := ParseRabbitMqParams(3,'*@', ReadValues('this.rabbitmq.url')); 
+  if IsLocalExists then
+  begin
+    Result := ParseRabbitMqParams(3,'*@', ReadValues('this.rabbitmq.url'));
+  end else begin
+    Result := RabbitMqPage.Values[2];
+  end;
 end;
 
 function GetRabbitMqProto(Param: String): String;
 begin
-  Result := ParseRabbitMqParams(4,'@', ReadValues('this.rabbitmq.url'));
+  if IsLocalExists then
+  begin
+    Result := ParseRabbitMqParams(4,'@', ReadValues('this.rabbitmq.url'));
+  end else begin
+    Result := RabbitMqPage.Values[3];
+  end;
 end;
 
 function GetRedisHost(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.redis.host');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.redis.host');
+  end else begin
+    Result := RedisPage.Values[0];
+  end;
 end;
 
 function GetDefaultPort(Param: String): String;
@@ -600,7 +650,12 @@ end;
 
 function GetDocServicePort(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.server.port');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.server.port');
+  end else begin
+    Result := '8000';
+  end;
 end;
 
 function GetExamplePort(Param: String): String;
@@ -609,53 +664,149 @@ begin
 end;
 
 function GetLicensePath(Param: String): String;
+var
+  LicensePath: String;
 begin
-  Result := ReadValues('this.license.license_file');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.license.license_file');
+  end else begin
+    LicensePath := ExpandConstant('{{#LICENSE_PATH}\license.lic}}');
+    StringChangeEx(LicensePath, '\', '/', True);
+    Result := LicensePath;
+  end;
 end;
 
 function GetFontsPath(Param: String): String;
+var
+  FontPath: String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.utils.utils_common_fontdir');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.utils.utils_common_fontdir');
+  end else begin
+    FontPath := ExpandConstant('{{fonts}}');
+    StringChangeEx(FontPath, '\', '/', True);
+    Result := FontPath;
+  end;
+end;
+
+function RandomString(StringLen:Integer):String;
+var
+  str: String;
+begin
+  str := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ0123456789';
+  Result := '';
+  repeat
+    Result := Result + str[Random(Length(str)) + 1];
+  until(Length(Result) = StringLen)
+end;
+
+function SetJWTRandomString(Param: String): String;
+begin
+  if JWTSecret = '' then
+  begin;
+    JWTSecret := RandomString(30);
+  end;
+  Result := JWTSecret;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssInstall then
+  begin;
+    IsLocalExists := FileExists(ExpandConstant('{app}\config\local.json'))
+  end;
+  if CurStep = ssPostInstall then
+  begin;
+    if JWTSecret <> '' then
+    begin;
+      if WizardSilent() = false then
+      begin;
+        MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
+      end;
+    end;
+  end;
 end;
 
 function GetJwtEnabledBrowser(Param: String): String;
 begin
+  if IsLocalExists then
+  begin
   Result := ReadValues('this.services.CoAuthoring.token.enable.browser');
+  end else begin
+    Result := 'true';
+  end;
 end;
 
 function GetJwtEnabledRequestInbox(Param: String): String;
 begin
+  if IsLocalExists then
+  begin
   Result := ReadValues('this.services.CoAuthoring.token.enable.request.inbox');
+  end else begin
+    Result := 'true';
+  end;
 end;
 
 function GetJwtEnabledRequestOutbox(Param: String): String;
 begin
+  if IsLocalExists then
+  begin
   Result := ReadValues('this.services.CoAuthoring.token.enable.request.outbox');
+  end else begin
+    Result := 'true';
+  end;
 end;
 
 function GetJwtSecretInbox(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.secret.inbox.string');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.secret.inbox.string');
+  end else begin
+    Result := SetJWTRandomString('');
+  end;
 end;
 
 function GetJwtSecretOutbox(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.secret.outbox.string');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.secret.outbox.string');
+  end else begin
+    Result := SetJWTRandomString('');
+  end;
 end;
 
 function GetJwtSecretSession(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.secret.session.string');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.secret.session.string');
+  end else begin
+    Result := SetJWTRandomString('');
+  end;
 end;
 
 function GetJwtHeaderInbox(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.token.inbox.header');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.token.inbox.header');
+  end else begin
+    Result := 'Authorization';
+  end;
 end;
 
 function GetJwtHeaderOutbox(Param: String): String;
 begin
-  Result := ReadValues('this.services.CoAuthoring.token.outbox.header');
+  if IsLocalExists then
+  begin
+    Result := ReadValues('this.services.CoAuthoring.token.outbox.header');
+  end else begin
+    Result := 'Authorization';
+  end;
 end;
 
 function IsCommercial: Boolean;
