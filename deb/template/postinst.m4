@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # postinst script for M4_ONLYOFFICE_VALUE
 #
 # see: dh_installdeb(1)
