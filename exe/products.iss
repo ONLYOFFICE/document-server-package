@@ -123,13 +123,13 @@ var
   Patch: String;
   SemVer: String;
 begin
-  Version := '3.9';
-  Patch := '10';
+  Version := '3.7';
+  Patch := '2';
   SemVer := Version + '.' + Patch;
   if not IsMsiProductInstalled(
            Dependency_String(
-            '{B0D35164-DCE0-5CD6-B3AE-55F0AE08E42E}',
-            '{0D8FFA35-4E68-56AE-9C6D-7B33F2B22892}'),
+            '{A6516328-639D-562B-8A85-C3E305DDAC6F}',
+            '{39BBB1D2-2CD1-57A7-A873-E06D44986C30}'),
             StrToInt(Version)) then 
   begin
     Dependency_Add(
@@ -153,7 +153,7 @@ begin
     Dependency_Add(
       'certbot.exe',
       '/S',
-      'Certbot beta win32',
+      'Certbot 1.24.0 x86',
       Dependency_String(
         '',
         'https://dl.eff.org/certbot-beta-installer-win32.exe'),

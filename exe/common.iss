@@ -509,14 +509,26 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
+;Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
+;Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
+;Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
 
 [Code]
 var
   JWTSecret: String;
+  IsRedisSelected: Boolean;
+  IsRabbitSelected: Boolean;
+  IsCertbotSelected: Boolean;
+  IsPostgreSelected: Boolean;
+
+procedure SetDependencyCheckVar;
+begin
+  IsRedisSelected := False;
+  IsRabbitSelected := False;
+  IsCertbotSelected := False;
+  IsPostgreSelected := False;
+end;
 
 function UninstallPreviosVersion(): Boolean;
 var
@@ -576,6 +588,7 @@ function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
+  SetDependencyCheckVar;
   
   if not UninstallPreviosVersion() then
   begin
@@ -962,24 +975,24 @@ begin
   end;
 end;
 
-function ShouldSkipPage(PageID: Integer): Boolean;
-begin
-  Result := false;
-  case PageID of
-    DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
-    RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
-  else
-    if IsCommercial then
-    begin
-      if PageID = RedisPage.ID then
-      begin
-        Result := not IsComponentSelected('Prerequisites\Redis');
-      end;
-    end;
-  end;
-end;
+//  function ShouldSkipPage(PageID: Integer): Boolean;
+//  begin
+//    Result := false;
+//    case PageID of
+//      DbPage.ID:
+//        Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+//      RabbitMqPage.ID:
+//        Result := not IsComponentSelected('Prerequisites\RabbitMq');
+//    else
+//      if IsCommercial then
+//      begin
+//        if PageID = RedisPage.ID then
+//        begin
+//          Result := not IsComponentSelected('Prerequisites\Redis');
+//        end;
+//      end;
+//    end;
+//  end;
 
 function ArrayLength(a: array of integer): Integer;
 begin
@@ -1026,40 +1039,56 @@ begin
   if WizardSilent() = false then
   begin
     case CurPageID of
-      DbPage.ID:
-        Result := CheckDbConnection();
-      RabbitMqPage.ID:
-        Result := CheckRabbitMqConnection();
-      wpWelcome:
-        Result := CheckPortOccupied();
+      //DbPage.ID:
+      //  Result := CheckDbConnection();
+      //RabbitMqPage.ID:
+      //  Result := CheckRabbitMqConnection();
+      //wpWelcome:
+      //  Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-        if IsComponentSelected('Prerequisites\Redis') then
-        begin
-          Dependency_AddRedis;
-        end;
-        if IsComponentSelected('Prerequisites\RabbitMq') then
-        begin
-          Dependency_AddErlang;
-          Dependency_AddRabbitMq;
-        end;
-        if not IsComponentSelected('Prerequisites\PostgreSQL') then
-        begin
-          Dependency_AddPostgreSQL;
-        end;
+        //if IsComponentSelected('Prerequisites\Redis') then
+        //begin
+        //  if not IsRedisSelected then
+        //  begin
+        //    IsRedisSelected := True;
+        //    Dependency_AddRedis;
+        //  end;
+        //end;
+        //if IsComponentSelected('Prerequisites\RabbitMq') then
+        //begin
+        //  if not IsRabbitSelected then
+        //  begin
+        //    IsRabbitSelected := True;
+        //    Dependency_AddErlang;
+        //    Dependency_AddRabbitMq;
+        //  end;
+        //end;
+        //if not IsComponentSelected('Prerequisites\PostgreSQL') then
+        //begin
+        //  if not IsPostgreSelected then
+        //  begin
+        //    IsPostgreSelected := True;
+        //    Dependency_AddPostgreSQL;
+        //  end;
+        //end;
         if IsComponentSelected('Prerequisites\Certbot') then
         begin
-          Dependency_AddCertbot;
+          if not IsCertbotSelected then
+          begin
+            IsCertbotSelected := True;
+            Dependency_AddCertbot;
+          end;
         end;
       end;
-    else
-      if IsCommercial then
-      begin
-        if CurPageID = RedisPage.ID then
-        begin
-          Result := CheckRedisConnection();
-        end;
-      end;
+    //else
+    //  if IsCommercial then
+    //  begin
+    //    if CurPageID = RedisPage.ID then
+    //    begin
+    //      Result := CheckRedisConnection();
+    //    end;
+    //  end;
     end;
   end;
 end;
