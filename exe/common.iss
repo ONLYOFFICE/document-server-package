@@ -237,7 +237,7 @@ en.InstallSrv=Installing service %1...
 ru.InstallSrv=Установка сервиса %1...
 
 en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
-ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' что бы удалить ей, или 'Отменить' что бы выйти из программы инсталляции.
+ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' чтобы удалить её, или 'Отмена' чтобы выйти из программы инсталляции.
 
 en.EnableJWT=JWT is enabled by default. A random secret is generated automatically. The secret is available in %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, in services.CoAuthoring.secret.browser.string parameter.
 ru.EnableJWT=JWT включен по умолчанию. Случайный секрет генерируется автоматически. Секрет доступен в %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, параметр services.CoAuthoring.secret.browser.string
@@ -263,7 +263,7 @@ ru.FullInstall=Полная установка
 en.CompactInstall=Compact installation
 ru.CompactInstall=Компактная установка
 
-en.CustomInstall=Custom installtion
+en.CustomInstall=Custom installation
 ru.CustomInstall=Выборочная установка
 
 en.Postgre=PostgreSQL Database
