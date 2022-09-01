@@ -517,6 +517,14 @@ Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Ty
 [Code]
 var
   JWTSecret: String;
+  IsJWTRegistryExists: Boolean;
+  IsLocalJsonExists: Boolean;
+
+procedure SetCheckVariables;
+begin
+  IsJWTRegistryExists := False;
+  IsLocalJsonExists := False;
+end;
 
 function UninstallPreviosVersion(): Boolean;
 var
@@ -576,6 +584,7 @@ function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
+  SetCheckVariables;
   
   if not UninstallPreviosVersion() then
   begin
@@ -710,13 +719,27 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssInstall then
+  begin;
+    if ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}}}') <> '' then
+    begin;
+      IsJWTRegistryExists := True;
+    end;
+    if FileExists(ExpandConstant('{app}\config\local.json')) then
+    begin
+      IsLocalJsonExists := True;
+    end;
+  end;
   if CurStep = ssPostInstall then
   begin;
-    if ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}}}') = '' then
+    if WizardSilent() = false then
     begin;
-      if WizardSilent() = false then
+      if not IsJWTRegistryExists then
       begin;
-        MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
+        if not IsLocalJsonExists then
+        begin;
+          MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
+        end;
       end;
     end;
   end;
@@ -724,12 +747,32 @@ end;
 
 function GetJwtEnabled(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#sAppRegPath},{#REG_JWT_ENABLED}|true}}');
+  if not IsJWTRegistryExists then
+  begin
+    if not IsLocalJsonExists then
+    begin
+      Result := ExpandConstant('{param:JWT_ENABLED|true}');
+    end else begin
+      Result := ExpandConstant('{param:JWT_ENABLED|false}');
+    end;
+  end else begin
+    Result := ExpandConstant('{param:JWT_ENABLED|{reg:HKLM\{#sAppRegPath},{#REG_JWT_ENABLED}|true}}');
+  end;
 end;
 
 function GetJwtSecret(Param: String): String;
 begin
-  Result := ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}|{code:SetJWTRandomString}}}');
+  if not IsJWTRegistryExists then
+  begin
+    if not IsLocalJsonExists then
+    begin
+      Result := ExpandConstant('{param:JWT_SECRET|{code:SetJWTRandomString}}');
+    end else begin
+      Result := ExpandConstant('{param:JWT_SECRET|secret}');
+    end;
+  end else begin
+    Result := ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}|secret}}');
+  end;
 end;
 
 function GetJwtHeader(Param: String): String;
