@@ -584,7 +584,7 @@ function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
-  InitVariables;
+  InitVariables();
   
   if not UninstallPreviosVersion() then
   begin
@@ -722,7 +722,7 @@ begin
   Result := LocalJsonExists;
 end;
 
-procedure ssInstallStepExec;
+procedure ssInstallExec;
 begin
   if ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}}}') <> '' then 
   begin
@@ -734,7 +734,7 @@ begin
   end;
 end;
 
-procedure ssPostInstallStepExec;
+procedure ssPostInstallExec;
 begin
   if (WizardSilent() = false) and (not IsJWTRegistryExists) and (not IsLocalJsonExists()) then
   begin
@@ -746,11 +746,11 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
   begin
-    ssInstallStepExec;
+    ssInstallExec();
   end;
   if CurStep = ssPostInstall then
   begin
-    ssPostInstallStepExec;
+    ssPostInstallExec();
   end;
 end;
 
