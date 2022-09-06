@@ -62,9 +62,6 @@ mkdir -p "$DATA_DIR/App_Data/cache/files"
 mkdir -p "$DATA_DIR/App_Data/docbuilder"
 
 #make exchange dir
-mkdir -p "%{buildroot}%{_localstatedir}/www/%{_ds_prefix}/../Data"
-
-#make exchange dir
 mkdir -p "$HOME_DIR/fonts"
 
 #install supervisor configs
@@ -206,7 +203,6 @@ rm -rf "%{buildroot}"
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}
 
 %attr(750, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
-%attr(755, -, -) %{_localstatedir}/www/%{_ds_prefix}/../Data
 
 %if %{defined example}
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
@@ -241,6 +237,13 @@ exit 0
 %post
 # Make symlink to libcurl-gnutls
 ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
+
+#make exchange dir
+DATA_DIR="%{_localstatedir}/www/%{_ds_prefix}/../Data"
+if [ ! -d "${DATA_DIR}" ]; then
+  mkdir -m 755 -p "${DATA_DIR}"
+  chown ds:ds "${DATA_DIR}"
+fi
 
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 
