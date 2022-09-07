@@ -14,7 +14,7 @@ MYSQL=""
 PSQL=""
 CREATEDB=""
 DB_TYPE=${DB_TYPE:-postgres}
-DB_PORT=""
+DB_PORT=${DB_PORT:-}
 DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
@@ -277,15 +277,16 @@ establish_mysql_conn(){
 	echo "OK"
 }
 
-execute_db_script(){
+execute_db_script(){ 
+	DB_PORT=${DB_PORT:-$(echo $DB_HOST | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')}
 	case $DB_TYPE in
 		postgres)
-			DB_PORT=5432 
+			DB_PORT=${DB_PORT:-5432} 
 			establish_postgres_conn || exit $?
 			execute_postgres_scripts || exit $?
 			;;	
 		mysql) 
-			DB_PORT=3306  
+			DB_PORT=${DB_PORT:-3306}  
 			establish_mysql_conn || exit $?
 			execute_mysql_sqript || exit $?
 			;;   
