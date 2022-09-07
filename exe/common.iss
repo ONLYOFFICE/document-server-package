@@ -994,7 +994,7 @@ begin
   end;
 end;
 
-function ShouldSkipPage(PageID: Integer): Boolean;
+(*function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
   case PageID of
@@ -1011,7 +1011,7 @@ begin
       end;
     end;
   end;
-end;
+end;*)
 
 function ArrayLength(a: array of integer): Integer;
 begin
