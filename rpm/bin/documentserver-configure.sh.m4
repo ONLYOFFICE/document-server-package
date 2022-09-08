@@ -280,7 +280,7 @@ establish_mysql_conn(){
 execute_db_script(){
 	#Parse port from host string
 	DB_PORT=${DB_PORT:-$(echo $DB_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
-	DB_HOST="${DB_HOST//:*}"
+	DB_HOST="${DB_HOST/:*/}"
 	case $DB_TYPE in
 		postgres)
 			DB_PORT=${DB_PORT:-5432} 
