@@ -148,7 +148,7 @@ while [ "$1" != "" ]; do
 			echo "      -jh, --jwtheader             Defines the http header that will be used to send the JSON Web Token            ( Defaults to Authorization )"
 			echo "      -dbt, --databasetype         The database type. Supported values are postgres, mariadb or mysql              ( Defaults to postgres )"
 			echo "      -dbh, --databasehost         The IP address or the name of the host where the database server is running"
-			echo "      -dbp, --databaseport         The database server port number                                                 ( Default to 5432 )"
+			echo "      -dbp, --databaseport         The database server port number                                                 ( Defaults to 5432 )"
 			echo "      -dbn, --databasename         The name of a database to be created on the image startup"
 			echo "      -dbu, --databaseuser         The new user name with superuser permissions for the database account"
 			echo "      -dbpw, --databasepassword    The password set for the database account"
@@ -176,13 +176,7 @@ done
 AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
-REDIS_PORT=${REDIS_PORT:-6379}
-
-MYSQL=""
-PSQL=""
-CREATEDB=""
 DB_TYPE=${DB_TYPE:-postgres}
-DB_PORT=${DB_PORT:-}
 DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
@@ -253,7 +247,7 @@ save_activemq_params(){
 	$JSON -e "if(this.activemq.connectOptions===undefined)this.activemq.connectOptions={};"
 
 	$JSON -e "this.activemq.connectOptions.host = '${AMQP_SERVER_HOST}'"
-	if [ ! "${AMQP_SERVER_PORT}" == "" ]; then
+	if [ ! -z "${AMQP_SERVER_PORT}" ]; then
 		$JSON -e "this.activemq.connectOptions.port = '${AMQP_SERVER_PORT}'"
 	else
 		$JSON -e "delete this.activemq.connectOptions.port"
@@ -355,15 +349,16 @@ input_amqp_params(){
 	echo "Configuring AMQP access... "
 	[ -z $AMQP_SERVER_HOST  ] && read -e -p "Host: " -i "$AMQP_SERVER_HOST" AMQP_SERVER_HOST
 	[ -z $AMQP_SERVER_USER  ] && read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
-	[ -z $AMQP_SERVER_PWD  ] && read -e -p "Password: " -s AMQP_SERVER_PWD
+	[ -z $AMQP_SERVER_PWD   ] && read -e -p "Password: " -s AMQP_SERVER_PWD
 	
-	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
 	#Parse port from host string
 	AMQP_SERVER_PORT=${AMQP_SERVER_PORT:-$(echo $AMQP_SERVER_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
 	AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
 	
-	[ -n $AMQP_SERVER_PORT  ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
-	echo
+	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
+	[ ! -z $AMQP_SERVER_PORT ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
+    
+    echo
 }
 
 execute_postgres_scripts(){
@@ -434,7 +429,7 @@ execute_db_script(){
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
-	exec {FD}<> /dev/tcp/$REDIS_HOST/$REDIS_PORT && exec {FD}>&-
+	exec {FD}<> /dev/tcp/$REDIS_HOST/${REDIS_PORT:="6379"} && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
