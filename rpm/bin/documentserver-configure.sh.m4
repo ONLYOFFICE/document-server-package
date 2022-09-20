@@ -442,7 +442,7 @@ establish_redis_conn() {
 establish_amqp_conn() {
 	echo -n "Trying to establish AMQP connection... "
   
-	exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/$AMQP_SERVER_PORT && exec {FD}>&-
+	exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/${AMQP_SERVER_PORT:="5672"} && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
