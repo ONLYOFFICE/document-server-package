@@ -320,49 +320,6 @@ save_jwt_params(){
   fi
 }
 
-parse_amqp_url(){
-  local amqp=${AMQP_SERVER_URL}
-
-  # extract the protocol
-  local proto="$(echo $amqp | grep :// | sed -e's,^\(.*://\).*,\1,g')"
-  # remove the protocol
-  local url="$(echo ${amqp/$proto/})"
-
-  # extract the user and password (if any)
-  local userpass="$(echo $url | grep @ | cut -d@ -f1)"
-  local pass=$(echo $userpass | grep : | cut -d: -f2)
-
-  local user
-  if [ -n "$pass" ]; then
-    user=$(echo $userpass | grep : | cut -d: -f1)
-  else
-    user=$userpass
-  fi
-
-  # extract the host
-  local hostport="$(echo ${url/$userpass@/} | cut -d/ -f1)"
-  # by request - try to extract the port
-  local port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
-
-  local host
-  if [ -n "$port" ]; then
-    host=$(echo $hostport | grep : | cut -d: -f1)
-  else
-    host=$hostport
-    port="5672"
-  fi
-
-  # extract the path (if any)
-  local path="$(echo $url | grep / | cut -d/ -f2-)"
-
-  AMQP_SERVER_PROTO=${proto%://}
-  AMQP_SERVER_HOST=$host
-  AMQP_SERVER_PORT=$port
-  AMQP_SERVER_HOST_PORT_PATH=$hostport$path
-  AMQP_SERVER_USER=$user
-  AMQP_SERVER_PWD=$pass
-}
-
 input_db_params(){
 	echo "Configuring database access... "
     
@@ -381,10 +338,17 @@ input_redis_params(){
 
 input_amqp_params(){
 	echo "Configuring AMQP access... "
-	[ -z $AMQP_SERVER_HOST  ] && read -e -p "Host: " -i "$AMQP_SERVER_HOST_PORT_PATH" AMQP_SERVER_HOST_PORT_PATH
+	[ -z $AMQP_SERVER_HOST  ] && read -e -p "Host: " -i "$AMQP_SERVER_HOST" AMQP_SERVER_HOST
 	[ -z $AMQP_SERVER_USER  ] && read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
 	[ -z $AMQP_SERVER_PWD  ] && read -e -p "Password: " -s AMQP_SERVER_PWD
-	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
+	
+    AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
+    #Parse port from host string
+    AMQP_SERVER_PORT=${AMQP_SERVER_PORT:-$(echo $AMQP_SERVER_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
+    AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
+
+    [ -n $AMQP_SERVER_PORT  ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
+    
 	echo
 }
 
