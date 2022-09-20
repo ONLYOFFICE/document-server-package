@@ -7,6 +7,164 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
+[ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
+
+while [ "$1" != "" ]; do
+	case $1 in
+
+		-p | --dsport )
+			if [ "$2" != "" ]; then
+				DS_PORT=$2
+				shift
+			fi
+		;;
+
+		-dbt | --databasetype )
+			if [ "$2" != "" ]; then
+				DB_TYPE=$2
+				shift
+			fi
+		;;
+
+		-dbh | --datahost )
+			if [ "$2" != "" ]; then
+				DB_HOST=$2
+				shift
+			fi
+		;;
+
+		-dbp | --databaseport )
+			if [ "$2" != "" ]; then
+				DB_PORT=$2
+				shift
+			fi
+		;;
+
+		-dbn | --databasename )
+			if [ "$2" != "" ]; then
+				DB_NAME=$2
+				shift
+			fi
+		;;
+
+		-dbu | --databaseuser )
+			if [ "$2" != "" ]; then
+				DB_USER=$2
+				shift
+			fi
+		;;
+
+		-dbpw | --databasepassword )
+			if [ "$2" != "" ]; then
+				DB_PWD=$2
+				shift
+			fi
+		;;
+
+		-je | --jwtenabled )
+			if [ "$2" != "" ]; then
+				JWT_ENABLED=$2
+				shift
+			fi
+		;;
+
+		-js | --jwtsecret )
+			if [ "$2" != "" ]; then
+				JWT_SECRET=$2
+				shift
+			fi
+		;;
+
+		-jh | --jwtheader )
+			if [ "$2" != "" ]; then
+				JWT_HEADER=$2
+				shift
+			fi
+		;;
+
+		-at | --amqptype )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_TYPE=$2
+				shift
+			fi
+		;;
+
+		-apr | --amqpproto )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_PROTO=$2
+				shift
+			fi
+		;;
+
+		-ah | --amqphost )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_HOST=$2
+				shift
+			fi
+		;;
+
+		-ap | --amqpport )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_PORT=$2
+				shift
+			fi
+		;;
+
+		-au | --amqpuser )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_USER=$2
+				shift
+			fi
+		;;
+
+		-apw | --amqppassword )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_PWD=$2
+				shift
+			fi
+		;;
+
+		-rh | --redishost )
+			if [ "$2" != "" ]; then
+				REDIS_HOST=$2
+				shift
+			fi
+		;;
+
+		-? | -h | --help )
+			echo "  Usage: bash documentserver-configure.sh [PARAMETER] [[PARAMETER], ...]"
+			echo
+			echo "    Parameters:"
+			echo "      -p, --dsport                 The value by that incoming connections are listened                             ( Defaults to 80 )"
+			echo "      -je, --jwtenabled            Specifies the enabling the JSON Web Token validation                            ( Defaults to true )"
+			echo "      -js, --jwtsecret             Defines the secret key to validate the JSON Web Token in the request            ( Defaults to random secret )"
+			echo "      -jh, --jwtheader             Defines the http header that will be used to send the JSON Web Token            ( Defaults to Authorization )"
+			echo "      -dbt, --databasetype         The database type. Supported values are postgres, mariadb or mysql              ( Defaults to postgres )"
+			echo "      -dbh, --databasehost         The IP address or the name of the host where the database server is running."
+			echo "      -dbp, --databaseport         The database server port number                                                 ( Default to 5432 )"
+			echo "      -dbn, --databasename         The name of a database to be created on the image startup."
+			echo "      -dbu, --databaseuser         The new user name with superuser permissions for the database account."
+			echo "      -dbpw, --databasepassword    The password set for the database account."
+			echo "      -at, --amqptype              Defines the message broker type. Possible values are rabbitmq or activemq       ( Defaults to rabbitmq )"
+			echo "      -apr, --amqpproto            The protocol for the connection to AMQP server. Possible values are amqp, amqps ( Defaults to amqp )"
+			echo "      -au, --amqpuser              The username for the AMQP server account."
+			echo "      -apw, --amqppassword         The password set for the AMQP server account."
+			echo "      -ah, --amqphost              The IP address or the name of the host where the AMQP server is running."
+			echo "      -ap, --amqpport              The port for the connection to AMQP server.                                     ( Defaults to 5672 )"
+			echo "      -rh, --redishost             The IP address or the name of the host where the Redis server is running."
+			echo "      -?, -h, --help               this help"
+			echo
+			exit 0
+		;;
+
+		* )
+			echo "Unknown parameter $1" 1>&2
+			exit 1
+		;;
+	esac
+	shift
+done
+
 AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
@@ -26,8 +184,6 @@ fi
 JWT_ENABLED=${JWT_ENABLED:-true}
 JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
-
-[ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
@@ -209,24 +365,25 @@ parse_amqp_url(){
 
 input_db_params(){
 	echo "Configuring database access... "
-	read -e -p "Host: " -i "$DB_HOST" DB_HOST
-	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
-	read -e -p "User: " -i "$DB_USER" DB_USER 
-	read -e -p "Password: " -s DB_PWD
+    
+	[ -z $DB_HOST ] && read -e -p "Host: " -i "$DB_HOST" DB_HOST
+	[ -z $DB_NAME ] && read -e -p "Database name: " -i "$DB_NAME" DB_NAME
+	[ -z $DB_USER ] && read -e -p "User: " -i "$DB_USER" DB_USER 
+	[ -z $DB_PWD  ] && read -e -p "Password: " -s DB_PWD
 	echo
 }
 
 input_redis_params(){
 	echo "Configuring redis access... "
-	read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
+	[ -z $REDIS_HOST  ] && read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
 	echo
 }
 
 input_amqp_params(){
 	echo "Configuring AMQP access... "
-	read -e -p "Host: " -i "$AMQP_SERVER_HOST_PORT_PATH" AMQP_SERVER_HOST_PORT_PATH
-	read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
-	read -e -p "Password: " -s AMQP_SERVER_PWD
+	[ -z $AMQP_SERVER_HOST  ] && read -e -p "Host: " -i "$AMQP_SERVER_HOST_PORT_PATH" AMQP_SERVER_HOST_PORT_PATH
+	[ -z $AMQP_SERVER_USER  ] && read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
+	[ -z $AMQP_SERVER_PWD  ] && read -e -p "Password: " -s AMQP_SERVER_PWD
 	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
 	echo
 }
