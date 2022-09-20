@@ -286,7 +286,7 @@ save_redis_params(){
 	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
 	$JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
 	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
-    $JSON -e "this.services.CoAuthoring.redis.port = '$REDIS_PORT'"
+	$JSON -e "this.services.CoAuthoring.redis.port = '$REDIS_PORT'"
 }
 
 save_jwt_params(){
@@ -353,12 +353,12 @@ input_amqp_params(){
 	[ -z $AMQP_SERVER_USER  ] && read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
 	[ -z $AMQP_SERVER_PWD  ] && read -e -p "Password: " -s AMQP_SERVER_PWD
 	
-    AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
-    #Parse port from host string
-    AMQP_SERVER_PORT=${AMQP_SERVER_PORT:-$(echo $AMQP_SERVER_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
-    AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
-
-    [ -n $AMQP_SERVER_PORT  ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
+	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
+	#Parse port from host string
+	AMQP_SERVER_PORT=${AMQP_SERVER_PORT:-$(echo $AMQP_SERVER_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
+	AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
+	
+	[ -n $AMQP_SERVER_PORT  ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
 	echo
 }
 
