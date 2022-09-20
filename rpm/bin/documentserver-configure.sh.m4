@@ -131,6 +131,13 @@ while [ "$1" != "" ]; do
 			fi
 		;;
 
+		-rp | --redisport )
+			if [ "$2" != "" ]; then
+				REDIS_PORT=$2
+				shift
+			fi
+		;;
+
 		-? | -h | --help )
 			echo "  Usage: bash documentserver-configure.sh [PARAMETER] [[PARAMETER], ...]"
 			echo
@@ -140,18 +147,19 @@ while [ "$1" != "" ]; do
 			echo "      -js, --jwtsecret             Defines the secret key to validate the JSON Web Token in the request            ( Defaults to random secret )"
 			echo "      -jh, --jwtheader             Defines the http header that will be used to send the JSON Web Token            ( Defaults to Authorization )"
 			echo "      -dbt, --databasetype         The database type. Supported values are postgres, mariadb or mysql              ( Defaults to postgres )"
-			echo "      -dbh, --databasehost         The IP address or the name of the host where the database server is running."
+			echo "      -dbh, --databasehost         The IP address or the name of the host where the database server is running"
 			echo "      -dbp, --databaseport         The database server port number                                                 ( Default to 5432 )"
-			echo "      -dbn, --databasename         The name of a database to be created on the image startup."
-			echo "      -dbu, --databaseuser         The new user name with superuser permissions for the database account."
-			echo "      -dbpw, --databasepassword    The password set for the database account."
+			echo "      -dbn, --databasename         The name of a database to be created on the image startup"
+			echo "      -dbu, --databaseuser         The new user name with superuser permissions for the database account"
+			echo "      -dbpw, --databasepassword    The password set for the database account"
 			echo "      -at, --amqptype              Defines the message broker type. Possible values are rabbitmq or activemq       ( Defaults to rabbitmq )"
 			echo "      -apr, --amqpproto            The protocol for the connection to AMQP server. Possible values are amqp, amqps ( Defaults to amqp )"
-			echo "      -au, --amqpuser              The username for the AMQP server account."
-			echo "      -apw, --amqppassword         The password set for the AMQP server account."
-			echo "      -ah, --amqphost              The IP address or the name of the host where the AMQP server is running."
-			echo "      -ap, --amqpport              The port for the connection to AMQP server.                                     ( Defaults to 5672 )"
-			echo "      -rh, --redishost             The IP address or the name of the host where the Redis server is running."
+			echo "      -au, --amqpuser              The username for the AMQP server account"
+			echo "      -apw, --amqppassword         The password set for the AMQP server account"
+			echo "      -ah, --amqphost              The IP address or the name of the host where the AMQP server is running"
+			echo "      -ap, --amqpport              The port for the connection to AMQP server                                      ( Defaults to 5672 )"
+			echo "      -rh, --redishost             The IP address or the name of the host where the Redis server is running"
+			echo "      -rp, --redisport             The port for the connection to Redis server                                     ( Defaults to 6379 )"
 			echo "      -?, -h, --help               this help"
 			echo
 			exit 0
@@ -167,6 +175,8 @@ done
 
 AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
+
+REDIS_PORT=${REDIS_PORT:-6379}
 
 MYSQL=""
 PSQL=""
@@ -276,6 +286,7 @@ save_redis_params(){
 	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
 	$JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
 	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
+    $JSON -e "this.services.CoAuthoring.redis.port = '$REDIS_PORT'"
 }
 
 save_jwt_params(){
@@ -348,7 +359,6 @@ input_amqp_params(){
     AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
 
     [ -n $AMQP_SERVER_PORT  ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
-    
 	echo
 }
 
@@ -420,7 +430,7 @@ execute_db_script(){
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
-	exec {FD}<> /dev/tcp/$REDIS_HOST/6379 && exec {FD}>&-
+	exec {FD}<> /dev/tcp/$REDIS_HOST/$REDIS_PORT && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -507,7 +517,6 @@ establish_redis_conn || exit $?
 
 ,)dnl
 input_amqp_params
-parse_amqp_url
 establish_amqp_conn || exit $?
 
 save_db_params
