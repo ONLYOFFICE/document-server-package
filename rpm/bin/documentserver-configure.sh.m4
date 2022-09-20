@@ -344,6 +344,10 @@ input_db_params(){
 input_redis_params(){
 	echo "Configuring redis access... "
 	[ -z $REDIS_HOST  ] && read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
+
+	#Parse port from host string
+	REDIS_PORT=${REDIS_PORT:-$(echo $REDIS_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
+	REDIS_HOST="${REDIS_HOST/:*/}"
 	echo
 }
 
