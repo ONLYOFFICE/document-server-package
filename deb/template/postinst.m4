@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # postinst script for M4_ONLYOFFICE_VALUE
 #
 # see: dh_installdeb(1)
@@ -38,6 +38,7 @@ DB_USER=""
 DB_PWD=""
 DB_NAME=""
 
+RABBITMQ_PROTO=""
 RABBITMQ_HOST=""
 RABBITMQ_USER=""
 RABBITMQ_PWD=""
@@ -68,6 +69,8 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/db-name || true
 	DB_NAME="$RET"
 
+	db_get M4_ONLYOFFICE_VALUE/rabbitmq-proto || true
+	RABBITMQ_PROTO="$RET"
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-host || true
 	RABBITMQ_HOST="$RET"
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-user || true
@@ -86,17 +89,32 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	db_get M4_ONLYOFFICE_VALUE/jwt-enabled || true
 	JWT_ENABLED="$RET"
 	db_get M4_ONLYOFFICE_VALUE/jwt-secret || true
-	JWT_SECRET="$RET"
+	JWT_SECRET="${RET//select }"
 	db_get M4_ONLYOFFICE_VALUE/jwt-header || true
 	JWT_HEADER="$RET"
 
-	if [ ! -f $LOCAL_CONFIG ] && [ -z $JWT_SECRET ]; then
+	if [ $JWT_ENABLED = "true" ] && [ -z $JWT_SECRET ]; then
+		JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
 		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
-		db_set M4_ONLYOFFICE_VALUE/jwt-secret select $JWT_SECRET || true
+		db_set M4_ONLYOFFICE_VALUE/jwt-secret $JWT_SECRET || true
+	elif [ $JWT_ENABLED = "false" ]; then
+		JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT in ${LOCAL_CONFIG} in services.CoAuthoring.token.enable and configure your custom JWT key in services.CoAuthoring.secret"
 	fi
 }
 
 install_db() {
+	if [ -z $DB_TYPE ]; then
+		if dpkg -l | grep -q postgresql-client; then
+			DB_TYPE="postgres"
+		elif dpkg -l | grep -q mysql-client || dpkg -l | grep -q mysql-community-client; then
+			DB_TYPE="mysql"
+		elif dpkg -l | grep -q mariadb-client; then
+			DB_TYPE="mariadb"
+		fi
+
+		db_set M4_ONLYOFFICE_VALUE/db-type $DB_TYPE || true
+	fi
+
 	case $DB_TYPE in
 		"postgres")
 			install_postges
@@ -163,24 +181,24 @@ save_db_params(){
   $JSON -e "if(this.services===undefined)this.services={};"
   $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
   $JSON -e "if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={};" >/dev/null 2>&1
-  $JSON -e "this.services.CoAuthoring.sql.type = '$DB_TYPE'"
-  $JSON -e "this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
-  $JSON -e "this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
-  $JSON -e "this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
-  $JSON -e "this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
-  $JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
+  $JSON -e "if(this.services.CoAuthoring.sql.type===undefined)this.services.CoAuthoring.sql.type = '$DB_TYPE'"
+  $JSON -e "if(this.services.CoAuthoring.sql.dbHost===undefined)this.services.CoAuthoring.sql.dbHost = '$DB_HOST'"
+  $JSON -e "if(this.services.CoAuthoring.sql.dbPort===undefined)this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
+  $JSON -e "if(this.services.CoAuthoring.sql.dbName===undefined)this.services.CoAuthoring.sql.dbName = '$DB_NAME'"
+  $JSON -e "if(this.services.CoAuthoring.sql.dbUser===undefined)this.services.CoAuthoring.sql.dbUser = '$DB_USER'"
+  $JSON -e "if(this.services.CoAuthoring.sql.dbPass===undefined)this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
 }
 
 save_rabbitmq_params(){
   $JSON -e "if(this.rabbitmq===undefined)this.rabbitmq={};"
-  $JSON -e "this.rabbitmq.url = 'amqp://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
+  $JSON -e "if(this.rabbitmq.url===undefined)this.rabbitmq.url = '$RABBITMQ_PROTO://$RABBITMQ_USER:$RABBITMQ_PWD@$RABBITMQ_HOST'"
 }
 
 save_redis_params(){
   $JSON -e "if(this.services===undefined)this.services={};"
   $JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
   $JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
-  $JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
+  $JSON -e "if(this.services.CoAuthoring.redis.host===undefined)this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
 }
 
 save_jwt_params(){
@@ -191,43 +209,52 @@ save_jwt_params(){
   if [ "${JWT_ENABLED}" = "true" ] || [ "${JWT_ENABLED}" = "false" ]; then
     ${JSON} -e "if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={};"
     ${JSON} -e "if(this.services.CoAuthoring.token.enable.request===undefined)this.services.CoAuthoring.token.enable.request={};"
-    ${JSON} -e "this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
-    ${JSON} -e "this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
-    ${JSON} -e "this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
+    ${JSON} -e "if(this.services.CoAuthoring.token.enable.browser===undefined)this.services.CoAuthoring.token.enable.browser = ${JWT_ENABLED}"
+    ${JSON} -e "if(this.services.CoAuthoring.token.enable.request.inbox===undefined)this.services.CoAuthoring.token.enable.request.inbox = ${JWT_ENABLED}"
+    ${JSON} -e "if(this.services.CoAuthoring.token.enable.request.outbox===undefined)this.services.CoAuthoring.token.enable.request.outbox = ${JWT_ENABLED}"
   fi
   
   ${JSON} -e "if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={};"
 
   ${JSON} -e "if(this.services.CoAuthoring.secret.inbox===undefined)this.services.CoAuthoring.secret.inbox={};"
-  ${JSON} -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
+  ${JSON} -e "if(this.services.CoAuthoring.secret.inbox.string===undefined)this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
 
   ${JSON} -e "if(this.services.CoAuthoring.secret.outbox===undefined)this.services.CoAuthoring.secret.outbox={};"
-  ${JSON} -e "this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
+  ${JSON} -e "if(this.services.CoAuthoring.secret.outbox.string===undefined)this.services.CoAuthoring.secret.outbox.string = '${JWT_SECRET}'"
 
   ${JSON} -e "if(this.services.CoAuthoring.secret.session===undefined)this.services.CoAuthoring.secret.session={};"
-  ${JSON} -e "this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
+  ${JSON} -e "if(this.services.CoAuthoring.secret.session.string===undefined)this.services.CoAuthoring.secret.session.string = '${JWT_SECRET}'"
   
   ${JSON} -e "if(this.services.CoAuthoring.token.inbox===undefined)this.services.CoAuthoring.token.inbox={};"
-  ${JSON} -e "this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
+  ${JSON} -e "if(this.services.CoAuthoring.token.inbox.header===undefined)this.services.CoAuthoring.token.inbox.header = '${JWT_HEADER}'"
 
   ${JSON} -e "if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={};"
-  ${JSON} -e "this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
+  ${JSON} -e "if(this.services.CoAuthoring.token.outbox.header===undefined)this.services.CoAuthoring.token.outbox.header = '${JWT_HEADER}'"
 
   if [ -f "${EXAMPLE_CONFIG}" ]; then
     ${JSON_EXAMPLE} -e "if(this.server===undefined)this.server={};"
     ${JSON_EXAMPLE} -e "if(this.server.token===undefined)this.server.token={};"
 
     if [ "${JWT_ENABLED}" = "true" ] || [ "${JWT_ENABLED}" = "false" ]; then
-      ${JSON_EXAMPLE} -e "this.server.token.enable = ${JWT_ENABLED}"
+      ${JSON_EXAMPLE} -e "if(this.server.token.enable===undefined)this.server.token.enable = ${JWT_ENABLED}"
     fi
-    ${JSON_EXAMPLE} -e "this.server.token.secret = '${JWT_SECRET}'"
-    ${JSON_EXAMPLE} -e "this.server.token.authorizationHeader = '${JWT_HEADER}'"
+    ${JSON_EXAMPLE} -e "if(this.server.token.secret===undefined)this.server.token.secret = '${JWT_SECRET}'"
+    ${JSON_EXAMPLE} -e "if(this.server.token.authorizationHeader===undefined)this.server.token.authorizationHeader = '${JWT_HEADER}'"
   fi
 }
 
 setup_nginx(){
    DS_CONF=$CONF_DIR/nginx/ds.conf
   
+  if [ ! -e $DS_CONF ]; then
+	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
+	  
+	  # generate secure link
+	  documentserver-update-securelink.sh -s $(pwgen -s 20) -r true
+  elif ! grep -q secure_link_secret $DS_CONF; then
+	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
+  fi
+
   db_get M4_ONLYOFFICE_VALUE/ds-port || true
   DS_PORT="$RET"
   
@@ -319,6 +346,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		service nginx restart >/dev/null 2>&1
 		
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
+		echo "$JWT_MESSAGE"
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)

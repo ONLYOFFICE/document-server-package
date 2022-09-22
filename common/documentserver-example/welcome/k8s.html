@@ -22,7 +22,7 @@
     *
     -->
 
-    <title>ONLYOFFICE Docs {{OFFICIAL_PRODUCT_NAME}}</title>
+    <title>ONLYOFFICE Docs Developer Edition</title>
     <link href="css/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:900,800,700,600,500,400,300&subset=latin,cyrillic-ext,cyrillic,latin-ext" />
     <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
@@ -35,7 +35,7 @@
     </header>
     <div class="gray-block">
         <div class="content-block">
-            <h1 class="orange-text">ONLYOFFICE Docs {{OFFICIAL_PRODUCT_NAME}} installed</h1>
+            <h1 class="orange-text">ONLYOFFICE Docs Developer Edition installed</h1>
             <p>To edit office documents and collaborate, integrate ONLYOFFICE Docs into your sync&share app.</p>
             <h2>Integration options</h2>
             <div class="links-block">
@@ -45,24 +45,14 @@
             </div>
         </div>
     </div>
-    <div class="notice_block">
-        <h1>Starting from version 7.2,  JWT is enabled by default.</h1> <br>
-        <p class="notice_text">A random secret is generated automatically if a custom secret has not been added during installation.</p>
-        <p class="notice_text">The secret is available in - <em>/etc/onlyoffice/documentserver/<b>local.json</b></em> in - <em>services.CoAuthoring.secret.browser.string</em> parameter.</p>
-        <p class="notice_text">If you want to replace the default secret with a custom key, read the <a href="https://api.onlyoffice.com/editors/signature/">documentation.</a></p>
-    </div>
     <div>
         <div class="content-block">
             <h1>Testing before integration</h1>
-            <p>Use the integrated test example, a simple doc management system, to check if the editors are running correctly.</p>
-            <h3>Start test example:</h3>
-            <pre>sudo supervisorctl start ds:example</pre>
-            <h3>Add it to the autostart:</h3>
-            <pre>sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisord.d/ds-example.ini</pre>
             <p>If you already installed test example, access it here:</p>
             <a href="/example/">
                 <div class="button">GO TO TEST EXAMPLE</div>
             </a>
+            <p></p>
             <p>Please do NOT use a test example on your own server without proper code modifications. It is intended for testing purposes only and must be disabled before launching the editors into production.</p>
         </div>
     </div>
@@ -75,7 +65,7 @@
                 For commercial versions, contact us <a href="https://helpdesk.onlyoffice.com/" target="_blank">here</a>.
             </p>
             <h1>ONLYOFFICE Docs editions</h1>
-            <p>Want to know what else we’ve got? 
+            <p>Want to know what else we’ve got?
                 <a href="https://www.onlyoffice.com/compare-editions.aspx" target="_blank">Compare editions</a>
             </p>
             <footer>© Ascensio Systems SIA 2022. All rights reserved.</footer>

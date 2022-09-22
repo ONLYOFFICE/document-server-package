@@ -21,7 +21,9 @@ if [ "$#" -ge "2" ]; then
 
     if [ -f ${SSL_CERT} -a -f ${SSL_KEY} ]; then
         if [ -f ${NGINX_CONF_DIR}/ds-ssl.conf.tmpl ]; then
+            SECURE_LINK_SECRET=$(grep -oP '(?<=secure_link_secret ).*(?=;)' ${NGINX_CONF_DIR}/ds.conf | head -1)
             cp -f ${NGINX_CONF_DIR}/ds-ssl.conf.tmpl ${NGINX_CONF_DIR}/ds.conf
+            sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX_CONF_DIR}/ds.conf
             sed 's,{{SSL_CERTIFICATE_PATH}},'"${SSL_CERT}"',' -i ${NGINX_CONF_DIR}/ds.conf
             sed 's,{{SSL_KEY_PATH}},'"${SSL_KEY}"',' -i ${NGINX_CONF_DIR}/ds.conf
         fi

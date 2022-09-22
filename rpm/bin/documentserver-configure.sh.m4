@@ -7,18 +7,23 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
+AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
 MYSQL=""
 PSQL=""
 CREATEDB=""
 DB_TYPE=${DB_TYPE:-postgres}
-DB_PORT=""
+DB_PORT=${DB_PORT:-}
 DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 
-JWT_ENABLED=${JWT_ENABLED:-false}
+if [ -z $JWT_SECRET ] && [ -z $JWT_ENABLED ]; then
+	JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
+fi
+
+JWT_ENABLED=${JWT_ENABLED:-true}
 JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
@@ -99,6 +104,15 @@ save_activemq_params(){
 	else
 		$JSON -e "delete this.activemq.connectOptions.password"
 	fi
+
+	case "${AMQP_SERVER_PROTO}" in
+		amqp+ssl|amqps)
+			$JSON -e "this.activemq.connectOptions.transport = 'tls'"
+		;;
+		*)
+			$JSON -e "delete this.activemq.connectOptions.transport"
+		;;
+	esac 
 }
 
 save_redis_params(){
@@ -185,6 +199,7 @@ parse_amqp_url(){
   # extract the path (if any)
   local path="$(echo $url | grep / | cut -d/ -f2-)"
 
+  AMQP_SERVER_PROTO=${proto%://}
   AMQP_SERVER_HOST=$host
   AMQP_SERVER_PORT=$port
   AMQP_SERVER_HOST_PORT_PATH=$hostport$path
@@ -212,7 +227,7 @@ input_amqp_params(){
 	read -e -p "Host: " -i "$AMQP_SERVER_HOST_PORT_PATH" AMQP_SERVER_HOST_PORT_PATH
 	read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
 	read -e -p "Password: " -s AMQP_SERVER_PWD
-	AMQP_SERVER_URL=amqp://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
+	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
 	echo
 }
 
@@ -236,7 +251,7 @@ establish_postgres_conn() {
                 export PGPASSWORD=$DB_PWD
         fi
 
-	PSQL="psql -q -h$DB_HOST -d$DB_NAME -U$DB_USER -w"
+	PSQL="psql -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
 	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
 	echo "OK"
@@ -252,7 +267,7 @@ execute_mysql_sqript(){
 establish_mysql_conn(){
 	echo -n "Trying to database MySQL connection... "
 	command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
-	MYSQL="mysql -h$DB_HOST -u$DB_USER"
+	MYSQL="mysql -h$DB_HOST -P${DB_PORT:="3306"} -u$DB_USER"
 	if [ -n "$DB_PWD" ]; then
 		MYSQL="$MYSQL -p$DB_PWD"
 	fi 
@@ -263,14 +278,15 @@ establish_mysql_conn(){
 }
 
 execute_db_script(){
+	#Parse port from host string
+	DB_PORT=${DB_PORT:-$(echo $DB_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
+	DB_HOST="${DB_HOST/:*/}"
 	case $DB_TYPE in
 		postgres)
-			DB_PORT=5432 
 			establish_postgres_conn || exit $?
 			execute_postgres_scripts || exit $?
 			;;	
 		mysql) 
-			DB_PORT=3306  
 			establish_mysql_conn || exit $?
 			execute_mysql_sqript || exit $?
 			;;   
@@ -384,4 +400,9 @@ tune_local_configs
 
 setup_nginx
 
+# generate secure link
+documentserver-update-securelink.sh
+
 restart_services
+
+echo $JWT_MESSAGE

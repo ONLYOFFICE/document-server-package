@@ -8,8 +8,8 @@
         notifempty
         sharedscripts
         postrotate
-            if systemctl is-active nginx -q; then
-                systemctl reload nginx > /dev/null
+            if pgrep -x "nginx" >/dev/null; then
+              service nginx restart;
             fi
         endscript
 }
@@ -26,10 +26,8 @@
         nocreate
         sharedscripts
         postrotate
-            if systemctl is-active supervisor -q; then
-                systemctl restart supervisor > /dev/null
-            elif systemctl is-active supervisord -q; then
-                systemctl restart supervisord > /dev/null
+            if pgrep -x ""supervisord"" >/dev/null; then
+              service supervisor restart;
             fi
         endscript
 }

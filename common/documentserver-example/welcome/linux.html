@@ -6,7 +6,7 @@
 
     <!--
     *
-    * (c) Copyright Ascensio System SIA 2021
+    * (c) Copyright Ascensio System SIA 2022
     *
     * Licensed under the Apache License, Version 2.0 (the "License");
     * you may not use this file except in compliance with the License.
@@ -45,6 +45,12 @@
             </div>
         </div>
     </div>
+    <div class="notice_block">
+        <h1>Starting from version 7.2,  JWT is enabled by default.</h1> <br>
+        <p class="notice_text">A random secret is generated automatically if a custom secret has not been added during installation.</p>
+        <p class="notice_text">The secret is available in - <em>/etc/onlyoffice/documentserver/<b>local.json</b></em> in - <em>services.CoAuthoring.secret.browser.string</em> parameter.</p>
+        <p class="notice_text">If you want to replace the default secret with a custom key, read the <a href="https://api.onlyoffice.com/editors/signature/">documentation.</a></p>
+    </div>
     <div>
         <div class="content-block">
             <h1>Testing before integration</h1>
@@ -72,7 +78,7 @@
             <p>Want to know what else we’ve got? 
                 <a href="https://www.onlyoffice.com/compare-editions.aspx" target="_blank">Compare editions</a>
             </p>
-            <footer>© Ascensio Systems SIA 2021. All rights reserved.</footer>
+            <footer>© Ascensio Systems SIA 2022. All rights reserved.</footer>
         </div>
     </div>
 </body>
