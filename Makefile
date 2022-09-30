@@ -402,7 +402,7 @@ documentserver-example:
 
 	sed "s|{{OFFICIAL_PRODUCT_NAME}}|"$(OFFICIAL_PRODUCT_NAME)"|"  -i $(DOCUMENTSERVER_EXAMPLE)/welcome/*.html
 
-	find common/documentserver-example/welcome -depth -type f -exec sed -i "s_{{year}}_$(date +"%Y")_g" {} \;
+	find $(DOCUMENTSERVER_EXAMPLE)/welcome -depth -type f -exec sed -i "s_{{year}}_$(shell date +"%Y")_g" {} \;
 
 	echo "Done" > $@
 
