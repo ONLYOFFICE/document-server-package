@@ -6,7 +6,7 @@
 
     <!--
     *
-    * (c) Copyright Ascensio System SIA 2021
+    * (c) Copyright Ascensio System SIA 2022
     *
     * Licensed under the Apache License, Version 2.0 (the "License");
     * you may not use this file except in compliance with the License.
@@ -46,9 +46,11 @@
         </div>
     </div>
     <div class="notice_block">
-        <p class="notice_text">Starting from version 7.2,  JWT is enabled by default. A random secret is generated automatically if a custom secret has not been added during installation. To obtain the default secret, run this command:</p>
-        <p class="notice_text"> <span>‘docker exec &lt;container_id&gt;/var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'</span></p>
-        <p class="notice_text">You can replace the default secret with a custom key using Docker env.</p>
+        <h1>Starting from version 7.2,  JWT is enabled by default.</h1> <br>
+        <p class="notice_text">A random secret is generated automatically if a custom secret has not been added during installation. To obtain the default secret, run this command:</p>
+        <pre> sudo docker exec $(sudo docker ps -q) /var/www/onlyoffice/documentserver/npm/json -f /etc/onlyoffice/documentserver/local.json 'services.CoAuthoring.secret.session.string'</span></pre>
+        <p class="notice_text notice_margin">You can replace the default secret with a custom key using Docker env.</p>
+        <p class="notice_text notice_margin">More information about JWT in the <a href="https://api.onlyoffice.com/editors/signature/">documentation.</a></p>
     </div>
     <div>
         <div class="content-block">
@@ -77,7 +79,7 @@
             <p>Want to know what else we’ve got? 
                 <a href="https://www.onlyoffice.com/compare-editions.aspx" target="_blank">Compare editions</a>
             </p>
-            <footer>© Ascensio Systems SIA 2021. All rights reserved.</footer>
+            <footer>© Ascensio Systems SIA 2022. All rights reserved.</footer>
         </div>
     </div>
 </body>

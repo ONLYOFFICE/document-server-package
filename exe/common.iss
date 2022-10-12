@@ -237,10 +237,10 @@ en.InstallSrv=Installing service %1...
 ru.InstallSrv=Установка сервиса %1...
 
 en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
-ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' что бы удалить ей, или 'Отменить' что бы выйти из программы инсталляции.
+ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' чтобы удалить её, или 'Отмена' чтобы выйти из программы инсталляции.
 
-en.EnableJWT=JWT is enabled by default. A random secret is generated automatically. The secret is available in %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, in services.CoAuthoring.secret.browser.string parameter.
-ru.EnableJWT=JWT включен по умолчанию. Случайный секрет генерируется автоматически. Секрет доступен в %ProgramFiles%\ONLYOFFICE\DocumentServer\config\local.json, параметр services.CoAuthoring.secret.browser.string
+en.EnableJWT=JWT is enabled by default. A random secret is generated automatically. The secret is available in %ProgramFiles%\{#sAppPath}\config\local.json, in services.CoAuthoring.secret.inbox.string parameter.
+ru.EnableJWT=JWT включен по умолчанию. Случайный секрет генерируется автоматически. Секрет доступен в %ProgramFiles%\{#sAppPath}\config\local.json, параметр services.CoAuthoring.secret.inbox.string
 
 en.RemoveDb=Removing database...
 ru.RemoveDb=Удаление базы данных...
@@ -263,7 +263,7 @@ ru.FullInstall=Полная установка
 en.CompactInstall=Compact installation
 ru.CompactInstall=Компактная установка
 
-en.CustomInstall=Custom installtion
+en.CustomInstall=Custom installation
 ru.CustomInstall=Выборочная установка
 
 en.Postgre=PostgreSQL Database
@@ -324,7 +324,7 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 ;Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Files]
-Source: ..\common\documentserver\home\*;            DestDir: {app}; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\home\*;            DestDir: {app}; Excludes: "*local.json"; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
 Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
@@ -400,20 +400,20 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token===undefined)this.services.CoAuthoring.token={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.enable===undefined)this.services.CoAuthoring.token.enable={{request:{{}}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.browser = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.inbox = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.outbox = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.browser = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_ENABLED}')));
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.inbox = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_ENABLED}')));
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.enable.request.outbox = {code:GetJwtEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_ENABLED}')));
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={{inbox:{{},outbox:{{},session: {{} };"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.inbox.string = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.outbox.string = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.session.string = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.inbox.string = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}')));
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.outbox.string = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}')));
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.secret.session.string = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}')));
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.inbox===undefined)this.services.CoAuthoring.token.inbox={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.inbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.inbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -509,14 +509,22 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
+;Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
+;Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
+;Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
 
 [Code]
 var
   JWTSecret: String;
+  IsJWTRegistryExists: Boolean;
+  LocalJsonExists: Boolean;
+
+procedure InitVariables;
+begin
+  IsJWTRegistryExists := False;
+  LocalJsonExists := False;
+end;
 
 function UninstallPreviosVersion(): Boolean;
 var
@@ -576,6 +584,7 @@ function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
+  InitVariables();
   
   if not UninstallPreviosVersion() then
   begin
@@ -708,17 +717,40 @@ begin
   Result := JWTSecret;
 end;
 
+function IsLocalJsonExists(): Boolean;
+begin
+  Result := LocalJsonExists;
+end;
+
+procedure ssInstallExec;
+begin
+  if ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}}}') <> '' then 
+  begin
+    IsJWTRegistryExists := True;
+  end;
+  if FileExists(ExpandConstant('{app}\config\local.json')) then 
+  begin
+    LocalJsonExists := True;
+  end;
+end;
+
+procedure ssPostInstallExec;
+begin
+  if (WizardSilent() = false) and (not IsJWTRegistryExists) and (not IsLocalJsonExists()) then
+  begin
+    MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
+  end;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssInstall then
+  begin
+    ssInstallExec();
+  end;
   if CurStep = ssPostInstall then
-  begin;
-    if ExpandConstant('{param:JWT_SECRET|{reg:HKLM\{#sAppRegPath},{#REG_JWT_SECRET}}}') = '' then
-    begin;
-      if WizardSilent() = false then
-      begin;
-        MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
-      end;
-    end;
+  begin
+    ssPostInstallExec();
   end;
 end;
 
@@ -962,7 +994,7 @@ begin
   end;
 end;
 
-function ShouldSkipPage(PageID: Integer): Boolean;
+(*function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
   case PageID of
@@ -979,7 +1011,7 @@ begin
       end;
     end;
   end;
-end;
+end;*)
 
 function ArrayLength(a: array of integer): Integer;
 begin
@@ -1026,40 +1058,40 @@ begin
   if WizardSilent() = false then
   begin
     case CurPageID of
-      DbPage.ID:
-        Result := CheckDbConnection();
-      RabbitMqPage.ID:
-        Result := CheckRabbitMqConnection();
-      wpWelcome:
-        Result := CheckPortOccupied();
+      // DbPage.ID:
+      //   Result := CheckDbConnection();
+      // RabbitMqPage.ID:
+      //   Result := CheckRabbitMqConnection();
+      // wpWelcome:
+      //   Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-        if IsComponentSelected('Prerequisites\Redis') then
-        begin
-          Dependency_AddRedis;
-        end;
-        if IsComponentSelected('Prerequisites\RabbitMq') then
-        begin
-          Dependency_AddErlang;
-          Dependency_AddRabbitMq;
-        end;
-        if not IsComponentSelected('Prerequisites\PostgreSQL') then
-        begin
-          Dependency_AddPostgreSQL;
-        end;
+        // if IsComponentSelected('Prerequisites\Redis') then
+        // begin
+        //   Dependency_AddRedis;
+        // end;
+        // if IsComponentSelected('Prerequisites\RabbitMq') then
+        // begin
+        //   Dependency_AddErlang;
+        //   Dependency_AddRabbitMq;
+        // end;
+        // if not IsComponentSelected('Prerequisites\PostgreSQL') then
+        // begin
+        //   Dependency_AddPostgreSQL;
+        // end;
         if IsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
       end;
-    else
-      if IsCommercial then
-      begin
-        if CurPageID = RedisPage.ID then
-        begin
-          Result := CheckRedisConnection();
-        end;
-      end;
+    // else
+    //   if IsCommercial then
+    //   begin
+    //     if CurPageID = RedisPage.ID then
+    //     begin
+    //       Result := CheckRedisConnection();
+    //     end;
+    //   end;
     end;
   end;
 end;

@@ -1,6 +1,6 @@
 ﻿/**
  *
- * (c) Copyright Ascensio System SIA 2021
+ * (c) Copyright Ascensio System SIA 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,13 +90,11 @@ a:hover {
 
 .notice_block{
     margin: 0 auto;
-    padding: 64px 0;
+    padding: 0 0;
     width: 1120px;
     margin-top: 64px;
     box-sizing: border-box;
-    border-radius: 5px;
-    padding: 40px 32px;
-    background: #f9f9f9;
+    
 }
 
 .notice_text {
@@ -105,6 +103,10 @@ a:hover {
     margin: 0;
     padding-bottom: 0px;
     
+}
+
+.notice_margin{
+    margin-top: 8px;
 }
 
 .notice_text span {
