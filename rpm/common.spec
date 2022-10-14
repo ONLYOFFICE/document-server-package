@@ -62,9 +62,6 @@ mkdir -p "$DATA_DIR/App_Data/cache/files"
 mkdir -p "$DATA_DIR/App_Data/docbuilder"
 
 #make exchange dir
-mkdir -p "%{buildroot}%{_localstatedir}/www/%{_ds_prefix}/../Data"
-
-#make exchange dir
 mkdir -p "$HOME_DIR/fonts"
 
 #install systemd services
@@ -195,7 +192,6 @@ rm -rf "%{buildroot}"
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}
 
 %attr(750, ds, ds) %{_localstatedir}/lib/%{_ds_prefix}
-%attr(755, -, -) %{_localstatedir}/www/%{_ds_prefix}/../Data
 
 %if %{defined example}
 %attr(755, ds, ds) %{_localstatedir}/log/%{_ds_prefix}-example
@@ -232,6 +228,13 @@ exit 0
 # Make symlink to libcurl-gnutls
 ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
 
+#make exchange dir
+DATA_DIR="%{_localstatedir}/www/%{_ds_prefix}/../Data"
+if [ ! -d "${DATA_DIR}" ]; then
+  mkdir -m 755 -p "${DATA_DIR}"
+  chown ds:ds "${DATA_DIR}"
+fi
+
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 
 %if %{defined example}
@@ -262,6 +265,11 @@ if [ "$IS_UPGRADE" = "true" ]; then
   LOCAL_CONFIG="/etc/%{_ds_prefix}/local.json"
   JSON_BIN="$DIR/npm/json"
   JSON="$JSON_BIN -f $LOCAL_CONFIG"
+
+  JWT_ENABLED=$($JSON services.CoAuthoring.token.enable.request.inbox)
+  if [ $JWT_ENABLED = "false" ]; then
+    JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT in ${LOCAL_CONFIG} in services.CoAuthoring.token.enable and configure your custom JWT key in services.CoAuthoring.secret"
+  fi
 
   if [ -f ${LOCAL_CONFIG} ] && [[ -n "$($JSON services.CoAuthoring.sql)" ]]; then
     #load_db_params
@@ -354,6 +362,8 @@ done
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
+
+echo "$JWT_MESSAGE"
 
 %transfiletriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
 %{_bindir}/documentserver-generate-allfonts.sh true

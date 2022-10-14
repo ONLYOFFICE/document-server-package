@@ -6,7 +6,7 @@
 
     <!--
     *
-    * (c) Copyright Ascensio System SIA 2021
+    * (c) Copyright Ascensio System SIA 2022
     *
     * Licensed under the Apache License, Version 2.0 (the "License");
     * you may not use this file except in compliance with the License.
@@ -33,17 +33,25 @@
             <img src="css/logo.svg" alt="ONLYOFFICE">
         </a>
     </header>
-    <div class="gray-block">
-        <div class="content-block">
-            <h1 class="orange-text">ONLYOFFICE Docs {{OFFICIAL_PRODUCT_NAME}} installed</h1>
-            <p>To edit office documents and collaborate, integrate ONLYOFFICE Docs into your sync&share app.</p>
-            <h2>Integration options</h2>
-            <div class="links-block">
-                <a href="https://www.onlyoffice.com/collaboration-platform.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">ONLYOFFICE Groups</a>|
-                <a href="https://www.onlyoffice.com/all-connectors.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">Connectors for 3rd party apps</a>|
-                <a href="https://api.onlyoffice.com/editors/basic" target="_blank">Integration API for developers</a>
+    <div>
+        <div class="gray-block">
+            <div class="content-block">
+                <h1 class="orange-text">ONLYOFFICE Docs {{OFFICIAL_PRODUCT_NAME}} installed</h1>
+                <p>To edit office documents and collaborate, integrate ONLYOFFICE Docs into your sync&share app.</p>
+                <h2>Integration options</h2>
+                <div class="links-block">
+                    <a href="https://www.onlyoffice.com/collaboration-platform.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">ONLYOFFICE Groups</a>|
+                    <a href="https://www.onlyoffice.com/all-connectors.aspx?utm_source=test_example&utm_medium=start_screen&utm_campaign=installation" target="_blank">Connectors for 3rd party apps</a>|
+                    <a href="https://api.onlyoffice.com/editors/basic" target="_blank">Integration API for developers</a>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="notice_block">
+        <h1>Starting from version 7.2,  JWT is enabled by default.</h1> <br>
+        <p class="notice_text">A random secret is generated automatically if a custom secret has not been added during installation.<br>The secret is available in - <em>%ProgramFiles%\ONLYOFFICE\DocumentServer\config\<b>local.json</b></em></p>        
+        <p class="notice_text">in - <em>services.CoAuthoring.secret.browser.string</em> parameter.</p>
+        <p class="notice_text">If you want to replace the default secret with a custom key, read the <a href="https://api.onlyoffice.com/editors/signature/">documentation.</a></p>
     </div>
     <div>
         <div class="content-block">
@@ -72,7 +80,7 @@
             <p>Want to know what else we’ve got? 
                 <a href="https://www.onlyoffice.com/compare-editions.aspx" target="_blank">Compare editions</a>
             </p>
-            <footer>© Ascensio Systems SIA 2021. All rights reserved.</footer>
+            <footer>© Ascensio Systems SIA 2022. All rights reserved.</footer>
         </div>
     </div>
 </body>

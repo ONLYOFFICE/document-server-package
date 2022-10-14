@@ -8,8 +8,8 @@
         notifempty
         sharedscripts
         postrotate
-            if systemctl is-active nginx -q; then
-                systemctl reload nginx > /dev/null
+            if pgrep -x "nginx" >/dev/null; then
+              service nginx restart;
             fi
         endscript
 }
