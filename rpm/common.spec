@@ -249,7 +249,11 @@ if [ "$IS_UPGRADE" = "true" ]; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $NGINX_CONF
   fi
 
-  chown ds:ds %{_localstatedir}/log/%{_ds_prefix}/**/*.log %{_localstatedir}/log/%{_ds_prefix}-example/*.log
+  chown ds:ds %{_localstatedir}/log/%{_ds_prefix}/**/*.log
+
+  %if %{defined example}
+    chown -R ds:ds %{_localstatedir}/log/%{_ds_prefix}-example
+  %endif
 
   DIR="/var/www/%{_ds_prefix}"
   LOCAL_CONFIG="/etc/%{_ds_prefix}/local.json"
