@@ -57,9 +57,9 @@
             <h1>Testing before integration</h1>
             <p>Use the integrated test example, a simple doc management system, to check if the editors are running correctly.</p>
             <h3>Start test example:</h3>
-            <pre>sudo docker exec $(sudo docker ps -q) sudo service ds-example start</pre>
+            <pre>sudo docker exec $(sudo docker ps -q) sudo supervisorctl start ds:example</pre>
             <h3>Add it to the autostart:</h3>
-            <pre>sudo docker exec $(sudo docker ps -q) sudo systemctl enable ds-example</pre>
+            <pre>sudo docker exec $(sudo docker ps -q) sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf</pre>
             <p>If you already installed test example, access it here:</p>
             <a href="/example/">
                 <div class="button">GO TO TEST EXAMPLE</div>

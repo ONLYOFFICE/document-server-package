@@ -26,10 +26,14 @@
         nocreate
         sharedscripts
         postrotate
-            for SVC in M4_PACKAGE_SERVICES; do
-                if [ -e /usr/lib/systemd/system/$SVC.service ]; then
-                    service $SVC restart > /dev/null
-                fi
-            done
+            if pgrep -x ""systemd"" >/dev/null; then
+                for SVC in M4_PACKAGE_SERVICES ds-example; do
+                    if systemctl is-active $SVC | grep -q "active"; then
+                        systemctl restart $SVC > /dev/null
+                    fi
+                done
+            elif pgrep -x ""supervisord"" >/dev/null; then
+                service supervisor restart
+            fi
         endscript
 }
