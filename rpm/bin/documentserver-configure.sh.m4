@@ -353,10 +353,12 @@ input_amqp_params(){
 	
 	#Parse port from host string
 	AMQP_SERVER_PORT=${AMQP_SERVER_PORT:-$(echo $AMQP_SERVER_HOST | grep : | sed -r 's_^.*:+|/.*$__g')}
+	AMQP_SERVER_PATH="$(echo $AMQP_SERVER_HOST | grep / | cut -d/ -f2-)"
 	AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
 	
 	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
 	[ ! -z $AMQP_SERVER_PORT ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
+    [ ! -z $AMQP_SERVER_PATH ] && AMQP_SERVER_URL="$AMQP_SERVER_URL/$AMQP_SERVER_PATH"
     
     echo
 }
