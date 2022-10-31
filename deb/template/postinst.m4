@@ -250,7 +250,7 @@ setup_nginx(){
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
 	  
 	  # generate secure link
-	  [ -z "$DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(pwgen -s 20) -r true
+	  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(pwgen -s 20) -r true
   elif ! grep -q secure_link_secret $DS_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
@@ -332,7 +332,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
     chown root:root ${CONF_DIR}/logrotate/*
 
 		# generate allfonts.js and thumbnail
-		[ -z "$DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
+		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$LOG_DIR-example"
@@ -348,7 +348,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		db_stop
 
 		# restart dependent services
-		if [ -z "$DOCKER_INSTALLATION" ]; then
+		if [ -z "$DS_DOCKER_INSTALLATION" ]; then
 			for SVC in M4_PACKAGE_SERVICES; do
 				if [ -e /usr/lib/systemd/system/$SVC.service ]; then
 					systemctl enable $SVC >/dev/null 2>&1
