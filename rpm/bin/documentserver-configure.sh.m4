@@ -54,9 +54,10 @@ restart_services() {
 	mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
 
 	echo -n "Restarting services... "
-	for SVC in supervisord nginx
-	do
-		systemctl restart $SVC 
+	for SVC in M4_PACKAGE_SERVICES nginx; do
+		if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+			systemctl restart $SVC 
+		fi
 	done
 	echo "OK"
 }

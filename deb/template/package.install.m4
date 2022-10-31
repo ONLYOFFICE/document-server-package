@@ -4,10 +4,10 @@
 ../../common/documentserver/nginx/*.tmpl etc/M4_DS_PREFIX/nginx
 ../../common/documentserver/nginx/includes/*.conf etc/M4_DS_PREFIX/nginx/includes
 
-../../common/documentserver/supervisor/*.conf etc/M4_DS_PREFIX/supervisor
+../../common/documentserver/systemd/*.service /usr/lib/systemd/system
 
 ifelse('M4_DS_EXAMPLE_ENABLE', '1',
-../../common/documentserver-example/supervisor/*.conf etc/M4_DS_PREFIX-example/supervisor,)
+../../common/documentserver-example/systemd/*.service /usr/lib/systemd/system,)
 
 ../../common/documentserver/logrotate/*.conf etc/M4_DS_PREFIX/logrotate
 

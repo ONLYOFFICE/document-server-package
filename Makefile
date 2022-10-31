@@ -49,6 +49,8 @@ DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(TAR_ARCH).tar.gz
 
+PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
+
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
@@ -198,6 +200,7 @@ DEB_DEPS += deb/build/debian/templates
 DEB_DEPS += deb/build/debian/triggers
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).install
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).links
+DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).dirs
 
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
@@ -214,17 +217,13 @@ LINUX_DEPS += common/documentserver/logrotate/ds.conf
 #Prevent copy old artifacts
 LINUX_DEPS_CLEAN += common/documentserver/logrotate/*.conf
 
-LINUX_DEPS += common/documentserver/supervisor/ds.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
+LINUX_DEPS += common/documentserver/systemd/ds-converter.service
+LINUX_DEPS += common/documentserver/systemd/ds-docservice.service
+LINUX_DEPS += common/documentserver/systemd/ds-metrics.service
+LINUX_DEPS += common/documentserver-example/systemd/ds-example.service
 
-LINUX_DEPS_CLEAN += common/documentserver/supervisor/*.conf
-
-LINUX_DEPS += common/documentserver-example/supervisor/ds.conf
-LINUX_DEPS += common/documentserver-example/supervisor/ds-example.conf
-
-LINUX_DEPS_CLEAN += common/documentserver-example/supervisor/*.conf
+LINUX_DEPS_CLEAN += common/documentserver/systemd/*.service
+LINUX_DEPS_CLEAN += common/documentserver-example/systemd/*.service
 
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
@@ -269,6 +268,7 @@ M4_PARAMS += -D M4_DS_ROOT='$(DS_ROOT)'
 M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
 M4_PARAMS += -D M4_DS_EXAMLE='$(DS_EXAMLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
+M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
 
 .PHONY: all clean clean-docker rpm deb packages deploy-bin
 

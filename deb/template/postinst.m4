@@ -250,7 +250,7 @@ setup_nginx(){
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
 	  
 	  # generate secure link
-	  documentserver-update-securelink.sh -s $(pwgen -s 20) -r true
+	  [ -z "$DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(pwgen -s 20) -r true
   elif ! grep -q secure_link_secret $DS_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
@@ -332,19 +332,31 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
     chown root:root ${CONF_DIR}/logrotate/*
 
 		# generate allfonts.js and thumbnail
-		documentserver-generate-allfonts.sh true
+		[ -z "$DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
 
 		chown ds:ds -R "$LOG_DIR"
+		chown ds:ds -R "$LOG_DIR-example"
 		chown ds:ds -R "$APP_DIR"
 		chown ds:ds -R "$APP_DIR-example"
+
+		if [ -d /etc/M4_DS_PREFIX/supervisor ]; then
+			rm -rf /etc/M4_DS_PREFIX*/supervisor
+			supervisorctl update 2>/dev/null || true
+		fi
 
 		# call db_stop to prevent installation hang
 		db_stop
 
 		# restart dependent services
-		service supervisor restart >/dev/null 2>&1
-		service nginx restart >/dev/null 2>&1
-		
+		if [ -z "$DOCKER_INSTALLATION" ]; then
+			for SVC in M4_PACKAGE_SERVICES; do
+				if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+					systemctl enable $SVC >/dev/null 2>&1
+					systemctl restart $SVC >/dev/null 2>&1
+				fi
+			done
+			service nginx restart >/dev/null 2>&1
+		fi
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 		echo "$JWT_MESSAGE"
 	;;
