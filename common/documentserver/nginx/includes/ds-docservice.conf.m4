@@ -74,7 +74,7 @@ location / {
 }
 
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?(\/doc\/.*) {
-  proxy_pass http://docservice$2;
+  proxy_pass http://docservice$2$is_args$args;
   proxy_http_version 1.1;
 }
 
