@@ -48,6 +48,11 @@ echo -n Generating presentation themes, please wait...
 
 echo Done
 
+echo -n Generating js caches, please wait...
+"$DIR/server/FileConverter/bin/x2t" -create-js-cache
+
+echo Done
+
 #Remove gzipped files
 rm -f \
   $DIR/fonts/*.gz \
