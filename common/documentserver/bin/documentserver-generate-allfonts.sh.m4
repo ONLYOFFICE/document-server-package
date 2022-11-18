@@ -20,10 +20,6 @@ echo -n Generating AllFonts.js, please wait...
   --output-web="$DIR/fonts"\
   --use-system="true"
 
-chown -R ds:ds "$DIR/sdkjs"
-chown -R ds:ds "$DIR/server/FileConverter/bin"
-chown -R ds:ds "$DIR/fonts"
-
 echo Done
 
 echo -n Generating presentation themes, please wait...
@@ -52,6 +48,11 @@ echo -n Generating js caches, please wait...
 "$DIR/server/FileConverter/bin/x2t" -create-js-cache
 
 echo Done
+
+# Setting user rights for files created in the previous steps
+chown -R ds:ds "$DIR/sdkjs"
+chown -R ds:ds "$DIR/server/FileConverter/bin"
+chown -R ds:ds "$DIR/fonts"
 
 #Remove gzipped files
 rm -f \
