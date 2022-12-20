@@ -43,6 +43,12 @@ ECHO | SET /p="Generating presentation themes, please wait..."
 
 ECHO Done
 
+ECHO | SET /p="Generating js caches, please wait..."
+
+"%~dp0\..\server\FileConverter\bin\x2t.exe" -create-js-cache
+
+ECHO Done
+
 rem Restart web-site and converter
 IF NOT "%ONLYOFFICE_DATA_CONTAINER%"=="true" (  
   net stop DsDocServiceSvc
