@@ -186,10 +186,6 @@ TARGET := $(PLATFORM)_$(ARCHITECTURE)
 DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
-PACKAGES += deploy-bin
-endif
-
 ISCC := iscc
 ISCC_PARAMS +=	//Qp
 ISCC_PARAMS +=	//DsAppVerShort=$(PRODUCT_VERSION)
