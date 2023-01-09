@@ -186,7 +186,7 @@ if [ -z $JWT_SECRET ] && [ -z $JWT_ENABLED ]; then
 fi
 
 JWT_ENABLED=${JWT_ENABLED:-true}
-JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
+JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
 create_local_configs(){
