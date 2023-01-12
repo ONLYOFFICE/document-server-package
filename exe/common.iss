@@ -595,7 +595,7 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
-    Dependency_AddPython3;
+ // Dependency_AddPython3;
   end;
 
   Result := true;
