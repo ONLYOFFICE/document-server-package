@@ -509,10 +509,11 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-;Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-;Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
-;Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Python"; Description: "Python 3.7 (x64)"; Flags: checkablealone; Types: full;
 
 [Code]
 var
@@ -595,7 +596,6 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
-    Dependency_AddPython3;
   end;
 
   Result := true;
@@ -736,7 +736,7 @@ end;
 
 procedure ssPostInstallExec;
 begin
-  if (WizardSilent() = false) and (not IsJWTRegistryExists) and (not IsLocalJsonExists()) then
+  if (WizardSilent() = false) and (not IsJWTRegistryExists) and (not IsLocalJsonExists()) and (ExpandConstant('{param:JWT_ENABLED}') <> 'false') then
   begin
     MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
   end;
@@ -869,7 +869,7 @@ begin
     ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -931,7 +931,7 @@ begin
       GetRabbitMqPwd('') + ' ' +
       GetRabbitMqHost('')),
       '',
-      SW_SHOW,
+      SW_HIDE,              
       EwWaitUntilTerminated,
       ResultCode);
   end
@@ -978,7 +978,7 @@ begin
     '>',
     'iredis -h ' + GetRedisHost('') + ' quit',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -994,24 +994,24 @@ begin
   end;
 end;
 
-(*function ShouldSkipPage(PageID: Integer): Boolean;
+function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
   case PageID of
     DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+      Result := IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+      Result := IsComponentSelected('Prerequisites\RabbitMq');
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := not IsComponentSelected('Prerequisites\Redis');
+        Result := IsComponentSelected('Prerequisites\Redis');
       end;
     end;
   end;
-end;*)
+end;
 
 function ArrayLength(a: array of integer): Integer;
 begin
@@ -1058,40 +1058,47 @@ begin
   if WizardSilent() = false then
   begin
     case CurPageID of
-      // DbPage.ID:
-      //   Result := CheckDbConnection();
-      // RabbitMqPage.ID:
-      //   Result := CheckRabbitMqConnection();
-      // wpWelcome:
-      //   Result := CheckPortOccupied();
+         DbPage.ID:
+           Result := CheckDbConnection();
+         RabbitMqPage.ID:
+           Result := CheckRabbitMqConnection();
+         wpWelcome:
+           Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-        // if IsComponentSelected('Prerequisites\Redis') then
-        // begin
-        //   Dependency_AddRedis;
-        // end;
-        // if IsComponentSelected('Prerequisites\RabbitMq') then
-        // begin
-        //   Dependency_AddErlang;
-        //   Dependency_AddRabbitMq;
-        // end;
-        // if not IsComponentSelected('Prerequisites\PostgreSQL') then
-        // begin
-        //   Dependency_AddPostgreSQL;
-        // end;
+           if IsComponentSelected('Prerequisites\Redis') then
+           begin
+             Dependency_AddRedis;
+             CheckRedisConnection();
+           end;
+           if IsComponentSelected('Prerequisites\RabbitMq') then
+           begin
+             Dependency_AddErlang;
+             Dependency_AddRabbitMq;
+             CheckRabbitMqConnection();
+           end;
+           if IsComponentSelected('Prerequisites\PostgreSQL') then
+           begin
+             Dependency_AddPostgreSQL;
+             CheckDbConnection();
+           end;
         if IsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
+        if IsComponentSelected('Prerequisites\Python') then
+        begin
+          Dependency_AddPython3;
+        end;
       end;
-    // else
-    //   if IsCommercial then
-    //   begin
-    //     if CurPageID = RedisPage.ID then
-    //     begin
-    //       Result := CheckRedisConnection();
-    //     end;
-    //   end;
+       else
+         if IsCommercial then
+         begin
+           if CurPageID = RedisPage.ID then
+           begin
+             Result := CheckRedisConnection();
+           end;
+         end;  
     end;
   end;
 end;

@@ -8,7 +8,7 @@ from sys import argv
 
 script, username, password, host = argv
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 credentials = pika.PlainCredentials(username, password)
 parameters = pika.ConnectionParameters(host, credentials=credentials)
