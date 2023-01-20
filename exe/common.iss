@@ -354,15 +354,15 @@ Name: "{#LICENSE_PATH}";
 Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
 
 [Registry]
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}";
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}"; Check: InstallPrereq;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial and InstallPrereq ;
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}"; Check: not IsStringEmpty(ExpandConstant('{param:DOCSERVICE_PORT}'));
@@ -378,16 +378,16 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefin
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq; 
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial and InstallPrereq;
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.server===undefined)this.services.CoAuthoring.server={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -424,8 +424,8 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: InstallPrereq and IsNotClusterMode; StatusMsg: "{cm:RemoveDb}";
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: InstallPrereq and CreateDbAuth; StatusMsg: "{cm:CreateDb}"
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} ""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
@@ -509,10 +509,11 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-;Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-;Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
-;Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; Check: InstallPrereq;
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; Check: InstallPrereq; 
+Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full;
+Name: "Prerequisites\Python"; Description: "Python 3.7 (x64)"; Flags: checkablealone; Types: full; Check: InstallPrereq;
 
 [Code]
 var
@@ -595,7 +596,6 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
-    Dependency_AddPython3;
   end;
 
   Result := true;
@@ -777,8 +777,15 @@ begin
   end;
 end;
 
+function InstallPrereq: Boolean;
+begin
+  Result := false; // true - Turn on installing prerequisites feature, false otherwise 
+end;
+
 procedure InitializeWizard;
 begin
+  
+  If InstallPrereq then begin
   DbPage := CreateInputQueryPage(
     wpPreparing,
     ExpandConstant('{cm:Postgre}'),
@@ -808,8 +815,9 @@ begin
   RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
   RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
   RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
-  
-  if IsCommercial then begin
+  end;
+
+  if IsCommercial and InstallPrereq then begin
     RedisPage := CreateInputQueryPage(
       RabbitMqPage.ID,
       ExpandConstant('{cm:Redis}'),
@@ -869,7 +877,7 @@ begin
     ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -931,7 +939,7 @@ begin
       GetRabbitMqPwd('') + ' ' +
       GetRabbitMqHost('')),
       '',
-      SW_SHOW,
+      SW_HIDE,              
       EwWaitUntilTerminated,
       ResultCode);
   end
@@ -978,7 +986,7 @@ begin
     '>',
     'iredis -h ' + GetRedisHost('') + ' quit',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -994,24 +1002,26 @@ begin
   end;
 end;
 
-(*function ShouldSkipPage(PageID: Integer): Boolean;
+function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
+  if InstallPrereq then begin
   case PageID of
     DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+      Result := IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+      Result := IsComponentSelected('Prerequisites\RabbitMq');
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := not IsComponentSelected('Prerequisites\Redis');
+        Result := IsComponentSelected('Prerequisites\Redis');
       end;
     end;
   end;
-end;*)
+end;
+end;
 
 function ArrayLength(a: array of integer): Integer;
 begin
@@ -1057,42 +1067,50 @@ begin
   Result := true;
   if WizardSilent() = false then
   begin
+  if InstallPrereq then begin
     case CurPageID of
-      // DbPage.ID:
-      //   Result := CheckDbConnection();
-      // RabbitMqPage.ID:
-      //   Result := CheckRabbitMqConnection();
-      // wpWelcome:
-      //   Result := CheckPortOccupied();
+      DbPage.ID:
+        Result := CheckDbConnection();
+      RabbitMqPage.ID:
+        Result := CheckRabbitMqConnection();
+      wpWelcome:
+        Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-        // if IsComponentSelected('Prerequisites\Redis') then
-        // begin
-        //   Dependency_AddRedis;
-        // end;
-        // if IsComponentSelected('Prerequisites\RabbitMq') then
-        // begin
-        //   Dependency_AddErlang;
-        //   Dependency_AddRabbitMq;
-        // end;
-        // if not IsComponentSelected('Prerequisites\PostgreSQL') then
-        // begin
-        //   Dependency_AddPostgreSQL;
-        // end;
+           if IsComponentSelected('Prerequisites\Redis') then
+           begin
+             Dependency_AddRedis;
+             CheckRedisConnection();
+           end;
+           if IsComponentSelected('Prerequisites\RabbitMq') then
+           begin
+             Dependency_AddErlang;
+             Dependency_AddRabbitMq;
+             CheckRabbitMqConnection();
+           end;
+           if IsComponentSelected('Prerequisites\PostgreSQL') then
+           begin
+             Dependency_AddPostgreSQL;
+             CheckDbConnection();
+           end;
         if IsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
+        if IsComponentSelected('Prerequisites\Python') then
+        begin
+          Dependency_AddPython3;
+        end;
       end;
-    // else
-    //   if IsCommercial then
-    //   begin
-    //     if CurPageID = RedisPage.ID then
-    //     begin
-    //       Result := CheckRedisConnection();
-    //     end;
-    //   end;
+       else
+         if IsCommercial then
+          begin
+            if CurPageID = RedisPage.ID then
+            begin
+              Result := CheckRedisConnection();
+            end;
+         end;  
     end;
   end;
 end;
-
+end;
