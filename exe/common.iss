@@ -779,7 +779,10 @@ end;
 
 function InstallPrereq: Boolean;
 begin
-  Result := false; // true - Turn on installing prerequisites feature, false otherwise 
+  Result := false;
+if ExpandConstant('{param:InstallPrereq}') = 'Yes' then begin
+    Result := true; 
+  end;
 end;
 
 procedure InitializeWizard;
