@@ -46,11 +46,11 @@ begin
   begin
     Dependency_Add(
       'erlang.exe',
-      '',
-      'Erlang 23 x64',
+      '/S',
+      'Erlang 24 x64',
       Dependency_String(
         '',
-        'https://erlang.org/download/otp_win64_23.1.exe'),
+        'https://erlang.org/download/otp_win64_24.2.exe'),
       '',
       False,
       False);
@@ -63,11 +63,11 @@ begin
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
-      '',
-      'RabbitMQ 3.8',
+      '/S',
+      'RabbitMQ 3.9',
       Dependency_String(
         '',
-        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'),
+        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.9.12/rabbitmq-server-3.9.12.exe'),
       '',
       False,
       False);
@@ -82,8 +82,8 @@ begin
   begin
     Dependency_Add(
       'postgresql.exe',
-      '--unattendedmodeui minimal',
-      'PostgreSQL 9.5 x64',
+      '--mode unattended --unattendedmodeui none',
+      'PostgreSQL 10.2 x64',
       Dependency_String(
         '',
         'https://sbp.enterprisedb.com/getfile.jsp?fileid=1258024'),
@@ -135,7 +135,7 @@ begin
     Dependency_Add(
       'python ' + Version + Dependency_ArchSuffix + '.exe',
       'PrependPath=1 DefaultJustForMeTargetDir=' +
-        ExpandConstant('{sd}') + '\Python  /passive /norestart',
+        ExpandConstant('{sd}') + '\Python  /quiet /norestart',
       'Python ' + Version + Dependency_ArchTitle,
       Dependency_String(
         'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '.exe',
