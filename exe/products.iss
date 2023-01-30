@@ -82,7 +82,7 @@ begin
   begin
     Dependency_Add(
       'postgresql.exe',
-      '--mode unattended --unattendedmodeui none',
+      '--unattendedmodeui none --install_runtimes 0 --mode unattended',
       'PostgreSQL 10.2 x64',
       Dependency_String(
         '',

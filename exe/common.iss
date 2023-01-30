@@ -334,6 +334,7 @@ Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DI
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
+Source: scripts\PostgreSqlConfig.bat;                   DestDir: "{app}"; Flags: ignoreversion; Components: Program
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify
@@ -509,11 +510,11 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; Check: InstallPrereq;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.9"; Flags: checkablealone; Types: full; Check: InstallPrereq;
 Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; Check: InstallPrereq; 
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full;
-Name: "Prerequisites\Python"; Description: "Python 3.7 (x64)"; Flags: checkablealone; Types: full; Check: InstallPrereq;
+Name: "Prerequisites\Python"; Description: "Python 3.7 "; Flags: checkablealone; Types: full; Check: InstallPrereq;
 
 [Code]
 var
@@ -573,6 +574,7 @@ end;
 function ExtractFiles(): Boolean;
 begin
   ExtractTemporaryFile('connectionRabbit.py');
+  ExtractTemporaryFile('PostgreSqlConfig.bat');
   ExtractTemporaryFile('psql.exe');
   ExtractTemporaryFile('libintl-8.dll');
   ExtractTemporaryFile('libpq.dll');
@@ -876,6 +878,18 @@ begin
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
+  if IsComponentSelected('Prerequisites\PostgreSQL') then 
+  begin
+     ShellExec(
+      '',
+      (ExpandConstant('{tmp}\PostgreSqlConfig.bat')),
+      '',
+      '',
+      SW_HIDE,              
+      EwWaitUntilTerminated,
+      ResultCode);
+   end;
+
   Exec(
     ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
@@ -907,7 +921,7 @@ begin
     ExpandConstant('{#Python}'),
     '--version',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -927,7 +941,7 @@ begin
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install pika',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
   end;
@@ -1083,18 +1097,15 @@ begin
            if IsComponentSelected('Prerequisites\Redis') then
            begin
              Dependency_AddRedis;
-             CheckRedisConnection();
            end;
            if IsComponentSelected('Prerequisites\RabbitMq') then
            begin
              Dependency_AddErlang;
              Dependency_AddRabbitMq;
-             CheckRabbitMqConnection();
            end;
            if IsComponentSelected('Prerequisites\PostgreSQL') then
            begin
-             Dependency_AddPostgreSQL;
-             CheckDbConnection();
+             Dependency_AddPostgreSQL; 
            end;
         if IsComponentSelected('Prerequisites\Certbot') then
         begin
@@ -1104,6 +1115,21 @@ begin
         begin
           Dependency_AddPython3;
         end;
+      end;
+      wpFinished:
+      begin
+        if IsComponentSelected('Prerequisites\Redis') then
+           begin
+             CheckRedisConnection();
+           end;
+           if IsComponentSelected('Prerequisites\RabbitMq') then
+           begin
+             CheckRabbitMqConnection();
+           end;
+           if IsComponentSelected('Prerequisites\PostgreSQL') then
+           begin
+             CheckDbConnection();
+           end;
       end;
        else
          if IsCommercial then
