@@ -424,9 +424,9 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{cmd}"; Parameters: "/c SET PGPASSWORD=postgres& ""{commonpf64}\PostgreSQL\10\bin\psql.exe"" -U postgres -q -c ""CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
-Filename: "{cmd}"; Parameters: "/c SET PGPASSWORD=postgres& ""{commonpf64}\PostgreSQL\10\bin\psql.exe"" -U postgres -q -c ""CREATE DATABASE onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
-Filename: "{cmd}"; Parameters: "/c SET PGPASSWORD=postgres& ""{commonpf64}\PostgreSQL\10\bin\psql.exe"" -U postgres -q -c ""GRANT ALL PRIVILEGES ON DATABASE onlyoffice  TO onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE onlyoffice  TO onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: InstallPrereq and IsNotClusterMode; StatusMsg: "{cm:RemoveDb}";
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: InstallPrereq and CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -843,7 +843,7 @@ begin
 
   SaveStringToFile(
     ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
-    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
+    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd('')+ #13#10 +  GetDbHost('')+ ':' + GetDbPort('')+ ':postgres:postgres:postgres',
     False);
 end;
 
