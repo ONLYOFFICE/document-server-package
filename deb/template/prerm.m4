@@ -20,11 +20,12 @@ set -e
 case "$1" in
     remove|upgrade|deconfigure)
         documentserver-prepare4shutdown.sh || true
-        DS_COUNT=$(supervisorctl avail | grep ds | wc -l)
-        if [ $DS_COUNT -gt 0 ]; then
-            echo "Stopping documentserver services..."
-            supervisorctl stop ds:*
-        fi
+        echo "Stopping documentserver services..."
+        for SVC in M4_PACKAGE_SERVICES; do
+            if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+                systemctl stop $SVC
+            fi
+        done
         
         unlink /etc/nginx/conf.d/ds.conf
     ;;

@@ -43,11 +43,26 @@ APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 TAR_PACKAGE_DIR = $(PWD)
 
-APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
-RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(RPM_ARCH).rpm
-DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
+DISTRIB_CODENAME=$(shell lsb_release -cs || echo "n/a")
+ifeq ($(DISTRIB_CODENAME),trusty)
+  RPM_RELEASE     := el7
+  APT_RPM_RELEASE := p7
+  DEB_RELEASE     := jessie
+  TAR_RELEASE     := gcc4
+else ifeq ($(DISTRIB_CODENAME),xenial)
+  RPM_RELEASE     := el8
+  APT_RPM_RELEASE := p8
+  DEB_RELEASE     := stretch
+  TAR_RELEASE     := gcc5
+endif
+
+APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(APT_RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
+RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
+DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
-TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(TAR_ARCH).tar.gz
+TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)$(TAR_RELEASE:%=_%)_$(TAR_ARCH).tar.gz
+
+PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -171,10 +186,6 @@ TARGET := $(PLATFORM)_$(ARCHITECTURE)
 DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
-ifeq ($(PRODUCT_NAME),$(filter $(PRODUCT_NAME),documentserver-ee documentserver-ie))
-PACKAGES += deploy-bin
-endif
-
 ISCC := iscc
 ISCC_PARAMS +=	//Qp
 ISCC_PARAMS +=	//DsAppVerShort=$(PRODUCT_VERSION)
@@ -198,6 +209,7 @@ DEB_DEPS += deb/build/debian/templates
 DEB_DEPS += deb/build/debian/triggers
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).install
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).links
+DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).dirs
 
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
@@ -214,17 +226,13 @@ LINUX_DEPS += common/documentserver/logrotate/ds.conf
 #Prevent copy old artifacts
 LINUX_DEPS_CLEAN += common/documentserver/logrotate/*.conf
 
-LINUX_DEPS += common/documentserver/supervisor/ds.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-converter.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-docservice.conf
-LINUX_DEPS += common/documentserver/supervisor/ds-metrics.conf
+LINUX_DEPS += common/documentserver/systemd/ds-converter.service
+LINUX_DEPS += common/documentserver/systemd/ds-docservice.service
+LINUX_DEPS += common/documentserver/systemd/ds-metrics.service
+LINUX_DEPS += common/documentserver-example/systemd/ds-example.service
 
-LINUX_DEPS_CLEAN += common/documentserver/supervisor/*.conf
-
-LINUX_DEPS += common/documentserver-example/supervisor/ds.conf
-LINUX_DEPS += common/documentserver-example/supervisor/ds-example.conf
-
-LINUX_DEPS_CLEAN += common/documentserver-example/supervisor/*.conf
+LINUX_DEPS_CLEAN += common/documentserver/systemd/*.service
+LINUX_DEPS_CLEAN += common/documentserver-example/systemd/*.service
 
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
@@ -269,6 +277,7 @@ M4_PARAMS += -D M4_DS_ROOT='$(DS_ROOT)'
 M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
 M4_PARAMS += -D M4_DS_EXAMLE='$(DS_EXAMLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
+M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
 
 .PHONY: all clean clean-docker rpm deb packages deploy-bin
 
@@ -406,27 +415,17 @@ documentserver-example:
 
 	echo "Done" > $@
 
-$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-
 apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
 	mv -f $< $@
 
-rpm/$(PACKAGE_NAME).spec : rpm/package.spec
-	mv -f $< $@
-
-exe/$(PACKAGE_NAME).iss : exe/package.iss
-	mv -f $< $@
-
-%.rpm: 
+$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 	mkdir -p $(@D)
-
 	cd $(@D)/../../.. && rpmbuild \
 		-bb \
 		--define '_topdir $(@D)/../../../builddir' \
 		--define '_package_name $(PACKAGE_NAME)' \
 		--define '_product_version $(PRODUCT_VERSION)' \
-		--define '_build_number $(BUILD_NUMBER)' \
+		--define '_build_number $(BUILD_NUMBER)$(APT_RPM_RELEASE:%=.%)' \
 		--define '_company_name $(COMPANY_NAME)' \
 		--define '_product_name $(PRODUCT_NAME)' \
 		--define '_publisher_name $(PUBLISHER_NAME)' \
@@ -439,6 +438,33 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_binary_payload w7.xzdio' \
 		--target $(RPM_ARCH) \
 		$(PACKAGE_NAME).spec
+
+rpm/$(PACKAGE_NAME).spec : rpm/package.spec
+	mv -f $< $@
+
+$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+	mkdir -p $(@D)
+	cd $(@D)/../../.. && rpmbuild \
+		-bb \
+		--define '_topdir $(@D)/../../../builddir' \
+		--define '_package_name $(PACKAGE_NAME)' \
+		--define '_product_version $(PRODUCT_VERSION)' \
+		--define '_build_number $(BUILD_NUMBER)$(RPM_RELEASE:%=.%)' \
+		--define '_company_name $(COMPANY_NAME)' \
+		--define '_product_name $(PRODUCT_NAME)' \
+		--define '_publisher_name $(PUBLISHER_NAME)' \
+		--define '_publisher_url $(PUBLISHER_URL)' \
+		--define '_support_url $(SUPPORT_URL)' \
+		--define '_support_mail $(SUPPORT_MAIL)' \
+		--define '_company_name_low $(COMPANY_NAME_LOW)' \
+		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
+		--define '_ds_prefix $(DS_PREFIX)' \
+		--define '_binary_payload w7.xzdio' \
+		--target $(RPM_ARCH) \
+		$(PACKAGE_NAME).spec
+
+exe/$(PACKAGE_NAME).iss : exe/package.iss
+	mv -f $< $@
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
@@ -460,7 +486,7 @@ deb/build/debian/% : deb/template/%
 	mkdir -pv $(@D) && cp -fv $< $@
 
 deb/build/debian/% : deb/template/%.m4
-	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE:%=~%) $< > $@
 
 deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@

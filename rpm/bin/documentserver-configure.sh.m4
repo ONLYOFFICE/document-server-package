@@ -7,14 +7,176 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f $EXAMPLE_CONFIG"
 
+[ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
+
+while [ "$1" != "" ]; do
+	case $1 in
+
+		-p | --dsport )
+			if [ "$2" != "" ]; then
+				DS_PORT=$2
+				shift
+			fi
+		;;
+
+		-dbt | --databasetype )
+			if [ "$2" != "" ]; then
+				DB_TYPE=$2
+				shift
+			fi
+		;;
+
+		-dbh | --datahost )
+			if [ "$2" != "" ]; then
+				DB_HOST=$2
+				shift
+			fi
+		;;
+
+		-dbp | --databaseport )
+			if [ "$2" != "" ]; then
+				DB_PORT=$2
+				shift
+			fi
+		;;
+
+		-dbn | --databasename )
+			if [ "$2" != "" ]; then
+				DB_NAME=$2
+				shift
+			fi
+		;;
+
+		-dbu | --databaseuser )
+			if [ "$2" != "" ]; then
+				DB_USER=$2
+				shift
+			fi
+		;;
+
+		-dbpw | --databasepassword )
+			if [ "$2" != "" ]; then
+				DB_PWD=$2
+				shift
+			fi
+		;;
+
+		-je | --jwtenabled )
+			if [ "$2" != "" ]; then
+				JWT_ENABLED=$2
+				shift
+			fi
+		;;
+
+		-js | --jwtsecret )
+			if [ "$2" != "" ]; then
+				JWT_SECRET=$2
+				shift
+			fi
+		;;
+
+		-jh | --jwtheader )
+			if [ "$2" != "" ]; then
+				JWT_HEADER=$2
+				shift
+			fi
+		;;
+
+		-at | --amqptype )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_TYPE=$2
+				shift
+			fi
+		;;
+
+		-apr | --amqpproto )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_PROTO=$2
+				shift
+			fi
+		;;
+
+		-ah | --amqphost )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_HOST=$2
+				shift
+			fi
+		;;
+
+		-ap | --amqpport )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_PORT=$2
+				shift
+			fi
+		;;
+
+		-au | --amqpuser )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_USER=$2
+				shift
+			fi
+		;;
+
+		-apw | --amqppassword )
+			if [ "$2" != "" ]; then
+				AMQP_SERVER_PWD=$2
+				shift
+			fi
+		;;
+
+		-rh | --redishost )
+			if [ "$2" != "" ]; then
+				REDIS_HOST=$2
+				shift
+			fi
+		;;
+
+		-rp | --redisport )
+			if [ "$2" != "" ]; then
+				REDIS_PORT=$2
+				shift
+			fi
+		;;
+
+		-? | -h | --help )
+			echo "  Usage: bash documentserver-configure.sh [PARAMETER] [[PARAMETER], ...]"
+			echo
+			echo "    Parameters:"
+			echo "      -p, --dsport                 The value by that incoming connections are listened                             ( Defaults to 80 )"
+			echo "      -je, --jwtenabled            Specifies the enabling the JSON Web Token validation                            ( Defaults to true )"
+			echo "      -js, --jwtsecret             Defines the secret key to validate the JSON Web Token in the request            ( Defaults to random secret )"
+			echo "      -jh, --jwtheader             Defines the http header that will be used to send the JSON Web Token            ( Defaults to Authorization )"
+			echo "      -dbt, --databasetype         The database type. Supported values are postgres, mariadb or mysql              ( Defaults to postgres )"
+			echo "      -dbh, --databasehost         The IP address or the name of the host where the database server is running"
+			echo "      -dbp, --databaseport         The database server port number                                                 ( Defaults to 5432 )"
+			echo "      -dbn, --databasename         The name of a database to be created on the image startup"
+			echo "      -dbu, --databaseuser         The new user name with superuser permissions for the database account"
+			echo "      -dbpw, --databasepassword    The password set for the database account"
+			echo "      -at, --amqptype              Defines the message broker type. Possible values are rabbitmq or activemq       ( Defaults to rabbitmq )"
+			echo "      -apr, --amqpproto            The protocol for the connection to AMQP server. Possible values are amqp, amqps ( Defaults to amqp )"
+			echo "      -au, --amqpuser              The username for the AMQP server account"
+			echo "      -apw, --amqppassword         The password set for the AMQP server account"
+			echo "      -ah, --amqphost              The IP address or the name of the host where the AMQP server is running"
+			echo "      -ap, --amqpport              The port for the connection to AMQP server                                      ( Defaults to 5672 )"
+			echo "      -rh, --redishost             The IP address or the name of the host where the Redis server is running"
+			echo "      -rp, --redisport             The port for the connection to Redis server                                     ( Defaults to 6379 )"
+			echo "      -?, -h, --help               this help"
+			echo
+			exit 0
+		;;
+
+		* )
+			echo "Unknown parameter $1" 1>&2
+			exit 1
+		;;
+	esac
+	shift
+done
+
 AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
-MYSQL=""
-PSQL=""
-CREATEDB=""
 DB_TYPE=${DB_TYPE:-postgres}
-DB_PORT=${DB_PORT:-}
 DS_PORT=${DS_PORT:-80}
 # DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
 # EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
@@ -24,10 +186,8 @@ if [ -z $JWT_SECRET ] && [ -z $JWT_ENABLED ]; then
 fi
 
 JWT_ENABLED=${JWT_ENABLED:-true}
-JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)}
+JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
-
-[ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
@@ -54,9 +214,10 @@ restart_services() {
 	mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
 
 	echo -n "Restarting services... "
-	for SVC in supervisord nginx
-	do
-		systemctl restart $SVC 
+	for SVC in M4_PACKAGE_SERVICES nginx; do
+		if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+			systemctl restart $SVC 
+		fi
 	done
 	echo "OK"
 }
@@ -87,7 +248,7 @@ save_activemq_params(){
 	$JSON -e "if(this.activemq.connectOptions===undefined)this.activemq.connectOptions={};"
 
 	$JSON -e "this.activemq.connectOptions.host = '${AMQP_SERVER_HOST}'"
-	if [ ! "${AMQP_SERVER_PORT}" == "" ]; then
+	if [ ! -z "${AMQP_SERVER_PORT}" ]; then
 		$JSON -e "this.activemq.connectOptions.port = '${AMQP_SERVER_PORT}'"
 	else
 		$JSON -e "delete this.activemq.connectOptions.port"
@@ -120,6 +281,7 @@ save_redis_params(){
 	$JSON -e "if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={};"
 	$JSON -e "if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={};"
 	$JSON -e "this.services.CoAuthoring.redis.host = '$REDIS_HOST'"
+	$JSON -e "this.services.CoAuthoring.redis.port = '$REDIS_PORT'"
 }
 
 save_jwt_params(){
@@ -164,71 +326,42 @@ save_jwt_params(){
   fi
 }
 
-parse_amqp_url(){
-  local amqp=${AMQP_SERVER_URL}
-
-  # extract the protocol
-  local proto="$(echo $amqp | grep :// | sed -e's,^\(.*://\).*,\1,g')"
-  # remove the protocol
-  local url="$(echo ${amqp/$proto/})"
-
-  # extract the user and password (if any)
-  local userpass="$(echo $url | grep @ | cut -d@ -f1)"
-  local pass=$(echo $userpass | grep : | cut -d: -f2)
-
-  local user
-  if [ -n "$pass" ]; then
-    user=$(echo $userpass | grep : | cut -d: -f1)
-  else
-    user=$userpass
-  fi
-
-  # extract the host
-  local hostport="$(echo ${url/$userpass@/} | cut -d/ -f1)"
-  # by request - try to extract the port
-  local port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
-
-  local host
-  if [ -n "$port" ]; then
-    host=$(echo $hostport | grep : | cut -d: -f1)
-  else
-    host=$hostport
-    port="5672"
-  fi
-
-  # extract the path (if any)
-  local path="$(echo $url | grep / | cut -d/ -f2-)"
-
-  AMQP_SERVER_PROTO=${proto%://}
-  AMQP_SERVER_HOST=$host
-  AMQP_SERVER_PORT=$port
-  AMQP_SERVER_HOST_PORT_PATH=$hostport$path
-  AMQP_SERVER_USER=$user
-  AMQP_SERVER_PWD=$pass
-}
-
 input_db_params(){
 	echo "Configuring database access... "
-	read -e -p "Host: " -i "$DB_HOST" DB_HOST
-	read -e -p "Database name: " -i "$DB_NAME" DB_NAME
-	read -e -p "User: " -i "$DB_USER" DB_USER 
-	read -e -p "Password: " -s DB_PWD
+    
+	[ -z $DB_HOST ] && read -e -p "Host: " -i "$DB_HOST" DB_HOST
+	[ -z $DB_NAME ] && read -e -p "Database name: " -i "$DB_NAME" DB_NAME
+	[ -z $DB_USER ] && read -e -p "User: " -i "$DB_USER" DB_USER 
+	[ -z $DB_PWD  ] && read -e -p "Password: " -s DB_PWD
 	echo
 }
 
 input_redis_params(){
 	echo "Configuring redis access... "
-	read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
+	[ -z $REDIS_HOST  ] && read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
+
+	#Parse port from host string
+	REDIS_PORT=${REDIS_PORT:-$(echo $REDIS_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
+	REDIS_HOST="${REDIS_HOST/:*/}"
 	echo
 }
 
 input_amqp_params(){
 	echo "Configuring AMQP access... "
-	read -e -p "Host: " -i "$AMQP_SERVER_HOST_PORT_PATH" AMQP_SERVER_HOST_PORT_PATH
-	read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
-	read -e -p "Password: " -s AMQP_SERVER_PWD
-	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST_PORT_PATH
-	echo
+	[ -z $AMQP_SERVER_HOST  ] && read -e -p "Host: " -i "$AMQP_SERVER_HOST" AMQP_SERVER_HOST
+	[ -z $AMQP_SERVER_USER  ] && read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
+	[ -z $AMQP_SERVER_PWD   ] && read -e -p "Password: " -s AMQP_SERVER_PWD
+	
+	#Parse port from host string
+	AMQP_SERVER_PORT=${AMQP_SERVER_PORT:-$(echo $AMQP_SERVER_HOST | grep : | sed -r 's_^.*:+|/.*$__g')}
+	AMQP_SERVER_PATH="$(echo $AMQP_SERVER_HOST | grep / | cut -d/ -f2-)"
+	AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
+	
+	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
+	[ ! -z $AMQP_SERVER_PORT ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
+    [ ! -z $AMQP_SERVER_PATH ] && AMQP_SERVER_URL="$AMQP_SERVER_URL/$AMQP_SERVER_PATH"
+    
+    echo
 }
 
 execute_postgres_scripts(){
@@ -299,7 +432,7 @@ execute_db_script(){
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
-	exec {FD}<> /dev/tcp/$REDIS_HOST/6379 && exec {FD}>&-
+	exec {FD}<> /dev/tcp/$REDIS_HOST/${REDIS_PORT:="6379"} && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -312,7 +445,7 @@ establish_redis_conn() {
 establish_amqp_conn() {
 	echo -n "Trying to establish AMQP connection... "
   
-	exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/$AMQP_SERVER_PORT && exec {FD}>&-
+	exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/${AMQP_SERVER_PORT:="5672"} && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -386,7 +519,6 @@ establish_redis_conn || exit $?
 
 ,)dnl
 input_amqp_params
-parse_amqp_url
 establish_amqp_conn || exit $?
 
 save_db_params

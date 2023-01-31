@@ -41,8 +41,13 @@ sed "s,\(set \+\$secure_link_secret\).*,\1 "${SECURE_LINK_SECRET}";," -i ${NGINX
 ${JSON} -I -e 'this.storage={fs: {secretString: "'${SECURE_LINK_SECRET}'" }}' && chown ds:ds $LOCAL_CONF
 
 if [ "$RESTART_CONDITION" != "false" ]; then
-   supervisorctl restart ds:docservice
-   supervisorctl restart ds:converter
+  if pgrep -x ""systemd"" >/dev/null; then
+    systemctl restart ds-docservice
+    systemctl restart ds-converter
+  elif pgrep -x ""supervisord"" >/dev/null; then
+    supervisorctl restart ds:docservice
+    supervisorctl restart ds:converter
+  fi
 fi
 
 service nginx reload

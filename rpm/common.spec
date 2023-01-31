@@ -64,13 +64,9 @@ mkdir -p "$DATA_DIR/App_Data/docbuilder"
 #make exchange dir
 mkdir -p "$HOME_DIR/fonts"
 
-#install supervisor configs
-DS_SUPERVISOR_CONF=$CONF_DIR/supervisor/
-mkdir -p "$DS_SUPERVISOR_CONF"
-cp %{_builddir}/../../../common/documentserver/supervisor/*.conf "$DS_SUPERVISOR_CONF"
-
-# rename extention for supervisor config files
-rename 's/.conf$/.ini/' "$DS_SUPERVISOR_CONF"*
+#install systemd services
+mkdir -p %{buildroot}/usr/lib/systemd/system
+cp %{_builddir}/../../../common/documentserver/systemd/*.service %{buildroot}/usr/lib/systemd/system
 
 #install nginx config
 DS_NGINX_CONF=$CONF_DIR/nginx/
@@ -90,7 +86,6 @@ mkdir -p "%{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d}/"
 DS_LOGROTATE_CONF=$CONF_DIR/logrotate/
 mkdir -p "$DS_LOGROTATE_CONF"
 cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTATE_CONF"
-sed 's/\(service supervisor\)d\?/\1d/g' -i "$DS_LOGROTATE_CONF/ds.conf"
 
 %if %{defined example}
 #install documentserver example files
@@ -107,13 +102,8 @@ mkdir -p "${LOG_DIR}-example"
 # create data dir
 mkdir -p "${DATA_DIR}-example/files/"
 
-#install example supervisor configs
-DSE_SUPERVISOR_CONF=${CONF_DIR}-example/supervisor/
-mkdir -p "$DSE_SUPERVISOR_CONF"
-cp %{_builddir}/../../../common/documentserver-example/supervisor/*.conf "$DSE_SUPERVISOR_CONF"
-
-# rename extention for supervisor config files
-rename 's/.conf$/.ini/' "$DSE_SUPERVISOR_CONF"*
+#install example systemd services
+cp %{_builddir}/../../../common/documentserver-example/systemd/*.service %{buildroot}/usr/lib/systemd/system
 
 #install nginx config
 DSE_NGINX_CONF=${CONF_DIR}-example/nginx/includes/
@@ -131,15 +121,6 @@ find \
   $CONF_DIR/nginx/ds.conf \
   %{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d}/ds.conf
 
-mkdir -p "%{buildroot}%{_sysconfdir}/supervisord.d/"
-
-# Make symlinks for supervisor configs
-find \
-  ${CONF_DIR}*/supervisor/ \
-  -name *.ini \
-  -not -name *spellchecker* \
-  -exec sh -c '%__ln_s {} %{buildroot}%{_sysconfdir}/supervisord.d/$(basename {})' \;
-
 mkdir -p "%{buildroot}%{_sysconfdir}/logrotate.d/"
 
 # Make symlinks for logrotate configs
@@ -152,7 +133,6 @@ find \
 symlinks -c \
   %{buildroot}%{_sysconfdir}/nginx/%{nginx_conf_d} \
   %{buildroot}%{_sysconfdir}/nginx/includes \
-  %{buildroot}%{_sysconfdir}/supervisord.d \
   %{buildroot}%{_sysconfdir}/logrotate.d 
 
 %if %{defined example}
@@ -189,14 +169,13 @@ rm -rf "%{buildroot}"
 %config(noreplace) %{_sysconfdir}/%{_ds_prefix}/nginx/ds.conf
 
 %config %attr(644, root, root) %{_sysconfdir}/%{_ds_prefix}/logrotate/*
-%config %{_sysconfdir}/%{_ds_prefix}*/supervisor*/*
 
 %attr(755, root, root) %{_libdir}/*.so*
 %attr(744, root, root) %{_bindir}/documentserver-*.sh
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
 %attr(-, root, root) %{_sysconfdir}/nginx/includes/*
-%attr(-, root, root) %{_sysconfdir}/supervisord.d/*
+%attr(644, root, root) /usr/lib/systemd/system/*
 
 %dir
 %attr(750, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
@@ -224,10 +203,11 @@ case "$1" in
     # Upgrade
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh || true
-    for i in ds onlyoffice-documentserver; do
-      if [ $(supervisorctl avail | grep ${i} | wc -l) -gt 0 ]; then
-        echo "Stopping documentserver services..."
-        supervisorctl stop ${i}:*
+
+    echo "Stopping documentserver services..."
+    for SVC in %{package_services}; do
+      if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+        systemctl stop $SVC
       fi
     done
   ;;
@@ -268,6 +248,12 @@ if [ "$IS_UPGRADE" = "true" ]; then
   if [ -e $NGINX_CONF ] && ! grep -q secure_link_secret $NGINX_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $NGINX_CONF
   fi
+
+  chown ds:ds %{_localstatedir}/log/%{_ds_prefix}/**/*.log
+
+  %if %{defined example}
+    chown -R ds:ds %{_localstatedir}/log/%{_ds_prefix}-example
+  %endif
 
   DIR="/var/www/%{_ds_prefix}"
   LOCAL_CONFIG="/etc/%{_ds_prefix}/local.json"
@@ -358,10 +344,14 @@ for PORT in ${PORTS[@]}; do
     true
 done
 
-# restart dependent services
-if systemctl is-active --quiet supervisord; then
-  systemctl restart supervisord >/dev/null 2>&1
-fi
+#restart dependent services
+systemctl daemon-reload
+for SVC in %{package_services}; do
+  if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+    systemctl enable $SVC
+    systemctl restart $SVC
+  fi
+done
 
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
@@ -381,9 +371,11 @@ case "$1" in
     # Uninstall
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
-    if systemctl is-active --quiet supervisord; then
-      supervisorctl stop ds:*
-    fi
+    for SVC in %{package_services}; do
+      if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+        systemctl stop $SVC
+      fi
+    done
   ;;
   1)
     # Upgrade
@@ -412,10 +404,6 @@ case "$1" in
     :
   ;;
 esac
-
-if systemctl is-active --quiet supervisord; then
-  supervisorctl update >/dev/null 2>&1
-fi
 
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1

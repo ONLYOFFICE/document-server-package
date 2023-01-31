@@ -29,7 +29,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
 ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 `  redis-tools,'
 ,)dnl
-  supervisor(>= 3.0b2),
   ttf-mscorefonts-installer,
   xvfb,
   zlib1g

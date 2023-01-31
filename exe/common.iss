@@ -595,7 +595,7 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
-    Dependency_AddPython3;
+ // Dependency_AddPython3;
   end;
 
   Result := true;
@@ -736,7 +736,7 @@ end;
 
 procedure ssPostInstallExec;
 begin
-  if (WizardSilent() = false) and (not IsJWTRegistryExists) and (not IsLocalJsonExists()) then
+  if (WizardSilent() = false) and (not IsJWTRegistryExists) and (not IsLocalJsonExists()) and (ExpandConstant('{param:JWT_ENABLED}') <> 'false') then
   begin
     MsgBox(ExpandConstant('{cm:EnableJWT}'), mbInformation, MB_OK);
   end;

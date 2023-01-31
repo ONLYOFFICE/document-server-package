@@ -95,7 +95,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 	if [ $JWT_ENABLED = "true" ] && [ -z $JWT_SECRET ]; then
 		JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
-		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 12)
+		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
 		db_set M4_ONLYOFFICE_VALUE/jwt-secret $JWT_SECRET || true
 	elif [ $JWT_ENABLED = "false" ]; then
 		JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT in ${LOCAL_CONFIG} in services.CoAuthoring.token.enable and configure your custom JWT key in services.CoAuthoring.secret"
@@ -250,7 +250,7 @@ setup_nginx(){
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
 	  
 	  # generate secure link
-	  documentserver-update-securelink.sh -s $(pwgen -s 20) -r true
+	  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(pwgen -s 20) -r true
   elif ! grep -q secure_link_secret $DS_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
@@ -332,19 +332,31 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
     chown root:root ${CONF_DIR}/logrotate/*
 
 		# generate allfonts.js and thumbnail
-		documentserver-generate-allfonts.sh true
+		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
 
 		chown ds:ds -R "$LOG_DIR"
+		chown ds:ds -R "$LOG_DIR-example"
 		chown ds:ds -R "$APP_DIR"
 		chown ds:ds -R "$APP_DIR-example"
+
+		if [ -d /etc/M4_DS_PREFIX/supervisor ]; then
+			rm -rf /etc/M4_DS_PREFIX*/supervisor
+			supervisorctl update 2>/dev/null || true
+		fi
 
 		# call db_stop to prevent installation hang
 		db_stop
 
 		# restart dependent services
-		service supervisor restart >/dev/null 2>&1
-		service nginx restart >/dev/null 2>&1
-		
+		if [ -z "$DS_DOCKER_INSTALLATION" ]; then
+			for SVC in M4_PACKAGE_SERVICES; do
+				if [ -e /usr/lib/systemd/system/$SVC.service ]; then
+					systemctl enable $SVC >/dev/null 2>&1
+					systemctl restart $SVC >/dev/null 2>&1
+				fi
+			done
+			service nginx restart >/dev/null 2>&1
+		fi
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 		echo "$JWT_MESSAGE"
 	;;
