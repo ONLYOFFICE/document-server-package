@@ -334,7 +334,6 @@ Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DI
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
-Source: scripts\PostgreSqlConfig.bat;                   DestDir: "{app}"; Flags: ignoreversion; Components: Program
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify
@@ -424,6 +423,10 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:SECURE_LINK_SECRET}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
+Filename: "{cmd}"; Parameters: "/c SET PGPASSWORD=postgres& ""{commonpf64}\PostgreSQL\10\bin\psql.exe"" -U postgres -q -c ""CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{cmd}"; Parameters: "/c SET PGPASSWORD=postgres& ""{commonpf64}\PostgreSQL\10\bin\psql.exe"" -U postgres -q -c ""CREATE DATABASE onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{cmd}"; Parameters: "/c SET PGPASSWORD=postgres& ""{commonpf64}\PostgreSQL\10\bin\psql.exe"" -U postgres -q -c ""GRANT ALL PRIVILEGES ON DATABASE onlyoffice  TO onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: InstallPrereq and IsNotClusterMode; StatusMsg: "{cm:RemoveDb}";
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: InstallPrereq and CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -574,7 +577,6 @@ end;
 function ExtractFiles(): Boolean;
 begin
   ExtractTemporaryFile('connectionRabbit.py');
-  ExtractTemporaryFile('PostgreSqlConfig.bat');
   ExtractTemporaryFile('psql.exe');
   ExtractTemporaryFile('libintl-8.dll');
   ExtractTemporaryFile('libpq.dll');
@@ -878,18 +880,6 @@ begin
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
-  if IsComponentSelected('Prerequisites\PostgreSQL') then 
-  begin
-     ShellExec(
-      '',
-      (ExpandConstant('{tmp}\PostgreSqlConfig.bat')),
-      '',
-      '',
-      SW_HIDE,              
-      EwWaitUntilTerminated,
-      ResultCode);
-   end;
-
   Exec(
     ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
@@ -1115,22 +1105,7 @@ begin
         begin
           Dependency_AddPython3;
         end;
-      end;
-      wpFinished:
-      begin
-        if IsComponentSelected('Prerequisites\Redis') then
-           begin
-             CheckRedisConnection();
-           end;
-           if IsComponentSelected('Prerequisites\RabbitMq') then
-           begin
-             CheckRabbitMqConnection();
-           end;
-           if IsComponentSelected('Prerequisites\PostgreSQL') then
-           begin
-             CheckDbConnection();
-           end;
-      end;
+       end;
        else
          if IsCommercial then
           begin
