@@ -106,7 +106,7 @@ begin
   begin
     Dependency_Add(
       'redis.msi',
-      '/qb',
+      '/quiet',
       'Redis ' + Version + 'x64',
       Dependency_String(
         '',

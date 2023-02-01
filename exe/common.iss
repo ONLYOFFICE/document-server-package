@@ -424,9 +424,9 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER onlyoffice WITH PASSWORD 'onlyoffice';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE onlyoffice  TO onlyoffice;"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER {#sDbDefValue} WITH PASSWORD '{code:SetRandomDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE {#sDbDefValue};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#sDbDefValue}  TO {#sDbDefValue};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: InstallPrereq and IsNotClusterMode; StatusMsg: "{cm:RemoveDb}";
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: InstallPrereq and CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -524,6 +524,7 @@ var
   JWTSecret: String;
   IsJWTRegistryExists: Boolean;
   LocalJsonExists: Boolean;
+  DbPwd: String;
 
 procedure InitVariables;
 begin
@@ -834,17 +835,36 @@ begin
 
     RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
   end;
+end;
 
+function SetRandomDbPwd(Param: String): String;
+begin 
+  if DbPwd = '' then
+  begin;
+    DbPwd := RandomString(30);
+  end;
+  Result := DbPwd; 
 end;
 
 function CreateDbAuth(): Boolean;
 begin
   Result := true;
 
-  SaveStringToFile(
-    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
-    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd('')+ #13#10 +  GetDbHost('')+ ':' + GetDbPort('')+ ':postgres:postgres:postgres',
-    False);
+  if IsComponentSelected('Prerequisites\PostgreSQL') then begin
+    SaveStringToFile(
+      ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
+      GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + SetRandomDbPwd('')+ #13#10 +  GetDbHost('')+ ':' + GetDbPort('')+ ':postgres:postgres:postgres',
+      False);
+  end;
+
+   if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
+    SaveStringToFile(
+      ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
+      GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
+      False);
+  end;
+
+
 end;
 
 function IsNotClusterMode(): Boolean;
@@ -984,7 +1004,7 @@ begin
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install iredis',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
   end;
