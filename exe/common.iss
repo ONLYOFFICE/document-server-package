@@ -105,6 +105,9 @@
   #define sDbDefValue         'onlyoffice'
 #endif
 
+#define DbDefName              sDbDefValue
+#define DbDefUser              sDbDefValue
+
 #define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_ENV	          'NODE_ENV=production-windows'
 #define NODE_CONFIG_DIR       'NODE_CONFIG_DIR=""{app}\config""'
@@ -424,12 +427,12 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER {#sDbDefValue} WITH PASSWORD '{code:SetRandomDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbAuth;
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE {#sDbDefValue};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#sDbDefValue}  TO {#sDbDefValue};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreatePostgresUserAuth;
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: InstallPrereq and IsNotClusterMode; StatusMsg: "{cm:RemoveDb}";
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: InstallPrereq and CreateDbAuth; StatusMsg: "{cm:CreateDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: InstallPrereq and CreateDbUserAuth; StatusMsg: "{cm:CreateDb}"
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} ""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
@@ -524,7 +527,7 @@ var
   JWTSecret: String;
   IsJWTRegistryExists: Boolean;
   LocalJsonExists: Boolean;
-  DbPwd: String;
+  DbRandomPwd: String;
 
 procedure InitVariables;
 begin
@@ -611,9 +614,34 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
+function RandomString(StringLen:Integer):String;
+var
+  str: String;
+begin
+  str := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ0123456789';
+  Result := '';
+  repeat
+    Result := Result + str[Random(Length(str)) + 1];
+  until(Length(Result) = StringLen)
+end;
+
+function SetRandomDbPwd(Param: String): String;
+begin 
+  if DbRandomPwd = '' then
+  begin;
+    DbRandomPwd := RandomString(30);
+  end;
+  Result := DbRandomPwd; 
+end;
+
 function GetDbHost(Param: String): String;
 begin
-  Result := DbPage.Values[0];
+  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
+    Result := DbPage.Values[0];
+  end
+  else begin
+    Result := 'localhost';  
+  end;
 end;
 
 function GetDbPort(Param: String): String;
@@ -623,17 +651,32 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := DbPage.Values[1];
+  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
+    Result := DbPage.Values[1];
+  end
+  else begin
+    Result := '{#DbDefUser}';
+  end;
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := DbPage.Values[2];
+  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
+    Result := DbPage.Values[2];
+  end
+  else begin
+    Result := SetRandomDbPwd('');
+  end;                        
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := DbPage.Values[3];
+  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
+    Result := DbPage.Values[3];
+  end
+  else begin
+    Result := '{#DbDefName}';
+  end;
 end;
 
 function GetRabbitMqHost(Param: String): String;
@@ -700,17 +743,6 @@ begin
   FontPath := ExpandConstant('{param:FONTS_PATH|{reg:HKLM\{#sAppRegPath},{#REG_FONTS_PATH}|{fonts}}}');
   StringChangeEx(FontPath, '\', '/', True);
   Result := FontPath;
-end;
-
-function RandomString(StringLen:Integer):String;
-var
-  str: String;
-begin
-  str := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ0123456789';
-  Result := '';
-  repeat
-    Result := Result + str[Random(Length(str)) + 1];
-  until(Length(Result) = StringLen)
 end;
 
 function SetJWTRandomString(Param: String): String;
@@ -794,77 +826,73 @@ procedure InitializeWizard;
 begin
   
   If InstallPrereq then begin
-  DbPage := CreateInputQueryPage(
-    wpPreparing,
-    ExpandConstant('{cm:Postgre}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
-  DbPage.Add(ExpandConstant('{cm:Host}'), False);
-  DbPage.Add(ExpandConstant('{cm:User}'), False);
-  DbPage.Add(ExpandConstant('{cm:Password}'), True);
-  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
+    DbPage := CreateInputQueryPage(
+      wpPreparing,
+      ExpandConstant('{cm:Postgre}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
+    DbPage.Add(ExpandConstant('{cm:Host}'), False);
+    DbPage.Add(ExpandConstant('{cm:User}'), False);
+    DbPage.Add(ExpandConstant('{cm:Password}'), True);
+    DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
+    DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
+    DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
+    DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
+    DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
-  RabbitMqPage := CreateInputQueryPage(
-    DbPage.ID,
-    ExpandConstant('{cm:RabbitMq}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
-  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
-  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
-  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
-  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
+    RabbitMqPage := CreateInputQueryPage(
+      DbPage.ID,
+      ExpandConstant('{cm:RabbitMq}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
+    RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+    RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+    RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+    RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
   
-  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
-  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
-  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
-  end;
+    RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
+    RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
+    RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
+    RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
+    
+    if IsCommercial then begin
+      RedisPage := CreateInputQueryPage(
+        RabbitMqPage.ID,
+        ExpandConstant('{cm:Redis}'),
+        FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
+        FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
+      RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
-  if IsCommercial and InstallPrereq then begin
-    RedisPage := CreateInputQueryPage(
-      RabbitMqPage.ID,
-      ExpandConstant('{cm:Redis}'),
-      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
-      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
-    RedisPage.Add(ExpandConstant('{cm:Host}'), False);
-
-    RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+      RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+    end;
   end;
 end;
 
-function SetRandomDbPwd(Param: String): String;
-begin 
-  if DbPwd = '' then
-  begin;
-    DbPwd := RandomString(30);
-  end;
-  Result := DbPwd; 
+function CreateDbAuth(Host, Port, DatabaseName, User, Password: String): Boolean;
+var
+  FileName: String;
+  Content: String;
+begin
+  FileName := ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf');
+
+  Content := Format('%s:%s:%s:%s:%s', [Host, Port, DatabaseName, User, Password]);
+
+  Result := SaveStringToFile(FileName, Content, False);
 end;
 
-function CreateDbAuth(): Boolean;
+function CreatePostgresUserAuth(): Boolean;
 begin
   Result := true;
 
-  if IsComponentSelected('Prerequisites\PostgreSQL') then begin
-    SaveStringToFile(
-      ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
-      GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + SetRandomDbPwd('')+ #13#10 +  GetDbHost('')+ ':' + GetDbPort('')+ ':postgres:postgres:postgres',
-      False);
-  end;
+  CreateDbAuth(GetDbHost(''), GetDbPort(''), 'postgres', 'postgres', 'postgres');
+end;
 
-   if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
-    SaveStringToFile(
-      ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
-      GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
-      False);
-  end;
+function CreateDbUserAuth(): Boolean;
+begin
+  Result := true;
 
-
+  CreateDbAuth(GetDbHost(''), GetDbPort(''), GetDbName(''), GetDbUser(''), GetDbPwd(''));
 end;
 
 function IsNotClusterMode(): Boolean;
@@ -877,7 +905,7 @@ begin
   begin
     Result := false;
   end;
-  CreateDbAuth();
+  CreateDbUserAuth();
 end;
 
 function IsStringEmpty(Param: String): Boolean;
