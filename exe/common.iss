@@ -108,6 +108,8 @@
 #define DbDefName              sDbDefValue
 #define DbDefUser              sDbDefValue
 
+#define DefHost                'localhost'
+
 #define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_ENV	          'NODE_ENV=production-windows'
 #define NODE_CONFIG_DIR       'NODE_CONFIG_DIR=""{app}\config""'
@@ -357,15 +359,15 @@ Name: "{#LICENSE_PATH}";
 Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
 
 [Registry]
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}"; Check: InstallPrereq;
-Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial and InstallPrereq ;
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_HOST}"; ValueData: "{code:GetRabbitMqHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_USER}"; ValueData: "{code:GetRabbitMqUser}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PWD}"; ValueData: "{code:GetRabbitMqPwd}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_RABBITMQ_PROTO}"; ValueData: "{code:GetRabbitMqProto}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_REDIS_HOST}"; ValueData: "{code:GetRedisHost}"; Check: IsCommercial;
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_LICENSE_PATH}"; ValueData: "{code:GetLicensePath}"; Check: not IsStringEmpty(ExpandConstant('{param:LICENSE_PATH}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DS_PORT}"; ValueData: "{code:GetDefaultPort}"; Check: not IsStringEmpty(ExpandConstant('{param:DS_PORT}'));
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DOCSERVICE_PORT}"; ValueData: "{code:GetDocServicePort}"; Check: not IsStringEmpty(ExpandConstant('{param:DOCSERVICE_PORT}'));
@@ -381,16 +383,16 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefin
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq; 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: InstallPrereq;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial and InstallPrereq;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.server===undefined)this.services.CoAuthoring.server={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -431,8 +433,8 @@ Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER {#DbDefUser
 Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: InstallPrereq and IsNotClusterMode; StatusMsg: "{cm:RemoveDb}";
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: InstallPrereq and CreateDbUserAuth; StatusMsg: "{cm:CreateDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check:IsNotClusterMode; StatusMsg: "{cm:RemoveDb}";
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check:CreateDbUserAuth; StatusMsg: "{cm:CreateDb}"
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} ""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
@@ -527,7 +529,8 @@ var
   JWTSecret: String;
   IsJWTRegistryExists: Boolean;
   LocalJsonExists: Boolean;
-  DbRandomPwd: String;
+
+function GetRandomDbPwd: String; forward;
 
 procedure InitVariables;
 begin
@@ -614,34 +617,9 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
-function RandomString(StringLen:Integer):String;
-var
-  str: String;
-begin
-  str := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ0123456789';
-  Result := '';
-  repeat
-    Result := Result + str[Random(Length(str)) + 1];
-  until(Length(Result) = StringLen)
-end;
-
-function SetRandomDbPwd(Param: String): String;
-begin 
-  if DbRandomPwd = '' then
-  begin;
-    DbRandomPwd := RandomString(30);
-  end;
-  Result := DbRandomPwd; 
-end;
-
 function GetDbHost(Param: String): String;
 begin
-  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
-    Result := DbPage.Values[0];
-  end
-  else begin
-    Result := 'localhost';  
-  end;
+  Result := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DefHost}}}');   
 end;
 
 function GetDbPort(Param: String): String;
@@ -651,57 +629,42 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
-    Result := DbPage.Values[1];
-  end
-  else begin
-    Result := '{#DbDefUser}';
-  end;
+  Result := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
 end;
 
-function GetDbPwd(Param: String): String;
+function GetDbPwd(Param: String): String; 
 begin
-  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
-    Result := DbPage.Values[2];
-  end
-  else begin
-    Result := SetRandomDbPwd('');
-  end;                        
+  Result := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}');                        
 end;
 
 function GetDbName(Param: String): String;
 begin
-  if not IsComponentSelected('Prerequisites\PostgreSQL') then begin
-    Result := DbPage.Values[3];
-  end
-  else begin
-    Result := '{#DbDefName}';
-  end;
+  Result := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[0];
+  Result := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#DefHost}}}');
 end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[1];
+  Result := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
 end;
 
 function GetRabbitMqPwd(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[2];
+  Result := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
 end;
 
 function GetRabbitMqProto(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[3];
+  Result := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
 end;
 
 function GetRedisHost(Param: String): String;
 begin
-  Result := RedisPage.Values[0];
+  Result := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#DefHost}}}');
 end;
 
 function GetDefaultPort(Param: String): String;
@@ -743,6 +706,17 @@ begin
   FontPath := ExpandConstant('{param:FONTS_PATH|{reg:HKLM\{#sAppRegPath},{#REG_FONTS_PATH}|{fonts}}}');
   StringChangeEx(FontPath, '\', '/', True);
   Result := FontPath;
+end;
+
+function RandomString(StringLen:Integer):String;
+var
+  str: String;
+begin
+  str := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOMNOPQRSTUVWXYZ0123456789';
+  Result := '';
+  repeat
+    Result := Result + str[Random(Length(str)) + 1];
+  until(Length(Result) = StringLen)
 end;
 
 function SetJWTRandomString(Param: String): String;
@@ -836,10 +810,10 @@ begin
     DbPage.Add(ExpandConstant('{cm:Password}'), True);
     DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-    DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
-    DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
-    DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
-    DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
+    DbPage.Values[0] := GetDbHost('');
+    DbPage.Values[1] := GetDbUser('');
+    DbPage.Values[2] := GetDbPwd('');
+    DbPage.Values[3] := GetDbName('');
 
     RabbitMqPage := CreateInputQueryPage(
       DbPage.ID,
@@ -851,10 +825,10 @@ begin
     RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
     RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
   
-    RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
-    RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
-    RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-    RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
+    RabbitMqPage.Values[0] := GetRabbitMqHost('');
+    RabbitMqPage.Values[1] := GetRabbitMqUser('');
+    RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+    RabbitMqPage.Values[3] := GetRabbitMqProto('');
     
     if IsCommercial then begin
       RedisPage := CreateInputQueryPage(
@@ -864,19 +838,24 @@ begin
         FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
       RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
-      RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+      RedisPage.Values[0] := GetRedisHost('');
     end;
   end;
 end;
 
-function CreateDbAuth(Host, Port, DatabaseName, User, Password: String): Boolean;
+function GetRandomDbPwd: String;
+begin 
+  Result := RandomString(30); 
+end;
+
+function CreateDbAuth(Host, Port, DatabaseName, Username, Password: String): Boolean;
 var
   FileName: String;
   Content: String;
 begin
   FileName := ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf');
 
-  Content := Format('%s:%s:%s:%s:%s', [Host, Port, DatabaseName, User, Password]);
+  Content := Format('%s:%s:%s:%s:%s', [Host, Port, DatabaseName, Username, Password]);
 
   Result := SaveStringToFile(FileName, Content, False);
 end;
