@@ -529,6 +529,15 @@ var
   JWTSecret: String;
   IsJWTRegistryExists: Boolean;
   LocalJsonExists: Boolean;
+  DbUserName: String;
+  DbName: String;
+  DbPassword: String;
+  DbHost: String;
+  RabbitMqHost: String;
+  RabbitMqUserName: String;
+  RabbitMqPassword: String;
+  RabbitMqProto: String;
+  RedisHost: String;
 
 function GetRandomDbPwd: String; forward;
 
@@ -592,12 +601,36 @@ begin
   ExtractTemporaryFile('libiconv-2.dll')
 end;
 
+procedure InitializeDefPostgresVariables;
+begin
+  DbHost := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DefHost}}}');
+  DbUserName := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
+  DbPassword := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}');
+  DbName := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}'); 
+end;
+
+procedure InitializeDefRabbitMqVariables;
+begin
+  RabbitMqHost := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#DefHost}}}');
+  RabbitMqUserName := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
+  RabbitMqPassword := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
+  RabbitMqProto := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
+end;
+
+procedure InitializeDefRedisVariables;
+begin
+ RedisHost := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#DefHost}}}');
+end;
+
 function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
   InitVariables();
-  
+  InitializeDefPostgresVariables;
+  InitializeDefRabbitMqVariables;
+  InitializeDefRedisVariables;
+
   if not UninstallPreviosVersion() then
   begin
     Abort();
@@ -617,9 +650,30 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
+procedure InitializeUsersInputPostgres;
+begin
+  DbHost := DbPage.Values[0];
+  DbUserName := DbPage.Values[1];
+  DbPassword := DbPage.Values[2];
+  DbName := DbPage.Values[3];
+end;
+
+procedure InitializeUsersInputRabbit;
+begin
+  RabbitMqHost := RabbitMqPage.Values[0];
+  RabbitMqUserName := RabbitMqPage.Values[1];
+  RabbitMqPassword := RabbitMqPage.Values[2];
+  RabbitMqProto := RabbitMqPage.Values[3];
+end;
+
+procedure InitializeUsersInputRedis;
+begin
+ RedisHost := RedisPage.Values[0];
+end;
+
 function GetDbHost(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DefHost}}}');   
+  Result := DbHost;  
 end;
 
 function GetDbPort(Param: String): String;
@@ -629,42 +683,42 @@ end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
+  Result := DbUserName;
 end;
 
 function GetDbPwd(Param: String): String; 
 begin
-  Result := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}');                        
+  Result := DbPassword; 
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
+  Result := DbName;
 end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#DefHost}}}');
+  Result := RabbitMqHost;
 end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  Result := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
+  Result := RabbitMqUserName;
 end;
 
 function GetRabbitMqPwd(Param: String): String;
 begin
-  Result := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
+  Result := RabbitMqPassword;
 end;
 
 function GetRabbitMqProto(Param: String): String;
 begin
-  Result := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
+  Result := RabbitMqProto;
 end;
 
 function GetRedisHost(Param: String): String;
 begin
-  Result := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#DefHost}}}');
+  Result := RedisHost;
 end;
 
 function GetDefaultPort(Param: String): String;
@@ -723,7 +777,7 @@ function SetJWTRandomString(Param: String): String;
 begin
   if JWTSecret = '' then
   begin;
-    JWTSecret := RandomString(30);
+    JWTSecret := RandomString(32);
   end;
   Result := JWTSecret;
 end;
@@ -798,7 +852,6 @@ end;
 
 procedure InitializeWizard;
 begin
-  
   If InstallPrereq then begin
     DbPage := CreateInputQueryPage(
       wpPreparing,
@@ -810,11 +863,6 @@ begin
     DbPage.Add(ExpandConstant('{cm:Password}'), True);
     DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-    DbPage.Values[0] := GetDbHost('');
-    DbPage.Values[1] := GetDbUser('');
-    DbPage.Values[2] := GetDbPwd('');
-    DbPage.Values[3] := GetDbName('');
-
     RabbitMqPage := CreateInputQueryPage(
       DbPage.ID,
       ExpandConstant('{cm:RabbitMq}'),
@@ -824,11 +872,6 @@ begin
     RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
     RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
     RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
-  
-    RabbitMqPage.Values[0] := GetRabbitMqHost('');
-    RabbitMqPage.Values[1] := GetRabbitMqUser('');
-    RabbitMqPage.Values[2] := GetRabbitMqPwd('');
-    RabbitMqPage.Values[3] := GetRabbitMqProto('');
     
     if IsCommercial then begin
       RedisPage := CreateInputQueryPage(
@@ -838,7 +881,6 @@ begin
         FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
       RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
-      RedisPage.Values[0] := GetRedisHost('');
     end;
   end;
 end;
@@ -902,6 +944,8 @@ var
 begin
   Result := true;
 
+  InitializeUsersInputPostgres;
+
   SaveStringToFile(
     ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
@@ -932,6 +976,8 @@ var
   ResultCode: Integer;
 begin
   Result := true;
+
+  InitializeUsersInputRabbit;
 
   ShellExec(
     '',
@@ -1004,6 +1050,8 @@ var
   ResultCode: Integer;
 begin
   Result := true;
+
+  InitializeUsersInputRedis;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
   begin
