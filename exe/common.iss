@@ -122,7 +122,7 @@
 
 #define RedisHost              DefHost
 
-#define InstallPrereqParam     '/InstallPrereq'
+#define InstallPrereqParam     'InstallPrereq'
 
 #define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_ENV	          'NODE_ENV=production-windows'
@@ -443,12 +443,12 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
-Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbUserAuth; StatusMsg: "{cm:CreateDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} ""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
@@ -582,16 +582,16 @@ begin
   LocalJsonExists := False;
 
   InitDbParams(
-  ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DbHost}}}'),
-  ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#DbDefUser}}}'),
-  ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}'),
-  ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
+    ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DbHost}}}'),
+    ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#DbDefUser}}}'),
+    ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}'),
+    ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
 
   InitAmqpServerParams(
-  ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
-  ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|{#AmqpServerUserName}}}'),
-  ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|{#AmqpServerPassword}}}'),
-  ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|{#AmqpServerProto}}}'))
+    ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
+    ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|{#AmqpServerUserName}}}'),
+    ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|{#AmqpServerPassword}}}'),
+    ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|{#AmqpServerProto}}}'))
 
   InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
 end;
@@ -847,17 +847,11 @@ begin
 end;
 
 function InstallPrereq: Boolean;
-var
-  I: Integer;
 begin
   Result := false;
-for I := 1 to ParamCount do
+  if ExpandConstant('{param:{#InstallPrereqParam}}') = 'Yes' then
   begin
-    if ParamStr(I) = '{#InstallPrereqParam}' then
-    begin
-      Result := True;
-      Break;
-    end;
+    Result := True;
   end;
 end;
 
@@ -912,7 +906,7 @@ begin
   Result := RandomString(30); 
 end;
 
-function CreateDbAuth(Host, Port, DatabaseName, Username, Password: String): Boolean;
+function SavePgPassConf(Host, Port, DatabaseName, Username, Password: String): Boolean;
 var
   FileName: String;
   Content: String;
@@ -928,14 +922,14 @@ function CreateDbDefUserAuth(): Boolean;
 begin
   Result := true;
 
-  CreateDbAuth(GetDbHost(''), GetDbPort(''), '{#DbAdminName}', '{#DbAdminUserName}', '{#DbAdminPassword}');
+  SavePgPassConf(GetDbHost(''), GetDbPort(''), '{#DbAdminName}', '{#DbAdminUserName}', '{#DbAdminPassword}');
 end;
 
-function CreateDbUserAuth(): Boolean;
+function CreateDbAuth(): Boolean;
 begin
   Result := true;
 
-  CreateDbAuth(GetDbHost(''), GetDbPort(''), GetDbName(''), GetDbUser(''), GetDbPwd(''));
+  SavePgPassConf(GetDbHost(''), GetDbPort(''), GetDbName(''), GetDbUser(''), GetDbPwd(''));
 end;
 
 function IsNotClusterMode(): Boolean;
@@ -948,7 +942,7 @@ begin
   begin
     Result := false;
   end;
-  CreateDbUserAuth();
+  CreateDbAuth();
 end;
 
 function IsStringEmpty(Param: String): Boolean;
