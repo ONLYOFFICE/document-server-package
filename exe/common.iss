@@ -110,6 +110,18 @@
 
 #define DefHost                'localhost'
 
+#define DbHost                 DefHost
+#define DbAdminUserName        'postgres'
+#define DbAdminName            'postgres'
+#define DbAdminPassword        'postgres'
+
+#define AmqpServerHost         DefHost
+#define AmqpServerUserName     'guest'
+#define AmqpServerPassword     'guest'
+#define AmqpServerProto        'amqp'
+
+#define RedisHost              DefHost
+
 #define InstallPrereqParam     '/InstallPrereq'
 
 #define NSSM                  '{app}\nssm\nssm.exe'
@@ -435,8 +447,8 @@ Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE USER {#DbDefUser
 Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 Filename: "{#PSQL}"; Parameters: "-U postgres -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check:IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check:CreateDbUserAuth; StatusMsg: "{cm:CreateDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbUserAuth; StatusMsg: "{cm:CreateDb}"
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} ""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
@@ -543,10 +555,45 @@ var
 
 function GetRandomDbPwd: String; forward;
 
-procedure InitVariables;
+procedure InitDbParams(Host, UserName, Password, Name: String);
+begin
+  DbHost := Host;
+  DbUserName := UserName;
+  DbPassword := Password;
+  DbName := Name;
+end;
+
+procedure InitAmqpServerParams(Host, UserName, Password, Proto: String);
+begin
+  AmqpServerHost := Host;
+  AmqpServerUserName := UserName;
+  AmqpServerPassword := Password;
+  AmqpServerProto := Proto;
+end;
+
+procedure InitRedisParams(Host: String);
+begin
+  RedisHost := Host;
+end;
+
+procedure Init;
 begin
   IsJWTRegistryExists := False;
   LocalJsonExists := False;
+
+  InitDbParams(
+  ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DbHost}}}'),
+  ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#DbDefUser}}}'),
+  ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}'),
+  ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
+
+  InitAmqpServerParams(
+  ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
+  ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|{#AmqpServerUserName}}}'),
+  ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|{#AmqpServerPassword}}}'),
+  ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|{#AmqpServerProto}}}'))
+
+  InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
 end;
 
 function UninstallPreviosVersion(): Boolean;
@@ -603,35 +650,11 @@ begin
   ExtractTemporaryFile('libiconv-2.dll')
 end;
 
-procedure InitializeDbVariables;
-begin
-  DbHost := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DefHost}}}');
-  DbUserName := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
-  DbPassword := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}');
-  DbName := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}'); 
-end;
-
-procedure InitializeAmqpServerVariables;
-begin
-  AmqpServerHost := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#DefHost}}}');
-  AmqpServerUserName := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
-  AmqpServerPassword := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-  AmqpServerProto := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
-end;
-
-procedure InitializeRedisVariables;
-begin
- RedisHost := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#DefHost}}}');
-end;
-
 function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
-  InitVariables();
-  InitializeDbVariables;
-  InitializeAmqpServerVariables;
-  InitializeRedisVariables;
+  Init();
 
   if not UninstallPreviosVersion() then
   begin
@@ -652,30 +675,9 @@ var
   RabbitMqPage: TInputQueryWizardPage;
   RedisPage: TInputQueryWizardPage;
 
-procedure InitializeDbUserInputVariables;
-begin
-  DbHost := DbPage.Values[0];
-  DbUserName := DbPage.Values[1];
-  DbPassword := DbPage.Values[2];
-  DbName := DbPage.Values[3];
-end;
-
-procedure InitializeAmqpServerUserInputVariables;
-begin
-  AmqpServerHost := RabbitMqPage.Values[0];
-  AmqpServerUserName := RabbitMqPage.Values[1];
-  AmqpServerPassword := RabbitMqPage.Values[2];
-  AmqpServerProto := RabbitMqPage.Values[3];
-end;
-
-procedure InitializeRedisUserInputVariables;
-begin
- RedisHost := RedisPage.Values[0];
-end;
-
 function GetDbHost(Param: String): String;
 begin
-  Result := DbHost;  
+  Result := DbHost;
 end;
 
 function GetDbPort(Param: String): String;
@@ -688,9 +690,9 @@ begin
   Result := DbUserName;
 end;
 
-function GetDbPwd(Param: String): String; 
+function GetDbPwd(Param: String): String;
 begin
-  Result := DbPassword; 
+  Result := DbPassword;
 end;
 
 function GetDbName(Param: String): String;
@@ -779,7 +781,7 @@ function SetJWTRandomString(Param: String): String;
 begin
   if JWTSecret = '' then
   begin;
-    JWTSecret := RandomString(32);
+    JWTSecret := RandomString(30);
   end;
   Result := JWTSecret;
 end;
@@ -872,10 +874,10 @@ begin
     DbPage.Add(ExpandConstant('{cm:Password}'), True);
     DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-    DbPage.Values[0] := DbHost;
-    DbPage.Values[1] := DbUserName;
-    DbPage.Values[2] := DbPassword;
-    DbPage.Values[3] := DbName;
+    DbPage.Values[0] := GetDbHost('');
+    DbPage.Values[1] := GetDbUser('');
+    DbPage.Values[2] := GetDbPwd('');
+    DbPage.Values[3] := GetDbName('');
 
     RabbitMqPage := CreateInputQueryPage(
       DbPage.ID,
@@ -887,10 +889,10 @@ begin
     RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
     RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
     
-    RabbitMqPage.Values[0] := AmqpServerHost;
-    RabbitMqPage.Values[1] := AmqpServerUserName;
-    RabbitMqPage.Values[2] := AmqpServerPassword;
-    RabbitMqPage.Values[3] := AmqpServerProto;
+    RabbitMqPage.Values[0] := GetRabbitMqHost('');
+    RabbitMqPage.Values[1] := GetRabbitMqUser('');
+    RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+    RabbitMqPage.Values[3] := GetRabbitMqProto('');
 
     if IsCommercial then begin
       RedisPage := CreateInputQueryPage(
@@ -900,7 +902,7 @@ begin
         FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
       RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
-      RedisPage.Values[0] := RedisHost;
+      RedisPage.Values[0] := GetRedisHost('');
     end;
   end;
 end;
@@ -926,7 +928,7 @@ function CreateDbDefUserAuth(): Boolean;
 begin
   Result := true;
 
-  CreateDbAuth(GetDbHost(''), GetDbPort(''), 'postgres', 'postgres', 'postgres');
+  CreateDbAuth(GetDbHost(''), GetDbPort(''), '{#DbAdminName}', '{#DbAdminUserName}', '{#DbAdminPassword}');
 end;
 
 function CreateDbUserAuth(): Boolean;
@@ -1167,12 +1169,12 @@ begin
     case CurPageID of
       DbPage.ID:
       begin
-        InitializeDbUserInputVariables();
+        InitDbParams(DbPage.Values[0], DbPage.Values[1], DbPage.Values[2], DbPage.Values[3]);
         Result := CheckDbConnection();
       end;
       RabbitMqPage.ID:
       begin
-        InitializeAmqpServerUserInputVariables;
+        InitAmqpServerParams(RabbitMqPage.Values[0], RabbitMqPage.Values[1], RabbitMqPage.Values[2], RabbitMqPage.Values[3]);
         Result := CheckRabbitMqConnection();
       end;
       wpWelcome:
@@ -1206,7 +1208,7 @@ begin
           begin
             if CurPageID = RedisPage.ID then
             begin
-              InitializeRedisUserInputVariables;
+              InitRedisParams(RedisPage.Values[0]);
               Result := CheckRedisConnection();
             end;
          end;  
