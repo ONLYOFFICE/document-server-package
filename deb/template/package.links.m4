@@ -19,6 +19,3 @@ var/www/M4_DS_PREFIX/server/FileConverter/bin/libXpsFile.so lib/libXpsFile.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libUnicodeConverter.so lib/libUnicodeConverter.so
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libicudata.so.58 lib/libicudata.so.58
 var/www/M4_DS_PREFIX/server/FileConverter/bin/libicuuc.so.58 lib/libicuuc.so.58
-
-ifelse('M4_DS_EXAMPLE_ENABLE','1',
-etc/M4_DS_PREFIX-example/nginx/includes/ds-example.conf etc/nginx/includes/ds-example.conf,)

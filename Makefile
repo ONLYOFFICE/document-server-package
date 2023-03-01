@@ -61,6 +61,7 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE:%=.%).$
 DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)$(TAR_RELEASE:%=_%)_$(TAR_ARCH).tar.gz
+DEB_EXAMPLE = deb-example/$(PACKAGE_NAME)-example_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 
 PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
 
@@ -211,6 +212,22 @@ DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).install
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).links
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).dirs
 
+DEB_EXAMPLE_DEPS += deb-example/build/debian/source/format
+DEB_EXAMPLE_DEPS += deb-example/build/debian/changelog
+DEB_EXAMPLE_DEPS += deb-example/build/debian/compat
+DEB_EXAMPLE_DEPS += deb-example/build/debian/config
+DEB_EXAMPLE_DEPS += deb-example/build/debian/control
+DEB_EXAMPLE_DEPS += deb-example/build/debian/copyright
+DEB_EXAMPLE_DEPS += deb-example/build/debian/postinst
+DEB_EXAMPLE_DEPS += deb-example/build/debian/postrm
+DEB_EXAMPLE_DEPS += deb-example/build/debian/prerm
+DEB_EXAMPLE_DEPS += deb-example/build/debian/rules
+DEB_EXAMPLE_DEPS += deb-example/build/debian/templates
+DEB_EXAMPLE_DEPS += deb-example/build/debian/triggers
+DEB_EXAMPLE_DEPS += deb-example/build/debian/$(PACKAGE_NAME)-example.install
+DEB_EXAMPLE_DEPS += deb-example/build/debian/$(PACKAGE_NAME)-example.links
+DEB_EXAMPLE_DEPS += deb-example/build/debian/$(PACKAGE_NAME)-example.dirs
+
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-letsencrypt.conf
@@ -240,6 +257,8 @@ LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
+
+LINUX_EXAMPLE_DEPS += rpm-example/$(PACKAGE_NAME).spec
 
 LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
@@ -293,6 +312,8 @@ rpm_aarch64 : $(RPM)
 
 deb: $(DEB)
 
+deb-example: $(DEB_EXAMPLE)
+
 exe: $(EXE)
 
 tar: $(TAR)
@@ -304,6 +325,11 @@ clean:
 		deb/*.changes \
 		deb/*.ddeb \
 		deb/*.deb \
+		deb-example/build \
+		deb-example/*.buildinfo \
+		deb-example/*.changes \
+		deb-example/*.ddeb \
+		deb-example/*.deb \
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
@@ -491,8 +517,21 @@ deb/build/debian/% : deb/template/%.m4
 deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
-$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+deb-example/build/debian/% : deb-example/template/%
+	mkdir -pv $(@D) && cp -fv $< $@
+
+deb-example/build/debian/% : deb-example/template/%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE:%=~%) $< > $@
+
+deb-example/build/debian/$(PACKAGE_NAME)-example.% : deb-example/template/package.%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+
+
+$(DEB): $(DEB_DEPS) $(DEB_EXAMPLE_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
+
+$(DEB_EXAMPLE): $(DEB_EXAMPLE_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver-example
+	cd deb-example/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
 
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss

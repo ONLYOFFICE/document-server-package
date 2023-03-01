@@ -244,6 +244,11 @@ save_jwt_params(){
 }
 
 setup_nginx(){
+  if [ -d /etc/nginx/conf.d ] && [ -e /etc/nginx/conf.d/dse.conf ]; then
+    mkdir -p $CONF_DIR/dse
+    mv -f /etc/nginx/conf.d/dse.conf $CONF_DIR/dse
+  fi
+
    DS_CONF=$CONF_DIR/nginx/ds.conf
   
   if [ ! -e $DS_CONF ]; then

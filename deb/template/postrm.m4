@@ -54,6 +54,12 @@ clean_ds_files() {
 	  rm -f /etc/nginx/conf.d/ds.conf
     fi
 
+    CONF_DIR="/etc/M4_DS_PREFIX"
+	if [ -d /etc/nginx/conf.d/ ] && [ -e $CONF_DIR/dse/dse.conf ] && [ -f $DIR-example/example ]; then
+      mv $CONF_DIR/dse/dse.conf /etc/nginx/conf.d/
+	fi
+	rm -fr $CONF_DIR/dse
+
 	service nginx reload >/dev/null 2>&1
 }
 
