@@ -8,31 +8,8 @@ Build-Depends: debhelper (>= 8.0.0)
 Package: M4_PACKAGE_NAME
 Architecture: M4_DEB_ARCH
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
-  adduser,
-  ca-certificates,
-  coreutils,
-  curl,
-  onlyoffice-documentserver-example,
-  libasound2,
-  libcairo2,
-  libcurl3 | libcurl4,
-  libcurl3-gnutls,
-  libgconf-2-4,
-  libgtk-3-0,
-  libstdc++6 (>= 4.8.4),
-  libxml2,
-  libxss1,
-  libxtst6,
-  logrotate,
-  nginx-extras (>= 1.3.13),
-  postgresql-client (>= 9.1) | mysql-client | mysql-community-client | mariadb-client,
-  pwgen,
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
-`  redis-tools,'
-,)dnl
-  ttf-mscorefonts-installer,
-  xvfb,
-  zlib1g
+  M4_PACKAGE_NAME-core,
+  M4_PACKAGE_NAME-example
 Recommends:
 Description: defn(`DEB[Summary]')
 defn(`DEB[Description]')

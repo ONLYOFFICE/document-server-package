@@ -61,6 +61,7 @@ RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE:%=.%).$
 DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)$(TAR_RELEASE:%=_%)_$(TAR_ARCH).tar.gz
+DEB_CORE = deb-core/$(PACKAGE_NAME)-core$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 DEB_EXAMPLE = deb-example/$(PACKAGE_NAME)-example_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 
 PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
@@ -212,6 +213,22 @@ DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).install
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).links
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).dirs
 
+DEB_CORE_DEPS += deb-core/build/debian/source/format
+DEB_CORE_DEPS += deb-core/build/debian/changelog
+DEB_CORE_DEPS += deb-core/build/debian/compat
+DEB_CORE_DEPS += deb-core/build/debian/config
+DEB_CORE_DEPS += deb-core/build/debian/control
+DEB_CORE_DEPS += deb-core/build/debian/copyright
+DEB_CORE_DEPS += deb-core/build/debian/postinst
+DEB_CORE_DEPS += deb-core/build/debian/postrm
+DEB_CORE_DEPS += deb-core/build/debian/prerm
+DEB_CORE_DEPS += deb-core/build/debian/rules
+DEB_CORE_DEPS += deb-core/build/debian/templates
+DEB_CORE_DEPS += deb-core/build/debian/triggers
+DEB_CORE_DEPS += deb-core/build/debian/$(PACKAGE_NAME)-core.install
+DEB_CORE_DEPS += deb-core/build/debian/$(PACKAGE_NAME)-core.links
+DEB_CORE_DEPS += deb-core/build/debian/$(PACKAGE_NAME)-core.dirs
+
 DEB_EXAMPLE_DEPS += deb-example/build/debian/source/format
 DEB_EXAMPLE_DEPS += deb-example/build/debian/changelog
 DEB_EXAMPLE_DEPS += deb-example/build/debian/compat
@@ -312,6 +329,8 @@ rpm_aarch64 : $(RPM)
 
 deb: $(DEB)
 
+deb-core: $(DEB_CORE)
+
 deb-example: $(DEB_EXAMPLE)
 
 exe: $(EXE)
@@ -325,6 +344,11 @@ clean:
 		deb/*.changes \
 		deb/*.ddeb \
 		deb/*.deb \
+		deb-core/build \
+		deb-core/*.buildinfo \
+		deb-core/*.changes \
+		deb-core/*.ddeb \
+		deb-core/*.deb \
 		deb-example/build \
 		deb-example/*.buildinfo \
 		deb-example/*.changes \
@@ -517,6 +541,15 @@ deb/build/debian/% : deb/template/%.m4
 deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
+deb-core/build/debian/% : deb-core/template/%
+	mkdir -pv $(@D) && cp -fv $< $@
+
+deb-core/build/debian/% : deb-core/template/%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE:%=~%) $< > $@
+
+deb-core/build/debian/$(PACKAGE_NAME)-core.% : deb-core/template/package.%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+
 deb-example/build/debian/% : deb-example/template/%
 	mkdir -pv $(@D) && cp -fv $< $@
 
@@ -527,8 +560,11 @@ deb-example/build/debian/$(PACKAGE_NAME)-example.% : deb-example/template/packag
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
 
-$(DEB): $(DEB_DEPS) $(DEB_EXAMPLE_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+$(DEB): $(DEB_DEPS)
 	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
+
+$(DEB_CORE): $(DEB_CORE_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver
+	cd deb-core/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
 
 $(DEB_EXAMPLE): $(DEB_EXAMPLE_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver-example
 	cd deb-example/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
