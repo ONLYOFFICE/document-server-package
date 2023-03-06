@@ -50,4 +50,8 @@ if [ "$RESTART_CONDITION" != "false" ]; then
   fi
 fi
 
-service nginx reload
+if pgrep -x ""systemd"" >/dev/null; then
+	systemctl reload nginx
+else
+	service nginx reload
+fi
