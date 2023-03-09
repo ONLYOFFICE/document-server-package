@@ -5,6 +5,7 @@ Priority: optional
 Maintainer: M4_PUBLISHER_NAME <M4_SUPPORT_MAIL>
 Build-Depends: debhelper (>= 8.0.0)
 
+Replaces: M4_PACKAGE_NAME
 Package: M4_PACKAGE_NAME-core
 Architecture: M4_DEB_ARCH
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
