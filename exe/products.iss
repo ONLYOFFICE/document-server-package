@@ -50,7 +50,7 @@ begin
       'Erlang 24 x64',
       Dependency_String(
         '',
-        'https://erlang.org/download/otp_win64_24.2.exe'),
+        'https://github.com/erlang/otp/releases/download/OTP-24.2/otp_win64_24.2.exe'),
       '',
       False,
       False);
