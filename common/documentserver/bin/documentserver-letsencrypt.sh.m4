@@ -29,11 +29,11 @@ if [ "$#" -ge "2" ]; then
         fi
     fi
 
-    [ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
+    [ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl restart nginx || service nginx restart
 
     cat > ${DIR}/letsencrypt_cron.sh <<END
     certbot renew >> /var/log/le-renew.log
-    [ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
+    [ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl restart nginx || service nginx restart
 END
 
     chmod a+x ${DIR}/letsencrypt_cron.sh
