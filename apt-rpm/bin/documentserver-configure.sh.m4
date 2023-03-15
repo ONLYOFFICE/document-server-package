@@ -456,7 +456,7 @@ execute_db_script(){
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
-	exec {FD}<> /dev/tcp/$REDIS_HOST/${REDIS_PORT:="6379"} && exec {FD}>&-
+	lsof -iTCP:${REDIS_PORT:="6379"} -sTCP:LISTEN -P -n >/dev/null
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -469,7 +469,7 @@ establish_redis_conn() {
 establish_amqp_conn() {
 	echo -n "Trying to establish AMQP connection... "
   
-  exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/${AMQP_SERVER_PORT:="5672"} && exec {FD}>&-
+	lsof -iTCP:${AMQP_SERVER_PORT:="5672"} -sTCP:LISTEN -P -n >/dev/null
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -539,11 +539,11 @@ execute_db_script
 
 ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 input_redis_params
-# establish_redis_conn || exit $?
+establish_redis_conn || exit $?
 
 ,)dnl
 input_amqp_params
-# establish_amqp_conn || exit $?
+establish_amqp_conn || exit $?
 
 save_db_params
 save_amqp_params
