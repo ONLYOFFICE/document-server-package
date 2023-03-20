@@ -321,7 +321,10 @@ if [ "$IS_UPGRADE" = "true" ]; then
 fi
 
 # generate allfonts.js and thumbnail
-documentserver-generate-allfonts.sh true
+rpm_version=$(rpm -q --qf '%%{version}' rpm | awk -F. '{ printf("%%d%%03d%%03d%%03d", $1,$2,$3,$4); }';)
+if [[ "$rpm_version" -lt "4013001000" ]]; then
+  documentserver-generate-allfonts.sh true
+fi
 
 # check whethere enabled
 shopt -s nocasematch
