@@ -142,6 +142,11 @@ else
 		DS_FILES := /var/lib/$(DS_PREFIX)
 		DS_EXAMLE := /var/www/$(DS_PREFIX)-example
 		DEV_NULL := /dev/null
+		ifneq ($(COMPANY_NAME_LOW),onlyoffice)
+		RPMBUILD_OPTIONS = --noclean
+		else
+		RPMBUILD_OPTIONS =
+		endif
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		PLATFORM := mac
@@ -435,8 +440,13 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 		--define '_product_name_low $(PRODUCT_NAME_LOW)' \
 		--define '_ds_prefix $(DS_PREFIX)' \
 		--define '_binary_payload w7.xzdio' \
-		--target $(RPM_ARCH) \
+		--target $(RPM_ARCH) $(RPMBUILD_OPTIONS) \
 		$(PACKAGE_NAME).spec
+
+	if [ $(COMPANY_NAME_LOW) != onlyoffice ]; then
+		grep -iRl "onlyoffice" $(find ../../../builddir/BUILDROOT -regex '.*\(html\|sh\|conf\|css\)') ../../../$(PACKAGE_NAME).spec
+		rm -rf ../../../builddir/BUILDROOT
+	fi
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
@@ -465,6 +475,7 @@ deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 
 $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
+	[ $(COMPANY_NAME_LOW) != onlyoffice ] && grep -iRl "onlyoffice" $(find . -regex '.*\(html\|sh\|conf\|css\)')
 
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
