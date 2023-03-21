@@ -44,10 +44,10 @@ if [ "$RESTART_CONDITION" != "false" ]; then
   if pgrep -x ""systemd"" >/dev/null; then
     systemctl restart ds-docservice
     systemctl restart ds-converter
+	systemctl reload nginx
   elif pgrep -x ""supervisord"" >/dev/null; then
     supervisorctl restart ds:docservice
     supervisorctl restart ds:converter
+	service nginx reload
   fi
 fi
-
-[ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
