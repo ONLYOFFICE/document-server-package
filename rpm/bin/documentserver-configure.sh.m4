@@ -533,7 +533,7 @@ tune_local_configs
 setup_nginx
 
 # generate secure link
-documentserver-update-securelink.sh
+documentserver-update-securelink.sh -r false
 
 restart_services
 
