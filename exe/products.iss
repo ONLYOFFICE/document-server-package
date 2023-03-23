@@ -40,6 +40,30 @@ begin
   Result := IsInstalled('Certbot$', '{#Registry32}');
 end;
 
+function IsPythonInstalled(): Boolean;
+var
+  Version: String;
+begin
+  Version := '3.7';
+  Result := IsMsiProductInstalled(
+           Dependency_String(
+            '{A6516328-639D-562B-8A85-C3E305DDAC6F}',
+            '{39BBB1D2-2CD1-57A7-A873-E06D44986C30}'),
+            StrToInt(Version));
+end;
+
+function IsRedisInstalled(): Boolean;
+var
+  Version: String;
+begin
+  Version := '3';
+  Result := IsMsiProductInstalled(
+           Dependency_String(
+            '',
+            '{05410198-7212-4FC4-B7C8-AFEFC3DA0FBC}'),
+            StrToInt(Version));
+end;
+
 procedure Dependency_AddErlang;
 begin
   if IsErlangInstalled() = False then
@@ -98,23 +122,16 @@ var
   Version: String;
 begin
   Version := '3';
-  if not IsMsiProductInstalled(
-           Dependency_String(
-            '',
-            '{05410198-7212-4FC4-B7C8-AFEFC3DA0FBC}'),
-            StrToInt(Version)) then
-  begin
-    Dependency_Add(
-      'redis.msi',
-      '/quiet',
-      'Redis ' + Version + 'x64',
-      Dependency_String(
-        '',
-        'https://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'),
+  Dependency_Add(
+    'redis.msi',
+    '/quiet',
+    'Redis ' + Version + 'x64',
+    Dependency_String(
       '',
-      False,
-      False);
-  end;
+      'https://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'),
+    '',
+    False,
+    False);
 end;
 
 procedure Dependency_AddPython3;
@@ -126,24 +143,17 @@ begin
   Version := '3.7';
   Patch := '2';
   SemVer := Version + '.' + Patch;
-  if not IsMsiProductInstalled(
-           Dependency_String(
-            '{A6516328-639D-562B-8A85-C3E305DDAC6F}',
-            '{39BBB1D2-2CD1-57A7-A873-E06D44986C30}'),
-            StrToInt(Version)) then 
-  begin
-    Dependency_Add(
-      'python ' + Version + Dependency_ArchSuffix + '.exe',
-      'PrependPath=1 DefaultJustForMeTargetDir=' +
-        ExpandConstant('{sd}') + '\Python  /quiet /norestart',
-      'Python ' + Version + Dependency_ArchTitle,
-      Dependency_String(
-        'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '.exe',
-        'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '-amd64.exe'),
-      '',
-      False,
-      False);
-  end;
+  Dependency_Add(
+    'python ' + Version + Dependency_ArchSuffix + '.exe',
+    'PrependPath=1 DefaultJustForMeTargetDir=' +
+      ExpandConstant('{sd}') + '\Python  /quiet /norestart',
+    'Python ' + Version + Dependency_ArchTitle,
+    Dependency_String(
+      'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '.exe',
+      'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '-amd64.exe'),
+    '',
+    False,
+    False);
 end;
 
 procedure Dependency_AddCertbot;

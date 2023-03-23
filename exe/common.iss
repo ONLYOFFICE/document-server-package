@@ -532,11 +532,11 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.9"; Flags: checkablealone; Types: full; Check: InstallPrereq;
-Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; Check: InstallPrereq;
-Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full;
-Name: "Prerequisites\Python"; Description: "Python 3.7 "; Flags: checkablealone; Types: full; Check: InstallPrereq;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.9"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPostgreSQLInstalled;
+Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
+Name: "Prerequisites\Python"; Description: "Python 3.7 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
 
 [Code]
 var
