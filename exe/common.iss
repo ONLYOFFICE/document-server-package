@@ -151,6 +151,9 @@
 #define JSON '{app}\npm\json.exe'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\local.json""'
+#define JSON_DEFAULT_PARAMS '-I -q -f ""{app}\config\default.json""'
+
+#define LOCAL_DATA_STORAGE   'editorDataMemory'
 
 #define REPLACE '{app}\npm\replace.exe'
 
@@ -434,6 +437,8 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
+Filename: "{#JSON}"; Parameters: "{#JSON_DEFAULT_PARAMS} -e ""this.services.CoAuthoring.server.editorDataStorage = '{#LOCAL_DATA_STORAGE}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: UseLocalStorage;
+
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -533,7 +538,7 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.9"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
-Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled;
+Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled and not UseLocalStorage;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPostgreSQLInstalled;
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
 Name: "Prerequisites\Python"; Description: "Python 3.7 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
@@ -855,6 +860,15 @@ begin
   end;
 end;
 
+function UseLocalStorage: Boolean;
+begin
+  Result := false;
+  if ExpandConstant('{param:UseLocalStorage}') = 'Yes' then
+  begin
+    Result := True;
+  end;
+end;
+
 procedure InitializeWizard;
 begin
   If InstallPrereq then begin
@@ -1108,7 +1122,7 @@ begin
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := IsComponentSelected('Prerequisites\Redis');
+        Result := IsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
       end;
     end;
   end;
