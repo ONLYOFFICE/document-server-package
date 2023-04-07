@@ -37,10 +37,14 @@ endif
 
 APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
+RPM_CORE_BUILD_DIR = $(PWD)/rpm-core/builddir
+RPM_EXAMPLE_BUILD_DIR = $(PWD)/rpm-example/builddir
 EXE_BUILD_DIR = exe
 
 APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
+RPM_CORE_PACKAGE_DIR = $(RPM_CORE_BUILD_DIR)/RPMS/$(RPM_ARCH)
+RPM_EXAMPLE_PACKAGE_DIR = $(RPM_EXAMPLE_BUILD_DIR)/RPMS/$(RPM_ARCH)
 TAR_PACKAGE_DIR = $(PWD)
 
 DISTRIB_CODENAME=$(shell lsb_release -cs || echo "n/a")
@@ -63,6 +67,8 @@ EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)$(TAR_RELEASE:%=_%)_$(TAR_ARCH).tar.gz
 DEB_CORE = deb-core/$(PACKAGE_NAME)-core$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 DEB_EXAMPLE = deb-example/$(PACKAGE_NAME)-example_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
+RPM_CORE = $(RPM_CORE_PACKAGE_DIR)/$(PACKAGE_NAME)-core-$(PACKAGE_VERSION)$(RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
+RPM_EXAMPLE = $(RPM_EXAMPLE_PACKAGE_DIR)/$(PACKAGE_NAME)-example-$(PACKAGE_VERSION)$(RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
 
 PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
 
@@ -278,16 +284,30 @@ LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 
-LINUX_EXAMPLE_DEPS += rpm-example/$(PACKAGE_NAME).spec
+LINUX_CORE_DEPS += rpm-core/$(PACKAGE_NAME)-core.spec
+
+LINUX_EXAMPLE_DEPS += rpm-example/$(PACKAGE_NAME)-example.spec
 
 LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
 
-LINUX_DEPS += rpm/bin/documentserver-configure.sh
+LINUX_CORE_DEPS_CLEAN += rpm-core/$(PACKAGE_NAME)-core.spec
+
+LINUX_EXAMPLE_DEPS_CLEAN += rpm-example/$(PACKAGE_NAME)-example.spec
+
+#LINUX_DEPS += rpm/bin/documentserver-configure.sh
 LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+
+LINUX_CORE_DEPS += rpm-core/bin/documentserver-configure.sh
+
+LINUX_EXAMPLE_DEPS += rpm-example/bin/documentserver-example-configure.sh
 
 LINUX_DEPS_CLEAN += rpm/bin/*.sh
 LINUX_DEPS_CLEAN += apt-rpm/bin/*.sh
+
+LINUX_CORE_DEPS_CLEAN += rpm-core/bin/*.sh
+
+LINUX_EXAMPLE_DEPS_CLEAN += rpm-example/bin/*.sh
 
 WIN_DEPS += exe/$(PACKAGE_NAME).iss
 
@@ -326,6 +346,10 @@ apt-rpm:$(APT_RPM)
 
 rpm: $(RPM)
 
+rpm-core: $(RPM_CORE)
+
+rpm-example: $(RPM_EXAMPLE)
+
 rpm_aarch64 : TARGET = linux_arm64
 rpm_aarch64 : RPM_ARCH = aarch64
 rpm_aarch64 : $(RPM)
@@ -359,6 +383,8 @@ clean:
 		deb-example/*.deb \
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
+		$(RPM_CORE_BUILD_DIR)\
+		$(RPM_EXAMPLE_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
 		$(EXE_BUILD_DIR)/*.exe\
 		$(NGINX)\
@@ -371,6 +397,8 @@ clean:
 		$(FONTS)\
 		$(COMMON_DEPS)\
 		$(LINUX_DEPS_CLEAN)\
+		$(LINUX_CORE_DEPS_CLEAN)\
+		$(LINUX_EXAMPLE_DEPS_CLEAN)\
 		$(WIN_DEPS)\
 		documentserver\
 		documentserver-example
@@ -495,7 +523,55 @@ $(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 rpm/$(PACKAGE_NAME).spec : rpm/package.spec
 	mv -f $< $@
 
-$(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+rpm-core/$(PACKAGE_NAME)-core.spec : rpm-core/package.spec
+	mv -f $< $@
+
+$(RPM_CORE): $(COMMON_DEPS) $(LINUX_DEPS) $(LINUX_CORE_DEPS) documentserver
+	mkdir -p $(@D)
+	cd $(@D)/../../.. && rpmbuild \
+		-bb \
+		--define '_topdir $(@D)/../../../builddir' \
+		--define '_package_name $(PACKAGE_NAME)-core' \
+		--define '_product_version $(PRODUCT_VERSION)' \
+		--define '_build_number $(BUILD_NUMBER)$(RPM_RELEASE:%=.%)' \
+		--define '_company_name $(COMPANY_NAME)' \
+		--define '_product_name $(PRODUCT_NAME)' \
+		--define '_publisher_name $(PUBLISHER_NAME)' \
+		--define '_publisher_url $(PUBLISHER_URL)' \
+		--define '_support_url $(SUPPORT_URL)' \
+		--define '_support_mail $(SUPPORT_MAIL)' \
+		--define '_company_name_low $(COMPANY_NAME_LOW)' \
+		--define '_product_name_low $(PRODUCT_NAME_LOW)-core' \
+		--define '_ds_prefix $(DS_PREFIX)' \
+		--define '_binary_payload w7.xzdio' \
+		--target $(RPM_ARCH) \
+		$(PACKAGE_NAME)-core.spec
+
+rpm-example/$(PACKAGE_NAME)-example.spec : rpm-example/package.spec
+	mv -f $< $@
+
+$(RPM_EXAMPLE): $(COMMON_DEPS) $(LINUX_DEPS) $(LINUX_EXAMPLE_DEPS) documentserver-example
+	mkdir -p $(@D)
+	cd $(@D)/../../.. && rpmbuild \
+		-bb \
+		--define '_topdir $(@D)/../../../builddir' \
+		--define '_package_name $(PACKAGE_NAME)-example' \
+		--define '_product_version $(PRODUCT_VERSION)' \
+		--define '_build_number $(BUILD_NUMBER)$(RPM_RELEASE:%=.%)' \
+		--define '_company_name $(COMPANY_NAME)' \
+		--define '_product_name $(PRODUCT_NAME)' \
+		--define '_publisher_name $(PUBLISHER_NAME)' \
+		--define '_publisher_url $(PUBLISHER_URL)' \
+		--define '_support_url $(SUPPORT_URL)' \
+		--define '_support_mail $(SUPPORT_MAIL)' \
+		--define '_company_name_low $(COMPANY_NAME_LOW)' \
+		--define '_product_name_low $(PRODUCT_NAME_LOW)-example' \
+		--define '_ds_prefix $(DS_PREFIX)' \
+		--define '_binary_payload w7.xzdio' \
+		--target $(RPM_ARCH) \
+		$(PACKAGE_NAME)-example.spec
+
+$(RPM): $(COMMON_DEPS) $(LINUX_DEPS)
 	mkdir -p $(@D)
 	cd $(@D)/../../.. && rpmbuild \
 		-bb \
