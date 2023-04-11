@@ -35,7 +35,7 @@ ifneq ($(filter aarch%,$(UNAME_M)),)
 	TAR_ARCH := aarch64
 endif
 
-APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
+APT_RPM_BUILD_DIR = $(PWD)/apt-rpm-core/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
 EXE_BUILD_DIR = exe
 
@@ -56,7 +56,7 @@ else ifeq ($(DISTRIB_CODENAME),xenial)
   TAR_RELEASE     := gcc5
 endif
 
-APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(APT_RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
+APT_RPM_CORE = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(APT_RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
 DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
 EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
@@ -147,7 +147,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		PACKAGES = deb rpm tar apt-rpm
+		PACKAGES = deb rpm tar apt-rpm-core
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -239,16 +239,16 @@ LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
-LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
+LINUX_DEPS += apt-rpm-core/$(PACKAGE_NAME).spec
 
 LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
-LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
+LINUX_DEPS_CLEAN += apt-rpm-core/$(PACKAGE_NAME).spec
 
 LINUX_DEPS += rpm/bin/documentserver-configure.sh
-LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+LINUX_DEPS += apt-rpm-core/bin/documentserver-configure.sh
 
 LINUX_DEPS_CLEAN += rpm/bin/*.sh
-LINUX_DEPS_CLEAN += apt-rpm/bin/*.sh
+LINUX_DEPS_CLEAN += apt-rpm-core/bin/*.sh
 
 WIN_DEPS += exe/$(PACKAGE_NAME).iss
 
@@ -281,9 +281,9 @@ M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
 
 .PHONY: all clean clean-docker rpm deb packages deploy-bin
 
-all: rpm deb apt-rpm
+all: rpm deb apt-rpm-core
 
-apt-rpm:$(APT_RPM)
+apt-rpm-core:$(APT_RPM_CORE)
 
 rpm: $(RPM)
 
@@ -415,10 +415,10 @@ documentserver-example:
 
 	echo "Done" > $@
 
-apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
+apt-rpm-core/$(PACKAGE_NAME).spec : apt-rpm-core/package.spec
 	mv -f $< $@
 
-$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+$(APT_RPM_CORE): $(COMMON_DEPS) $(LINUX_DEPS) documentserver
 	mkdir -p $(@D)
 	cd $(@D)/../../.. && rpmbuild \
 		-bb \
