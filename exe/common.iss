@@ -106,9 +106,7 @@
   #define sDbDefValue         'onlyoffice'
 #endif
 
-#ifndef sDbDefPort
-  #define sDbDefPort        '5432'
-#endif
+#define DbDefPort             '5432'
 
 #define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_ENV	          'NODE_ENV=production-windows'
@@ -798,7 +796,7 @@ begin
   DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
   DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#sDbDefPort}}}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#DbDefPort}}}');
   DbPage.Values[2] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
   DbPage.Values[3] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
   DbPage.Values[4] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
