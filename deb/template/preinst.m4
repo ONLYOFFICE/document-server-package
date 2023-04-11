@@ -19,8 +19,12 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+
 case "$1" in
-	configure)
+	install)
+	;;
+
+	upgrade)
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)

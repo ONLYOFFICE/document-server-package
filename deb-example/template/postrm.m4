@@ -22,11 +22,31 @@ if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
 . /usr/share/debconf/confmodule
 fi
 
+clean_ds_files() {
+	if [ -d /etc/nginx/conf.d/ ] && [ -e /etc/nginx/conf.d/dse.conf ]; then
+	  rm -f /etc/nginx/conf.d/dse.conf
+    fi
+
+	CONF_DIR="/etc/M4_DS_PREFIX"
+	if [ ! -e $CONF_DIR/dse/dse.conf ]; then
+		rm -f $CONF_DIR/dse/dse.conf
+	fi
+
+	service nginx reload >/dev/null 2>&1
+}
+
 case "$1" in
 	purge)
+		# purge logs
+		if [ -d $LOG_DIR ]; then
+			rm -rf $LOG_DIR
+		fi
+
+		clean_ds_files
 	;;
 
 	remove|upgrade)
+		clean_ds_files
 	;;
   
 	failed-upgrade|abort-install|abort-upgrade|disappear)

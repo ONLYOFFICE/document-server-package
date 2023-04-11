@@ -147,7 +147,7 @@ else
 		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		PACKAGES = deb rpm tar apt-rpm
+		PACKAGES = deb deb-core deb-example rpm tar apt-rpm
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -202,6 +202,7 @@ DEB_DEPS += deb/build/debian/config
 DEB_DEPS += deb/build/debian/control
 DEB_DEPS += deb/build/debian/copyright
 DEB_DEPS += deb/build/debian/postinst
+DEB_DEPS += deb/build/debian/preinst
 DEB_DEPS += deb/build/debian/postrm
 DEB_DEPS += deb/build/debian/prerm
 DEB_DEPS += deb/build/debian/rules
@@ -210,6 +211,40 @@ DEB_DEPS += deb/build/debian/triggers
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).install
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).links
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).dirs
+
+DEB_CORE_DEPS += deb-core/build/debian/source/format
+DEB_CORE_DEPS += deb-core/build/debian/changelog
+DEB_CORE_DEPS += deb-core/build/debian/compat
+DEB_CORE_DEPS += deb-core/build/debian/config
+DEB_CORE_DEPS += deb-core/build/debian/control
+DEB_CORE_DEPS += deb-core/build/debian/copyright
+DEB_CORE_DEPS += deb-core/build/debian/postinst
+DEB_CORE_DEPS += deb-core/build/debian/preinst
+DEB_CORE_DEPS += deb-core/build/debian/postrm
+DEB_CORE_DEPS += deb-core/build/debian/prerm
+DEB_CORE_DEPS += deb-core/build/debian/rules
+DEB_CORE_DEPS += deb-core/build/debian/templates
+DEB_CORE_DEPS += deb-core/build/debian/triggers
+DEB_CORE_DEPS += deb-core/build/debian/$(PACKAGE_NAME)-core.install
+DEB_CORE_DEPS += deb-core/build/debian/$(PACKAGE_NAME)-core.links
+DEB_CORE_DEPS += deb-core/build/debian/$(PACKAGE_NAME)-core.dirs
+
+DEB_EXAMPLE_DEPS += deb-example/build/debian/source/format
+DEB_EXAMPLE_DEPS += deb-example/build/debian/changelog
+DEB_EXAMPLE_DEPS += deb-example/build/debian/compat
+DEB_EXAMPLE_DEPS += deb-example/build/debian/config
+DEB_EXAMPLE_DEPS += deb-example/build/debian/control
+DEB_EXAMPLE_DEPS += deb-example/build/debian/copyright
+DEB_EXAMPLE_DEPS += deb-example/build/debian/postinst
+DEB_EXAMPLE_DEPS += deb-example/build/debian/preinst
+DEB_EXAMPLE_DEPS += deb-example/build/debian/postrm
+DEB_EXAMPLE_DEPS += deb-example/build/debian/prerm
+DEB_EXAMPLE_DEPS += deb-example/build/debian/rules
+DEB_EXAMPLE_DEPS += deb-example/build/debian/templates
+DEB_EXAMPLE_DEPS += deb-example/build/debian/triggers
+DEB_EXAMPLE_DEPS += deb-example/build/debian/$(PACKAGE_NAME)-example.install
+DEB_EXAMPLE_DEPS += deb-example/build/debian/$(PACKAGE_NAME)-example.links
+DEB_EXAMPLE_DEPS += deb-example/build/debian/$(PACKAGE_NAME)-example.dirs
 
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
@@ -281,7 +316,7 @@ M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
 
 .PHONY: all clean clean-docker rpm deb packages deploy-bin
 
-all: rpm deb apt-rpm
+all: rpm deb deb-core deb-example apt-rpm
 
 apt-rpm:$(APT_RPM)
 
@@ -292,6 +327,10 @@ rpm_aarch64 : RPM_ARCH = aarch64
 rpm_aarch64 : $(RPM)
 
 deb: $(DEB)
+
+deb-core: $(DEB_CORE)
+
+deb-example: $(DEB_EXAMPLE)
 
 exe: $(EXE)
 
@@ -304,6 +343,16 @@ clean:
 		deb/*.changes \
 		deb/*.ddeb \
 		deb/*.deb \
+		deb-core/build \
+		deb-core/*.buildinfo \
+		deb-core/*.changes \
+		deb-core/*.ddeb \
+		deb-core/*.deb \
+		deb-example/build \
+		deb-example/*.buildinfo \
+		deb-example/*.changes \
+		deb-example/*.ddeb \
+		deb-example/*.deb \
 		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
@@ -491,8 +540,33 @@ deb/build/debian/% : deb/template/%.m4
 deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
-$(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
+deb-core/build/debian/% : deb-core/template/%
+	mkdir -pv $(@D) && cp -fv $< $@
+
+deb-core/build/debian/% : deb-core/template/%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE:%=~%) $< > $@
+
+deb-core/build/debian/$(PACKAGE_NAME)-core.% : deb-core/template/package.%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+
+deb-example/build/debian/% : deb-example/template/%
+	mkdir -pv $(@D) && cp -fv $< $@
+
+deb-example/build/debian/% : deb-example/template/%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE:%=~%) $< > $@
+
+deb-example/build/debian/$(PACKAGE_NAME)-example.% : deb-example/template/package.%.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+
+
+$(DEB): $(DEB_DEPS)
 	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
+
+$(DEB_CORE): $(DEB_CORE_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver
+	cd deb-core/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
+
+$(DEB_EXAMPLE): $(DEB_EXAMPLE_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver-example
+	cd deb-example/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
 
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
