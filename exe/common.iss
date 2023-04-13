@@ -71,6 +71,7 @@
 
 #define REG_LICENSE_PATH      'LicensePath'
 #define REG_DB_HOST           'DbHost'
+#define REG_DB_PORT           'DbPort'
 #define REG_DB_USER           'DbUser'
 #define REG_DB_PWD            'DbPwd'
 #define REG_DB_NAME           'DbName'
@@ -104,6 +105,8 @@
 #ifndef sDbDefValue
   #define sDbDefValue         'onlyoffice'
 #endif
+
+#define DbDefPort             '5432'
 
 #define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_ENV	          'NODE_ENV=production-windows'
@@ -183,7 +186,7 @@ DefaultGroupName        ={#sCompanyName}
 ;WizardImageFile         = data\dialogpicture.bmp
 ;WizardSmallImageFile    = data\dialogicon.bmp
 
-
+WizardSizePercent         = 110
 UsePreviousAppDir         = yes
 DirExistsWarning          =no
 DefaultDirName            ={pf}\{#sAppPath}
@@ -355,6 +358,7 @@ Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
 
 [Registry]
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_HOST}"; ValueData: "{code:GetDbHost}";
+Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PORT}"; ValueData: "{code:GetDbPort}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_USER}"; ValueData: "{code:GetDbUser}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_PWD}"; ValueData: "{code:GetDbPwd}";
 Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_DB_NAME}"; ValueData: "{code:GetDbName}";
@@ -379,6 +383,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefin
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPort = '{code:GetDbPort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -424,8 +429,8 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
 
 Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} ""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
@@ -613,22 +618,22 @@ end;
 
 function GetDbPort(Param: String): String;
 begin
-  Result := IntToStr(5432);
+  Result := DbPage.Values[1];
 end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := DbPage.Values[1];
+  Result := DbPage.Values[2];
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := DbPage.Values[2];
+  Result := DbPage.Values[3];
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := DbPage.Values[3];
+  Result := DbPage.Values[4];
 end;
 
 function GetRabbitMqHost(Param: String): String;
@@ -785,14 +790,16 @@ begin
     FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
     FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
   DbPage.Add(ExpandConstant('{cm:Host}'), False);
+  DbPage.Add(ExpandConstant('{cm:Port}'), False);
   DbPage.Add(ExpandConstant('{cm:User}'), False);
   DbPage.Add(ExpandConstant('{cm:Password}'), True);
   DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
   DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
+  DbPage.Values[1] := ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#DbDefPort}}}');
+  DbPage.Values[2] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
+  DbPage.Values[3] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
+  DbPage.Values[4] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
 
   RabbitMqPage := CreateInputQueryPage(
     DbPage.ID,
