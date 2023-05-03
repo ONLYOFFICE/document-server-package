@@ -326,6 +326,11 @@ if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
 fi
 
+# plugins installation
+ifelse(M4_COMPANY_NAME, `ONLYOFFICE', `
+documentserver-pluginsmanager.sh -r false --install "highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"
+')
+
 # check whethere enabled
 shopt -s nocasematch
 PORTS=()

@@ -225,9 +225,11 @@ LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
 LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
+LINUX_DEPS += rpm/common.spec
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 
+LINUX_DEPS_CLEAN += rpm/common.spec
 LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
 
