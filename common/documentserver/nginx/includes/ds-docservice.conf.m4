@@ -1,9 +1,6 @@
 #welcome page
 rewrite ^/$ $the_scheme://$the_host/welcome/ redirect;
 
-#support old version
-rewrite ^\/OfficeWeb(?<old>\/apps\/.*)$ $the_scheme://$the_host/M4_PACKAGE_VERSION/web-apps$old redirect;
-
 #script caching protection
 rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host/M4_PACKAGE_VERSION$cache redirect;
 
