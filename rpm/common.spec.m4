@@ -328,7 +328,7 @@ fi
 
 # plugins installation
 ifelse(M4_COMPANY_NAME, `ONLYOFFICE', `
-documentserver-pluginsmanager.sh -r false --install "highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"
+documentserver-pluginsmanager.sh -r false --install="highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"
 ')
 
 # check whethere enabled

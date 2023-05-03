@@ -336,7 +336,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 		# plugins installation
 		ifelse(M4_COMPANY_NAME, `ONLYOFFICE', `
-		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-pluginsmanager.sh -r false --install "highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"
+		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-pluginsmanager.sh -r false --install="highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"
 		')
 
 		chown ds:ds -R "$LOG_DIR"
