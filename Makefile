@@ -341,6 +341,10 @@ documentserver:
 	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 
+ifeq ($(COMPANY_NAME_LOW),onlyoffice)
+	/usr/bin/find $(DOCUMENTSERVER)/sdkjs-plugins/* -depth -type d -not -path "*marketplace*" -exec rm -r {} \;
+endif
+
 ifeq ($(PLATFORM),win)
 	cp -fr -t $(DOCUMENTSERVER)/license exe/license/*.license
 	echo ; >> $(DOCUMENTSERVER)/3rd-Party.txt
