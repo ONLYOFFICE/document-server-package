@@ -334,9 +334,17 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		# generate allfonts.js and thumbnail
 		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
 
-		# plugins installation
 		ifelse(M4_COMPANY_NAME, `ONLYOFFICE', `
-		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-pluginsmanager.sh -r false --install="highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"
+			# install/update plugins
+			if [ -z "$DS_PLUGIN_INSTALLATION" ]; then
+				PLUGINS_LIST=("highlight code" "macros" "mendeley" "ocr" "photo editor" "speech" "thesaurus" "translator" "youtube" "zotero")
+				INSTALLED_PLUGINS=$(documentserver-pluginsmanager.sh -r false --print-installed)
+				for PLUGIN in "${PLUGINS_LIST[@]}"; do
+					!(grep -q "$PLUGIN" <<< "$INSTALLED_PLUGINS") && PLUGIN_INSTALL_LIST+=("$PLUGIN")
+				done
+				(grep -cq "{" <<< "$INSTALLED_PLUGINS") && [ $? -eq 0 ] && documentserver-pluginsmanager.sh -r false --update-all 
+				[ ${#PLUGIN_INSTALL_LIST[@]} -gt 0 ] && documentserver-pluginsmanager.sh -r false --install="$(printf "%s," "${PLUGIN_INSTALL_LIST[@]}")"
+			fi
 		')
 
 		chown ds:ds -R "$LOG_DIR"
