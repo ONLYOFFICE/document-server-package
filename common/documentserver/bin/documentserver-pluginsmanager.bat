@@ -1,5 +1,4 @@
 @ECHO off
-
 rem Setup path env to enable to load the dlls
 set PATH=%~dp0\..\server\FileConverter\bin;%PATH%
 
