@@ -239,6 +239,9 @@ ru.GenFonts=Создание AllFonts.js...
 en.InstallSrv=Installing service %1...
 ru.InstallSrv=Установка сервиса %1...
 
+en.InstallPlugins=Installing plugins ...
+ru.InstallPlugins=Установка плагинов ...
+
 en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
 ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' чтобы удалить её, или 'Отмена' чтобы выйти из программы инсталляции.
 
@@ -378,6 +381,8 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
 
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --install=""highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
+
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -484,6 +489,8 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{
 
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
+
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --remove-all"; Flags: runhidden
 
 Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#NGINX_SRV} confirm"; Flags: runhidden
