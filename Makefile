@@ -225,11 +225,9 @@ LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
 LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
-LINUX_DEPS += rpm/common.spec
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 
-LINUX_DEPS_CLEAN += rpm/common.spec
 LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
 
@@ -344,7 +342,7 @@ documentserver:
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
-	/usr/bin/find $(DOCUMENTSERVER)/sdkjs-plugins/* -depth -type d -not -path "*marketplace*" -exec rm -r {} \;
+	/usr/bin/find $(DOCUMENTSERVER)/sdkjs-plugins/* -depth -type d -not -path "*marketplace*" -not -path "*v1*" -exec rm -r {} \;
 endif
 
 ifeq ($(PLATFORM),win)
@@ -461,6 +459,9 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=true
+else
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=false
 endif
 
 %.sh : %.sh.m4

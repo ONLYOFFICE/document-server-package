@@ -326,26 +326,25 @@ if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
 fi
 
-ifelse(M4_COMPANY_NAME, `ONLYOFFICE', `
-  # install/update plugins
-  if [ -z "$DS_PLUGIN_INSTALLATION" ]; then
-    PLUGINS_LIST=("highlight code" "macros" "mendeley" "ocr" "photo editor" "speech" "thesaurus" "translator" "youtube" "zotero")
-    INSTALLED_PLUGINS=$(documentserver-pluginsmanager.sh -r false --print-installed)
-    for PLUGIN in "${PLUGINS_LIST[@]}"; do
-      !(grep -q "$PLUGIN" <<< "$INSTALLED_PLUGINS") && PLUGIN_INSTALL_LIST+=("$PLUGIN")
-    done
-    if grep -cq "{" <<< "$INSTALLED_PLUGINS"; then 
-      echo -n Update plugins, please wait...
-      documentserver-pluginsmanager.sh -r false --update-all >/dev/null
-      echo Done
-    fi
-    if [ ${#PLUGIN_INSTALL_LIST[@]} -gt 0 ]; then
-      echo -n Install plugins, please wait...
-      documentserver-pluginsmanager.sh -r false --install="$(printf "%s," "${PLUGIN_INSTALL_LIST[@]}")" >/dev/null
-      echo Done
-    fi
+# install/update plugins
+DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-%plugin}
+if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
+  PLUGINS_LIST=("highlight code" "macros" "mendeley" "ocr" "photo editor" "speech" "thesaurus" "translator" "youtube" "zotero")
+  INSTALLED_PLUGINS=$(documentserver-pluginsmanager.sh -r false --print-installed)
+  for PLUGIN in "${PLUGINS_LIST[@]}"; do
+    !(grep -q "$PLUGIN" <<< "$INSTALLED_PLUGINS") && PLUGIN_INSTALL_LIST+=("$PLUGIN")
+  done
+  if grep -cq "{" <<< "$INSTALLED_PLUGINS"; then 
+    echo -n Update plugins, please wait...
+    documentserver-pluginsmanager.sh -r false --update-all >/dev/null
+    echo Done
   fi
-')
+  if [ ${#PLUGIN_INSTALL_LIST[@]} -gt 0 ]; then
+    echo -n Install plugins, please wait...
+    documentserver-pluginsmanager.sh -r false --install="$(printf "%s," "${PLUGIN_INSTALL_LIST[@]}")" >/dev/null
+    echo Done
+  fi
+fi
 
 # check whethere enabled
 shopt -s nocasematch
