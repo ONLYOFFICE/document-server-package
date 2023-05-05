@@ -490,8 +490,6 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
 
-Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --remove-all"; Flags: runhidden
-
 Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
 Filename: "{#NSSM}"; Parameters: "remove {#NGINX_SRV} confirm"; Flags: runhidden
 
