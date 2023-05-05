@@ -342,8 +342,16 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 				for PLUGIN in "${PLUGINS_LIST[@]}"; do
 					!(grep -q "$PLUGIN" <<< "$INSTALLED_PLUGINS") && PLUGIN_INSTALL_LIST+=("$PLUGIN")
 				done
-				(grep -cq "{" <<< "$INSTALLED_PLUGINS") && [ $? -eq 0 ] && documentserver-pluginsmanager.sh -r false --update-all 
-				[ ${#PLUGIN_INSTALL_LIST[@]} -gt 0 ] && documentserver-pluginsmanager.sh -r false --install="$(printf "%s," "${PLUGIN_INSTALL_LIST[@]}")"
+				if grep -cq "{" <<< "$INSTALLED_PLUGINS"; then 
+					echo -n Update plugins, please wait...
+					documentserver-pluginsmanager.sh -r false --update-all >/dev/null
+					echo Done
+				fi
+				if [ ${#PLUGIN_INSTALL_LIST[@]} -gt 0 ]; then
+					echo -n Install plugins, please wait...
+					documentserver-pluginsmanager.sh -r false --install="$(printf "%s," "${PLUGIN_INSTALL_LIST[@]}")" >/dev/null
+					echo Done
+				fi
 			fi
 		')
 
