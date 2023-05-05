@@ -421,6 +421,7 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
+    [ -d $DIR/sdkjs-plugins/ ] && rm -rf $DIR/sdkjs-plugins/
   ;;
   1)
     # Upgrade
