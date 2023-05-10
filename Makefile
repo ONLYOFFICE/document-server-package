@@ -92,6 +92,7 @@ SDKJS_DIR :=sdkjs
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 OFFICIAL_PRODUCT_NAME := 'Community Edition'
+M4_PARAMS += -D M4_DS_PLUGIN_BUILD=1
 endif
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))

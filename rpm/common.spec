@@ -156,6 +156,7 @@ rm -rf "%{buildroot}"
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
+%exclude %{_localstatedir}/www/%{_ds_prefix}/server/tools/pluginsmanager
 %if %{defined example}
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/example
 %endif
@@ -172,6 +173,7 @@ rm -rf "%{buildroot}"
 
 %attr(755, root, root) %{_libdir}/*.so*
 %attr(744, root, root) %{_bindir}/documentserver-*.sh
+%exclude %{_bindir}/documentserver-pluginsmanager.sh
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
 %attr(-, root, root) %{_sysconfdir}/nginx/includes/*
@@ -326,9 +328,6 @@ if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
 fi
 
-# install/update plugins
-documentserver-pluginsmanager.sh --postinst true --restart false
-
 # check whethere enabled
 shopt -s nocasematch
 PORTS=()
@@ -404,7 +403,6 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
-    [ -d $DIR/sdkjs-plugins/ ] && rm -rf $DIR/sdkjs-plugins/
   ;;
   1)
     # Upgrade
