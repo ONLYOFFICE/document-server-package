@@ -156,7 +156,6 @@ rm -rf "%{buildroot}"
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/metrics
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/Metrics/node_modules/modern-syslog/build/Release/core.node
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}/server/tools/*
-%exclude %{_localstatedir}/www/%{_ds_prefix}/server/tools/pluginsmanager
 %if %{defined example}
 %attr(550, ds, ds) %{_localstatedir}/www/%{_ds_prefix}-example/example
 %endif
@@ -173,7 +172,6 @@ rm -rf "%{buildroot}"
 
 %attr(755, root, root) %{_libdir}/*.so*
 %attr(744, root, root) %{_bindir}/documentserver-*.sh
-%exclude %{_bindir}/documentserver-pluginsmanager.sh
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
 %attr(-, root, root) %{_sysconfdir}/nginx/includes/*
@@ -326,6 +324,21 @@ fi
 rpm_version=$(rpm -q --qf '%%{version}' rpm | awk -F. '{ printf("%%d%%03d%%03d%%03d", $1,$2,$3,$4); }';)
 if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
+fi
+
+# install/update plugins
+DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-%{DS_PLUGIN_INSTALLATION}}
+[ "$IS_UPGRADE" = "true" ] && OLDER_PACKAGE_VERSION=$(rpm -q %{_package_name} --queryformat "%%{VERSION};" | cut -d';' -f1 | awk -F. '{ printf("%%d%%03d%%03d%%03d", $1,$2,$3,$4); }';)
+if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
+  if [[ "$OLDER_PACKAGE_VERSION" -lt "7004000000" ]]; then
+    echo -n Install plugins, please wait...
+    documentserver-pluginsmanager.sh -r false --install="highlight code, macros, mendeley, ocr, photo editor, speech, thesaurus, translator, youtube, zotero" >/dev/null
+    echo Done
+  elif [[ "$OLDER_PACKAGE_VERSION" -ge "7004000000" ]]; then
+    echo -n Update plugins, please wait...
+    documentserver-pluginsmanager.sh -r false --update-all >/dev/null
+    echo Done
+  fi
 fi
 
 # check whethere enabled
