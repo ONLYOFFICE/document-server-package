@@ -338,17 +338,10 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
 
 		# install/update plugins
-		OLDER_PACKAGE_VERSION=$(awk -F. '{ printf("%d%03d%03d%03d", $1,$2,$3,$4); }' <<< $2)
 		if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
-			if [[ "$OLDER_PACKAGE_VERSION" -lt "7004000000" ]]; then
-				echo -n Install plugins, please wait...
-				documentserver-pluginsmanager.sh -r false --install="highlight code, macros, mendeley, ocr, photo editor, speech, thesaurus, translator, youtube, zotero" >/dev/null
-				echo Done
-			elif [[ "$OLDER_PACKAGE_VERSION" -ge "7004000000" ]]; then
-				echo -n Update plugins, please wait...
-				documentserver-pluginsmanager.sh -r false --update-all >/dev/null
-				echo Done
-			fi
+			echo -n Install plugins, please wait...
+			documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+			echo Done
 		fi
 
 		chown ds:ds -R "$LOG_DIR"
