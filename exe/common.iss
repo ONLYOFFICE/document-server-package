@@ -138,6 +138,8 @@
 
 #define REPLACE '{app}\npm\replace.exe'
 
+#define DEFAULT_PLUGINS_LIST '{app}\sdkjs-plugins\plugin-list-default.json'
+
 #define NGINX_SRV  'DsProxySvc'
 #define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
 #define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
@@ -381,7 +383,9 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
 
-Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --install=""highlightcode, macros, mendeley, ocr, photoeditor, speech, thesaurus, translator, youtube, zotero"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
+#ifndef DISABLE_INSTALL_PLUGINS
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
+#endif
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
