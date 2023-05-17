@@ -138,6 +138,8 @@
 
 #define REPLACE '{app}\npm\replace.exe'
 
+#define DEFAULT_PLUGINS_LIST '{app}\sdkjs-plugins\plugin-list-default.json'
+
 #define NGINX_SRV  'DsProxySvc'
 #define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
 #define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
@@ -238,6 +240,9 @@ ru.GenFonts=Создание AllFonts.js...
 
 en.InstallSrv=Installing service %1...
 ru.InstallSrv=Установка сервиса %1...
+
+en.InstallPlugins=Installing plugins ...
+ru.InstallPlugins=Установка плагинов ...
 
 en.PrevVer=The previous version of {#sAppName} detected, please click 'OK' button to uninstall it, or 'Cancel' to quit setup.
 ru.PrevVer=Обнаружена предыдущая версия {#sAppName}, нажмите кнопку 'OK' чтобы удалить её, или 'Отмена' чтобы выйти из программы инсталляции.
@@ -377,6 +382,10 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT
 
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
+
+#ifndef DISABLE_INSTALL_PLUGINS
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
+#endif
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
