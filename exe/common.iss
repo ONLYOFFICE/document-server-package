@@ -25,7 +25,7 @@
 #endif
 
 #ifndef sPackageName
-  #define sPackageName        str(LowerCase(sCompanyName) + "-" + LowerCase(sProductName))
+  #define sPackageName        sCompanyName + "-" + sProductName
 #endif
 
 #define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\" + sPackageName + "\LICENSE.txt")
@@ -167,7 +167,7 @@ AppId                     ={#sAppId}
 AppVerName                ={#sAppName} {#sAppVerShort}
 AppVersion                ={#sAppVersion}
 VersionInfoVersion        ={#sAppVersion}
-OutputBaseFilename        ={#sPackageName}-{#sAppVersion}
+OutputBaseFilename        ={#sPackageName}-{#sAppVersion}-x64
 
 AppPublisher            ={#sPublisherName}
 AppPublisherURL         ={#sPublisherUrl}
