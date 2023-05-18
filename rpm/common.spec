@@ -329,7 +329,7 @@ fi
 # install/update plugins
 DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-%{DS_PLUGIN_INSTALLATION}}
 if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
-    echo -n Install plugins, please wait...
+    echo -n Installing plugins, please wait...
     documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
     echo Done
 fi
