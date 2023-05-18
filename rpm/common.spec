@@ -326,6 +326,14 @@ if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
 fi
 
+# install/update plugins
+DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-%{DS_PLUGIN_INSTALLATION}}
+if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
+    echo -n Installing plugins, please wait...
+    documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+    echo Done
+fi
+
 # check whethere enabled
 shopt -s nocasematch
 PORTS=()
@@ -401,6 +409,7 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
+    [ -d $DIR/sdkjs-plugins/ ] && rm -rf $DIR/sdkjs-plugins/
   ;;
   1)
     # Upgrade

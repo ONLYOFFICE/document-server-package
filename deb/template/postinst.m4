@@ -100,6 +100,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	elif [ $JWT_ENABLED = "false" ]; then
 		JWT_MESSAGE="You have JWT disabled. We recommend enabling JWT in ${LOCAL_CONFIG} in services.CoAuthoring.token.enable and configure your custom JWT key in services.CoAuthoring.secret"
 	fi
+
+	db_get M4_ONLYOFFICE_VALUE/plugins-enabled || true
+	DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-$RET}
 }
 
 install_db() {
@@ -333,6 +336,13 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 		# generate allfonts.js and thumbnail
 		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
+
+		# install/update plugins
+		if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
+			echo -n Installing plugins, please wait...
+			documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+			echo Done
+		fi
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$LOG_DIR-example"

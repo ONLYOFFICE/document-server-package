@@ -455,6 +455,9 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=true
+else
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=false
 endif
 
 %.sh : %.sh.m4
