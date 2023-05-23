@@ -326,13 +326,16 @@ if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
 fi
 
+set -x
+echo $DIR
 # install/update plugins
 DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-%{DS_PLUGIN_INSTALLATION}}
 if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
     echo -n Installing plugins, please wait...
-    documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+    documentserver-pluginsmanager.sh -r false --update=\"/var/www/%{_ds_prefix}/sdkjs-plugins/plugin-list-default.json\" 
     echo Done
 fi
+set +x
 
 # check whethere enabled
 shopt -s nocasematch

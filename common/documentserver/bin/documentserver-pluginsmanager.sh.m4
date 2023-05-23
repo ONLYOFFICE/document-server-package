@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 [ $(id -u) -ne 0 ] && { echo "Root privileges required"; exit 1; }
 
