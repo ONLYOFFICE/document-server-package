@@ -421,6 +421,12 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
+    rm -f /etc/onlyoffice/documentserver/nginx/ds.conf.rpmsave
+    rm -f /etc/onlyoffice/documentserver*/nginx/includes
+    rm -f /etc/onlyoffice/documentserver*/local.json
+    find /var/www/onlyoffice/ -type f -regex \
+    '.*\(themes_thumbnail@.*x\.png\|theme\.bin\|thumbnail@.*x\.png\|thumbnail_android\.png\|thumbnail_ios\.png\|thumbnail\.png\|image[0-9]+\.jpg\|image[0-9]+\.png\|fonts\.log\|themes\.js\)$' \
+    -delete
     [ -d $DIR/sdkjs-plugins/ ] && rm -rf $DIR/sdkjs-plugins/
   ;;
   1)
