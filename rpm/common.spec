@@ -326,24 +326,16 @@ if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
 fi
 
-[ "$IS_UPGRADE" = "true" ] && OLDER_PACKAGE_VERSION=$(rpm -q %{_package_name} --queryformat "%%{VERSION};" | cut -d';' -f1 | awk -F. '{ printf("%%d%%03d%%03d%%03d", $1,$2,$3,$4); }';)
 if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
-  # moving the old version of the plugins to /tmp
-  if [[ -n "$OLDER_PACKAGE_VERSION" && "$OLDER_PACKAGE_VERSION" -lt 7004000000 ]]; then
-    mkdir -p /tmp/%{_ds_prefix}/
-    PLUGINS_LIST=("highlightcode" "macros" "mendeley" "ocr" "photoeditor" "speech" "thesaurus" "translator" "youtube" "zotero")
-    for PLUGIN in "${PLUGINS_LIST[@]}"; do [ -d ${DIR}/sdkjs-plugins/${PLUGIN} ] && mv ${DIR}/sdkjs-plugins/${PLUGIN} /tmp/%{_ds_prefix}/; done
+  if [ "$IS_UPGRADE" = "true" ]; then
+    # Get a list of old versions of plugins to ignore
+    IGNORED_PLUGINS_LIST=$(rpm -ql $(rpm -q --last %{_package_name} | awk 'NR==2{print $1}') | grep /sdkjs-plugins/*.*/config.json | sed 's|.*/\(.*\)/config.json|\1|' | paste -sd ",")
   fi
 
   # install/update plugins
   echo -n Installing plugins, please wait...
-  documentserver-pluginsmanager.sh -r false --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+  documentserver-pluginsmanager.sh -r false --ignore=\"${IGNORED_PLUGINS_LIST[@]}\" --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
   echo Done
-
-  # returning an old version of plugins for later removal by rpm means
-  if [[ -n "$OLDER_PACKAGE_VERSION" && "$OLDER_PACKAGE_VERSION" -lt 7004000000 ]]; then
-    mv /tmp/%{_ds_prefix}/* ${DIR}/sdkjs-plugins/
-  fi
 fi
 
 # check whethere enabled
