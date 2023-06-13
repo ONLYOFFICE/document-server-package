@@ -43,24 +43,11 @@ APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 TAR_PACKAGE_DIR = $(PWD)
 
-DISTRIB_CODENAME=$(shell lsb_release -cs || echo "n/a")
-ifeq ($(DISTRIB_CODENAME),trusty)
-  RPM_RELEASE     := el7
-  APT_RPM_RELEASE := p7
-  DEB_RELEASE     := jessie
-  TAR_RELEASE     := gcc4
-else ifeq ($(DISTRIB_CODENAME),xenial)
-  RPM_RELEASE     := el8
-  APT_RPM_RELEASE := p8
-  DEB_RELEASE     := stretch
-  TAR_RELEASE     := gcc5
-endif
-
-APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(APT_RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
-RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE:%=.%).$(RPM_ARCH).rpm
-DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE:%=~%).deb
-EXE = $(EXE_BUILD_DIR)/$(PACKAGE_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER).exe
-TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)$(TAR_RELEASE:%=_%)_$(TAR_ARCH).tar.gz
+APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(APT_RPM_RELEASE_SUFFIX).$(RPM_ARCH).rpm
+RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE_SUFFIX).$(RPM_ARCH).rpm
+DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE_SUFFIX).deb
+EXE = $(EXE_BUILD_DIR)/$(COMPANY_NAME)-$(PRODUCT_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER)-x64.exe
+TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(TAR_RELEASE_SUFFIX)-$(TAR_ARCH).tar.gz
 
 PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
 
@@ -193,7 +180,7 @@ ISCC_PARAMS +=	//DsAppBuildNumber=$(BUILD_NUMBER)
 ifdef ENABLE_SIGNING
 ISCC_PARAMS +=	//DENABLE_SIGNING=1
 endif
-ISCC_PARAMS +=	//S"byparam=signtool.exe sign /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com \$$f"
+ISCC_PARAMS +=	//S"byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com \$$f"
 
 DEB_DEPS += deb/build/debian/source/format
 DEB_DEPS += deb/build/debian/changelog
@@ -425,7 +412,7 @@ $(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 		--define '_topdir $(@D)/../../../builddir' \
 		--define '_package_name $(PACKAGE_NAME)' \
 		--define '_product_version $(PRODUCT_VERSION)' \
-		--define '_build_number $(BUILD_NUMBER)$(APT_RPM_RELEASE:%=.%)' \
+		--define '_build_number $(BUILD_NUMBER)$(APT_RPM_RELEASE_SUFFIX)' \
 		--define '_company_name $(COMPANY_NAME)' \
 		--define '_product_name $(PRODUCT_NAME)' \
 		--define '_publisher_name $(PUBLISHER_NAME)' \
@@ -449,7 +436,7 @@ $(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 		--define '_topdir $(@D)/../../../builddir' \
 		--define '_package_name $(PACKAGE_NAME)' \
 		--define '_product_version $(PRODUCT_VERSION)' \
-		--define '_build_number $(BUILD_NUMBER)$(RPM_RELEASE:%=.%)' \
+		--define '_build_number $(BUILD_NUMBER)$(RPM_RELEASE_SUFFIX)' \
 		--define '_company_name $(COMPANY_NAME)' \
 		--define '_product_name $(PRODUCT_NAME)' \
 		--define '_publisher_name $(PUBLISHER_NAME)' \
@@ -468,6 +455,9 @@ exe/$(PACKAGE_NAME).iss : exe/package.iss
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=true
+else
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=false
 endif
 
 %.sh : %.sh.m4
@@ -486,7 +476,7 @@ deb/build/debian/% : deb/template/%
 	mkdir -pv $(@D) && cp -fv $< $@
 
 deb/build/debian/% : deb/template/%.m4
-	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE:%=~%) $< > $@
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE_SUFFIX) $< > $@
 
 deb/build/debian/$(PACKAGE_NAME).% : deb/template/package.%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
