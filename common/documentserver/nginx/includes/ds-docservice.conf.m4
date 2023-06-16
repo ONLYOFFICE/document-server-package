@@ -1,8 +1,8 @@
 #welcome page
-rewrite ^/$ $the_scheme://$the_host/welcome/ redirect;
+rewrite ^/$ $the_scheme://$the_host$http_x_forwarded_prefix/welcome/ redirect;
 
 #script caching protection
-rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host/M4_PACKAGE_VERSION$cache redirect;
+rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host$http_x_forwarded_prefix/M4_PACKAGE_VERSION$cache redirect;
 
 #disable caching for api.js
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
