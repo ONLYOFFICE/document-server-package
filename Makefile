@@ -464,6 +464,10 @@ endif
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 	chmod u+x $@
 
+ifneq (,$(findstring M4_DS_PLUGIN_INSTALLATION=false,$(M4_PARAMS)))
+	rm -rf common/documentserver/bin/documentserver-pluginsmanager.sh
+endif
+
 % : %.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 
