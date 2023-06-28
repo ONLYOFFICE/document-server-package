@@ -215,6 +215,7 @@ esac
 exit 0
 
 %post
+DIR="/var/www/%{_ds_prefix}"
 # Make symlink to libcurl-gnutls
 ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
 
@@ -255,7 +256,6 @@ if [ "$IS_UPGRADE" = "true" ]; then
     chown -R ds:ds %{_localstatedir}/log/%{_ds_prefix}-example
   %endif
 
-  DIR="/var/www/%{_ds_prefix}"
   LOCAL_CONFIG="/etc/%{_ds_prefix}/local.json"
   JSON_BIN="$DIR/npm/json"
   JSON="$JSON_BIN -f $LOCAL_CONFIG"
@@ -324,6 +324,18 @@ fi
 rpm_version=$(rpm -q --qf '%%{version}' rpm | awk -F. '{ printf("%%d%%03d%%03d%%03d", $1,$2,$3,$4); }';)
 if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
+fi
+
+if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
+  if [ "$IS_UPGRADE" = "true" ]; then
+    # Get a list of old versions of plugins to ignore
+    IGNORED_PLUGINS_LIST=$(rpm -ql $(rpm -q --last %{_package_name} | awk 'NR==2{print $1}') | grep /sdkjs-plugins/*.*/config.json | sed 's|.*/\(.*\)/config.json|\1|' | paste -sd ",")
+  fi
+
+  # install/update plugins
+  echo -n Installing plugins, please wait...
+  documentserver-pluginsmanager.sh -r false --ignore=\"${IGNORED_PLUGINS_LIST[@]}\" --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+  echo Done
 fi
 
 # check whethere enabled
@@ -401,6 +413,7 @@ case "$1" in
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*
+    [ -d $DIR/sdkjs-plugins/ ] && rm -rf $DIR/sdkjs-plugins/
   ;;
   1)
     # Upgrade
