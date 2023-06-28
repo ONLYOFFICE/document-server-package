@@ -335,7 +335,10 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 Source: ..\common\documentserver\home\*;            DestDir: {app}; Excludes: "*local.json"; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
 Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
-Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Excludes: "documentserver-pluginsmanager.bat"; Flags: ignoreversion recursesubdirs; Components: Program
+#ifndef DISABLE_INSTALL_PLUGINS
+Source: ..\common\documentserver\bin\documentserver-pluginsmanager.bat;    DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+#endif
 Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program

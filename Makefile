@@ -223,6 +223,11 @@ LINUX_DEPS_CLEAN += common/documentserver-example/systemd/*.service
 
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
+ifneq ($(COMPANY_NAME_LOW),onlyoffice)
+LINUX_DEPS := $(filter-out common/documentserver/bin/documentserver-pluginsmanager.sh,$(LINUX_DEPS))
+PLUGIN_MANAGER_FILE := $(wildcard common/documentserver/bin/documentserver-pluginsmanager.sh.m4)
+endif
+
 LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
@@ -460,9 +465,15 @@ else
 M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=false
 endif
 
+ifneq ($(PLUGIN_MANAGER_FILE),)
 %.sh : %.sh.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 	chmod u+x $@
+else ifeq ($(strip $(PLUGIN_MANAGER_FILE)),)
+%.sh : %.sh.m4
+	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
+	chmod u+x $@
+endif
 
 % : %.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
