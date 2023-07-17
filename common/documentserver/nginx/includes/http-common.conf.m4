@@ -27,6 +27,10 @@ map $http_upgrade $proxy_connection {
   "" close;
 }
 
+map $http_x_forwarded_prefix $the_prefix {
+    default $http_x_forwarded_prefix;
+}
+
 proxy_set_header Host $http_host;
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection $proxy_connection;
