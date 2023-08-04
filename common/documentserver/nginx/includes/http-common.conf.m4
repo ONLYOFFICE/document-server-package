@@ -11,9 +11,10 @@ map $http_host $this_host {
     default $http_host;
 }
 
-map $http_x_forwarded_proto $the_scheme {
-     default $http_x_forwarded_proto;
-     "" $scheme;
+map $http_cloudfront_forwarded_proto:$http_x_forwarded_proto $the_scheme {
+     default $scheme;
+     "~^https?:.*" $http_cloudfront_forwarded_proto;
+     "~^:https?$" $http_x_forwarded_proto;
 }
 
 map $http_x_forwarded_host $the_host {
@@ -24,6 +25,10 @@ map $http_x_forwarded_host $the_host {
 map $http_upgrade $proxy_connection {
   default upgrade;
   "" close;
+}
+
+map $http_x_forwarded_prefix $the_prefix {
+    default $http_x_forwarded_prefix;
 }
 
 proxy_set_header Host $http_host;
