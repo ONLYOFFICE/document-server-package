@@ -65,6 +65,8 @@ clean_ds_files() {
 
 case "$1" in
 	purge)
+		clean_ds_files
+
 		# purge logs
 		if [ -d $LOG_DIR ]; then
 			rm -rf $LOG_DIR
@@ -74,7 +76,12 @@ case "$1" in
 		if [ -d $APP_DIR ]; then
 			rm -rf 	$APP_DIR
 		fi
-    
+
+		# purge plugins
+		if [ -d $DIR/sdkjs-plugins/ ]; then
+			rm -rf $DIR/sdkjs-plugins/
+		fi
+
 		db_input high M4_ONLYOFFICE_VALUE/remove-db || true
 		db_go
 		db_get M4_ONLYOFFICE_VALUE/remove-db
@@ -104,8 +111,6 @@ case "$1" in
 					;;
 			esac
 		fi
-
-		clean_ds_files
 	;;
 
 	remove|upgrade)
