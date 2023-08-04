@@ -19,6 +19,9 @@ set -e
 
 case "$1" in
     remove|upgrade|deconfigure)
+        if [ -e /usr/lib/systemd/system/ds-example.service ]; then
+            systemctl stop ds-example
+        fi
     ;;
 
     failed-upgrade)
