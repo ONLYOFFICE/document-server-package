@@ -24,6 +24,7 @@ fi
 
 case "$1" in
 	purge)
+
 	;;
 
 	remove|upgrade)

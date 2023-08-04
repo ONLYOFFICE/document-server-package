@@ -21,6 +21,7 @@ set -e
 
 case "$1" in
 	configure)
+
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)
