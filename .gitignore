@@ -6,7 +6,8 @@ repo-rpm
 apt-rpm/builddir
 /apt-rpm/*documentserver*.spec
 rpm/builddir
-common/documentserver*/**/*.conf
+common/documentserver/**/*.conf
+common/documentserver-example/**/includes/*.conf
 common/documentserver*/nginx/*.tmpl
 /common/documentserver/bin/*.sh
 common/documentserver/config
