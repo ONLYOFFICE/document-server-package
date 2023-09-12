@@ -28,9 +28,11 @@
   #define sPackageName        sCompanyName + "-" + sProductName
 #endif
 
-#define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\" + sPackageName + "\LICENSE.txt")
-#ifnexist sLicenseFile
-  #define sLicenseFile str(sBrandingFolder + "\common\documentserver\license\onlyoffice-documentserver\LICENSE.txt")
+#define sLicenseFile sBrandingFolder + "\exe\license\community\LICENSE.rtf"
+#if SameText(sProductName, "DocumentServer-DE")
+#define sLicenseFile sBrandingFolder + "\exe\license\developer\LICENSE.rtf"
+#elif SameText(sProductName, "DocumentServer-EE")
+#define sLicenseFile sBrandingFolder + "\exe\license\enterprise\LICENSE.rtf"
 #endif
 
 #ifndef sPublisherName
@@ -209,7 +211,9 @@ MinVersion                =6.1.7600
 WizardImageFile           = {#sBrandingFolder}\exe\data\dialogpicture.bmp
 WizardSmallImageFile      = {#sBrandingFolder}\exe\data\dialogicon.bmp
 SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
+#ifexist sLicenseFile
 LicenseFile               = {#sLicenseFile}
+#endif
 ShowLanguageDialog        = no
 
 #ifdef ENABLE_SIGNING
