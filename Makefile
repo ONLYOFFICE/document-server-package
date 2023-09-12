@@ -352,7 +352,9 @@ ifeq ($(PLATFORM),win)
 	cat exe/license/3rd-Party.txt ; >> $(DOCUMENTSERVER)/3rd-Party.txt
 endif
 
-	[ -f $(LICENSE_FILE) ] && cp -fr -t $(DOCUMENTSERVER) $(LICENSE_FILE) || true
+	[ -f $(LICENSE_FILE) ] \
+		&& cp -f -t $(DOCUMENTSERVER) $(LICENSE_FILE) \
+		|| cp -f -t $(DOCUMENTSERVER) LICENSE.txt
 
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
 	#chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
