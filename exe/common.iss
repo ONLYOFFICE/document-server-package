@@ -1,75 +1,27 @@
-﻿#ifndef sBrandingFolder
-  #define sBrandingFolder '..\branding'
+﻿; -- Docs Installer --
+
+#ifndef EDITION
+#define EDITION 'community'
 #endif
 
-#define sBrandingFile str(sBrandingFolder + "\exe\branding.iss")
-
-#if FileExists(sBrandingFile)
-  #include str(sBrandingFile)
+#ifndef VERSION
+#define VERSION '0.0.0.0'
 #endif
 
-#ifndef sCompanyName
-  #define sCompanyName        'ONLYOFFICE'
+#ifndef BRANDING_DIR
+#define BRANDING_DIR '.'
 #endif
 
-#ifndef sIntCompanyName
-  #define sIntCompanyName     str(sCompanyName)
-#endif
-
-#ifndef sProductName
-  #define sProductName        'DocumentServer'
-#endif
-
-#ifndef sIntProductName
-  #define sIntProductName     'DocumentServer'
-#endif
+#include BRANDING_DIR + '\defines.iss'
 
 #ifndef sPackageName
-  #define sPackageName        sCompanyName + "-" + sProductName
+#define sPackageName sIntCompanyName + '-' + sIntProductName
+#if SameText(EDITION, 'developer') | SameText(EDITION, 'enterprise')
+#define sPackageName sPackageName + '-' + UpperCase(Copy(EDITION,1,1)) + 'E'
+#endif
 #endif
 
-#define sLicenseFile sBrandingFolder + "\exe\license\community\LICENSE.rtf"
-#if SameText(sProductName, "DocumentServer-DE")
-#define sLicenseFile sBrandingFolder + "\exe\license\developer\LICENSE.rtf"
-#elif SameText(sProductName, "DocumentServer-EE")
-#define sLicenseFile sBrandingFolder + "\exe\license\enterprise\LICENSE.rtf"
-#endif
-
-#ifndef sPublisherName
-  #define sPublisherName      'Ascensio System SIA'
-#endif
-
-#ifndef sAppCopyright
-  #define sAppCopyright      str("Copyright (C) " + GetDateTimeString('yyyy',,) + " " + sPublisherName)
-#endif
-
-#ifndef sPublisherUrl
-  #define sPublisherUrl       'https://www.onlyoffice.com/'
-#endif
-
-#ifndef sSupportURL
-  #define sSupportURL=str(sPublisherUrl + "support.aspx")
-#endif
-
-#ifndef sUpdatesURL
-  #define sUpdatesURL=str(sPublisherUrl)
-#endif
-
-#ifndef sAppName
-  #define sAppName            str(sCompanyName + " " + sProductName)
-#endif
-
-#ifndef sAppId
-	#define sAppId              str(sIntCompanyName + " " + sIntProductName)
-#endif
-
-#ifndef sAppPath
-  #define sAppPath            str(sIntCompanyName + "\" + sIntProductName)
-#endif
-
-#ifndef sAppRegPath
-  #define sAppRegPath        str("Software\" + sIntCompanyName + "\" + sIntProductName)
-#endif
+#define iconsExe              'projicons.exe'
 
 #define REG_LICENSE_PATH      'LicensePath'
 #define REG_DB_HOST           'DbHost'
@@ -89,24 +41,6 @@
 #define REG_JWT_ENABLED       'JwtEnabled'
 #define REG_JWT_SECRET        'JwtSecret'
 #define REG_JWT_HEADER        'JwtHeader'
-
-#define iconsExe            'projicons.exe'
-
-#ifndef sAppVerShort
-	#define sAppVerShort	'0.0.0'
-#endif
-
-#ifndef sAppBuildNumber
-	#define sAppBuildNumber	'0'
-#endif
-
-#ifndef sAppVersion
-  #define sAppVersion         str(sAppVerShort + '.' + sAppBuildNumber)
-#endif
-
-#ifndef sDbDefValue
-  #define sDbDefValue         'onlyoffice'
-#endif
 
 #define DbDefPort             '5432'
 
@@ -171,10 +105,10 @@
 [Setup]
 AppName                   ={#sAppName}
 AppId                     ={#sAppId}
-AppVerName                ={#sAppName} {#sAppVerShort}
-AppVersion                ={#sAppVersion}
-VersionInfoVersion        ={#sAppVersion}
-OutputBaseFilename        ={#sPackageName}-{#sAppVersion}-x64
+AppVerName                ={#sAppName} {#Copy(VERSION,1,RPos('.',VERSION)-1)}
+AppVersion                ={#VERSION}
+VersionInfoVersion        ={#VERSION}
+OutputBaseFilename        ={#sPackageName}-{#VERSION}-x64
 
 AppPublisher            ={#sPublisherName}
 AppPublisherURL         ={#sPublisherUrl}
@@ -208,13 +142,13 @@ PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
 MinVersion                =6.1.7600
-WizardImageFile           = {#sBrandingFolder}\exe\data\dialogpicture.bmp
-WizardSmallImageFile      = {#sBrandingFolder}\exe\data\dialogicon.bmp
-SetupIconFile             = {#sBrandingFolder}\exe\data\icon.ico
-LicenseFile               = {#sLicenseFile}
+WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
+WizardSmallImageFile      ={#BRANDING_DIR}\data\dialogicon.bmp
+SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
+LicenseFile               ={#BRANDING_DIR}\license\{#EDITION}\LICENSE.rtf
 ShowLanguageDialog        = no
 
-#ifdef ENABLE_SIGNING
+#ifdef SIGN
 SignTool=byparam $p
 #endif
 
@@ -338,7 +272,7 @@ Source: ..\common\documentserver\home\*;            DestDir: {app}; Excludes: "*
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
 Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Excludes: "documentserver-pluginsmanager.bat"; Flags: ignoreversion recursesubdirs; Components: Program
-#ifndef DISABLE_INSTALL_PLUGINS
+#ifdef DS_PLUGIN_INSTALLATION
 Source: ..\common\documentserver\bin\documentserver-pluginsmanager.bat;    DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
 #endif
 Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
@@ -388,7 +322,7 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT
 [Run]
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
 
-#ifndef DISABLE_INSTALL_PLUGINS
+#ifdef DS_PLUGIN_INSTALLATION
 Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
 #endif
 
@@ -791,7 +725,7 @@ end;
 function IsCommercial: Boolean;
 begin
   Result := false;
-  if ('{#sProductName}' = 'DocumentServer-EE') or ('{#sProductName}' = 'DocumentServer-IE') or ('{#sProductName}' = 'DocumentServer-DE') then begin
+  if ('{#EDITION}' = 'developer') or ('{#EDITION}' = 'enterprise') then begin
     Result := true;
   end;
 end;
@@ -1117,3 +1051,6 @@ begin
   end;
 end;
 
+#ifdef DS_EXAMPLE
+#include "example.iss"
+#endif
