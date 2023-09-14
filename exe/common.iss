@@ -1,11 +1,5 @@
 ﻿; -- Docs Installer --
 
-#ifndef BRANDING_DIR
-#define BRANDING_DIR '.'
-#endif
-
-#include BRANDING_DIR + '\defines.iss'
-
 #ifndef EDITION
 #define EDITION 'community'
 #endif
@@ -13,6 +7,12 @@
 #ifndef VERSION
 #define VERSION '0.0.0.0'
 #endif
+
+#ifndef BRANDING_DIR
+#define BRANDING_DIR '.'
+#endif
+
+#include BRANDING_DIR + '\defines.iss'
 
 #ifndef sPackageName
 #define sPackageName sIntCompanyName + '-' + sIntProductName
