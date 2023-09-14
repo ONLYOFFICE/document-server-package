@@ -174,13 +174,19 @@ DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
 ISCC := iscc
-ISCC_PARAMS +=	//Qp
-ISCC_PARAMS +=	//DsAppVerShort=$(PRODUCT_VERSION)
-ISCC_PARAMS +=	//DsAppBuildNumber=$(BUILD_NUMBER)
-ifdef ENABLE_SIGNING
-ISCC_PARAMS +=	//DENABLE_SIGNING=1
+ISCC_PARAMS += //DVERSION=$(PRODUCT_VERSION).$(BUILD_NUMBER)
+ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
+ISCC_PARAMS += //DEDITION=community
+else ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de))
+ISCC_PARAMS += //DEDITION=developer
+else ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
+ISCC_PARAMS += //DEDITION=enterprise
 endif
-ISCC_PARAMS +=	//S"byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com \$$f"
+ISCC_PARAMS += //DBRANDING_DIR='$(shell cygpath -a -w "$(BRANDING_DIR)/exe")'
+ifdef ENABLE_SIGNING
+ISCC_PARAMS += //DSIGN
+ISCC_PARAMS += //S"byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com \$$f"
+endif
 
 DEB_DEPS += deb/build/debian/source/format
 DEB_DEPS += deb/build/debian/changelog
@@ -241,8 +247,6 @@ LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
 
 LINUX_DEPS_CLEAN += rpm/bin/*.sh
 LINUX_DEPS_CLEAN += apt-rpm/bin/*.sh
-
-WIN_DEPS += exe/$(PACKAGE_NAME).iss
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 ONLYOFFICE_VALUE := onlyoffice
@@ -310,7 +314,6 @@ clean:
 		$(FONTS)\
 		$(COMMON_DEPS)\
 		$(LINUX_DEPS_CLEAN)\
-		$(WIN_DEPS)\
 		documentserver\
 		documentserver-example
 		
@@ -457,9 +460,6 @@ $(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 		--target $(RPM_ARCH) \
 		$(PACKAGE_NAME).spec
 
-exe/$(PACKAGE_NAME).iss : exe/package.iss
-	mv -f $< $@
-
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
 M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=true
@@ -498,9 +498,9 @@ $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-e
 	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
 
 %.exe:
-	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(PACKAGE_NAME).iss
+	cd $(@D) && $(ISCC) $(ISCC_PARAMS) common.iss
 
-$(EXE): $(WIN_DEPS) $(COMMON_DEPS) documentserver documentserver-example $(NGINX) $(PSQL) $(NSSM)
+$(EXE): $(COMMON_DEPS) documentserver documentserver-example $(NGINX) $(PSQL) $(NSSM)
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
