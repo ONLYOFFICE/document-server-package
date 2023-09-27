@@ -145,7 +145,9 @@ MinVersion                =6.1.7600
 WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
 WizardSmallImageFile      ={#BRANDING_DIR}\data\dialogicon.bmp
 SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
+#if SameText(sIntCompanyName, 'onlyoffice')
 LicenseFile               ={#BRANDING_DIR}\license\{#EDITION}\LICENSE.rtf
+#endif
 ShowLanguageDialog        = no
 
 #ifdef SIGN
