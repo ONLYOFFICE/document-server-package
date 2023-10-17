@@ -1,7 +1,7 @@
                     GNU AFFERO GENERAL PUBLIC LICENSE
                        Version 3, 19 November 2007
 
- Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
@@ -629,8 +629,8 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    ONLYOFFICE Docs Community Edition
+    Copyright (C) 2010-2023  Ascensio System SIA
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -643,7 +643,19 @@ the "copyright" line and a pointer to where the full notice is found.
     GNU Affero General Public License for more details.
 
     You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+    You can contact Ascensio System SIA at 20A-6 Ernesta Birznieka-Upish
+    street, Riga, Latvia, EU, LV-1050.
+
+    The interactive user interfaces in modified source and object code
+    version of the Program must display Appropriate Legal Notices, as required
+    under Section 5 of the GNU AGPL version 3.
+
+    Pursuant to Section 7(b) of the License you must retain the original
+    Product logo when distributing the program. Pursuant to Section 7(e) we
+    decline to grant you any rights under trademark law for use of our
+    trademarks.
 
 Also add information on how to contact you by electronic and paper mail.
 
@@ -658,4 +670,4 @@ specific requirements.
   You should also get your employer (if you work as a programmer) or school,
 if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU AGPL, see
-<http://www.gnu.org/licenses/>.
+<https://www.gnu.org/licenses/>.
