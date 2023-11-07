@@ -338,6 +338,20 @@ if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
   echo Done
 fi
 
+#Deleting the cache left before updating the document server (Bug #60628)
+if [ "${DB_TYPE}" = "postgres" ]; then
+  CACHE_DATABASE=$(psql -t -A "user=${DB_USER} password=${DB_PWD} host=${DB_HOST} dbname=${DB_NAME} port=${DB_PORT}" -c "SELECT id FROM task_result;")
+elif [ "${DB_TYPE}" = "mysql" ]; then
+  CACHE_DATABASE=$(mysql -u${DB_USER} -p${DB_PWD} -h${DB_HOST} -P${DB_PORT} -D${DB_NAME} -s -N -e "SELECT id FROM task_result;")
+fi
+
+CACHE_PATH="/var/lib/%{_ds_prefix}/App_Data/cache/files/data"
+if [[ -d "${CACHE_PATH}" ]]; then
+  for CACHE_FILE in $(ls "${CACHE_PATH}"); do
+    [[ ! "${CACHE_DATABASE}" =~ "${CACHE_FILE}" ]] && rm -rf "${CACHE_PATH}/${CACHE_FILE}"
+  done
+fi
+
 # check whethere enabled
 shopt -s nocasematch
 PORTS=()

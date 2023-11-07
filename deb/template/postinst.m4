@@ -291,6 +291,21 @@ setup_nginx(){
 
 }
 
+delete_unused_cache_files(){
+	if [ "${DB_TYPE}" = "postgres" ]; then
+		CACHE_DATABASE=$(psql -t -A "user=${DB_USER} password=${DB_PWD} host=${DB_HOST} dbname=${DB_NAME} port=${DB_PORT}" -c "SELECT id FROM task_result;")
+	elif [ "${DB_TYPE}" = "mysql" ] || [ "${DB_TYPE}" = "mariadb" ]; then
+		CACHE_DATABASE=$(mysql -u${DB_USER} -p${DB_PWD} -h${DB_HOST} -P${DB_PORT} -D${DB_NAME} -s -N -e "SELECT id FROM task_result;")
+	fi
+
+	CACHE_PATH="/var/lib/M4_DS_PREFIX/App_Data/cache/files/data"
+	if [[ -d "${CACHE_PATH}" ]]; then
+		for CACHE_FILE in $(ls "${CACHE_PATH}"); do
+			[[ ! "${CACHE_DATABASE}" =~ "${CACHE_FILE}" ]] && rm -rf "${CACHE_PATH}/${CACHE_FILE}"
+		done
+	fi
+}
+
 case "$1" in
 	configure)
 		adduser --quiet --home "$DIR" --system --group ds
@@ -343,6 +358,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 			documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
 			echo Done
 		fi
+
+		#Deleting the cache left before updating the document server (Bug #60628)
+		delete_unused_cache_files
 
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$LOG_DIR-example"
