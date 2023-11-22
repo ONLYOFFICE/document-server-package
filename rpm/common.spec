@@ -338,6 +338,10 @@ if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
   echo Done
 fi
 
+#Deleting the cache left before updating the document server (Bug #60628)
+CACHE_PATH="/var/lib/%{_ds_prefix}/App_Data/cache/files/data"
+[ -d "${CACHE_PATH}" ] && rm -rf "${CACHE_PATH}"/*
+
 # check whethere enabled
 shopt -s nocasematch
 PORTS=()

@@ -344,6 +344,10 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 			echo Done
 		fi
 
+		#Deleting the cache left before updating the document server (Bug #60628)
+		CACHE_PATH="${APP_DIR}/App_Data/cache/files/data"
+		[ -d "${CACHE_PATH}" ] && rm -rf "${CACHE_PATH}"/*
+
 		chown ds:ds -R "$LOG_DIR"
 		chown ds:ds -R "$LOG_DIR-example"
 		chown ds:ds -R "$APP_DIR"
