@@ -17,7 +17,8 @@ ECHO | SET /p="Generating AllFonts.js, please wait..."
   --images="%~dp0\..\sdkjs\common\Images" ^
   --selection="%~dp0\..\server\FileConverter\bin\font_selection.bin" ^
   --output-web="%~dp0\..\fonts" ^
-  --use-system="true"
+  --use-system="true" ^
+  --use-system-user-fonts="false"
 
 ECHO Done
 
