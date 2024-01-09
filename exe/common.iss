@@ -42,7 +42,28 @@
 #define REG_JWT_SECRET        'JwtSecret'
 #define REG_JWT_HEADER        'JwtHeader'
 
-#define DbDefPort             '5432'
+#ifndef sDbDefValue
+  #define sDbDefValue         'onlyoffice'
+#endif
+
+#define DbDefName              sDbDefValue
+#define DbDefUser              sDbDefValue
+#define DbDefPort              '5432'
+#define DefHost                'localhost'
+
+#define DbHost                 DefHost
+#define DbAdminUserName        'postgres'
+#define DbAdminName            'postgres'
+#define DbAdminPassword        'postgres'
+
+#define AmqpServerHost         DefHost
+#define AmqpServerUserName     'guest'
+#define AmqpServerPassword     'guest'
+#define AmqpServerProto        'amqp'
+
+#define RedisHost              DefHost
+
+#define InstallPrereqParam     'InstallPrereq'
 
 #define NSSM                  '{app}\nssm\nssm.exe'
 #define NODE_ENV	          'NODE_ENV=production-windows'
@@ -71,6 +92,10 @@
 #define JSON '{app}\npm\json.exe'
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\local.json""'
+
+#define JSON_DEFAULT_PARAMS '-I -q -f ""{app}\config\default.json""'
+
+#define LOCAL_DATA_STORAGE   'editorDataMemory'
 
 #define REPLACE '{app}\npm\replace.exe'
 
@@ -370,6 +395,8 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
+Filename: "{#JSON}"; Parameters: "{#JSON_DEFAULT_PARAMS} -e ""this.services.CoAuthoring.server.editorDataStorage = '{#LOCAL_DATA_STORAGE}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: UseLocalStorage;
+
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -378,6 +405,10 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:SECURE_LINK_SECRET}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -464,21 +495,71 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-;Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-;Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
-;Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
+Name: "Prerequisites\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled and not UseLocalStorage;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPostgreSQLInstalled;
+Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
+Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
 
 [Code]
 var
   JWTSecret: String;
   IsJWTRegistryExists: Boolean;
   LocalJsonExists: Boolean;
+  DbUserName: String;
+  DbName: String;
+  DbPassword: String;
+  DbHost: String;
+  DbPort: String;
+  AmqpServerHost: String;
+  AmqpServerUserName: String;
+  AmqpServerPassword: String;
+  AmqpServerProto: String;
+  RedisHost: String;
 
-procedure InitVariables;
+function GetRandomDbPwd: String; forward;
+
+procedure InitDbParams(Host, Port, UserName, Password, Name: String);
+begin
+  DbHost := Host;
+  DbPort := Port;
+  DbUserName := UserName;
+  DbPassword := Password;
+  DbName := Name;
+end;
+
+procedure InitAmqpServerParams(Host, UserName, Password, Proto: String);
+begin
+  AmqpServerHost := Host;
+  AmqpServerUserName := UserName;
+  AmqpServerPassword := Password;
+  AmqpServerProto := Proto;
+end;
+
+procedure InitRedisParams(Host: String);
+begin
+  RedisHost := Host;
+end;
+
+procedure Init;
 begin
   IsJWTRegistryExists := False;
   LocalJsonExists := False;
+
+  InitDbParams(
+    ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DbHost}}}'),
+    ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#DbDefPort}}}'),
+    ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#DbDefUser}}}'),
+    ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}'),
+    ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
+
+  InitAmqpServerParams(
+    ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
+    ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|{#AmqpServerUserName}}}'),
+    ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|{#AmqpServerPassword}}}'),
+    ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|{#AmqpServerProto}}}'))
+
+  InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
 end;
 
 function UninstallPreviosVersion(): Boolean;
@@ -539,7 +620,7 @@ function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
-  InitVariables();
+  Init();
   
   if not UninstallPreviosVersion() then
   begin
@@ -550,7 +631,6 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
- // Dependency_AddPython3;
   end;
 
   Result := true;
@@ -563,52 +643,52 @@ var
 
 function GetDbHost(Param: String): String;
 begin
-  Result := DbPage.Values[0];
+  Result := DbHost;
 end;
 
 function GetDbPort(Param: String): String;
 begin
-  Result := DbPage.Values[1];
+  Result := DbPort;
 end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := DbPage.Values[2];
+  Result := DbUserName;
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := DbPage.Values[3];
+  Result := DbPassword;
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := DbPage.Values[4];
+  Result := DbName;
 end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[0];
+  Result := AmqpServerHost;
 end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[1];
+  Result := AmqpServerUserName;
 end;
 
 function GetRabbitMqPwd(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[2];
+  Result := AmqpServerPassword;
 end;
 
 function GetRabbitMqProto(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[3];
+  Result := AmqpServerProto;
 end;
 
 function GetRedisHost(Param: String): String;
 begin
-  Result := RedisPage.Values[0];
+  Result := RedisHost;
 end;
 
 function GetDefaultPort(Param: String): String;
@@ -732,61 +812,101 @@ begin
   end;
 end;
 
+function InstallPrereq: Boolean;
+begin
+  Result := false;
+  if ExpandConstant('{param:{#InstallPrereqParam}}') = 'Yes' then
+  begin
+    Result := True;
+  end;
+end;
+
+function UseLocalStorage: Boolean;
+begin
+  Result := false;
+  if ExpandConstant('{param:UseLocalStorage}') = 'Yes' then
+  begin
+    Result := True;
+  end;
+end;
+
 procedure InitializeWizard;
 begin
-  DbPage := CreateInputQueryPage(
-    wpPreparing,
-    ExpandConstant('{cm:Postgre}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
-  DbPage.Add(ExpandConstant('{cm:Host}'), False);
-  DbPage.Add(ExpandConstant('{cm:Port}'), False);
-  DbPage.Add(ExpandConstant('{cm:User}'), False);
-  DbPage.Add(ExpandConstant('{cm:Password}'), True);
-  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
+  If InstallPrereq then begin
+    DbPage := CreateInputQueryPage(
+      wpPreparing,
+      ExpandConstant('{cm:Postgre}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
+    DbPage.Add(ExpandConstant('{cm:Host}'), False);
+    DbPage.Add(ExpandConstant('{cm:Port}'), False);
+    DbPage.Add(ExpandConstant('{cm:User}'), False);
+    DbPage.Add(ExpandConstant('{cm:Password}'), True);
+    DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#DbDefPort}}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
-  DbPage.Values[4] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
+    DbPage.Values[0] := GetDbHost('');
+    DbPage.Values[1] := GetDbPort('');
+    DbPage.Values[2] := GetDbUser('');
+    DbPage.Values[3] := GetDbPwd('');
+    DbPage.Values[4] := GetDbName('');
 
-  RabbitMqPage := CreateInputQueryPage(
-    DbPage.ID,
-    ExpandConstant('{cm:RabbitMq}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
-  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
-  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
-  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
-  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
-  
-  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
-  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
-  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
-  
-  if IsCommercial then begin
-    RedisPage := CreateInputQueryPage(
-      RabbitMqPage.ID,
-      ExpandConstant('{cm:Redis}'),
-      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
-      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
-    RedisPage.Add(ExpandConstant('{cm:Host}'), False);
+    RabbitMqPage := CreateInputQueryPage(
+      DbPage.ID,
+      ExpandConstant('{cm:RabbitMq}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
+    RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+    RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+    RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+    RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
 
-    RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+    RabbitMqPage.Values[0] := GetRabbitMqHost('');
+    RabbitMqPage.Values[1] := GetRabbitMqUser('');
+    RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+    RabbitMqPage.Values[3] := GetRabbitMqProto('');
+
+    if IsCommercial then begin
+      RedisPage := CreateInputQueryPage(
+        RabbitMqPage.ID,
+        ExpandConstant('{cm:Redis}'),
+        FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
+        FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
+      RedisPage.Add(ExpandConstant('{cm:Host}'), False);
+
+      RedisPage.Values[0] := GetRedisHost('');
+    end;
   end;
+end;
 
+function GetRandomDbPwd: String;
+begin
+  Result := RandomString(30);
+end;
+
+function SavePgPassConf(Host, Port, DatabaseName, Username, Password: String): Boolean;
+var
+  FileName: String;
+  Content: String;
+begin
+  FileName := ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf');
+
+  Content := Format('%s:%s:%s:%s:%s', [Host, Port, DatabaseName, Username, Password]);
+
+  Result := SaveStringToFile(FileName, Content, False);
+end;
+
+function CreateDbDefUserAuth(): Boolean;
+begin
+  Result := true;
+
+  SavePgPassConf(GetDbHost(''), GetDbPort(''), '{#DbAdminName}', '{#DbAdminUserName}', '{#DbAdminPassword}');
 end;
 
 function CreateDbAuth(): Boolean;
 begin
   Result := true;
 
-  SaveStringToFile(
-    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
-    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
-    False);
+  SavePgPassConf(GetDbHost(''), GetDbPort(''), GetDbName(''), GetDbUser(''), GetDbPwd(''));
 end;
 
 function IsNotClusterMode(): Boolean;
@@ -826,7 +946,7 @@ begin
     ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -853,7 +973,7 @@ begin
     ExpandConstant('{#Python}'),
     '--version',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -873,7 +993,7 @@ begin
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install pika',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
   end;
@@ -888,7 +1008,7 @@ begin
       GetRabbitMqPwd('') + ' ' +
       GetRabbitMqHost('')),
       '',
-      SW_SHOW,
+      SW_HIDE,
       EwWaitUntilTerminated,
       ResultCode);
   end
@@ -926,18 +1046,18 @@ begin
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install iredis',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
   end;
 
   Exec(
-    '>',
-    'iredis -h ' + GetRedisHost('') + ' quit',
-    '',
-    SW_SHOW,
-    EwWaitUntilTerminated,
-    ResultCode);
+  ExpandConstant('{sd}') + '\Python\scripts\iredis.exe',
+  '-h ' + GetRedisHost('') + ' quit',
+  '',
+  SW_HIDE,
+  EwWaitUntilTerminated,
+  ResultCode);
 
   if ResultCode <> 0 then
   begin
@@ -951,24 +1071,26 @@ begin
   end;
 end;
 
-(*function ShouldSkipPage(PageID: Integer): Boolean;
+function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
+  if InstallPrereq then begin
   case PageID of
     DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+      Result := IsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+      Result := IsComponentSelected('Prerequisites\RabbitMq');
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := not IsComponentSelected('Prerequisites\Redis');
+        Result := IsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
       end;
     end;
   end;
-end;*)
+end;
+end;
 
 function ArrayLength(a: array of integer): Integer;
 begin
@@ -1014,43 +1136,56 @@ begin
   Result := true;
   if WizardSilent() = false then
   begin
+  if InstallPrereq then begin
     case CurPageID of
-      // DbPage.ID:
-      //   Result := CheckDbConnection();
-      // RabbitMqPage.ID:
-      //   Result := CheckRabbitMqConnection();
-      // wpWelcome:
-      //   Result := CheckPortOccupied();
+      DbPage.ID:
+      begin
+        InitDbParams(DbPage.Values[0], DbPage.Values[1], DbPage.Values[2], DbPage.Values[3], DbPage.Values[4]);
+        Result := CheckDbConnection();
+      end;
+      RabbitMqPage.ID:
+      begin
+        InitAmqpServerParams(RabbitMqPage.Values[0], RabbitMqPage.Values[1], RabbitMqPage.Values[2], RabbitMqPage.Values[3]);
+        Result := CheckRabbitMqConnection();
+      end;
+      wpWelcome:
+        Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-        // if IsComponentSelected('Prerequisites\Redis') then
-        // begin
-        //   Dependency_AddRedis;
-        // end;
-        // if IsComponentSelected('Prerequisites\RabbitMq') then
-        // begin
-        //   Dependency_AddErlang;
-        //   Dependency_AddRabbitMq;
-        // end;
-        // if not IsComponentSelected('Prerequisites\PostgreSQL') then
-        // begin
-        //   Dependency_AddPostgreSQL;
-        // end;
+           if IsComponentSelected('Prerequisites\Redis') then
+           begin
+             Dependency_AddRedis;
+           end;
+           if IsComponentSelected('Prerequisites\RabbitMq') then
+           begin
+             Dependency_AddErlang;
+             Dependency_AddRabbitMq;
+           end;
+           if IsComponentSelected('Prerequisites\PostgreSQL') then
+           begin
+             Dependency_AddPostgreSQL;
+           end;
         if IsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
-      end;
-    // else
-    //   if IsCommercial then
-    //   begin
-    //     if CurPageID = RedisPage.ID then
-    //     begin
-    //       Result := CheckRedisConnection();
-    //     end;
-    //   end;
+        if IsComponentSelected('Prerequisites\Python') then
+        begin
+          Dependency_AddPython3;
+        end;
+       end;
+       else
+         if IsCommercial then
+          begin
+            if CurPageID = RedisPage.ID then
+            begin
+              InitRedisParams(RedisPage.Values[0]);
+              Result := CheckRedisConnection();
+            end;
+         end;
     end;
   end;
+end;
 end;
 
 #ifdef DS_EXAMPLE
