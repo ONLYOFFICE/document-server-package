@@ -82,8 +82,7 @@ DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
 PSQL_ZIP := postgresql-10.20-2-windows-x64-binaries.zip
 
-NSSM_ZIP := nssm_x64.zip
-NSSM := $(DOCUMENTSERVER)/nssm/nssm.exe
+WINSW := $(DOCUMENTSERVER)/tools/WinSW-x64.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
@@ -305,7 +304,7 @@ clean:
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
 		$(EXE_BUILD_DIR)/*.exe\
 		$(NGINX)\
-		$(NSSM)\
+		$(WINSW)\
 		$(PSQL)\
 		$(DS_BIN_REPO)\
 		$(DOCUMENTSERVER_FILES)\
@@ -500,7 +499,7 @@ $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-e
 %.exe:
 	cd $(@D) && $(ISCC) $(ISCC_PARAMS) common.iss
 
-$(EXE): $(COMMON_DEPS) documentserver documentserver-example $(NGINX) $(PSQL) $(NSSM)
+$(EXE): $(COMMON_DEPS) documentserver documentserver-example $(NGINX) $(PSQL) $(WINSW)
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
@@ -530,10 +529,8 @@ $(DS_BIN): documentserver
 	mkdir -p $(@D)
 	$(AR) $@ ./$(DOCUMENTSERVER)/sdkjs ./$(DOCUMENTSERVER)/server/FileConverter/bin
 
-$(NSSM):
-	$(CURL) $(NSSM_ZIP) https://github.com/ONLYOFFICE/nssm/releases/download/v2.24.1/$(NSSM_ZIP) && \
-	7z x -y -o$(DOCUMENTSERVER)/nssm $(NSSM_ZIP) && \
-	rm -f $(NSSM_ZIP)
+$(WINSW):
+	$(CURL) $(WINSW) https://github.com/winsw/winsw/releases/download/v3.0.0-alpha.11/WinSW-x64.exe
 
 packages: $(PACKAGES)
 

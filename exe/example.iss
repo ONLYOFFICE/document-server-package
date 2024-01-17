@@ -3,8 +3,10 @@
 #define EXAMPLE_SRV_DESCR  str(sAppName + " Example Service")
 #define EXAMPLE_SRV_DIR    '{app}\example'
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
+#define EXAMPLE_SRV_FILE '{app}\tools\Example.xml'
 
-#define NODE_EXAMPLE_SRV_ENV  'NODE_ENV=production-windows NODE_CONFIG_DIR=""{app}\example\config"" NODE_DISABLE_COLORS=1'
+#define NODE_EXAMPLE_ENV 'production-windows'
+#define NODE_EXAMPLE_DISABLE_COLORS '1'
 
 #define JSON_EXAMPLE_PARAMS '-I -q -f ""{app}\example\config\local.json""'
 
@@ -37,24 +39,18 @@ Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.
 Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.secret = '{code:GetJwtSecret}'"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_SECRET}')));
 Filename: "{#JSON}"; Parameters: "{#JSON_EXAMPLE_PARAMS} -e ""this.server.token.authorizationHeader = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
-Filename: "{#NSSM}"; Parameters: "install {#EXAMPLE_SRV} ""{#EXAMPLE_SRV_DIR}\example.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} DisplayName {#EXAMPLE_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Description {#EXAMPLE_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppDirectory {#EXAMPLE_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppEnvironmentExtra {#NODE_EXAMPLE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppRotateFiles 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppRotateOnline 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppRotateBytes {#LOG_ROTATE_BYTES}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStdout {#EXAMPLE_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} AppStderr {#EXAMPLE_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#EXAMPLE_SRV} Start SERVICE_DEMAND_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#EXAMPLE_SRV}}"
-
+Filename: "{#REPLACE}"; Parameters: """DsExampleSvc"" ""{#EXAMPLE_SRV}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
+Filename: "{#REPLACE}"; Parameters: """DsExampleSvc_Display"" ""{#EXAMPLE_SRV_DISPLAY}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
+Filename: "{#REPLACE}"; Parameters: """DsExampleSvc_Descr"" ""{#EXAMPLE_SRV_DESCR}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
+Filename: "{#REPLACE}"; Parameters: """production-windows"" ""{#NODE_EXAMPLE_ENV}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
+Filename: "{#REPLACE}"; Parameters: """Node_Disable_Colors"" ""{#NODE_EXAMPLE_DISABLE_COLORS}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
+Filename: "{#REPLACE}"; Parameters: """APPDIR"" ""{app}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
+Filename: "{#WINSW}";   Parameters: "install ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 
 Filename: "http://localhost:{code:GetDefaultPort}/welcome/"; Description: "{cm:OpenWelcome}"; Flags: postinstall shellexec skipifsilent
 
 [UninstallRun]
-Filename: "{#NSSM}"; Parameters: "stop {#EXAMPLE_SRV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "remove {#EXAMPLE_SRV} confirm"; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "stop ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "uninstall ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden
 
 

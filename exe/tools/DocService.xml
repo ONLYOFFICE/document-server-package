@@ -1,0 +1,20 @@
+<service>
+	<id>DsDocServiceSvc</id>
+	<name>DsDocServiceSvc_Display</name>
+	<description>DsDocServiceSvc_Descr</description>
+	<priority>RealTime</priority>
+	<startmode>Automatic</startmode>
+	<delayedAutoStart>true</delayedAutoStart>
+	<onfailure action="restart" delay="1 sec"/>
+	<logpath>APPDIR\Log\docservice</logpath>
+	<workingdirectory>APPDIR\server\DocService</workingdirectory>
+	<executable>APPDIR\server\DocService\docservice.exe</executable>
+	<env name="NODE_ENV" value="production-windows" />
+  	<env name="NODE_CONFIG_DIR" value="APPDIR\config" />
+  	<env name="NODE_DISABLE_COLORS" value="Node_Disable_Colors" />
+  	<env name="APPLICATION_NAME" value="App_Name" />
+	<log mode="roll-by-size">
+  		<sizeThreshold>10240</sizeThreshold>
+  		<keepFiles>8</keepFiles>
+	</log>
+</service>
