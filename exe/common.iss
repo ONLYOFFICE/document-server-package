@@ -419,7 +419,6 @@ Filename: "{#REPLACE}"; Parameters: """DsConverterSvc_Descr"" ""{#CONVERTER_SRV_
 Filename: "{#REPLACE}"; Parameters: """production-windows"" ""{#NODE_ENV}"" ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """Node_Disable_Colors"" ""{#NODE_DISABLE_COLORS}"" ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """App_Name"" ""{#APPLICATION_NAME}"" ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#REPLACE}"; Parameters: """APPDIR"" ""{app}"" ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
 Filename: "{#WINSW}";   Parameters: "install ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#WINSW}";   Parameters: "start ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
 
@@ -429,7 +428,6 @@ Filename: "{#REPLACE}"; Parameters: """DsDocServiceSvc_Descr"" ""{#DOCSERVICE_SR
 Filename: "{#REPLACE}"; Parameters: """production-windows"" ""{#NODE_ENV}"" ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """Node_Disable_Colors"" ""{#NODE_DISABLE_COLORS}"" ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """App_Name"" ""{#APPLICATION_NAME}"" ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#REPLACE}"; Parameters: """APPDIR"" ""{app}"" ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#WINSW}";   Parameters: "install ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#DOCSERVICE_SRV}}"
 Filename: "{#WINSW}";   Parameters: "start ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
 
@@ -438,7 +436,6 @@ Filename: "{#REPLACE}"; Parameters: """DsProxySvc_Display"" ""{#NGINX_SRV_DISPLA
 Filename: "{#REPLACE}"; Parameters: """DsProxySvc_Descr"" ""{#NGINX_SRV_DESCR}"" ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """DsProxySvc_Descr"" ""{#NGINX_SRV_DESCR}"" ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """openssl_env"" ""{#NGINX_OPENSSL_ENV}"" ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#REPLACE}"; Parameters: """APPDIR"" ""{app}"" ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
 Filename: "{#WINSW}";   Parameters: "install ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#NGINX_SRV}}"
 Filename: "{#WINSW}";   Parameters: "start ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#NGINX_SRV}}"
 

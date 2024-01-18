@@ -44,7 +44,6 @@ Filename: "{#REPLACE}"; Parameters: """DsExampleSvc_Display"" ""{#EXAMPLE_SRV_DI
 Filename: "{#REPLACE}"; Parameters: """DsExampleSvc_Descr"" ""{#EXAMPLE_SRV_DESCR}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """production-windows"" ""{#NODE_EXAMPLE_ENV}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#REPLACE}"; Parameters: """Node_Disable_Colors"" ""{#NODE_EXAMPLE_DISABLE_COLORS}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
-Filename: "{#REPLACE}"; Parameters: """APPDIR"" ""{app}"" ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#EXAMPLE_SRV}}"
 Filename: "{#WINSW}";   Parameters: "install ""{#EXAMPLE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#EXAMPLE_SRV}}"
 
 Filename: "http://localhost:{code:GetDefaultPort}/welcome/"; Description: "{cm:OpenWelcome}"; Flags: postinstall shellexec skipifsilent

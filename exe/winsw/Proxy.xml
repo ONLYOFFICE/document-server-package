@@ -6,14 +6,13 @@
 	<startmode>Automatic</startmode>
 	<delayedAutoStart>true</delayedAutoStart>
 	<onfailure action="restart" delay="1 sec"/>
-	<logpath>APPDIR\Log\nginx</logpath>
-	<workingdirectory>APPDIR\nginx</workingdirectory>
-	<executable>&quot;APPDIR\nginx\nginx.exe&quot;</executable>
-	<startarguments>-p &quot;APPDIR\nginx&quot;</startarguments>
-  	<stopexecutable>&quot;APPDIR\nginx\nginx.exe&quot;</stopexecutable>
-  	<stoparguments>-p &quot;APPDIR\nginx&quot; -s quit</stoparguments>
+	<logpath>%BASE%\..\Log\nginx</logpath>
+	<workingdirectory>%BASE%\..\nginx</workingdirectory>
+	<executable>&quot;%BASE%\..\nginx\nginx.exe&quot;</executable>
+	<startarguments>-p &quot;%BASE%\..\nginx&quot;</startarguments>
+	<stopexecutable>&quot;%BASE%\..\nginx\nginx.exe&quot;</stopexecutable>
+	<stoparguments>-p &quot;%BASE%\..\nginx&quot; -s quit</stoparguments>
 	<env name="OPENSSL_CONF" value="openssl_env" />
-	<stopexecutable>APPDIR\nginx\nginx.exe</stopexecutable>
 	<log mode="roll-by-size">
   		<sizeThreshold>10240</sizeThreshold>
   		<keepFiles>8</keepFiles>
