@@ -3,7 +3,7 @@
 #define EXAMPLE_SRV_DESCR  str(sAppName + " Example Service")
 #define EXAMPLE_SRV_DIR    '{app}\example'
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
-#define EXAMPLE_SRV_FILE '{app}\tools\Example.xml'
+#define EXAMPLE_SRV_FILE '{app}\winsw\Example.xml'
 
 #define NODE_EXAMPLE_ENV 'production-windows'
 #define NODE_EXAMPLE_DISABLE_COLORS '1'

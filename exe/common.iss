@@ -66,7 +66,7 @@
 
 #define InstallPrereqParam     'InstallPrereq'
 
-#define WINSW                 '{app}\tools\WinSW-x64.exe'
+#define WINSW                 '{app}\winsw\WinSW-x64.exe'
 #define NODE_ENV	            'production-windows'
 #define NODE_DISABLE_COLORS   '1'
 #define APPLICATION_NAME      str(sCompanyName)
@@ -78,14 +78,14 @@
 #define CONVERTER_SRV_DESCR  str(sAppName + " Converter Service")
 #define CONVERTER_SRV_DIR    '{app}\server\FileConverter'
 #define CONVERTER_SRV_LOG_DIR    '{app}\Log\converter'
-#define CONVERTER_SRV_FILE '{app}\tools\Converter.xml'
+#define CONVERTER_SRV_FILE '{app}\winsw\Converter.xml'
 
 #define DOCSERVICE_SRV        'DsDocServiceSvc'
 #define DOCSERVICE_SRV_DISPLAY  str(sAppName + " DocService")
 #define DOCSERVICE_SRV_DESCR  str(sAppName + " DocService Service")
 #define DOCSERVICE_SRV_DIR    '{app}\server\docservice'
 #define DOCSERVICE_SRV_LOG_DIR    '{app}\Log\docservice'
-#define DOCSERVICE_SRV_FILE '{app}\tools\DocService.xml'
+#define DOCSERVICE_SRV_FILE '{app}\winsw\DocService.xml'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
@@ -100,7 +100,7 @@
 
 #define DEFAULT_PLUGINS_LIST '{app}\sdkjs-plugins\plugin-list-default.json'
 
-#define PROXY_SRV_FILE '{app}\tools\Proxy.xml'
+#define PROXY_SRV_FILE '{app}\winsw\Proxy.xml'
 #define NGINX_SRV  'DsProxySvc'
 #define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
 #define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
@@ -308,7 +308,7 @@ Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DI
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
-Source: tools\*;            DestDir: "{app}\tools"; Flags: ignoreversion; Components: Program
+Source: winsw\*;                                DestDir: "{app}\winsw"; Flags: ignoreversion; Components: Program
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify

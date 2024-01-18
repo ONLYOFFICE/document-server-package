@@ -82,7 +82,7 @@ DS_MIME_TYPES = common/documentserver/nginx/includes/ds-mime.types.conf
 PSQL := $(DOCUMENTSERVER)/pgsql/bin
 PSQL_ZIP := postgresql-10.20-2-windows-x64-binaries.zip
 
-WINSW := $(DOCUMENTSERVER)/tools/WinSW-x64.exe
+WINSW := $(DOCUMENTSERVER)/winsw/WinSW-x64.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
