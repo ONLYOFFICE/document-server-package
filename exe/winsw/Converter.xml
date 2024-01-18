@@ -13,8 +13,10 @@
 	<env name="NODE_CONFIG_DIR" value="%BASE%\..\config" />
 	<env name="NODE_DISABLE_COLORS" value="Node_Disable_Colors" />
 	<env name="APPLICATION_NAME" value="App_Name" />
-	<log mode="roll-by-size">
-  		<sizeThreshold>10240</sizeThreshold>
-  		<keepFiles>8</keepFiles>
+	<log mode="roll-by-size-time">
+		<sizeThreshold>10240</sizeThreshold>
+		<pattern>yyyyMMdd</pattern>
+		<autoRollAtTime>00:00:00</autoRollAtTime>
+		<keepFiles>30</keepFiles>
 	</log>
 </service>
