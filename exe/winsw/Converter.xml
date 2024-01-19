@@ -12,7 +12,7 @@
 	<env name="NODE_ENV" value="production-windows" />
 	<env name="NODE_CONFIG_DIR" value="%BASE%\..\config" />
 	<env name="NODE_DISABLE_COLORS" value="Node_Disable_Colors" />
-	<env name="APPLICATION_NAME" value="App_Name" />
+	<env name="APPLICATION_NAME" value="ONLYOFFICE" />
 	<log mode="roll-by-size-time">
 		<sizeThreshold>10240</sizeThreshold>
 		<pattern>yyyyMMdd</pattern>
