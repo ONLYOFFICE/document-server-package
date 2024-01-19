@@ -67,9 +67,6 @@
 #define InstallPrereqParam     'InstallPrereq'
 
 #define WINSW                 '{app}\winsw\WinSW-x64.exe'
-#define NODE_ENV	            'production-windows'
-#define NODE_DISABLE_COLORS   '1'
-#define APPLICATION_NAME      str(sCompanyName)
 
 #define LOCAL_SERVICE 'NT Authority\LocalService'
 

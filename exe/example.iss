@@ -5,9 +5,6 @@
 #define EXAMPLE_SRV_LOG_DIR    '{app}\Log\example'
 #define EXAMPLE_SRV_FILE '{app}\winsw\Example.xml'
 
-#define NODE_EXAMPLE_ENV 'production-windows'
-#define NODE_EXAMPLE_DISABLE_COLORS '1'
-
 #define JSON_EXAMPLE_PARAMS '-I -q -f ""{app}\example\config\local.json""'
 
 [CustomMessages]
