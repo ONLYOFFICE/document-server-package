@@ -367,7 +367,7 @@ documentserver:
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 
 	sed 's|<env name="NODE_DISABLE_COLORS" value="[^"]*" />|<env name="NODE_DISABLE_COLORS" value="$(NODE_DISABLE_COLORS)" />|' -i $(EXE_BUILD_DIR)/winsw/*.xml
-	sed 's|<env name="APPLICATION_NAME" value="[^"]*" />|<env name="APPLICATION_NAME" value="$(PRODUCT_SHORT_NAME)" />|' -i $(EXE_BUILD_DIR)/winsw/*.xml
+	sed 's|<env name="APPLICATION_NAME" value="[^"]*" />|<env name="APPLICATION_NAME" value="$(COMPANY_NAME)" />|' -i $(EXE_BUILD_DIR)/winsw/*.xml
 
 	sed 's|<id>[^<]*</id>|<id>$(CONVERTER_SRV)</id>|' -i  $(EXE_BUILD_DIR)/winsw/Converter.xml
 	sed 's|<name>[^<]*</name>|<name>$(CONVERTER_SRV_DISPLAY)</name>|' -i  $(EXE_BUILD_DIR)/winsw/Converter.xml
