@@ -7,7 +7,7 @@
 	<onfailure action="restart" delay="1 sec"/>
 	<logpath>%BASE%\..\Log\example</logpath>
 	<workingdirectory>%BASE%\..\example</workingdirectory>
-	<executable>%BASE%\..\example\example.exe</executable>
+	<executable>&quot;%BASE%\..\example\example.exe&quot;</executable>
 	<env name="NODE_ENV" value="production-windows" />
 	<env name="NODE_CONFIG_DIR" value="%BASE%\..\example\config" />
 	<env name="NODE_DISABLE_COLORS" value="1" />

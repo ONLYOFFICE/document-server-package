@@ -8,7 +8,7 @@
 	<onfailure action="restart" delay="1 sec"/>
 	<logpath>%BASE%\..\Log\converter</logpath>
 	<workingdirectory>%BASE%\..\server\FileConverter</workingdirectory>
-	<executable>%BASE%\..\server\FileConverter\converter.exe</executable>
+	<executable>&quot;%BASE%\..\server\FileConverter\converter.exe&quot;</executable>
 	<env name="NODE_ENV" value="production-windows" />
 	<env name="NODE_CONFIG_DIR" value="%BASE%\..\config" />
 	<env name="NODE_DISABLE_COLORS" value="1" />
