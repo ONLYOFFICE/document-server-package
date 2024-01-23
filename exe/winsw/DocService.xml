@@ -11,7 +11,7 @@
 	<executable>%BASE%\..\server\DocService\docservice.exe</executable>
 	<env name="NODE_ENV" value="production-windows" />
 	<env name="NODE_CONFIG_DIR" value="%BASE%\..\config" />
-	<env name="NODE_DISABLE_COLORS" value="Node_Disable_Colors" />
+	<env name="NODE_DISABLE_COLORS" value="1" />
 	<env name="APPLICATION_NAME" value="ONLYOFFICE" />
 	<log mode="roll-by-size-time">
 		<sizeThreshold>10240</sizeThreshold>

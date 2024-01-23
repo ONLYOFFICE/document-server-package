@@ -89,24 +89,6 @@ BUILD_DATE := $(shell date +%F-%H-%M)
 WEBAPPS_DIR := web-apps
 SDKJS_DIR :=sdkjs
 
-CONVERTER_SRV = DsConverterSvc
-CONVERTER_SRV_DISPLAY = $(COMPANY_NAME) Document Server Converter
-CONVERTER_SRV_DESCR = $(CONVERTER_SRV_DISPLAY) Service
-
-DOCSERVICE_SRV = DsDocServiceSvc
-DOCSERVICE_SRV_DISPLAY = $(COMPANY_NAME) Document Server DocService
-DOCSERVICE_SRV_DESCR = $(DOCSERVICE_SRV_DISPLAY) Service
-
-PROXY_SRV = DsProxySvc
-PROXY_SRV_DISPLAY = $(COMPANY_NAME) Document Server Proxy
-PROXY_SRV_DESCR = $(PROXY_SRV_DISPLAY) Service
-
-EXAMPLE_SRV = DsExampleSvc
-EXAMPLE_SRV_DISPLAY = $(COMPANY_NAME) Document Server Example
-EXAMPLE_SRV_DESCR = $(EXAMPLE_SRV_DISPLAY) Service
-
-NODE_DISABLE_COLORS = 1
-
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 OFFICIAL_PRODUCT_NAME := 'Community Edition'
 endif
@@ -366,24 +348,7 @@ documentserver:
 	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 
-	sed 's|<env name="NODE_DISABLE_COLORS" value="[^"]*" />|<env name="NODE_DISABLE_COLORS" value="$(NODE_DISABLE_COLORS)" />|' -i $(EXE_BUILD_DIR)/winsw/*.xml
 	sed 's|<env name="APPLICATION_NAME" value="[^"]*" />|<env name="APPLICATION_NAME" value="$(COMPANY_NAME)" />|' -i $(EXE_BUILD_DIR)/winsw/*.xml
-
-	sed 's|<id>[^<]*</id>|<id>$(CONVERTER_SRV)</id>|' -i  $(EXE_BUILD_DIR)/winsw/Converter.xml
-	sed 's|<name>[^<]*</name>|<name>$(CONVERTER_SRV_DISPLAY)</name>|' -i  $(EXE_BUILD_DIR)/winsw/Converter.xml
-	sed 's|<description>[^<]*</description>|<description>$(CONVERTER_SRV_DESCR)</description>|' -i  $(EXE_BUILD_DIR)/winsw/Converter.xml
-
-	sed 's|<id>[^<]*</id>|<id>$(DOCSERVICE_SRV)</id>|' -i  $(EXE_BUILD_DIR)/winsw/DocService.xml
-	sed 's|<name>[^<]*</name>|<name>$(DOCSERVICE_SRV_DISPLAY)</name>|' -i  $(EXE_BUILD_DIR)/winsw/DocService.xml
-	sed 's|<description>[^<]*</description>|<description>$(DOCSERVICE_SRV_DESCR)</description>|' -i  $(EXE_BUILD_DIR)/winsw/DocService.xml
-
-	sed 's|<id>[^<]*</id>|<id>$(PROXY_SRV)</id>|' -i  $(EXE_BUILD_DIR)/winsw/Proxy.xml
-	sed 's|<name>[^<]*</name>|<name>$(PROXY_SRV_DISPLAY)</name>|' -i  $(EXE_BUILD_DIR)/winsw/Proxy.xml
-	sed 's|<description>[^<]*</description>|<description>$(PROXY_SRV_DESCR)</description>|' -i  $(EXE_BUILD_DIR)/winsw/Proxy.xml
-
-	sed 's|<id>[^<]*</id>|<id>$(EXAMPLE_SRV)</id>|' -i  $(EXE_BUILD_DIR)/winsw/Example.xml
-	sed 's|<name>[^<]*</name>|<name>$(EXAMPLE_SRV_DISPLAY)</name>|' -i  $(EXE_BUILD_DIR)/winsw/Example.xml
-	sed 's|<description>[^<]*</description>|<description>$(EXAMPLE_SRV_DESCR)</description>|' -i  $(EXE_BUILD_DIR)/winsw/Example.xml
 
 ifeq ($(PLATFORM),win)
 	cp -fr -t $(DOCUMENTSERVER)/license exe/license/*.license
