@@ -1,7 +1,7 @@
 <service>
-	<id>DsProxySvc</id>
-	<name>DsProxySvc_Display</name>
-	<description>DsProxySvc_Descr</description>
+	<id>{#NGINX_SRV}</id>
+	<name>{#NGINX_SRV_DISPLAY}</name>
+	<description>{#NGINX_SRV_DESCR}</description>
 	<priority>RealTime</priority>
 	<startmode>Automatic</startmode>
 	<delayedAutoStart>true</delayedAutoStart>

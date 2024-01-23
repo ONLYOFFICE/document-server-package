@@ -1,7 +1,7 @@
 <service>
-	<id>DsConverterSvc</id>
-	<name>DsConverterSvc_Display</name>
-	<description>DsConverterSvc_Descr</description>
+	<id>{#CONVERTER_SRV}</id>
+	<name>{#CONVERTER_SRV_DISPLAY}</name>
+	<description>{#CONVERTER_SRV_DESCR}</description>
 	<priority>RealTime</priority>
 	<startmode>Automatic</startmode>
 	<delayedAutoStart>true</delayedAutoStart>
@@ -12,7 +12,7 @@
 	<env name="NODE_ENV" value="production-windows" />
 	<env name="NODE_CONFIG_DIR" value="%BASE%\..\config" />
 	<env name="NODE_DISABLE_COLORS" value="1" />
-	<env name="APPLICATION_NAME" value="ONLYOFFICE" />
+	<env name="APPLICATION_NAME" value="{#sCompanyName}" />
 	<log mode="roll-by-size-time">
 		<sizeThreshold>10240</sizeThreshold>
 		<pattern>yyyyMMdd</pattern>

@@ -16,6 +16,7 @@ Source: ..\common\documentserver-example\home\*;      DestDir: {app}\example; Fl
 Source: ..\common\documentserver-example\config\*;    DestDir: {app}\example\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec
 Source: local\local.json;                             DestDir: {app}\example\config; Flags: onlyifdoesntexist uninsneveruninstall
 Source: ..\common\documentserver-example\nginx\*;     DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs
+Source: {#file "winsw\Example.xml"};                  DestDir: "{app}\winsw"; Flags: ignoreversion; DestName: "Example.xml"
 
 [Dirs]
 Name: "{app}\example\files";   Permissions: users-modify

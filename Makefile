@@ -348,8 +348,6 @@ documentserver:
 	cp -fr -t $(DOCUMENTSERVER) $(3RD_PARTY_LICENSE_FILES)
 	rm -fr $(3RD_PARTY_LICENSE_FILES)
 
-	sed 's|<env name="APPLICATION_NAME" value="[^"]*" />|<env name="APPLICATION_NAME" value="$(COMPANY_NAME)" />|' -i $(EXE_BUILD_DIR)/winsw/*.xml
-
 ifeq ($(PLATFORM),win)
 	cp -fr -t $(DOCUMENTSERVER)/license exe/license/*.license
 	echo ; >> $(DOCUMENTSERVER)/3rd-Party.txt

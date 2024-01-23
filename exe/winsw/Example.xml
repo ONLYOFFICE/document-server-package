@@ -1,7 +1,7 @@
 <service>
-	<id>DsExampleSvc</id>
-	<name>DsExampleSvc_Display</name>
-	<description>DsExampleSvc_Descr</description>
+	<id>{#EXAMPLE_SRV}</id>
+	<name>{#EXAMPLE_SRV_DISPLAY}</name>
+	<description>{#EXAMPLE_SRV_DESCR}</description>
 	<priority>RealTime</priority>
 	<startmode>Manual</startmode>
 	<onfailure action="restart" delay="1 sec"/>
