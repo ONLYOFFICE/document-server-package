@@ -18,7 +18,8 @@ echo -n Generating AllFonts.js, please wait...
   --images="$DIR/sdkjs/common/Images"\
   --selection="$DIR/server/FileConverter/bin/font_selection.bin"\
   --output-web="$DIR/fonts"\
-  --use-system="true"
+  --use-system="true"\
+  --use-system-user-fonts="false"
 
 echo Done
 
