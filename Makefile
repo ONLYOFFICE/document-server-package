@@ -173,18 +173,19 @@ DS_BIN_REPO := ./ds-repo
 DS_BIN := ./$(TARGET)/ds-bin-$(PRODUCT_VERSION)$(ARCH_EXT)
 
 ISCC := iscc
-ISCC_PARAMS += //DVERSION=$(PRODUCT_VERSION).$(BUILD_NUMBER)
+ISCC_PARAMS += -Qp
+ISCC_PARAMS += -DVERSION=$(PRODUCT_VERSION).$(BUILD_NUMBER)
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
-ISCC_PARAMS += //DEDITION=community
+ISCC_PARAMS += -DEDITION=community
 else ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de))
-ISCC_PARAMS += //DEDITION=developer
+ISCC_PARAMS += -DEDITION=developer
 else ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
-ISCC_PARAMS += //DEDITION=enterprise
+ISCC_PARAMS += -DEDITION=enterprise
 endif
-ISCC_PARAMS += //DBRANDING_DIR='$(shell cygpath -a -w "$(BRANDING_DIR)/exe")'
+ISCC_PARAMS += -DBRANDING_DIR='$(shell cygpath -a -w "$(BRANDING_DIR)/exe")'
 ifdef ENABLE_SIGNING
-ISCC_PARAMS += //DSIGN
-ISCC_PARAMS += //S"byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com \$$f"
+ISCC_PARAMS += -DSIGN
+ISCC_PARAMS += -S'byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com $$f'
 endif
 
 DEB_DEPS += deb/build/debian/source/format
