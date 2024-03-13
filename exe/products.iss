@@ -97,8 +97,6 @@ begin
 end;
 
 procedure Dependency_AddPostgreSQL;
-var
-  ResultCode: Integer;
 begin
   if IsPostgreSQLInstalled() = False then
   begin

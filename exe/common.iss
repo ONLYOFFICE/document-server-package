@@ -85,7 +85,7 @@
 #define DOCSERVICE_SRV_FILE '{app}\winsw\DocService.xml'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
-#define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
+#define POSTGRESQL_DATA_DIR '{commonappdata}\postgresql'
 
 #define JSON '{app}\npm\json.exe'
 
@@ -148,7 +148,7 @@ DefaultGroupName        ={#sCompanyName}
 WizardSizePercent         = 110
 UsePreviousAppDir         = yes
 DirExistsWarning          =no
-DefaultDirName            ={pf}\{#sAppPath}
+DefaultDirName            ={commonpf}\{#sAppPath}
 DisableProgramGroupPage   = yes
 DisableWelcomePage        = no
 DEPCompatible             = no
@@ -162,7 +162,7 @@ Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
-MinVersion                =6.1.7600
+MinVersion                =6.1sp1
 WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
 WizardSmallImageFile      ={#BRANDING_DIR}\data\dialogicon.bmp
 SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
@@ -170,6 +170,7 @@ SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
 LicenseFile               ={#BRANDING_DIR}\license\{#EDITION}\LICENSE.rtf
 #endif
 ShowLanguageDialog        = no
+MissingRunOnceIdsWarning  = no
 
 #ifdef SIGN
 SignTool=byparam $p
@@ -405,9 +406,9 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -579,7 +580,8 @@ begin
   ExtractTemporaryFile('libpq.dll');
   ExtractTemporaryFile('libcrypto-1_1-x64.dll');
   ExtractTemporaryFile('libssl-1_1-x64.dll');
-  ExtractTemporaryFile('libiconv-2.dll')
+  ExtractTemporaryFile('libiconv-2.dll');
+  Result := true;
 end;
 
 function InitializeSetup(): Boolean;
@@ -904,7 +906,7 @@ begin
   Result := true;
 
   SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+    ExpandConstant('{commonappdata}\postgresql\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
@@ -1043,15 +1045,15 @@ begin
   if InstallPrereq then begin
   case PageID of
     DbPage.ID:
-      Result := IsComponentSelected('Prerequisites\PostgreSQL');
+      Result := WizardIsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
-      Result := IsComponentSelected('Prerequisites\RabbitMq');
+      Result := WizardIsComponentSelected('Prerequisites\RabbitMq');
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := IsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
+        Result := WizardIsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
       end;
     end;
   end;
@@ -1118,24 +1120,24 @@ begin
         Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-           if IsComponentSelected('Prerequisites\Redis') then
+           if WizardIsComponentSelected('Prerequisites\Redis') then
            begin
              Dependency_AddRedis;
            end;
-           if IsComponentSelected('Prerequisites\RabbitMq') then
+           if WizardIsComponentSelected('Prerequisites\RabbitMq') then
            begin
              Dependency_AddErlang;
              Dependency_AddRabbitMq;
            end;
-           if IsComponentSelected('Prerequisites\PostgreSQL') then
+           if WizardIsComponentSelected('Prerequisites\PostgreSQL') then
            begin
              Dependency_AddPostgreSQL;
            end;
-        if IsComponentSelected('Prerequisites\Certbot') then
+        if WizardIsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
-        if IsComponentSelected('Prerequisites\Python') then
+        if WizardIsComponentSelected('Prerequisites\Python') then
         begin
           Dependency_AddPython3;
         end;
