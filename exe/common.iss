@@ -848,7 +848,14 @@ end;
 
 function GetRandomDbPwd: String;
 begin
-  Result := RandomString(30);
+  if InstallPrereq then
+  begin
+    Result := RandomString(30);
+  end
+  else
+  begin
+    Result := ExpandConstant('{#sDbDefValue}');
+  end;
 end;
 
 function SavePgPassConf(Host, Port, DatabaseName, Username, Password: String): Boolean;
