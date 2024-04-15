@@ -85,7 +85,7 @@
 #define DOCSERVICE_SRV_FILE '{app}\winsw\DocService.xml'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
-#define POSTGRESQL_DATA_DIR '{commonappdata}\postgresql'
+#define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
 
 #define JSON '{app}\npm\json.exe'
 
@@ -171,6 +171,7 @@ LicenseFile               ={#BRANDING_DIR}\license\{#EDITION}\LICENSE.rtf
 #endif
 ShowLanguageDialog        = no
 MissingRunOnceIdsWarning  = no
+UsedUserAreasWarning      = no
 
 #ifdef SIGN
 SignTool=byparam $p
@@ -913,7 +914,7 @@ begin
   Result := true;
 
   SaveStringToFile(
-    ExpandConstant('{commonappdata}\postgresql\pgpass.conf'),
+    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
