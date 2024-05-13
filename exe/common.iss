@@ -464,10 +464,10 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
-Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPostgreSQLInstalled;
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
-Name: "Prerequisites\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled and not UseLocalStorage;
+Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
+Name: "Prerequisites\Python\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
+Name: "Prerequisites\Python\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled and not UseLocalStorage;
 
 [Code]
 var
@@ -1060,13 +1060,13 @@ begin
     DbPage.ID:
       Result := WizardIsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
-      Result := WizardIsComponentSelected('Prerequisites\RabbitMq');
+      Result := WizardIsComponentSelected('Prerequisites\Python\RabbitMq');
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := WizardIsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
+        Result := WizardIsComponentSelected('Prerequisites\Python\Redis') or UseLocalStorage;
       end;
     end;
   end;
@@ -1133,11 +1133,11 @@ begin
         Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-           if WizardIsComponentSelected('Prerequisites\Redis') then
+           if WizardIsComponentSelected('Prerequisites\Python\Redis') then
            begin
              Dependency_AddRedis;
            end;
-           if WizardIsComponentSelected('Prerequisites\RabbitMq') then
+           if WizardIsComponentSelected('Prerequisites\Python\RabbitMq') then
            begin
              Dependency_AddErlang;
              Dependency_AddRabbitMq;
