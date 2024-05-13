@@ -913,8 +913,13 @@ var
 begin
   Result := true;
 
+  if not DirExists(ExpandConstant('{#POSTGRESQL_DATA_DIR}')) then
+  begin
+    ForceDirectories(ExpandConstant('{#POSTGRESQL_DATA_DIR}'));
+  end;
+
   SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
