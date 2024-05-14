@@ -961,7 +961,7 @@ begin
   if ResultCode <> 0 then
   begin
     MsgBox(
-      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
       mbInformation,
       MB_OK);
@@ -1020,6 +1020,25 @@ var
   ResultCode: Integer;
 begin
   Result := true;
+
+    ShellExec(
+    '',
+    ExpandConstant('{#Python}'),
+    '--version',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#Redis}']),
+      mbInformation,
+      MB_OK);
+    Exit;
+  end;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
   begin
