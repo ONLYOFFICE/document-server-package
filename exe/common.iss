@@ -960,12 +960,18 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(
+    if MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
       mbInformation,
-      MB_OK);
-    Exit;
+      MB_OKCANCEL) = IDOK then
+      begin
+        Exit;
+      end
+      else
+      begin
+        Abort;
+      end;
   end;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
@@ -1032,12 +1038,18 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(
+    if MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#Redis}']),
       mbInformation,
-      MB_OK);
-    Exit;
+      MB_OKCANCEL) = IDOK then
+      begin
+        Exit;
+      end
+      else
+      begin
+        Abort;
+      end;
   end;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
