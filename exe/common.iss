@@ -965,13 +965,13 @@ begin
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
       mbInformation,
       MB_OKCANCEL) = IDOK then
-      begin
-        Exit;
-      end
-      else
-      begin
-        Abort;
-      end;
+    begin
+      Exit;
+    end
+    else
+    begin
+      Abort;
+    end;
   end;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
@@ -1043,13 +1043,13 @@ begin
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#Redis}']),
       mbInformation,
       MB_OKCANCEL) = IDOK then
-      begin
-        Exit;
-      end
-      else
-      begin
-        Abort;
-      end;
+    begin
+      Exit;
+    end
+    else
+    begin
+      Abort;
+    end;
   end;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
