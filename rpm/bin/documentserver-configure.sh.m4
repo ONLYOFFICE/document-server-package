@@ -519,20 +519,24 @@ setup_nginx(){
 }
 
 save_wopi_params() {
-	if [ "${WOPI_ENABLED}" == "true" ]; then
-		WOPI_PRIVATE_KEY="/etc/M4_DS_PREFIX/wopi_private.key"
-		WOPI_PUBLIC_KEY="/etc/M4_DS_PREFIX/wopi_public.key"
+	WOPI_PRIVATE_KEY="/etc/M4_DS_PREFIX/wopi_private.key"
+	WOPI_PUBLIC_KEY="/etc/M4_DS_PREFIX/wopi_public.key"
 
-		[ ! -f "${WOPI_PRIVATE_KEY}" ] && echo -n "Generating WOPI private key..." && openssl genpkey -algorithm RSA -outform PEM -out "${WOPI_PRIVATE_KEY}" >/dev/null 2>&1 && echo "Done"
-		[ ! -f "${WOPI_PUBLIC_KEY}" ] && echo -n "Generating WOPI public key..." && openssl rsa -pubout -in "${WOPI_PRIVATE_KEY}" -outform PEM -out "${WOPI_PUBLIC_KEY}" >/dev/null 2>&1 && echo "Done"
-		WOPI_MODULUS=$(openssl rsa -pubin -inform PEM -modulus -noout -in "${WOPI_PUBLIC_KEY}" | sed 's/Modulus=//')
+	[ ! -f "${WOPI_PRIVATE_KEY}" ] && echo -n "Generating WOPI private key..." && openssl genpkey -algorithm RSA -outform PEM -out "${WOPI_PRIVATE_KEY}" >/dev/null 2>&1 && echo "Done"
+	[ ! -f "${WOPI_PUBLIC_KEY}" ] && echo -n "Generating WOPI public key..." && openssl rsa -RSAPublicKey_out -in "${WOPI_PRIVATE_KEY}" -outform "MS PUBLICKEYBLOB" -out "${WOPI_PUBLIC_KEY}" >/dev/null 2>&1  && echo "Done"
+	WOPI_MODULUS=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "${WOPI_PUBLIC_KEY}" | sed 's/Modulus=//')
+	WOPI_EXPONENT=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "${WOPI_PUBLIC_KEY}" | grep -oP '(?<=Exponent: )\d+')
 
-		${JSON} -e "if(this.wopi===undefined)this.wopi={};"
-		${JSON} -e "this.wopi.enable = ${WOPI_ENABLED}"
-		${JSON} -e "this.wopi.privateKey = '$(base64 -w0 ${WOPI_PRIVATE_KEY})'"
-		${JSON} -e "this.wopi.publicKey = '$(base64 -w0 ${WOPI_PUBLIC_KEY})'"
-		${JSON} -e "this.wopi.modulus = '${WOPI_MODULUS}'"
-	fi
+	${JSON} -e "if(this.wopi===undefined)this.wopi={};"
+	${JSON} -e "this.wopi.enable = ${WOPI_ENABLED}"
+	${JSON} -e "this.wopi.privateKey = '$(openssl base64 -in ${WOPI_PRIVATE_KEY} -A)'"
+	${JSON} -e "this.wopi.privateKeyOld = '$(openssl base64 -in ${WOPI_PRIVATE_KEY} -A)'"
+	${JSON} -e "this.wopi.publicKey = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.publicKeyOld = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.modulus = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.modulusOld = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.exponent = '${WOPI_EXPONENT}'"
+	${JSON} -e "this.wopi.exponentOld = '${WOPI_EXPONENT}'"
 }
 
 create_local_configs
