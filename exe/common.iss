@@ -398,6 +398,17 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.wopi===undefined)this.wopi={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: GenerateRSAKey;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.enable = '{code:GetWopiEnabled}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKey = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKeyOld = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKey = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKeyOld = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulus = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulusOld = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponent = '{code:GetWopiExponent}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponentOld = '{code:GetWopiExponent}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -464,6 +475,7 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
+Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: checkablealone; Types: full; Check: not IsOpenSSLInstalled;
 Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPostgreSQLInstalled;
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
@@ -484,6 +496,11 @@ var
   DbHost: String;
   DbPort: String;
   RedisHost: String;
+  WopiEnabled: String;
+  WopiPrivateKey: String;
+  WopiPublicKey: String;
+  WopiModulus: String;
+  WopiExponent: String;
 
 function GetRandomDbPwd: String; forward;
 
@@ -509,6 +526,11 @@ begin
   RedisHost := Host;
 end;
 
+procedure InitWopiEnabled(Enabled: String);
+begin
+  WopiEnabled := Enabled;
+end;
+
 procedure Init;
 begin
   IsJWTRegistryExists := False;
@@ -528,6 +550,8 @@ begin
     ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
 
   InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
+
+  InitWopiEnabled(ExpandConstant('{param:WOPI_ENABLED|false}'));
 end;
 
 function UninstallPreviosVersion(): Boolean;
@@ -746,6 +770,101 @@ begin
   end;
 end;
 
+function LoadStringFromFile(const FileName: string): string;
+var
+  SL: TStringList;
+begin
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    Result := SL.Text;
+  finally
+    SL.Free;
+  end;
+end;
+
+function GenerateRSAKey(): Boolean;
+var
+  ResultCode: Integer;
+  Command: String;
+  TempFileName: String;
+  WopiPrivateKeyPath: String;
+  WopiPublicKeyPath: String;
+  Output: String;
+begin
+  Result := False;
+  WopiPrivateKeyPath := ExpandConstant('{app}\config\wopi_private_key.pem');
+  WopiPublicKeyPath := ExpandConstant('{app}\config\wopi_public_key.pem');
+  TempFileName := ExpandConstant('{tmp}\output.txt');
+
+  if not FileExists(WopiPrivateKeyPath) then
+  begin
+    Command := 'openssl genpkey -algorithm RSA -outform PEM -out "' + WopiPrivateKeyPath + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  if FileExists(WopiPrivateKeyPath) then
+  begin
+    Command := 'openssl base64 -in "' + WopiPrivateKeyPath + '" -A > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      WopiPrivateKey := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end;
+
+  if not FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl rsa -RSAPublicKey_out -in "' + WopiPrivateKeyPath + '" -outform "MS PUBLICKEYBLOB" -out "' + WopiPublicKeyPath + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  if FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl base64 -in "' + WopiPublicKeyPath + '" -A > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      WopiPublicKey := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end;
+
+  if FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "' + WopiPublicKeyPath + '" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      if Pos('Modulus=', Output) = 1 then
+        Delete(Output, 1, 8);
+      WopiModulus := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+
+    Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "' + WopiPublicKeyPath + '" | findstr "Exponent:" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      if Pos('Exponent:', Output) = 1 then
+      begin
+        Delete(Output, 1, Pos('Exponent:', Output) + 8);
+        if Pos('(', Output) > 0 then
+          Output := Copy(Output, 1, Pos('(', Output) - 1);
+      end;
+      WopiExponent := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end;
+
+  Result := True;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
@@ -771,6 +890,31 @@ end;
 function GetJwtHeader(Param: String): String;
 begin
   Result := ExpandConstant('{param:JWT_HEADER|{reg:HKLM\{#sAppRegPath},{#REG_JWT_HEADER}|Authorization}}');
+end;
+
+function GetWopiEnabled(Param: string): String;
+begin
+  Result := WopiEnabled;
+end;
+
+function GetWopiPrivateKey (Param: string): String;
+begin
+  Result := WopiPrivateKey;
+end;
+
+function GetWopiPublicKey(Param: string): String;
+begin
+  Result := WopiPublicKey;
+end;
+
+function GetWopiModulus(Param: string): string;
+begin
+  Result := WopiModulus;
+end;
+
+function GetWopiExponent(Param: string): string;
+begin
+  Result := WopiExponent;
 end;
 
 function IsCommercial: Boolean;
@@ -1184,6 +1328,10 @@ begin
         if WizardIsComponentSelected('Prerequisites\Python') then
         begin
           Dependency_AddPython3;
+        end;
+        if WizardIsComponentSelected('Prerequisites\OpenSSL') then
+        begin
+          Dependency_AddOpenSSL;
         end;
        end;
        else

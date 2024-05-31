@@ -62,6 +62,11 @@ begin
             StrToInt(Version));
 end;
 
+function IsOpenSSLInstalled(): Boolean;
+begin
+  Result := IsInstalled('{8A79DC1B-5F6C-4C14-A33F-BD020AFD6739}', '{#Registry64}');
+end;
+
 procedure Dependency_AddErlang;
 begin
   if IsErlangInstalled() = False then
@@ -163,6 +168,23 @@ begin
       Dependency_String(
         '',
         'https://dl.eff.org/certbot-beta-installer-win32.exe'),
+      '',
+      False,
+      False);
+  end;
+end;
+
+procedure Dependency_AddOpenSSL;
+begin
+  if IsOpenSSLInstalled() = False then
+  begin
+    Dependency_Add(
+      'openssl.exe',
+      '/exenoui /qn /norestart REBOOT=ReallySuppress ADJUSTSYSTEMPATHENV=yes',
+      'OpenSSL x64 3.3.0',
+      Dependency_String(
+        '',
+        'https://download.firedaemon.com/FireDaemon-OpenSSL/FireDaemon-OpenSSL-x64-3.3.0.exe'),
       '',
       False,
       False);
