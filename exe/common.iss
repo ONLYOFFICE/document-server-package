@@ -119,10 +119,6 @@
 #define PostgreSQL 'PostgreSQL'
 #define Redis 'Redis'
 
-#define WopiEnabled    'false'
-#define WopiPrivateKey '{app}\config\wopi_private_key.pem'
-#define WopiPublicKey  '{app}\config\wopi_public_key.pem'
-
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
 #include "products.iss"
@@ -555,7 +551,7 @@ begin
 
   InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
 
-  InitWopiEnabled(ExpandConstant('{param:WOPI_ENABLED|{#WopiEnabled}}'));
+  InitWopiEnabled(ExpandConstant('{param:WOPI_ENABLED|false}'));
 end;
 
 function UninstallPreviosVersion(): Boolean;
