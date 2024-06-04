@@ -64,8 +64,6 @@
 
 #define RedisHost              DefHost
 
-#define InstallPrereqParam     'InstallPrereq'
-
 #define WINSW                 '{app}\winsw\WinSW-x64.exe'
 
 #define LOCAL_SERVICE 'NT Authority\LocalService'
@@ -476,10 +474,10 @@ Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags:
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
 Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: checkablealone; Types: full; Check: not IsOpenSSLInstalled;
-Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPostgreSQLInstalled;
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
-Name: "Prerequisites\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled and not UseLocalStorage;
+Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: not IsPythonInstalled;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: not IsPostgreSQLInstalled;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: not IsRabbitMQInstalled;
+Name: "Prerequisites\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRedisInstalled and not UseLocalStorage;
 
 [Code]
 var
@@ -925,15 +923,6 @@ begin
   end;
 end;
 
-function InstallPrereq: Boolean;
-begin
-  Result := false;
-  if ExpandConstant('{param:{#InstallPrereqParam}}') = 'Yes' then
-  begin
-    Result := True;
-  end;
-end;
-
 function UseLocalStorage: Boolean;
 begin
   Result := false;
@@ -945,62 +934,54 @@ end;
 
 procedure InitializeWizard;
 begin
-  If InstallPrereq then begin
-    DbPage := CreateInputQueryPage(
-      wpPreparing,
-      ExpandConstant('{cm:Postgre}'),
-      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
-      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
-    DbPage.Add(ExpandConstant('{cm:Host}'), False);
-    DbPage.Add(ExpandConstant('{cm:Port}'), False);
-    DbPage.Add(ExpandConstant('{cm:User}'), False);
-    DbPage.Add(ExpandConstant('{cm:Password}'), True);
-    DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
+  DbPage := CreateInputQueryPage(
+    wpPreparing,
+    ExpandConstant('{cm:Postgre}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
+  DbPage.Add(ExpandConstant('{cm:Host}'), False);
+  DbPage.Add(ExpandConstant('{cm:Port}'), False);
+  DbPage.Add(ExpandConstant('{cm:User}'), False);
+  DbPage.Add(ExpandConstant('{cm:Password}'), True);
+  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-    DbPage.Values[0] := GetDbHost('');
-    DbPage.Values[1] := GetDbPort('');
-    DbPage.Values[2] := GetDbUser('');
-    DbPage.Values[3] := GetDbPwd('');
-    DbPage.Values[4] := GetDbName('');
+  DbPage.Values[0] := GetDbHost('');
+  DbPage.Values[1] := GetDbPort('');
+  DbPage.Values[2] := GetDbUser('');
+  DbPage.Values[3] := GetDbPwd('');
+  DbPage.Values[4] := GetDbName('');
 
-    RabbitMqPage := CreateInputQueryPage(
-      DbPage.ID,
-      ExpandConstant('{cm:RabbitMq}'),
-      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
-      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
-    RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
-    RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
-    RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
-    RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
+  RabbitMqPage := CreateInputQueryPage(
+    DbPage.ID,
+    ExpandConstant('{cm:RabbitMq}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
+  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
 
-    RabbitMqPage.Values[0] := GetRabbitMqHost('');
-    RabbitMqPage.Values[1] := GetRabbitMqUser('');
-    RabbitMqPage.Values[2] := GetRabbitMqPwd('');
-    RabbitMqPage.Values[3] := GetRabbitMqProto('');
+  RabbitMqPage.Values[0] := GetRabbitMqHost('');
+  RabbitMqPage.Values[1] := GetRabbitMqUser('');
+  RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+  RabbitMqPage.Values[3] := GetRabbitMqProto('');
 
-    if IsCommercial then begin
-      RedisPage := CreateInputQueryPage(
-        RabbitMqPage.ID,
-        ExpandConstant('{cm:Redis}'),
-        FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
-        FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
-      RedisPage.Add(ExpandConstant('{cm:Host}'), False);
+  if IsCommercial then
+  begin
+    RedisPage := CreateInputQueryPage(
+      RabbitMqPage.ID,
+      ExpandConstant('{cm:Redis}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
+    RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
-      RedisPage.Values[0] := GetRedisHost('');
-    end;
+    RedisPage.Values[0] := GetRedisHost('');
   end;
 end;
 
 function GetRandomDbPwd: String;
 begin
-  if InstallPrereq then
-  begin
-    Result := RandomString(30);
-  end
-  else
-  begin
-    Result := ExpandConstant('{#sDbDefValue}');
-  end;
+  Result := RandomString(30);
 end;
 
 function SavePgPassConf(Host, Port, DatabaseName, Username, Password: String): Boolean;
@@ -1230,7 +1211,6 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
-  if InstallPrereq then begin
   case PageID of
     DbPage.ID:
       Result := WizardIsComponentSelected('Prerequisites\PostgreSQL');
@@ -1245,7 +1225,6 @@ begin
       end;
     end;
   end;
-end;
 end;
 
 function ArrayLength(a: array of integer): Integer;
@@ -1292,7 +1271,6 @@ begin
   Result := true;
   if WizardSilent() = false then
   begin
-  if InstallPrereq then begin
     case CurPageID of
       DbPage.ID:
       begin
@@ -1345,7 +1323,6 @@ begin
          end;
     end;
   end;
-end;
 end;
 
 #ifdef DS_EXAMPLE
