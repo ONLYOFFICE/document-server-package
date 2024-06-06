@@ -116,6 +116,7 @@
 #define RabbitMq 'RabbitMQ'
 #define PostgreSQL 'PostgreSQL'
 #define Redis 'Redis'
+#define OpenSslPath '{pf}\FireDaemon OpenSSL 3\bin'
 
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
@@ -404,8 +405,8 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKey = '{co
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKeyOld = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulus = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulusOld = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponent = '{code:GetWopiExponent}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponentOld = '{code:GetWopiExponent}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponent = {code:GetWopiExponent}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponentOld = {code:GetWopiExponent}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
 
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -473,7 +474,7 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
-Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: checkablealone; Types: full; Check: not IsOpenSSLInstalled;
+Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: fixed; Types: full custom compact; Check: not IsOpenSSLInstalled;
 Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: not IsPythonInstalled;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: not IsPostgreSQLInstalled;
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: not IsRabbitMQInstalled;
@@ -781,6 +782,26 @@ begin
   end;
 end;
 
+function FormatFileWithNewline(const FileName: string): string;
+var
+  SL: TStringList;
+  i: Integer;
+  ResultStr: string;
+begin
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    ResultStr := '';
+    for i := 0 to SL.Count - 1 do
+    begin
+      ResultStr := ResultStr + SL[i] + '\n';
+    end;
+    Result := ResultStr;
+  finally
+    SL.Free;
+  end;
+end;
+
 function GenerateRSAKey(): Boolean;
 var
   ResultCode: Integer;
@@ -798,31 +819,25 @@ begin
   if not FileExists(WopiPrivateKeyPath) then
   begin
     Command := 'openssl genpkey -algorithm RSA -outform PEM -out "' + WopiPrivateKeyPath + '"';
-    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 
   if FileExists(WopiPrivateKeyPath) then
   begin
-    Command := 'openssl base64 -in "' + WopiPrivateKeyPath + '" -A > "' + TempFileName + '"';
-    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-    if FileExists(TempFileName) then
-    begin
-      Output := LoadStringFromFile(TempFileName);
-      WopiPrivateKey := Trim(Output);
-      DeleteFile(TempFileName);
-    end;
+    Output := FormatFileWithNewline(WopiPrivateKeyPath);
+    WopiPrivateKey := Trim(Output);
   end;
 
   if not FileExists(WopiPublicKeyPath) then
   begin
     Command := 'openssl rsa -RSAPublicKey_out -in "' + WopiPrivateKeyPath + '" -outform "MS PUBLICKEYBLOB" -out "' + WopiPublicKeyPath + '"';
-    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 
   if FileExists(WopiPublicKeyPath) then
   begin
     Command := 'openssl base64 -in "' + WopiPublicKeyPath + '" -A > "' + TempFileName + '"';
-    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
     if FileExists(TempFileName) then
     begin
       Output := LoadStringFromFile(TempFileName);
@@ -834,7 +849,7 @@ begin
   if FileExists(WopiPublicKeyPath) then
   begin
     Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "' + WopiPublicKeyPath + '" > "' + TempFileName + '"';
-    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
     if FileExists(TempFileName) then
     begin
       Output := LoadStringFromFile(TempFileName);
@@ -845,7 +860,7 @@ begin
     end;
 
     Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "' + WopiPublicKeyPath + '" | findstr "Exponent:" > "' + TempFileName + '"';
-    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
     if FileExists(TempFileName) then
     begin
       Output := LoadStringFromFile(TempFileName);
