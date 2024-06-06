@@ -474,7 +474,7 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
-Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: checkablealone; Types: full; Check: not IsOpenSSLInstalled;
+Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: fixed; Types: full custom compact; Check: not IsOpenSSLInstalled;
 Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: not IsPythonInstalled;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: not IsPostgreSQLInstalled;
 Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: not IsRabbitMQInstalled;
