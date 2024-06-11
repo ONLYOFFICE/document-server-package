@@ -398,7 +398,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthori
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.wopi===undefined)this.wopi={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: GenerateRSAKey;
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.enable = '{code:GetWopiEnabled}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.enable = {code:GetWopiEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKey = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKeyOld = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKey = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
