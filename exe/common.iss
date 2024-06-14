@@ -906,8 +906,28 @@ begin
 end;
 
 function GetWopiEnabled(Param: string): String;
+var
+  ResultCode: Integer;
+  Output: String;
+  TempFileName: String;
+  Command: String;
 begin
-  Result := WopiEnabled;
+  if LocalJsonExists then
+  begin
+    TempFileName := ExpandConstant('{tmp}\output.txt');
+    Command := ExpandConstant('{#JSON}') + ' -q -f "{app}\config\local.json" -a "wopi.enable" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      Result := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end
+  else
+  begin
+    Result := WopiEnabled;
+  end
 end;
 
 function GetWopiPrivateKey (Param: string): String;
