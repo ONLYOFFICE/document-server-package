@@ -40,17 +40,44 @@ begin
   Result := IsInstalled('Certbot$', '{#Registry32}');
 end;
 
+function IsPythonInstalled(): Boolean;
+var
+  Version: String;
+  PythonRegPath: String;
+begin
+  Version :=  '3.11'
+  PythonRegPath := 'Software\Python\PythonCore\' + Version + '\InstallPath';
+  Result := RegKeyExists(HKLM, PythonRegPath) or RegKeyExists(HKCU, PythonRegPath);
+end;
+
+function IsRedisInstalled(): Boolean;
+var
+  Version: String;
+begin
+  Version := '5';
+  Result := IsMsiProductInstalled(
+           Dependency_String(
+            '',
+            '{05410198-7212-4FC4-B7C8-AFEFC3DA0FBC}'),
+            StrToInt(Version));
+end;
+
+function IsOpenSSLInstalled(): Boolean;
+begin
+  Result := IsInstalled('{8A79DC1B-5F6C-4C14-A33F-BD020AFD6739}', '{#Registry64}');
+end;
+
 procedure Dependency_AddErlang;
 begin
   if IsErlangInstalled() = False then
   begin
     Dependency_Add(
       'erlang.exe',
-      '',
-      'Erlang 23 x64',
+      '/S',
+      'Erlang 26.2.1 x64',
       Dependency_String(
         '',
-        'https://erlang.org/download/otp_win64_23.1.exe'),
+        'https://github.com/erlang/otp/releases/download/OTP-26.2.1/otp_win64_26.2.1.exe'),
       '',
       False,
       False);
@@ -63,11 +90,11 @@ begin
   begin
     Dependency_Add(
       'rabbitmq-server.exe',
-      '',
-      'RabbitMQ 3.8',
+      '/S',
+      'RabbitMQ 3.12.11',
       Dependency_String(
         '',
-        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/rabbitmq-server-3.8.9.exe'),
+        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.12.11/rabbitmq-server-3.12.11.exe'),
       '',
       False,
       False);
@@ -75,18 +102,16 @@ begin
 end;
 
 procedure Dependency_AddPostgreSQL;
-var
-  ResultCode: Integer;
 begin
   if IsPostgreSQLInstalled() = False then
   begin
     Dependency_Add(
       'postgresql.exe',
-      '--unattendedmodeui minimal',
-      'PostgreSQL 9.5 x64',
+      '--unattendedmodeui none --install_runtimes 0 --mode unattended',
+      'PostgreSQL 12.17 x64',
       Dependency_String(
         '',
-        'https://sbp.enterprisedb.com/getfile.jsp?fileid=1258024'),
+        'https://get.enterprisedb.com/postgresql/postgresql-12.17-1-windows-x64.exe'),
       '',
       False,
       False);
@@ -97,24 +122,17 @@ procedure Dependency_AddRedis;
 var
   Version: String;
 begin
-  Version := '3';
-  if not IsMsiProductInstalled(
-           Dependency_String(
-            '',
-            '{05410198-7212-4FC4-B7C8-AFEFC3DA0FBC}'),
-            StrToInt(Version)) then
-  begin
-    Dependency_Add(
-      'redis.msi',
-      '/qb',
-      'Redis ' + Version + 'x64',
-      Dependency_String(
-        '',
-        'https://download.onlyoffice.com/install/windows/redist/Redis-x64-3.0.504.msi'),
+  Version := '5.0.10';
+  Dependency_Add(
+    'redis.msi',
+    '/quiet',
+    'Redis ' + Version + 'x64',
+    Dependency_String(
       '',
-      False,
-      False);
-  end;
+      'https://download.onlyoffice.com/install/windows/redist/Redis-x64-5.0.10.msi'),
+    '',
+    False,
+    False);
 end;
 
 procedure Dependency_AddPython3;
@@ -123,27 +141,20 @@ var
   Patch: String;
   SemVer: String;
 begin
-  Version := '3.7';
-  Patch := '2';
+  Version := '3.11';
+  Patch := '3';
   SemVer := Version + '.' + Patch;
-  if not IsMsiProductInstalled(
-           Dependency_String(
-            '{A6516328-639D-562B-8A85-C3E305DDAC6F}',
-            '{39BBB1D2-2CD1-57A7-A873-E06D44986C30}'),
-            StrToInt(Version)) then 
-  begin
-    Dependency_Add(
-      'python ' + Version + Dependency_ArchSuffix + '.exe',
-      'PrependPath=1 DefaultJustForMeTargetDir=' +
-        ExpandConstant('{sd}') + '\Python  /passive /norestart',
-      'Python ' + Version + Dependency_ArchTitle,
-      Dependency_String(
-        'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '.exe',
-        'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '-amd64.exe'),
-      '',
-      False,
-      False);
-  end;
+  Dependency_Add(
+    'python ' + Version + Dependency_ArchSuffix + '.exe',
+    'PrependPath=1 DefaultJustForMeTargetDir=' +
+      ExpandConstant('{sd}') + '\Python  /quiet /norestart',
+    'Python ' + Version + Dependency_ArchTitle,
+    Dependency_String(
+      'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '.exe',
+      'https://www.python.org/ftp/python/' + SemVer + '/python-' + SemVer + '-amd64.exe'),
+    '',
+    False,
+    False);
 end;
 
 procedure Dependency_AddCertbot;
@@ -157,6 +168,23 @@ begin
       Dependency_String(
         '',
         'https://dl.eff.org/certbot-beta-installer-win32.exe'),
+      '',
+      False,
+      False);
+  end;
+end;
+
+procedure Dependency_AddOpenSSL;
+begin
+  if IsOpenSSLInstalled() = False then
+  begin
+    Dependency_Add(
+      'openssl.exe',
+      '/exenoui /qn /norestart REBOOT=ReallySuppress ADJUSTSYSTEMPATHENV=yes',
+      'OpenSSL x64 3.3.0',
+      Dependency_String(
+        '',
+        'https://download.firedaemon.com/FireDaemon-OpenSSL/FireDaemon-OpenSSL-x64-3.3.0.exe'),
       '',
       False,
       False);

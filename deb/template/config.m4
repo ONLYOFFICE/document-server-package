@@ -19,6 +19,7 @@ db_fset M4_ONLYOFFICE_VALUE/example-port seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-enabled seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-secret seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-header seen true
+db_fset M4_ONLYOFFICE_VALUE/wopi-enabled seen true
 
 db_input medium M4_ONLYOFFICE_VALUE/db-type || true
 db_input medium M4_ONLYOFFICE_VALUE/db-host || true

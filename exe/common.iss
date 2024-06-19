@@ -42,14 +42,29 @@
 #define REG_JWT_SECRET        'JwtSecret'
 #define REG_JWT_HEADER        'JwtHeader'
 
-#define DbDefPort             '5432'
+#ifndef sDbDefValue
+  #define sDbDefValue         'onlyoffice'
+#endif
 
-#define NSSM                  '{app}\nssm\nssm.exe'
-#define NODE_ENV	          'NODE_ENV=production-windows'
-#define NODE_CONFIG_DIR       'NODE_CONFIG_DIR=""{app}\config""'
-#define NODE_DISABLE_COLORS   'NODE_DISABLE_COLORS=1'
-#define APPLICATION_NAME      str("APPLICATION_NAME=" + sCompanyName)
-#define NODE_SRV_ENV          str(NODE_ENV + ' ' + NODE_CONFIG_DIR + ' ' + NODE_DISABLE_COLORS + ' ' + APPLICATION_NAME)
+#define DefHost               'localhost'
+
+#define DbDefName              sDbDefValue
+#define DbDefUser              sDbDefValue
+#define DbDefPort              '5432'
+
+#define DbHost                 DefHost
+#define DbAdminUserName        'postgres'
+#define DbAdminName            'postgres'
+#define DbAdminPassword        'postgres'
+
+#define AmqpServerHost         DefHost
+#define AmqpServerUserName     'guest'
+#define AmqpServerPassword     'guest'
+#define AmqpServerProto        'amqp'
+
+#define RedisHost              DefHost
+
+#define WINSW                 '{app}\winsw\WinSW-x64.exe'
 
 #define LOCAL_SERVICE 'NT Authority\LocalService'
 
@@ -58,12 +73,14 @@
 #define CONVERTER_SRV_DESCR  str(sAppName + " Converter Service")
 #define CONVERTER_SRV_DIR    '{app}\server\FileConverter'
 #define CONVERTER_SRV_LOG_DIR    '{app}\Log\converter'
+#define CONVERTER_SRV_FILE '{app}\winsw\Converter.xml'
 
 #define DOCSERVICE_SRV        'DsDocServiceSvc'
 #define DOCSERVICE_SRV_DISPLAY  str(sAppName + " DocService")
 #define DOCSERVICE_SRV_DESCR  str(sAppName + " DocService Service")
 #define DOCSERVICE_SRV_DIR    '{app}\server\docservice'
 #define DOCSERVICE_SRV_LOG_DIR    '{app}\Log\docservice'
+#define DOCSERVICE_SRV_FILE '{app}\winsw\DocService.xml'
 
 #define PSQL '{app}\pgsql\bin\psql.exe'
 #define POSTGRESQL_DATA_DIR '{userappdata}\postgresql'
@@ -72,10 +89,13 @@
 
 #define JSON_PARAMS '-I -q -f ""{app}\config\local.json""'
 
+#define LOCAL_DATA_STORAGE   'editorDataMemory'
+
 #define REPLACE '{app}\npm\replace.exe'
 
 #define DEFAULT_PLUGINS_LIST '{app}\sdkjs-plugins\plugin-list-default.json'
 
+#define PROXY_SRV_FILE '{app}\winsw\Proxy.xml'
 #define NGINX_SRV  'DsProxySvc'
 #define NGINX_SRV_DISPLAY  str(sAppName + " Proxy")
 #define NGINX_SRV_DESCR  str(sAppName + " Proxy Service")
@@ -84,7 +104,6 @@
 #define NGINX_DS_CONF '{app}\nginx\conf\ds.conf'
 #define NGINX_DS_TMPL '{app}\nginx\conf\ds.conf.tmpl'
 #define NGINX_DS_SSL_TMPL '{app}\nginx\conf\ds-ssl.conf.tmpl'
-#define NGINX_SRV_ENV 'OPENSSL_CONF=openssl\openssl.conf'
 
 #define LICENSE_PATH str("{commonappdata}\" + sIntCompanyName + "\Data")
 
@@ -97,6 +116,7 @@
 #define RabbitMq 'RabbitMQ'
 #define PostgreSQL 'PostgreSQL'
 #define Redis 'Redis'
+#define OpenSslPath '{pf}\FireDaemon OpenSSL 3\bin'
 
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
@@ -127,7 +147,7 @@ DefaultGroupName        ={#sCompanyName}
 WizardSizePercent         = 110
 UsePreviousAppDir         = yes
 DirExistsWarning          =no
-DefaultDirName            ={pf}\{#sAppPath}
+DefaultDirName            ={commonpf}\{#sAppPath}
 DisableProgramGroupPage   = yes
 DisableWelcomePage        = no
 DEPCompatible             = no
@@ -141,7 +161,7 @@ Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
-MinVersion                =6.1.7600
+MinVersion                =6.1sp1
 WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
 WizardSmallImageFile      ={#BRANDING_DIR}\data\dialogicon.bmp
 SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
@@ -149,6 +169,8 @@ SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
 LicenseFile               ={#BRANDING_DIR}\license\{#EDITION}\LICENSE.rtf
 #endif
 ShowLanguageDialog        = no
+MissingRunOnceIdsWarning  = no
+UsedUserAreasWarning      = no
 
 #ifdef SIGN
 SignTool=byparam $p
@@ -283,6 +305,10 @@ Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DI
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
 Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
+Source: winsw\WinSW-x64.exe;                    DestDir: "{app}\winsw"; Flags: ignoreversion; Components: Program
+Source: {#file "winsw\Converter.xml"};          DestDir: "{app}\winsw"; Flags: ignoreversion; DestName: "Converter.xml"
+Source: {#file "winsw\DocService.xml"};         DestDir: "{app}\winsw"; Flags: ignoreversion; DestName: "DocService.xml"
+Source: {#file "winsw\Proxy.xml"};              DestDir: "{app}\winsw"; Flags: ignoreversion; DestName: "Proxy.xml"
 
 [Dirs]
 Name: "{app}\server\App_Data";        Permissions: service-modify
@@ -346,6 +372,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.server===undefined)this.services.CoAuthoring.server={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.port = '{code:GetDocServicePort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.server.editorDataStorage = '{#LOCAL_DATA_STORAGE}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: UseLocalStorage;
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.license===undefined)this.license={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -370,6 +397,17 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.wopi===undefined)this.wopi={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: GenerateRSAKey;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.enable = {code:GetWopiEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKey = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKeyOld = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKey = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKeyOld = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulus = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulusOld = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponent = {code:GetWopiExponent}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponentOld = {code:GetWopiExponent}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -379,50 +417,21 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
+
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
 
-Filename: "{#NSSM}"; Parameters: "install {#CONVERTER_SRV} ""{#CONVERTER_SRV_DIR}\converter.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} DisplayName {#CONVERTER_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} Description {#CONVERTER_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppDirectory {#CONVERTER_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppRotateFiles 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppRotateOnline 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppRotateBytes {#LOG_ROTATE_BYTES}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStdout {#CONVERTER_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} AppStderr {#CONVERTER_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#CONVERTER_SRV} Start SERVICE_DELAYED_AUTO_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
-Filename: "{#NSSM}"; Parameters: "start {#CONVERTER_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
+Filename: "{#WINSW}";   Parameters: "install ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
+Filename: "{#WINSW}";   Parameters: "start ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
 
-Filename: "{#NSSM}"; Parameters: "install {#DOCSERVICE_SRV} ""{#DOCSERVICE_SRV_DIR}\docservice.exe"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} DisplayName {#DOCSERVICE_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} Description {#DOCSERVICE_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppDirectory {#DOCSERVICE_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppEnvironmentExtra {#NODE_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppRotateFiles 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppRotateOnline 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppRotateBytes {#LOG_ROTATE_BYTES}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStdout {#DOCSERVICE_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} AppStderr {#DOCSERVICE_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#DOCSERVICE_SRV} Start SERVICE_DELAYED_AUTO_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
-Filename: "{#NSSM}"; Parameters: "start {#DOCSERVICE_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#WINSW}";   Parameters: "install ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#DOCSERVICE_SRV}}"
+Filename: "{#WINSW}";   Parameters: "start ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#DOCSERVICE_SRV}}"
 
-Filename: "{#NSSM}"; Parameters: "install {#NGINX_SRV} ""{#NGINX_SRV_DIR}\nginx"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} DisplayName {#NGINX_SRV_DISPLAY}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Description {#NGINX_SRV_DESCR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppDirectory {#NGINX_SRV_DIR}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppEnvironmentExtra {#NGINX_SRV_ENV}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppRotateFiles 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppRotateOnline 1"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppRotateBytes {#LOG_ROTATE_BYTES}"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStdout {#NGINX_SRV_LOG_DIR}\out.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} AppStderr {#NGINX_SRV_LOG_DIR}\error.log"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} ObjectName ""{#LOCAL_SERVICE}"" """" "; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "set {#NGINX_SRV} Start SERVICE_DELAYED_AUTO_START"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#NGINX_SRV}}"
-Filename: "{#NSSM}"; Parameters: "start {#NGINX_SRV}"; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#NGINX_SRV}}"
+Filename: "{#WINSW}";   Parameters: "install ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#NGINX_SRV}}"
+Filename: "{#WINSW}";   Parameters: "start ""{#PROXY_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#NGINX_SRV}}"
 
 Filename: "sc"; Parameters: "failure ""{#CONVERTER_SRV}"" actions= restart/60000/restart/60000/restart/60000 reset= 86400"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#CONVERTER_SRV}}"
 Filename: "sc"; Parameters: "failure ""{#DOCSERVICE_SRV}"" actions= restart/60000/restart/60000/restart/60000 reset= 86400"; Flags: runhidden; StatusMsg: "{cm:CfgSrv,{#DOCSERVICE_SRV}}"
@@ -435,14 +444,14 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
 
-Filename: "{#NSSM}"; Parameters: "stop {#NGINX_SRV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "remove {#NGINX_SRV} confirm"; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "stop ""{#PROXY_SRV_FILE}"""; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "uninstall ""{#PROXY_SRV_FILE}"""; Flags: runhidden
 
-Filename: "{#NSSM}"; Parameters: "stop {#CONVERTER_SRV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "remove {#CONVERTER_SRV} confirm"; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "stop ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "uninstall ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden
 
-Filename: "{#NSSM}"; Parameters: "stop {#DOCSERVICE_SRV}"; Flags: runhidden
-Filename: "{#NSSM}"; Parameters: "remove {#DOCSERVICE_SRV} confirm"; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "stop ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden
+Filename: "{#WINSW}"; Parameters: "uninstall ""{#DOCSERVICE_SRV_FILE}"""; Flags: runhidden
 
 Filename: "schtasks"; Parameters: "/End /TN ""{#LogRotateTaskName}"""; Flags: runhidden
 Filename: "schtasks"; Parameters: "/Delete /F /TN ""{#LogRotateTaskName}"""; Flags: runhidden
@@ -464,21 +473,84 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-;Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.8"; Flags: checkablealone; Types: full; 
-;Name: "Prerequisites\Redis"; Description: "Redis 3"; Flags: checkablealone; Types: full; Check: IsCommercial;
-;Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 10.2"; Flags: checkablealone; Types: full; 
-Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; 
+Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
+Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: fixed; Types: full custom compact; Check: not IsOpenSSLInstalled;
+Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: not IsPythonInstalled;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: not IsPostgreSQLInstalled;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: not IsRabbitMQInstalled;
+Name: "Prerequisites\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRedisInstalled and not UseLocalStorage;
 
 [Code]
 var
   JWTSecret: String;
   IsJWTRegistryExists: Boolean;
   LocalJsonExists: Boolean;
+  AmqpServerHost: String;
+  AmqpServerUserName: String;
+  AmqpServerPassword: String;
+  AmqpServerProto: String;
+  DbUserName: String;
+  DbName: String;
+  DbPassword: String;
+  DbHost: String;
+  DbPort: String;
+  RedisHost: String;
+  WopiEnabled: String;
+  WopiPrivateKey: String;
+  WopiPublicKey: String;
+  WopiModulus: String;
+  WopiExponent: String;
 
-procedure InitVariables;
+function GetRandomDbPwd: String; forward;
+
+procedure InitAmqpServerParams(Host, UserName, Password, Proto: String);
+begin
+  AmqpServerHost := Host;
+  AmqpServerUserName := UserName;
+  AmqpServerPassword := Password;
+  AmqpServerProto := Proto;
+end;
+
+procedure InitDbParams(Host, Port, UserName, Password, Name: String);
+begin
+  DbHost := Host;
+  DbPort := Port;
+  DbUserName := UserName;
+  DbPassword := Password;
+  DbName := Name;
+end;
+
+procedure InitRedisParams(Host: String);
+begin
+  RedisHost := Host;
+end;
+
+procedure InitWopiEnabled(Enabled: String);
+begin
+  WopiEnabled := Enabled;
+end;
+
+procedure Init;
 begin
   IsJWTRegistryExists := False;
   LocalJsonExists := False;
+
+  InitAmqpServerParams(
+    ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
+    ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|{#AmqpServerUserName}}}'),
+    ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|{#AmqpServerPassword}}}'),
+    ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|{#AmqpServerProto}}}'))
+
+  InitDbParams(
+    ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DbHost}}}'),
+    ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#DbDefPort}}}'),
+    ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#DbDefUser}}}'),
+    ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}'),
+    ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
+
+  InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
+
+  InitWopiEnabled(ExpandConstant('{param:WOPI_ENABLED|false}'));
 end;
 
 function UninstallPreviosVersion(): Boolean;
@@ -532,14 +604,15 @@ begin
   ExtractTemporaryFile('libpq.dll');
   ExtractTemporaryFile('libcrypto-1_1-x64.dll');
   ExtractTemporaryFile('libssl-1_1-x64.dll');
-  ExtractTemporaryFile('libiconv-2.dll')
+  ExtractTemporaryFile('libiconv-2.dll');
+  Result := true;
 end;
 
 function InitializeSetup(): Boolean;
 begin
  
   ExtractFiles();
-  InitVariables();
+  Init();
   
   if not UninstallPreviosVersion() then
   begin
@@ -550,7 +623,6 @@ begin
   begin
     Dependency_AddVC2013;
     Dependency_AddVC2015To2022;
- // Dependency_AddPython3;
   end;
 
   Result := true;
@@ -563,52 +635,52 @@ var
 
 function GetDbHost(Param: String): String;
 begin
-  Result := DbPage.Values[0];
+  Result := DbHost;
 end;
 
 function GetDbPort(Param: String): String;
 begin
-  Result := DbPage.Values[1];
+  Result := DbPort;
 end;
 
 function GetDbUser(Param: String): String;
 begin
-  Result := DbPage.Values[2];
+  Result := DbUserName;
 end;
 
 function GetDbPwd(Param: String): String;
 begin
-  Result := DbPage.Values[3];
+  Result := DbPassword;
 end;
 
 function GetDbName(Param: String): String;
 begin
-  Result := DbPage.Values[4];
+  Result := DbName;
 end;
 
 function GetRabbitMqHost(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[0];
+  Result := AmqpServerHost;
 end;
 
 function GetRabbitMqUser(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[1];
+  Result := AmqpServerUserName;
 end;
 
 function GetRabbitMqPwd(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[2];
+  Result := AmqpServerPassword;
 end;
 
 function GetRabbitMqProto(Param: String): String;
 begin
-  Result := RabbitMqPage.Values[3];
+  Result := AmqpServerProto;
 end;
 
 function GetRedisHost(Param: String): String;
 begin
-  Result := RedisPage.Values[0];
+  Result := RedisHost;
 end;
 
 function GetDefaultPort(Param: String): String;
@@ -697,6 +769,115 @@ begin
   end;
 end;
 
+function LoadStringFromFile(const FileName: string): string;
+var
+  SL: TStringList;
+begin
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    Result := SL.Text;
+  finally
+    SL.Free;
+  end;
+end;
+
+function FormatFileWithNewline(const FileName: string): string;
+var
+  SL: TStringList;
+  i: Integer;
+  ResultStr: string;
+begin
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    ResultStr := '';
+    for i := 0 to SL.Count - 1 do
+    begin
+      ResultStr := ResultStr + SL[i] + '\n';
+    end;
+    Result := ResultStr;
+  finally
+    SL.Free;
+  end;
+end;
+
+function GenerateRSAKey(): Boolean;
+var
+  ResultCode: Integer;
+  Command: String;
+  TempFileName: String;
+  WopiPrivateKeyPath: String;
+  WopiPublicKeyPath: String;
+  Output: String;
+begin
+  Result := False;
+  WopiPrivateKeyPath := ExpandConstant('{app}\config\wopi_private_key.pem');
+  WopiPublicKeyPath := ExpandConstant('{app}\config\wopi_public_key.pem');
+  TempFileName := ExpandConstant('{tmp}\output.txt');
+
+  if not FileExists(WopiPrivateKeyPath) then
+  begin
+    Command := 'openssl genpkey -algorithm RSA -outform PEM -out "' + WopiPrivateKeyPath + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  if FileExists(WopiPrivateKeyPath) then
+  begin
+    Output := FormatFileWithNewline(WopiPrivateKeyPath);
+    WopiPrivateKey := Trim(Output);
+  end;
+
+  if not FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl rsa -RSAPublicKey_out -in "' + WopiPrivateKeyPath + '" -outform "MS PUBLICKEYBLOB" -out "' + WopiPublicKeyPath + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  if FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl base64 -in "' + WopiPublicKeyPath + '" -A > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      WopiPublicKey := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end;
+
+  if FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "' + WopiPublicKeyPath + '" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      if Pos('Modulus=', Output) = 1 then
+        Delete(Output, 1, 8);
+      WopiModulus := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+
+    Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "' + WopiPublicKeyPath + '" | findstr "Exponent:" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      if Pos('Exponent:', Output) = 1 then
+      begin
+        Delete(Output, 1, Pos('Exponent:', Output) + 8);
+        if Pos('(', Output) > 0 then
+          Output := Copy(Output, 1, Pos('(', Output) - 1);
+      end;
+      WopiExponent := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end;
+
+  Result := True;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
@@ -724,11 +905,65 @@ begin
   Result := ExpandConstant('{param:JWT_HEADER|{reg:HKLM\{#sAppRegPath},{#REG_JWT_HEADER}|Authorization}}');
 end;
 
+function GetWopiEnabled(Param: string): String;
+var
+  ResultCode: Integer;
+  Output: String;
+  TempFileName: String;
+  Command: String;
+begin
+  if LocalJsonExists then
+  begin
+    TempFileName := ExpandConstant('{tmp}\output.txt');
+    Command := ExpandConstant('{#JSON}') + ' -q -f "{app}\config\local.json" -a "wopi.enable" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      Result := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end
+  else
+  begin
+    Result := WopiEnabled;
+  end
+end;
+
+function GetWopiPrivateKey (Param: string): String;
+begin
+  Result := WopiPrivateKey;
+end;
+
+function GetWopiPublicKey(Param: string): String;
+begin
+  Result := WopiPublicKey;
+end;
+
+function GetWopiModulus(Param: string): string;
+begin
+  Result := WopiModulus;
+end;
+
+function GetWopiExponent(Param: string): string;
+begin
+  Result := WopiExponent;
+end;
+
 function IsCommercial: Boolean;
 begin
   Result := false;
   if ('{#EDITION}' = 'developer') or ('{#EDITION}' = 'enterprise') then begin
     Result := true;
+  end;
+end;
+
+function UseLocalStorage: Boolean;
+begin
+  Result := false;
+  if ExpandConstant('{param:UseLocalStorage}') = 'Yes' then
+  begin
+    Result := True;
   end;
 end;
 
@@ -745,11 +980,11 @@ begin
   DbPage.Add(ExpandConstant('{cm:Password}'), True);
   DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-  DbPage.Values[0] := ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|localhost}}');
-  DbPage.Values[1] := ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#DbDefPort}}}');
-  DbPage.Values[2] := ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#sDbDefValue}}}');
-  DbPage.Values[3] := ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#sDbDefValue}}}');
-  DbPage.Values[4] := ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#sDbDefValue}}}');
+  DbPage.Values[0] := GetDbHost('');
+  DbPage.Values[1] := GetDbPort('');
+  DbPage.Values[2] := GetDbUser('');
+  DbPage.Values[3] := GetDbPwd('');
+  DbPage.Values[4] := GetDbName('');
 
   RabbitMqPage := CreateInputQueryPage(
     DbPage.ID,
@@ -760,13 +995,14 @@ begin
   RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
   RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
-  
-  RabbitMqPage.Values[0] := ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|localhost}}');
-  RabbitMqPage.Values[1] := ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|guest}}');
-  RabbitMqPage.Values[2] := ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|guest}}');
-  RabbitMqPage.Values[3] := ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|amqp}}');
-  
-  if IsCommercial then begin
+
+  RabbitMqPage.Values[0] := GetRabbitMqHost('');
+  RabbitMqPage.Values[1] := GetRabbitMqUser('');
+  RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+  RabbitMqPage.Values[3] := GetRabbitMqProto('');
+
+  if IsCommercial then
+  begin
     RedisPage := CreateInputQueryPage(
       RabbitMqPage.ID,
       ExpandConstant('{cm:Redis}'),
@@ -774,19 +1010,39 @@ begin
       FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
     RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
-    RedisPage.Values[0] := ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|localhost}}');
+    RedisPage.Values[0] := GetRedisHost('');
   end;
+end;
 
+function GetRandomDbPwd: String;
+begin
+  Result := RandomString(30);
+end;
+
+function SavePgPassConf(Host, Port, DatabaseName, Username, Password: String): Boolean;
+var
+  FileName: String;
+  Content: String;
+begin
+  FileName := ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf');
+
+  Content := Format('%s:%s:%s:%s:%s', [Host, Port, DatabaseName, Username, Password]);
+
+  Result := SaveStringToFile(FileName, Content, False);
+end;
+
+function CreateDbDefUserAuth(): Boolean;
+begin
+  Result := true;
+
+  SavePgPassConf(GetDbHost(''), GetDbPort(''), '{#DbAdminName}', '{#DbAdminUserName}', '{#DbAdminPassword}');
 end;
 
 function CreateDbAuth(): Boolean;
 begin
   Result := true;
 
-  SaveStringToFile(
-    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
-    GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
-    False);
+  SavePgPassConf(GetDbHost(''), GetDbPort(''), GetDbName(''), GetDbUser(''), GetDbPwd(''));
 end;
 
 function IsNotClusterMode(): Boolean;
@@ -817,8 +1073,13 @@ var
 begin
   Result := true;
 
+  if not DirExists(ExpandConstant('{#POSTGRESQL_DATA_DIR}')) then
+  begin
+    ForceDirectories(ExpandConstant('{#POSTGRESQL_DATA_DIR}'));
+  end;
+
   SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
@@ -826,7 +1087,7 @@ begin
     ExpandConstant('{tmp}\psql.exe'),
     '-h ' + GetDbHost('') + ' -U ' + GetDbUser('') + ' -d ' + GetDbName('') + ' -w -c ";"',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
@@ -853,18 +1114,24 @@ begin
     ExpandConstant('{#Python}'),
     '--version',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
 
   if ResultCode <> 0 then
   begin
-    MsgBox(
-      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
+    if MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
       mbInformation,
-      MB_OK);
-    Exit;
+      MB_OKCANCEL) = IDOK then
+    begin
+      Exit;
+    end
+    else
+    begin
+      Abort;
+    end;
   end;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
@@ -873,7 +1140,7 @@ begin
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install pika',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
   end;
@@ -888,7 +1155,7 @@ begin
       GetRabbitMqPwd('') + ' ' +
       GetRabbitMqHost('')),
       '',
-      SW_SHOW,
+      SW_HIDE,
       EwWaitUntilTerminated,
       ResultCode);
   end
@@ -920,24 +1187,49 @@ var
 begin
   Result := true;
 
+    ShellExec(
+    '',
+    ExpandConstant('{#Python}'),
+    '--version',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
+  begin
+    if MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#Redis}']),
+      mbInformation,
+      MB_OKCANCEL) = IDOK then
+    begin
+      Exit;
+    end
+    else
+    begin
+      Abort;
+    end;
+  end;
+
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
   begin
     Exec(
     ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
     'install iredis',
     '',
-    SW_SHOW,
+    SW_HIDE,
     EwWaitUntilTerminated,
     ResultCode);
   end;
 
   Exec(
-    '>',
-    'iredis -h ' + GetRedisHost('') + ' quit',
-    '',
-    SW_SHOW,
-    EwWaitUntilTerminated,
-    ResultCode);
+  ExpandConstant('{sd}') + '\Python\scripts\iredis.exe',
+  '-h ' + GetRedisHost('') + ' quit',
+  '',
+  SW_HIDE,
+  EwWaitUntilTerminated,
+  ResultCode);
 
   if ResultCode <> 0 then
   begin
@@ -951,24 +1243,24 @@ begin
   end;
 end;
 
-(*function ShouldSkipPage(PageID: Integer): Boolean;
+function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
   case PageID of
     DbPage.ID:
-      Result := not IsComponentSelected('Prerequisites\PostgreSQL');
+      Result := WizardIsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
-      Result := not IsComponentSelected('Prerequisites\RabbitMq');
+      Result := WizardIsComponentSelected('Prerequisites\RabbitMq');
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := not IsComponentSelected('Prerequisites\Redis');
+        Result := WizardIsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
       end;
     end;
   end;
-end;*)
+end;
 
 function ArrayLength(a: array of integer): Integer;
 begin
@@ -1015,40 +1307,55 @@ begin
   if WizardSilent() = false then
   begin
     case CurPageID of
-      // DbPage.ID:
-      //   Result := CheckDbConnection();
-      // RabbitMqPage.ID:
-      //   Result := CheckRabbitMqConnection();
-      // wpWelcome:
-      //   Result := CheckPortOccupied();
+      DbPage.ID:
+      begin
+        InitDbParams(DbPage.Values[0], DbPage.Values[1], DbPage.Values[2], DbPage.Values[3], DbPage.Values[4]);
+        Result := CheckDbConnection();
+      end;
+      RabbitMqPage.ID:
+      begin
+        InitAmqpServerParams(RabbitMqPage.Values[0], RabbitMqPage.Values[1], RabbitMqPage.Values[2], RabbitMqPage.Values[3]);
+        Result := CheckRabbitMqConnection();
+      end;
+      wpWelcome:
+        Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-        // if IsComponentSelected('Prerequisites\Redis') then
-        // begin
-        //   Dependency_AddRedis;
-        // end;
-        // if IsComponentSelected('Prerequisites\RabbitMq') then
-        // begin
-        //   Dependency_AddErlang;
-        //   Dependency_AddRabbitMq;
-        // end;
-        // if not IsComponentSelected('Prerequisites\PostgreSQL') then
-        // begin
-        //   Dependency_AddPostgreSQL;
-        // end;
-        if IsComponentSelected('Prerequisites\Certbot') then
+           if WizardIsComponentSelected('Prerequisites\Redis') then
+           begin
+             Dependency_AddRedis;
+           end;
+           if WizardIsComponentSelected('Prerequisites\RabbitMq') then
+           begin
+             Dependency_AddErlang;
+             Dependency_AddRabbitMq;
+           end;
+           if WizardIsComponentSelected('Prerequisites\PostgreSQL') then
+           begin
+             Dependency_AddPostgreSQL;
+           end;
+        if WizardIsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
-      end;
-    // else
-    //   if IsCommercial then
-    //   begin
-    //     if CurPageID = RedisPage.ID then
-    //     begin
-    //       Result := CheckRedisConnection();
-    //     end;
-    //   end;
+        if WizardIsComponentSelected('Prerequisites\Python') then
+        begin
+          Dependency_AddPython3;
+        end;
+        if WizardIsComponentSelected('Prerequisites\OpenSSL') then
+        begin
+          Dependency_AddOpenSSL;
+        end;
+       end;
+       else
+         if IsCommercial then
+          begin
+            if CurPageID = RedisPage.ID then
+            begin
+              InitRedisParams(RedisPage.Values[0]);
+              Result := CheckRedisConnection();
+            end;
+         end;
     end;
   end;
 end;

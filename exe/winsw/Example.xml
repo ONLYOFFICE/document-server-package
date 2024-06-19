@@ -1,0 +1,20 @@
+<service>
+	<id>{#EXAMPLE_SRV}</id>
+	<name>{#EXAMPLE_SRV_DISPLAY}</name>
+	<description>{#EXAMPLE_SRV_DESCR}</description>
+	<priority>RealTime</priority>
+	<startmode>Manual</startmode>
+	<onfailure action="restart" delay="1 sec"/>
+	<logpath>%BASE%\..\Log\example</logpath>
+	<workingdirectory>%BASE%\..\example</workingdirectory>
+	<executable>&quot;%BASE%\..\example\example.exe&quot;</executable>
+	<env name="NODE_ENV" value="production-windows" />
+	<env name="NODE_CONFIG_DIR" value="%BASE%\..\example\config" />
+	<env name="NODE_DISABLE_COLORS" value="1" />
+	<log mode="roll-by-size-time">
+		<sizeThreshold>10240</sizeThreshold>
+		<pattern>yyyyMMdd</pattern>
+		<autoRollAtTime>00:00:00</autoRollAtTime>
+		<keepFiles>30</keepFiles>
+	</log>
+</service>
