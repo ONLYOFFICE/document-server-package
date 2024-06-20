@@ -5,6 +5,7 @@
 	<priority>RealTime</priority>
 	<startmode>Automatic</startmode>
 	<delayedAutoStart>true</delayedAutoStart>
+	<serviceaccount><username>NT AUTHORITY\LocalService</username></serviceaccount>
 	<onfailure action="restart" delay="1 sec"/>
 	<logpath>%BASE%\..\Log\converter</logpath>
 	<workingdirectory>%BASE%\..\server\FileConverter</workingdirectory>
