@@ -276,6 +276,9 @@ ru.NotAvailable=%1 не установлен или недоступен,
 en.SkipValidation=%1 parameters validation will be skipped.
 ru.SkipValidation=будет пропущена проверка параметров %1
 
+en.SkipConnection=%nIf you want to skip the connection check, press OK or to recheck the connection, press Cancel.
+ru.SkipConnection=%nЕсли вы хотите пропустить проверку соединения, нажмите OK, или для повторной проверки соединения нажмите Cancel.
+
 en.CheckFailed=Failed to check parameters,
 ru.CheckFailed=Ошибка проверки параметров
 
@@ -1093,13 +1096,20 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(
+    if MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-        ([GetDbHost(''), 'PSQL', IntToStr(ResultCode) + '.'])),
-      mbError,
-      MB_OK);
-    Result := false;
+        ([GetDbHost(''), 'PSQL', IntToStr(ResultCode) + '.'])) +
+      FmtMessage(ExpandConstant('{cm:SkipConnection}'), ['PSQL']),
+      mbInformation,
+      MB_OKCANCEL) = IDOK then
+    begin
+      Exit;
+    end
+    else
+    begin
+      Result := false;
+    end;
   end;
 end;
 
