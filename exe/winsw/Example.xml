@@ -4,6 +4,7 @@
 	<description>{#EXAMPLE_SRV_DESCR}</description>
 	<priority>RealTime</priority>
 	<startmode>Manual</startmode>
+	<serviceaccount><username>NT AUTHORITY\LocalService</username></serviceaccount>
 	<onfailure action="restart" delay="1 sec"/>
 	<logpath>%BASE%\..\Log\example</logpath>
 	<workingdirectory>%BASE%\..\example</workingdirectory>
