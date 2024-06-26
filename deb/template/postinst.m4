@@ -103,6 +103,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 
 	db_get M4_ONLYOFFICE_VALUE/plugins-enabled || true
 	DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-$RET}
+
+	db_get M4_ONLYOFFICE_VALUE/wopi-enabled || true
+	WOPI_ENABLED="$RET"
 }
 
 install_db() {
@@ -291,6 +294,27 @@ setup_nginx(){
 
 }
 
+save_wopi_params() {
+	WOPI_PRIVATE_KEY="${CONF_DIR}/wopi_private.key"
+	WOPI_PUBLIC_KEY="${CONF_DIR}/wopi_public.key"
+
+	[ ! -f "${WOPI_PRIVATE_KEY}" ] && echo -n "Generating WOPI private key..." && openssl genpkey -algorithm RSA -outform PEM -out "${WOPI_PRIVATE_KEY}" >/dev/null 2>&1 && echo "Done"
+	[ ! -f "${WOPI_PUBLIC_KEY}" ] && echo -n "Generating WOPI public key..." && openssl rsa -RSAPublicKey_out -in "${WOPI_PRIVATE_KEY}" -outform "MS PUBLICKEYBLOB" -out "${WOPI_PUBLIC_KEY}" >/dev/null 2>&1  && echo "Done"
+	WOPI_MODULUS=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "${WOPI_PUBLIC_KEY}" | sed 's/Modulus=//')
+	WOPI_EXPONENT=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "${WOPI_PUBLIC_KEY}" | grep -oP '(?<=Exponent: )\d+')
+
+	${JSON} -e "if(this.wopi===undefined)this.wopi={};"
+	${JSON} -e "this.wopi.enable = ${WOPI_ENABLED}"
+	${JSON} -e "this.wopi.privateKey = '$(awk '{printf "%s\\n", $0}' ${WOPI_PRIVATE_KEY})'"
+	${JSON} -e "this.wopi.privateKeyOld = '$(awk '{printf "%s\\n", $0}' ${WOPI_PRIVATE_KEY})'"
+	${JSON} -e "this.wopi.publicKey = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.publicKeyOld = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.modulus = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.modulusOld = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.exponent = ${WOPI_EXPONENT}"
+	${JSON} -e "this.wopi.exponentOld = ${WOPI_EXPONENT}"
+}
+
 case "$1" in
 	configure)
 		adduser --quiet --home "$DIR" --system --group ds
@@ -307,6 +331,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 `		save_redis_params
 ',)dnl
 		save_jwt_params
+		save_wopi_params
 
 		# configure ngninx for M4_ONLYOFFICE_VALUE
 		setup_nginx

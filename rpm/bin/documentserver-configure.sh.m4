@@ -138,6 +138,13 @@ while [ "$1" != "" ]; do
 			fi
 		;;
 
+		-we | --wopienabled )
+			if [ "$2" != "" ]; then
+				WOPI_ENABLED=$2
+				shift
+			fi
+		;;
+
 		-? | -h | --help )
 			echo "  Usage: bash documentserver-configure.sh [PARAMETER] [[PARAMETER], ...]"
 			echo
@@ -160,6 +167,7 @@ while [ "$1" != "" ]; do
 			echo "      -ap, --amqpport              The port for the connection to AMQP server                                      ( Defaults to 5672 )"
 			echo "      -rh, --redishost             The IP address or the name of the host where the Redis server is running"
 			echo "      -rp, --redisport             The port for the connection to Redis server                                     ( Defaults to 6379 )"
+			echo "      -we, --wopienabled           Specifies the enabling the Web Application Open Platform Interface Protocol     ( Defaults to false )"
 			echo "      -?, -h, --help               this help"
 			echo
 			exit 0
@@ -188,6 +196,8 @@ fi
 JWT_ENABLED=${JWT_ENABLED:-true}
 JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
+
+WOPI_ENABLED=${WOPI_ENABLED:-false}
 
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
@@ -508,6 +518,27 @@ setup_nginx(){
   done
 }
 
+save_wopi_params() {
+	WOPI_PRIVATE_KEY="/etc/M4_DS_PREFIX/wopi_private.key"
+	WOPI_PUBLIC_KEY="/etc/M4_DS_PREFIX/wopi_public.key"
+
+	[ ! -f "${WOPI_PRIVATE_KEY}" ] && echo -n "Generating WOPI private key..." && openssl genpkey -algorithm RSA -outform PEM -out "${WOPI_PRIVATE_KEY}" >/dev/null 2>&1 && echo "Done"
+	[ ! -f "${WOPI_PUBLIC_KEY}" ] && echo -n "Generating WOPI public key..." && openssl rsa -RSAPublicKey_out -in "${WOPI_PRIVATE_KEY}" -outform "MS PUBLICKEYBLOB" -out "${WOPI_PUBLIC_KEY}" >/dev/null 2>&1  && echo "Done"
+	WOPI_MODULUS=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "${WOPI_PUBLIC_KEY}" | sed 's/Modulus=//')
+	WOPI_EXPONENT=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "${WOPI_PUBLIC_KEY}" | grep -oP '(?<=Exponent: )\d+')
+
+	${JSON} -e "if(this.wopi===undefined)this.wopi={};"
+	${JSON} -e "this.wopi.enable = ${WOPI_ENABLED}"
+	${JSON} -e "this.wopi.privateKey = '$(awk '{printf "%s\\n", $0}' ${WOPI_PRIVATE_KEY})'"
+	${JSON} -e "this.wopi.privateKeyOld = '$(awk '{printf "%s\\n", $0}' ${WOPI_PRIVATE_KEY})'"
+	${JSON} -e "this.wopi.publicKey = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.publicKeyOld = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.modulus = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.modulusOld = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.exponent = ${WOPI_EXPONENT}"
+	${JSON} -e "this.wopi.exponentOld = ${WOPI_EXPONENT}"
+}
+
 create_local_configs
 
 input_db_params
@@ -527,6 +558,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 save_redis_params
 ,)dnl
 save_jwt_params
+save_wopi_params
 
 tune_local_configs
 

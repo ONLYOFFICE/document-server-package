@@ -64,8 +64,6 @@
 
 #define RedisHost              DefHost
 
-#define InstallPrereqParam     'InstallPrereq'
-
 #define WINSW                 '{app}\winsw\WinSW-x64.exe'
 
 #define LOCAL_SERVICE 'NT Authority\LocalService'
@@ -118,6 +116,7 @@
 #define RabbitMq 'RabbitMQ'
 #define PostgreSQL 'PostgreSQL'
 #define Redis 'Redis'
+#define OpenSslPath '{pf}\FireDaemon OpenSSL 3\bin'
 
 #define public Dependency_NoExampleSetup
 #include "InnoDependencyInstaller\CodeDependencies.iss"
@@ -148,7 +147,7 @@ DefaultGroupName        ={#sCompanyName}
 WizardSizePercent         = 110
 UsePreviousAppDir         = yes
 DirExistsWarning          =no
-DefaultDirName            ={pf}\{#sAppPath}
+DefaultDirName            ={commonpf}\{#sAppPath}
 DisableProgramGroupPage   = yes
 DisableWelcomePage        = no
 DEPCompatible             = no
@@ -162,7 +161,7 @@ Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
 SetupMutex                =ASC
-MinVersion                =6.1.7600
+MinVersion                =6.1sp1
 WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
 WizardSmallImageFile      ={#BRANDING_DIR}\data\dialogicon.bmp
 SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
@@ -170,6 +169,8 @@ SetupIconFile             ={#BRANDING_DIR}\data\icon.ico
 LicenseFile               ={#BRANDING_DIR}\license\{#EDITION}\LICENSE.rtf
 #endif
 ShowLanguageDialog        = no
+MissingRunOnceIdsWarning  = no
+UsedUserAreasWarning      = no
 
 #ifdef SIGN
 SignTool=byparam $p
@@ -274,6 +275,9 @@ ru.NotAvailable=%1 не установлен или недоступен,
 
 en.SkipValidation=%1 parameters validation will be skipped.
 ru.SkipValidation=будет пропущена проверка параметров %1
+
+en.SkipConnection=%nIf you want to skip the connection check, press OK or to recheck the connection, press Cancel.
+ru.SkipConnection=%nЕсли вы хотите пропустить проверку соединения, нажмите OK, или для повторной проверки соединения нажмите Cancel.
 
 en.CheckFailed=Failed to check parameters,
 ru.CheckFailed=Ошибка проверки параметров
@@ -396,6 +400,17 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.token.outbox===undefined)this.services.CoAuthoring.token.outbox={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.token.outbox.header = '{code:GetJwtHeader}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: (not IsLocalJsonExists()) or (not IsStringEmpty(ExpandConstant('{param:JWT_HEADER}')));
 
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.wopi===undefined)this.wopi={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: GenerateRSAKey;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.enable = {code:GetWopiEnabled}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKey = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.privateKeyOld = '{code:GetWopiPrivateKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKey = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.publicKeyOld = '{code:GetWopiPublicKey}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulus = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.modulusOld = '{code:GetWopiModulus}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponent = {code:GetWopiExponent}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponentOld = {code:GetWopiExponent}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
+
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -405,9 +420,9 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -462,10 +477,11 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
-Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPythonInstalled;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsPostgreSQLInstalled;
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: InstallPrereq and not IsRabbitMQInstalled;
-Name: "Prerequisites\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and InstallPrereq and not IsRedisInstalled and not UseLocalStorage;
+Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: fixed; Types: full custom compact; Check: not IsOpenSSLInstalled;
+Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: not IsPythonInstalled;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 12.17"; Flags: checkablealone; Types: full; Check: not IsPostgreSQLInstalled;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 3.12.11"; Flags: checkablealone; Types: full; Check: not IsRabbitMQInstalled;
+Name: "Prerequisites\Redis"; Description: "Redis 5.0.10"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRedisInstalled and not UseLocalStorage;
 
 [Code]
 var
@@ -482,6 +498,11 @@ var
   DbHost: String;
   DbPort: String;
   RedisHost: String;
+  WopiEnabled: String;
+  WopiPrivateKey: String;
+  WopiPublicKey: String;
+  WopiModulus: String;
+  WopiExponent: String;
 
 function GetRandomDbPwd: String; forward;
 
@@ -507,6 +528,11 @@ begin
   RedisHost := Host;
 end;
 
+procedure InitWopiEnabled(Enabled: String);
+begin
+  WopiEnabled := Enabled;
+end;
+
 procedure Init;
 begin
   IsJWTRegistryExists := False;
@@ -526,6 +552,8 @@ begin
     ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
 
   InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
+
+  InitWopiEnabled(ExpandConstant('{param:WOPI_ENABLED|false}'));
 end;
 
 function UninstallPreviosVersion(): Boolean;
@@ -579,7 +607,8 @@ begin
   ExtractTemporaryFile('libpq.dll');
   ExtractTemporaryFile('libcrypto-1_1-x64.dll');
   ExtractTemporaryFile('libssl-1_1-x64.dll');
-  ExtractTemporaryFile('libiconv-2.dll')
+  ExtractTemporaryFile('libiconv-2.dll');
+  Result := true;
 end;
 
 function InitializeSetup(): Boolean;
@@ -743,6 +772,115 @@ begin
   end;
 end;
 
+function LoadStringFromFile(const FileName: string): string;
+var
+  SL: TStringList;
+begin
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    Result := SL.Text;
+  finally
+    SL.Free;
+  end;
+end;
+
+function FormatFileWithNewline(const FileName: string): string;
+var
+  SL: TStringList;
+  i: Integer;
+  ResultStr: string;
+begin
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    ResultStr := '';
+    for i := 0 to SL.Count - 1 do
+    begin
+      ResultStr := ResultStr + SL[i] + '\n';
+    end;
+    Result := ResultStr;
+  finally
+    SL.Free;
+  end;
+end;
+
+function GenerateRSAKey(): Boolean;
+var
+  ResultCode: Integer;
+  Command: String;
+  TempFileName: String;
+  WopiPrivateKeyPath: String;
+  WopiPublicKeyPath: String;
+  Output: String;
+begin
+  Result := False;
+  WopiPrivateKeyPath := ExpandConstant('{app}\config\wopi_private_key.pem');
+  WopiPublicKeyPath := ExpandConstant('{app}\config\wopi_public_key.pem');
+  TempFileName := ExpandConstant('{tmp}\output.txt');
+
+  if not FileExists(WopiPrivateKeyPath) then
+  begin
+    Command := 'openssl genpkey -algorithm RSA -outform PEM -out "' + WopiPrivateKeyPath + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  if FileExists(WopiPrivateKeyPath) then
+  begin
+    Output := FormatFileWithNewline(WopiPrivateKeyPath);
+    WopiPrivateKey := Trim(Output);
+  end;
+
+  if not FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl rsa -RSAPublicKey_out -in "' + WopiPrivateKeyPath + '" -outform "MS PUBLICKEYBLOB" -out "' + WopiPublicKeyPath + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  if FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl base64 -in "' + WopiPublicKeyPath + '" -A > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      WopiPublicKey := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end;
+
+  if FileExists(WopiPublicKeyPath) then
+  begin
+    Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "' + WopiPublicKeyPath + '" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      if Pos('Modulus=', Output) = 1 then
+        Delete(Output, 1, 8);
+      WopiModulus := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+
+    Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "' + WopiPublicKeyPath + '" | findstr "Exponent:" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      if Pos('Exponent:', Output) = 1 then
+      begin
+        Delete(Output, 1, Pos('Exponent:', Output) + 8);
+        if Pos('(', Output) > 0 then
+          Output := Copy(Output, 1, Pos('(', Output) - 1);
+      end;
+      WopiExponent := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end;
+
+  Result := True;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssInstall then
@@ -770,20 +908,56 @@ begin
   Result := ExpandConstant('{param:JWT_HEADER|{reg:HKLM\{#sAppRegPath},{#REG_JWT_HEADER}|Authorization}}');
 end;
 
+function GetWopiEnabled(Param: string): String;
+var
+  ResultCode: Integer;
+  Output: String;
+  TempFileName: String;
+  Command: String;
+begin
+  if LocalJsonExists then
+  begin
+    TempFileName := ExpandConstant('{tmp}\output.txt');
+    Command := ExpandConstant('{#JSON}') + ' -q -f "{app}\config\local.json" -a "wopi.enable" > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      Result := Trim(Output);
+      DeleteFile(TempFileName);
+    end;
+  end
+  else
+  begin
+    Result := WopiEnabled;
+  end
+end;
+
+function GetWopiPrivateKey (Param: string): String;
+begin
+  Result := WopiPrivateKey;
+end;
+
+function GetWopiPublicKey(Param: string): String;
+begin
+  Result := WopiPublicKey;
+end;
+
+function GetWopiModulus(Param: string): string;
+begin
+  Result := WopiModulus;
+end;
+
+function GetWopiExponent(Param: string): string;
+begin
+  Result := WopiExponent;
+end;
+
 function IsCommercial: Boolean;
 begin
   Result := false;
   if ('{#EDITION}' = 'developer') or ('{#EDITION}' = 'enterprise') then begin
     Result := true;
-  end;
-end;
-
-function InstallPrereq: Boolean;
-begin
-  Result := false;
-  if ExpandConstant('{param:{#InstallPrereqParam}}') = 'Yes' then
-  begin
-    Result := True;
   end;
 end;
 
@@ -798,49 +972,48 @@ end;
 
 procedure InitializeWizard;
 begin
-  If InstallPrereq then begin
-    DbPage := CreateInputQueryPage(
-      wpPreparing,
-      ExpandConstant('{cm:Postgre}'),
-      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
-      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
-    DbPage.Add(ExpandConstant('{cm:Host}'), False);
-    DbPage.Add(ExpandConstant('{cm:Port}'), False);
-    DbPage.Add(ExpandConstant('{cm:User}'), False);
-    DbPage.Add(ExpandConstant('{cm:Password}'), True);
-    DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
+  DbPage := CreateInputQueryPage(
+    wpPreparing,
+    ExpandConstant('{cm:Postgre}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
+  DbPage.Add(ExpandConstant('{cm:Host}'), False);
+  DbPage.Add(ExpandConstant('{cm:Port}'), False);
+  DbPage.Add(ExpandConstant('{cm:User}'), False);
+  DbPage.Add(ExpandConstant('{cm:Password}'), True);
+  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
 
-    DbPage.Values[0] := GetDbHost('');
-    DbPage.Values[1] := GetDbPort('');
-    DbPage.Values[2] := GetDbUser('');
-    DbPage.Values[3] := GetDbPwd('');
-    DbPage.Values[4] := GetDbName('');
+  DbPage.Values[0] := GetDbHost('');
+  DbPage.Values[1] := GetDbPort('');
+  DbPage.Values[2] := GetDbUser('');
+  DbPage.Values[3] := GetDbPwd('');
+  DbPage.Values[4] := GetDbName('');
 
-    RabbitMqPage := CreateInputQueryPage(
-      DbPage.ID,
-      ExpandConstant('{cm:RabbitMq}'),
-      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
-      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
-    RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
-    RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
-    RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
-    RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
+  RabbitMqPage := CreateInputQueryPage(
+    DbPage.ID,
+    ExpandConstant('{cm:RabbitMq}'),
+    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
+  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
 
-    RabbitMqPage.Values[0] := GetRabbitMqHost('');
-    RabbitMqPage.Values[1] := GetRabbitMqUser('');
-    RabbitMqPage.Values[2] := GetRabbitMqPwd('');
-    RabbitMqPage.Values[3] := GetRabbitMqProto('');
+  RabbitMqPage.Values[0] := GetRabbitMqHost('');
+  RabbitMqPage.Values[1] := GetRabbitMqUser('');
+  RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+  RabbitMqPage.Values[3] := GetRabbitMqProto('');
 
-    if IsCommercial then begin
-      RedisPage := CreateInputQueryPage(
-        RabbitMqPage.ID,
-        ExpandConstant('{cm:Redis}'),
-        FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
-        FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
-      RedisPage.Add(ExpandConstant('{cm:Host}'), False);
+  if IsCommercial then
+  begin
+    RedisPage := CreateInputQueryPage(
+      RabbitMqPage.ID,
+      ExpandConstant('{cm:Redis}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#Redis}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#Redis}']));
+    RedisPage.Add(ExpandConstant('{cm:Host}'), False);
 
-      RedisPage.Values[0] := GetRedisHost('');
-    end;
+    RedisPage.Values[0] := GetRedisHost('');
   end;
 end;
 
@@ -903,8 +1076,13 @@ var
 begin
   Result := true;
 
+  if not DirExists(ExpandConstant('{#POSTGRESQL_DATA_DIR}')) then
+  begin
+    ForceDirectories(ExpandConstant('{#POSTGRESQL_DATA_DIR}'));
+  end;
+
   SaveStringToFile(
-    ExpandConstant('{userappdata}\postgresql\pgpass.conf'),
+    ExpandConstant('{#POSTGRESQL_DATA_DIR}\pgpass.conf'),
     GetDbHost('')+ ':' + GetDbPort('')+ ':' + GetDbName('') + ':' + GetDbUser('') + ':' + GetDbPwd(''),
     False);
 
@@ -918,13 +1096,20 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(
+    if MsgBox(
       FmtMessage(
         ExpandConstant('{cm:CheckConnection}'),
-        ([GetDbHost(''), 'PSQL', IntToStr(ResultCode) + '.'])),
-      mbError,
-      MB_OK);
-    Result := false;
+        ([GetDbHost(''), 'PSQL', IntToStr(ResultCode) + '.'])) +
+      FmtMessage(ExpandConstant('{cm:SkipConnection}'), ['PSQL']),
+      mbInformation,
+      MB_OKCANCEL) = IDOK then
+    begin
+      Exit;
+    end
+    else
+    begin
+      Result := false;
+    end;
   end;
 end;
 
@@ -945,12 +1130,18 @@ begin
 
   if ResultCode <> 0 then
   begin
-    MsgBox(
-      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python ']) +
+    if MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
       FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#RabbitMQ}']),
       mbInformation,
-      MB_OK);
-    Exit;
+      MB_OKCANCEL) = IDOK then
+    begin
+      Exit;
+    end
+    else
+    begin
+      Abort;
+    end;
   end;
 
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
@@ -1006,6 +1197,31 @@ var
 begin
   Result := true;
 
+    ShellExec(
+    '',
+    ExpandConstant('{#Python}'),
+    '--version',
+    '',
+    SW_HIDE,
+    EwWaitUntilTerminated,
+    ResultCode);
+
+  if ResultCode <> 0 then
+  begin
+    if MsgBox(
+      FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#Redis}']),
+      mbInformation,
+      MB_OKCANCEL) = IDOK then
+    begin
+      Exit;
+    end
+    else
+    begin
+      Abort;
+    end;
+  end;
+
   if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
   begin
     Exec(
@@ -1040,22 +1256,20 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
-  if InstallPrereq then begin
   case PageID of
     DbPage.ID:
-      Result := IsComponentSelected('Prerequisites\PostgreSQL');
+      Result := WizardIsComponentSelected('Prerequisites\PostgreSQL');
     RabbitMqPage.ID:
-      Result := IsComponentSelected('Prerequisites\RabbitMq');
+      Result := WizardIsComponentSelected('Prerequisites\RabbitMq');
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := IsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
+        Result := WizardIsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
       end;
     end;
   end;
-end;
 end;
 
 function ArrayLength(a: array of integer): Integer;
@@ -1102,7 +1316,6 @@ begin
   Result := true;
   if WizardSilent() = false then
   begin
-  if InstallPrereq then begin
     case CurPageID of
       DbPage.ID:
       begin
@@ -1118,26 +1331,30 @@ begin
         Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-           if IsComponentSelected('Prerequisites\Redis') then
+           if WizardIsComponentSelected('Prerequisites\Redis') then
            begin
              Dependency_AddRedis;
            end;
-           if IsComponentSelected('Prerequisites\RabbitMq') then
+           if WizardIsComponentSelected('Prerequisites\RabbitMq') then
            begin
              Dependency_AddErlang;
              Dependency_AddRabbitMq;
            end;
-           if IsComponentSelected('Prerequisites\PostgreSQL') then
+           if WizardIsComponentSelected('Prerequisites\PostgreSQL') then
            begin
              Dependency_AddPostgreSQL;
            end;
-        if IsComponentSelected('Prerequisites\Certbot') then
+        if WizardIsComponentSelected('Prerequisites\Certbot') then
         begin
           Dependency_AddCertbot;
         end;
-        if IsComponentSelected('Prerequisites\Python') then
+        if WizardIsComponentSelected('Prerequisites\Python') then
         begin
           Dependency_AddPython3;
+        end;
+        if WizardIsComponentSelected('Prerequisites\OpenSSL') then
+        begin
+          Dependency_AddOpenSSL;
         end;
        end;
        else
@@ -1151,7 +1368,6 @@ begin
          end;
     end;
   end;
-end;
 end;
 
 #ifdef DS_EXAMPLE
