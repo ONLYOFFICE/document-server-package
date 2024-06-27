@@ -516,6 +516,8 @@ setup_nginx(){
       semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
       true
   done
+
+  systemctl enable nginx
 }
 
 save_wopi_params() {
