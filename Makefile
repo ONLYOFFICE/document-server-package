@@ -541,3 +541,5 @@ deploy-bin: $(DS_BIN)
 	aws s3 sync --no-progress --acl public-read \
 		$(DS_BIN_REPO) \
 		s3://$(S3_BUCKET)/$(PLATFORM)/ds-bin/$(GIT_BRANCH)/$(PRODUCT_VERSION)/
+
+deb-dependencies: $(DEB_DEPS)
