@@ -6,12 +6,12 @@ import pika
 from pika.exchange_type import ExchangeType
 from sys import argv
 
-script, username, password, host = argv
+script, username, password, host, vhost = argv
 
 logging.basicConfig(level=logging.DEBUG)
 
 credentials = pika.PlainCredentials(username, password)
-parameters = pika.ConnectionParameters(host, credentials=credentials)
+parameters = pika.ConnectionParameters(host, virtual_host=vhost, credentials=credentials)
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 channel.exchange_declare(exchange="test_exchange",

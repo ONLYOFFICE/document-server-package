@@ -30,6 +30,7 @@
 #define REG_DB_PWD            'DbPwd'
 #define REG_DB_NAME           'DbName'
 #define REG_RABBITMQ_HOST     'RabbitMqHost'
+#define REG_RABBITMQ_VHOST    'RabbitMqVhost'
 #define REG_RABBITMQ_USER     'RabbitMqUser'
 #define REG_RABBITMQ_PWD      'RabbitMqPwd'
 #define REG_RABBITMQ_PROTO    'RabbitMqProto'
@@ -58,6 +59,7 @@
 #define DbAdminPassword        'postgres'
 
 #define AmqpServerHost         DefHost
+#define AmqpServerVhost        '/'
 #define AmqpServerUserName     'guest'
 #define AmqpServerPassword     'guest'
 #define AmqpServerProto        'amqp'
@@ -249,6 +251,9 @@ ru.Redis=Хранилище структур данных Redis
 en.Host=Host
 ru.Host=Хост
 
+en.Vhost=VHost
+ru.Vhost=Вхост
+
 en.Port=Port
 ru.Port=Порт
 
@@ -368,7 +373,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}/{code:GetRabbitMqVhost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
@@ -489,6 +494,7 @@ var
   IsJWTRegistryExists: Boolean;
   LocalJsonExists: Boolean;
   AmqpServerHost: String;
+  AmqpServerVhost: String;
   AmqpServerUserName: String;
   AmqpServerPassword: String;
   AmqpServerProto: String;
@@ -506,9 +512,10 @@ var
 
 function GetRandomDbPwd: String; forward;
 
-procedure InitAmqpServerParams(Host, UserName, Password, Proto: String);
+procedure InitAmqpServerParams(Host, Vhost, UserName, Password, Proto: String);
 begin
   AmqpServerHost := Host;
+  AmqpServerVhost := Vhost;
   AmqpServerUserName := UserName;
   AmqpServerPassword := Password;
   AmqpServerProto := Proto;
@@ -540,6 +547,7 @@ begin
 
   InitAmqpServerParams(
     ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
+    ExpandConstant('{param:RABBITMQ_VHOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_VHOST}|{#AmqpServerVhost}}}'),
     ExpandConstant('{param:RABBITMQ_USER|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_USER}|{#AmqpServerUserName}}}'),
     ExpandConstant('{param:RABBITMQ_PWD|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PWD}|{#AmqpServerPassword}}}'),
     ExpandConstant('{param:RABBITMQ_PROTO|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_PROTO}|{#AmqpServerProto}}}'))
@@ -664,6 +672,11 @@ end;
 function GetRabbitMqHost(Param: String): String;
 begin
   Result := AmqpServerHost;
+end;
+
+function GetRabbitMqVhost(Param: String): String;
+begin
+  Result := AmqpServerVhost;
 end;
 
 function GetRabbitMqUser(Param: String): String;
@@ -995,14 +1008,16 @@ begin
     FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
     FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
   RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+  RabbitMqPage.Add(ExpandConstant('{cm:Vhost}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
   RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
   RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
 
   RabbitMqPage.Values[0] := GetRabbitMqHost('');
-  RabbitMqPage.Values[1] := GetRabbitMqUser('');
-  RabbitMqPage.Values[2] := GetRabbitMqPwd('');
-  RabbitMqPage.Values[3] := GetRabbitMqProto('');
+  RabbitMqPage.Values[1] := GetRabbitMqVhost('');
+  RabbitMqPage.Values[2] := GetRabbitMqUser('');
+  RabbitMqPage.Values[3] := GetRabbitMqPwd('');
+  RabbitMqPage.Values[4] := GetRabbitMqProto('');
 
   if IsCommercial then
   begin
@@ -1163,7 +1178,8 @@ begin
       (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
       GetRabbitMqUser('') + ' ' +
       GetRabbitMqPwd('') + ' ' +
-      GetRabbitMqHost('')),
+      GetRabbitMqHost('') + ' ' +
+      GetRabbitMqVhost('')),
       '',
       SW_HIDE,
       EwWaitUntilTerminated,
@@ -1324,7 +1340,7 @@ begin
       end;
       RabbitMqPage.ID:
       begin
-        InitAmqpServerParams(RabbitMqPage.Values[0], RabbitMqPage.Values[1], RabbitMqPage.Values[2], RabbitMqPage.Values[3]);
+        InitAmqpServerParams(RabbitMqPage.Values[0], RabbitMqPage.Values[1], RabbitMqPage.Values[2], RabbitMqPage.Values[3], RabbitMqPage.Values[4]);
         Result := CheckRabbitMqConnection();
       end;
       wpWelcome:
