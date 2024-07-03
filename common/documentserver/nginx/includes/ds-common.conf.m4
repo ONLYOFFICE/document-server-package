@@ -19,3 +19,4 @@ gzip_types  text/plain
 
 access_log off;
 error_log M4_NGINX_LOG/nginx.error.log;
+underscores_in_headers on;
