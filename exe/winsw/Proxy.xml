@@ -12,7 +12,7 @@
 	<executable>&quot;%BASE%\..\nginx\nginx.exe&quot;</executable>
 	<startarguments>-p &quot;%BASE%\..\nginx&quot;</startarguments>
 	<stopexecutable>&quot;%BASE%\..\nginx\nginx.exe&quot;</stopexecutable>
-	<stoparguments>-p &quot;%BASE%\..\nginx&quot; -s quit</stoparguments>
+	<stoparguments>-p &quot;%BASE%\..\nginx&quot; -s stop</stoparguments>
 	<env name="OPENSSL_CONF" value="openssl\openssl.conf" />
 	<log mode="roll-by-time">
 		<pattern>yyyyMMdd</pattern>
