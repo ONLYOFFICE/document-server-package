@@ -416,6 +416,8 @@ Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
+;Filename: "{#REPLACE}"; Parameters: "{#Copy(VERSION,1,RPos('.',VERSION)-1)}-{#Copy(VERSION,RPos('.',VERSION)+1,RPos('.',VERSION)-1)} {code:GetRandomString} ""{#NGINX_SRV_DIR}\conf\includes\ds-docservice.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
 Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:SECURE_LINK_SECRET}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -736,6 +738,11 @@ begin
   repeat
     Result := Result + str[Random(Length(str)) + 1];
   until(Length(Result) = StringLen)
+end;
+
+function GetRandomString(Param: string): String;
+begin
+  Result := RandomString(5);
 end;
 
 function SetJWTRandomString(Param: String): String;
