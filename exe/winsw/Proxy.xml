@@ -12,10 +12,9 @@
 	<executable>&quot;%BASE%\..\nginx\nginx.exe&quot;</executable>
 	<startarguments>-p &quot;%BASE%\..\nginx&quot;</startarguments>
 	<stopexecutable>&quot;%BASE%\..\nginx\nginx.exe&quot;</stopexecutable>
-	<stoparguments>-p &quot;%BASE%\..\nginx&quot; -s quit</stoparguments>
+	<stoparguments>-p &quot;%BASE%\..\nginx&quot; -s stop</stoparguments>
 	<env name="OPENSSL_CONF" value="openssl\openssl.conf" />
-	<log mode="roll-by-size-time">
-		<sizeThreshold>10240</sizeThreshold>
+	<log mode="roll-by-time">
 		<pattern>yyyyMMdd</pattern>
 		<autoRollAtTime>00:00:00</autoRollAtTime>
 		<keepFiles>30</keepFiles>
