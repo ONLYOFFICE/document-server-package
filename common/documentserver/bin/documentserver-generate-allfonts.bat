@@ -58,3 +58,31 @@ IF NOT "%ONLYOFFICE_DATA_CONTAINER%"=="true" (
   net stop DsConverterSvc
   net start DsConverterSvc
 )
+
+setlocal enabledelayedexpansion
+set "charset=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+set "strLength=10"
+set "randomString="
+
+for /L %%i in (1,1,%strLength%) do (
+    set /a "index=!random! %% 62"
+    for %%j in (!index!) do (
+        set "char=!charset:~%%j,1!"
+        set "randomString=!randomString!!char!"
+    )
+)
+echo !randomString!> "%TEMP%\random_string.txt"
+endlocal
+
+set /p randomString=<"%TEMP%\random_string.txt"
+set "REWRITE_RULE=rewrite ^^(?^<cache^>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host$the_prefix/%randomString%$cache redirect;"
+set "LOCATION_BLOCK=location /%randomString%/ {proxy_pass http://docservice/;}"
+if exist "%~dp0\..\nginx\conf\includes\ds-cache.conf" (
+    del "%~dp0\..\nginx\conf\includes\ds-cache.conf"
+)
+
+echo %REWRITE_RULE% >> "%~dp0\..\nginx\conf\includes\ds-cache.conf"
+echo %LOCATION_BLOCK% >> "%~dp0\..\nginx\conf\includes\ds-cache.conf"
+
+net stop DsProxySvc
+net start DsProxySvc
