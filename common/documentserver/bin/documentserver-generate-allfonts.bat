@@ -67,12 +67,8 @@ set "datetime=%datetime: =0%"
 set "datetime=%datetime::=%"
 set cache_tag=%datetime%
 
-if exist "%~dp0\..\nginx\conf\includes\ds-cache.conf" (
-    del "%~dp0\..\nginx\conf\includes\ds-cache.conf"
-)
-
 REM Append the cache_tag setting to ds-cache.conf
-echo set $cache_tag "%cache_tag%"; >> "%~dp0\..\nginx\conf\includes\ds-cache.conf"
+echo set $cache_tag "%cache_tag%"; > "%~dp0\..\nginx\conf\includes\ds-cache.conf"
 
 endlocal
 
