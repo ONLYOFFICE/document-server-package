@@ -2,7 +2,7 @@
 rewrite ^/$ $the_scheme://$the_host$the_prefix/welcome/ redirect;
 
 #script caching protection
-rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host$the_prefix/M4_PACKAGE_VERSION$cache redirect;
+rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host$the_prefix/$cache_tag$cache redirect;
 
 #disable caching for api.js
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
@@ -75,8 +75,8 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?(\/doc\/.*) {
   proxy_http_version 1.1;
 }
 
-location /M4_PACKAGE_VERSION/ {
-  proxy_pass http://docservice/;
+location ~ ^/([\d]+\.[\d]+\.[\d]+[\.|-][\d]+)/(?<path>.*)$ {
+  proxy_pass http://docservice/$path;
 }
 
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(dictionaries)(\/.*)$ {
