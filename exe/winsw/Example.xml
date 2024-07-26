@@ -12,8 +12,7 @@
 	<env name="NODE_ENV" value="production-windows" />
 	<env name="NODE_CONFIG_DIR" value="%BASE%\..\example\config" />
 	<env name="NODE_DISABLE_COLORS" value="1" />
-	<log mode="roll-by-size-time">
-		<sizeThreshold>10240</sizeThreshold>
+	<log mode="roll-by-time">
 		<pattern>yyyyMMdd</pattern>
 		<autoRollAtTime>00:00:00</autoRollAtTime>
 		<keepFiles>30</keepFiles>
