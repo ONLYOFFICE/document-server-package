@@ -63,12 +63,9 @@ setlocal enabledelayedexpansion
 
 REM Generate a unique number based on the current date and time
 set "datetime=%date:~10,4%.%date:~4,2%.%date:~7,2%-%time:~0,2%%time:~3,2%%time:~6,2%"
-set "datetime=%datetime: =0%"
-set "datetime=%datetime::=%"
-set cache_tag=%datetime%
 
 REM Append the cache_tag setting to ds-cache.conf
-echo set $cache_tag "%cache_tag%"; > "%~dp0\..\nginx\conf\includes\ds-cache.conf"
+echo set $cache_tag "%datetime%"; > "%~dp0\..\nginx\conf\includes\ds-cache.conf"
 
 endlocal
 

@@ -71,3 +71,11 @@ if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
     supervisorctl restart ds:converter
   fi
 fi
+
+# Generate a unique number based on the current date and time
+datetime=$(date +'%Y.%m.%d-%H%M%S')
+
+# Append the cache_tag setting to ds-cache.conf
+echo "set \$cache_tag \"$datetime\";" > /etc/onlyoffice/documentserver/nginx/includes/ds-cache.conf
+
+[ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
