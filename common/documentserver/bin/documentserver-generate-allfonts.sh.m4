@@ -72,10 +72,7 @@ if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
   fi
 fi
 
-# Generate a unique number based on the current date and time
-datetime=$(date +'%Y.%m.%d-%H%M%S')
-
 # Append the cache_tag setting to ds-cache.conf
-echo "set \$cache_tag \"$datetime\";" > /etc/onlyoffice/documentserver/nginx/includes/ds-cache.conf
+echo "set \$cache_tag \"$(date +'%Y.%m.%d-%H%M%S')\";" > etc/M4_DS_PREFIX/nginx/includes/ds-cache.conf
 
 [ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
