@@ -57,5 +57,5 @@ IF NOT "%ONLYOFFICE_DATA_CONTAINER%"=="true" (
 
   net stop DsConverterSvc
   net start DsConverterSvc
-  call "%~dp0\documentserver-generate-cachetag.bat"
+  call "%~dp0\documentserver-flush-cache.bat"
 )

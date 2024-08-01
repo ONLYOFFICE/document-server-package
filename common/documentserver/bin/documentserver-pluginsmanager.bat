@@ -20,5 +20,5 @@ rem Restart web-site
 IF NOT "%RESTART_CONDITION%"=="false" (
   net stop DsDocServiceSvc
   net start DsDocServiceSvc
-  call "%~dp0\documentserver-generate-cachetag.bat"
+  call "%~dp0\documentserver-flush-cache.bat"
 )
