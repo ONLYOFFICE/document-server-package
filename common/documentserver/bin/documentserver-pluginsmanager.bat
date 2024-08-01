@@ -17,7 +17,8 @@ if not "%1"=="" (
 call "%PLUGIN_MANAGER%" --directory="%PLUGIN_DIR%" %*
 
 rem Restart web-site
-IF  "%RESTART_CONDITION%"=="true" (  
+IF NOT "%RESTART_CONDITION%"=="false" (
   net stop DsDocServiceSvc
   net start DsDocServiceSvc
+  call "%~dp0\documentserver-generate-cachetag.bat"
 )

@@ -357,6 +357,8 @@ Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; 
 Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
 #endif
 
+Filename: "{app}\bin\documentserver-generate-cachetag.bat"; Parameters: "false"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"

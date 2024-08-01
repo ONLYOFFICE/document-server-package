@@ -57,19 +57,5 @@ IF NOT "%ONLYOFFICE_DATA_CONTAINER%"=="true" (
 
   net stop DsConverterSvc
   net start DsConverterSvc
+  call "%~dp0\documentserver-generate-cachetag.bat"
 )
-
-setlocal enabledelayedexpansion
-
-REM Generate a unique number based on the current date and time
-set "datetime=%date:~10,4%.%date:~4,2%.%date:~7,2%-%time:~0,2%%time:~3,2%"
-set "datetime=%datetime: =0%"
-set "datetime=%datetime::=%"
-
-REM Append the cache_tag setting to ds-cache.conf
-echo set $cache_tag "%datetime%"; > "%~dp0\..\nginx\conf\includes\ds-cache.conf"
-
-endlocal
-
-net stop DsProxySvc
-net start DsProxySvc
