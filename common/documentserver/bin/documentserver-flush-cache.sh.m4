@@ -8,7 +8,7 @@ fi
 hash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | sha256sum | awk '{print $1}')
 
 # Save the hash to a variable in the configuration file
-echo "set \$cache_tag \"$hash\";" > /etc/onlyoffice/documentserver/nginx/includes/ds-cache.conf
+echo "set \$cache_tag \"$hash\";" > /etc/M4_DS_PREFIX/nginx/includes/ds-cache.conf
 
 if [ "$RESTART_CONDITION" != "false" ]; then
 	[ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
