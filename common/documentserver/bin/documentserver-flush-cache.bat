@@ -26,4 +26,3 @@ IF NOT "%RESTART_CONDITION%"=="false" (
   net stop DsProxySvc
   net start DsProxySvc
 )
-

@@ -70,9 +70,5 @@ if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
     supervisorctl restart ds:docservice
     supervisorctl restart ds:converter
   fi
+  documentserver-flush-cache.sh
 fi
-
-# Append the cache_tag setting to ds-cache.conf
-echo "set \$cache_tag \"$(date +'%Y.%m.%d-%H%M')\";" > etc/M4_DS_PREFIX/nginx/includes/ds-cache.conf
-
-[ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
