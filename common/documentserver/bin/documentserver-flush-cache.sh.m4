@@ -5,7 +5,7 @@ if [ "$1" != "" ]; then
 fi
 
 # Generate a SHA256 hash of the datetime
-hash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | sha256sum | awk '{print $1}')
+hash=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')
 
 # Save the hash to a variable in the configuration file
 echo "set \$cache_tag \"$hash\";" > /etc/M4_DS_PREFIX/nginx/includes/ds-cache.conf

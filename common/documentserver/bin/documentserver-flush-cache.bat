@@ -12,7 +12,7 @@ set "tempFile=%temp%\datetime.txt"
 echo %datetime% > "%tempFile%"
 
 REM Compute the hash of the file using certutil
-for /f "tokens=*" %%A in ('certutil -hashfile "%tempFile%" SHA256 ^| findstr /v /c:"CertUtil"') do (
+for /f "tokens=*" %%A in ('certutil -hashfile "%tempFile%" MD5 ^| findstr /v /c:"CertUtil"') do (
     set "hash=%%A"
 )
 

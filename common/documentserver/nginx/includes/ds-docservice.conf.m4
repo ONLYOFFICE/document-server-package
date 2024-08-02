@@ -70,13 +70,9 @@ location / {
   proxy_pass http://docservice;
 }
 
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?(\/doc\/.*) {
-  proxy_pass http://docservice$2$is_args$args;
-  proxy_http_version 1.1;
-}
-
 location ~ ^/([\d]+\.[\d]+\.[\d]+[\.|-][\w]+)/(?<path>.*)$ {
-  proxy_pass http://docservice/$path;
+  proxy_pass http://docservice/$path$is_args$args;
+  proxy_http_version 1.1;
 }
 
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(dictionaries)(\/.*)$ {
