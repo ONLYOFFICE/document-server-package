@@ -75,7 +75,7 @@ location ~ ^/([\d]+\.[\d]+\.[\d]+[\.|-][\w]+)/(?<path>.*)$ {
   proxy_http_version 1.1;
 }
 
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(dictionaries)(\/.*)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(dictionaries)(\/.*)$ {
   expires 365d;
   alias M4_DS_ROOT/$2$3;
 }
