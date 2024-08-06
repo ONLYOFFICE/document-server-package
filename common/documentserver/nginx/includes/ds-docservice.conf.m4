@@ -2,17 +2,17 @@
 rewrite ^/$ $the_scheme://$the_host$the_prefix/welcome/ redirect;
 
 #script caching protection
-rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host$the_prefix/M4_PACKAGE_VERSION$cache redirect;
+rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host$the_prefix/M4_PRODUCT_VERSION-$cache_tag$cache redirect;
 
 #disable caching for api.js
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
   expires -1;
   # gzip_static on;
   alias  M4_DS_ROOT/$2;
 }
 
 #suppress logging the unsupported locale error in web-apps
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps)(\/.*\.json)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps)(\/.*\.json)$ {
   expires 365d;
   error_log M4_DEV_NULL crit;
   # gzip_static on;
@@ -20,14 +20,14 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps)(\/.*\.json)$ {
 }
 
 #suppress logging the unsupported locale error in plugins
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(sdkjs-plugins)(\/.*\.json)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(sdkjs-plugins)(\/.*\.json)$ {
   expires 365d;
   error_log M4_DEV_NULL crit;
   # gzip_static on;
   alias M4_DS_ROOT/$2$3;
 }
 
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps|sdkjs|sdkjs-plugins|fonts)(\/.*)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps|sdkjs|sdkjs-plugins|fonts)(\/.*)$ {
   expires 365d;
   # gzip_static on;
   alias M4_DS_ROOT/$2$3;
@@ -51,7 +51,7 @@ location ~* ^(\/cache\/files.*)(\/.*) {
 
 # Allow "/internal" interface only from 127.0.0.1
 # Don't comment out the section below for the security reason!
- location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(internal)(\/.*)$ {
+ location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(internal)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
   proxy_pass http://docservice/$2$3;
@@ -60,7 +60,7 @@ location ~* ^(\/cache\/files.*)(\/.*) {
 # Allow "/info" interface only from 127.0.0.1 by default
 # Comment out lines allow 127.0.0.1; and deny all; 
 # of below section to turn on the info page
-location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(info)(\/.*)$ {
+location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(info)(\/.*)$ {
   allow 127.0.0.1;
   deny all;
   proxy_pass http://docservice/$2$3;
@@ -70,16 +70,12 @@ location / {
   proxy_pass http://docservice;
 }
 
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?(\/doc\/.*) {
-  proxy_pass http://docservice$2$is_args$args;
+location ~ ^/([\d]+\.[\d]+\.[\d]+[\.|-][\w]+)/(?<path>.*)$ {
+  proxy_pass http://docservice/$path$is_args$args;
   proxy_http_version 1.1;
 }
 
-location /M4_PACKAGE_VERSION/ {
-  proxy_pass http://docservice/;
-}
-
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(dictionaries)(\/.*)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(dictionaries)(\/.*)$ {
   expires 365d;
   alias M4_DS_ROOT/$2$3;
 }

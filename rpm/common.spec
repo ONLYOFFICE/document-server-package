@@ -337,6 +337,8 @@ if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
   documentserver-pluginsmanager.sh -r false --ignore=\"${IGNORED_PLUGINS_LIST[@]}\" --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
   echo Done
 fi
+  # generate cache_tag
+  documentserver-flush-cache.sh false
 
 #Deleting the cache left before updating the document server (Bug #60628)
 CACHE_PATH="/var/lib/%{_ds_prefix}/App_Data/cache/files/data"
