@@ -27,7 +27,7 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(sdkjs-plugins)(\/.*\.json)$ {
   alias M4_DS_ROOT/$2$3;
 }
 
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps|sdkjs|sdkjs-plugins|fonts)(\/.*)$ {
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps|sdkjs|sdkjs-plugins|fonts|dictionaries)(\/.*)$ {
   expires 365d;
   # gzip_static on;
   alias M4_DS_ROOT/$2$3;
@@ -75,8 +75,4 @@ location ~ ^/([\d]+\.[\d]+\.[\d]+[\.|-][\w]+)/(?<path>.*)$ {
   proxy_http_version 1.1;
 }
 
-location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(dictionaries)(\/.*)$ {
-  expires 365d;
-  alias M4_DS_ROOT/$2$3;
-}
 
