@@ -397,6 +397,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 					systemctl restart $SVC >/dev/null 2>&1
 				fi
 			done
+			systemctl is-active --quiet ds-example && systemctl restart ds-example
 			service nginx restart >/dev/null 2>&1
 		fi
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
