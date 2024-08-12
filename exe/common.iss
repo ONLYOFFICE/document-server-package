@@ -1175,8 +1175,8 @@ begin
       '',
       ExpandConstant('{#Python}'),
       (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
-      GetRabbitMqProto('') + ' ' +
-      GetRabbitMqUser('') + ' ' +
+      GetRabbitMqProto('') + ' "' +
+      GetRabbitMqUser('') + '" ' +
       GetRabbitMqPwd('') + ' ' +
       GetRabbitMqHost('')),
       '',
