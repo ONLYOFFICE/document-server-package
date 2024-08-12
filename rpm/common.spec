@@ -374,6 +374,8 @@ for SVC in %{package_services}; do
   fi
 done
 
+systemctl is-active --quiet ds-example && systemctl restart ds-example
+
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
@@ -392,7 +394,7 @@ case "$1" in
     # Uninstall
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
-    for SVC in %{package_services}; do
+    for SVC in %{package_services} ds-example; do
       if [ -e /usr/lib/systemd/system/$SVC.service ]; then
         systemctl stop $SVC
       fi
