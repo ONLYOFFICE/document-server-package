@@ -160,6 +160,7 @@ OutputDir                 =.\
 Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
+SetupLogging              =yes
 SetupMutex                =ASC
 MinVersion                =6.1sp1
 WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
