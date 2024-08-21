@@ -31,6 +31,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
   ttf-mscorefonts-installer,
   xvfb,
   openssl,
+  xxd,
   zlib1g
 Recommends:
 Description: defn(`DEB[Summary]')

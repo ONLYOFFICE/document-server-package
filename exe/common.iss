@@ -160,6 +160,7 @@ OutputDir                 =.\
 Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
+SetupLogging              =yes
 SetupMutex                =ASC
 MinVersion                =6.1sp1
 WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
@@ -861,8 +862,20 @@ begin
       if Pos('Modulus=', Output) = 1 then
         Delete(Output, 1, 8);
       WopiModulus := Trim(Output);
+
+    SaveStringToFile(TempFileName, WopiModulus, False);
+    Command := 'certutil -decodehex -f "' + TempFileName + '" "'+ ExpandConstant('{tmp}\output.bin') +'"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+    Command := 'openssl base64 -in "'+ ExpandConstant('{tmp}\output.bin') +'" -A > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      WopiModulus := Trim(Output);
       DeleteFile(TempFileName);
     end;
+  end;
 
     Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "' + WopiPublicKeyPath + '" | findstr "Exponent:" > "' + TempFileName + '"';
     Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
@@ -1164,7 +1177,7 @@ begin
       ExpandConstant('{#Python}'),
       (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
       GetRabbitMqProto('') + ' ' +
-      GetRabbitMqUser('') + ' ' +
+      '"' + GetRabbitMqUser('') + '"' + ' ' +
       GetRabbitMqPwd('') + ' ' +
       GetRabbitMqHost('')),
       '',
