@@ -19,6 +19,9 @@ for /f "tokens=*" %%A in ('certutil -hashfile "%tempFile%" MD5 ^| findstr /v /c:
 REM Append the cache_tag setting to ds-cache.conf
 echo set $cache_tag "%hash%"; > "%~dp0\..\nginx\conf\includes\ds-cache.conf"
 
+copy /y "%~dp0\..\web-apps\apps\api\documents\api.js.tpl" "%~dp0\..\web-apps\apps\api\documents\api.js"
+"%~dp0\..\npm\replace.exe" "{{HASH_POSTFIX}}" "%hash%" "%~dp0\..\web-apps\apps\api\documents\api.js"
+
 endlocal
 
 rem Restart web-site and converter
