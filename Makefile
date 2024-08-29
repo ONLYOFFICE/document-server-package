@@ -185,7 +185,7 @@ endif
 ISCC_PARAMS += -DBRANDING_DIR='$(shell cygpath -a -w "$(BRANDING_DIR)/exe")'
 ifdef ENABLE_SIGNING
 ISCC_PARAMS += -DSIGN
-ISCC_PARAMS += -S'byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com $$f'
+ISCC_PARAMS += -S'byparam=signtool sign /f $$q$(WINDOWS_CERTIFICATE)$$q /p $$q$(WINDOWS_CERTIFICATE_PASSWORD)$$q /t http://timestamp.digicert.com $$f'
 endif
 
 DEB_DEPS += deb/build/debian/source/format
