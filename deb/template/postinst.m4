@@ -102,7 +102,8 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	fi
 
 	db_get M4_ONLYOFFICE_VALUE/plugins-enabled || true
-	DS_PLUGIN_INSTALLATION=${DS_PLUGIN_INSTALLATION:-$RET}
+	DS_PLUGIN_INSTALLATION="${DS_PLUGIN_INSTALLATION:-${RET:-$(dpkg --compare-versions "${OLD_VERSION}" lt "8.2.0" && echo "true" || echo "M4_DS_PLUGIN_INSTALLATION")}}"
+	db_set M4_ONLYOFFICE_VALUE/plugins-enabled ${DS_PLUGIN_INSTALLATION} || true
 
 	db_get M4_ONLYOFFICE_VALUE/wopi-enabled || true
 	WOPI_ENABLED="$RET"

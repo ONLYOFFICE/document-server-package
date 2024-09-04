@@ -97,7 +97,6 @@ Description: Jwt authorization header:
 
 Template: M4_ONLYOFFICE_VALUE/plugins-enabled
 Type: boolean
-Default: M4_DS_PLUGIN_INSTALLATION
 Description: Install documentserver plugins?
 
 Template: M4_ONLYOFFICE_VALUE/wopi-enabled

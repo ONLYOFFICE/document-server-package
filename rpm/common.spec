@@ -326,16 +326,19 @@ if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
 fi
 
-if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
-  if [ "$IS_UPGRADE" = "true" ]; then
-    # Get a list of old versions of plugins to ignore
-    IGNORED_PLUGINS_LIST=$(rpm -ql $(rpm -q --last %{_package_name} | awk 'NR==2{print $1}') | grep /sdkjs-plugins/*.*/config.json | sed 's|.*/\(.*\)/config.json|\1|' | paste -sd ",")
-  fi
+if [ "$IS_UPGRADE" = "true" ]; then
+  # Get a list of old versions of plugins to ignore
+  IGNORED_PLUGINS_LIST=$(rpm -ql $(rpm -q --last %{_package_name} | awk 'NR==2{print $1}') | grep -oP '(?<=/sdkjs-plugins/)(?!marketplace/)[^/]+(?=/config.json)' | paste -sd ",")
 
-  # install/update plugins
-  echo -n Installing plugins, please wait...
-  documentserver-pluginsmanager.sh -r false --ignore=\"${IGNORED_PLUGINS_LIST[@]}\" --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
-  echo Done
+  if [ ! -z "${IGNORED_PLUGINS_LIST}" ]; then
+    echo -n Installing plugins, please wait...
+    documentserver-pluginsmanager.sh -r false --ignore="${IGNORED_PLUGINS_LIST[@]}" --update="${DIR}/sdkjs-plugins/plugin-list-default.json" >/dev/null
+    echo Done
+  elif find "${DIR}/sdkjs-plugins/" -type d -name '{*}' | read; then
+    echo -n Updating plugins, please wait...
+    documentserver-pluginsmanager.sh -r false --update-all >/dev/null
+    echo Done
+  fi
 fi
 
 #Deleting the cache left before updating the document server (Bug #60628)

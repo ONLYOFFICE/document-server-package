@@ -145,6 +145,13 @@ while [ "$1" != "" ]; do
 			fi
 		;;
 
+		-pe | --pluginsenabled )
+			if [ "$2" != "" ]; then
+				PLUGINS_ENABLED=$2
+				shift
+			fi
+		;;
+
 		-? | -h | --help )
 			echo "  Usage: bash documentserver-configure.sh [PARAMETER] [[PARAMETER], ...]"
 			echo
@@ -168,6 +175,7 @@ while [ "$1" != "" ]; do
 			echo "      -rh, --redishost             The IP address or the name of the host where the Redis server is running"
 			echo "      -rp, --redisport             The port for the connection to Redis server                                     ( Defaults to 6379 )"
 			echo "      -we, --wopienabled           Specifies the enabling the Web Application Open Platform Interface Protocol     ( Defaults to false )"
+			echo "      -pe, --pluginsenabled        Defines whether to enable default plugins                                       ( Defaults to M4_DS_PLUGIN_INSTALLATION )"
 			echo "      -?, -h, --help               this help"
 			echo
 			exit 0
@@ -565,6 +573,13 @@ save_wopi_params
 tune_local_configs
 
 setup_nginx
+
+PLUGINS_ENABLED=${PLUGINS_ENABLED:-M4_DS_PLUGIN_INSTALLATION}
+if [ "${PLUGINS_ENABLED}" = "true" ]; then
+  echo -n Installing plugins, please wait...
+  documentserver-pluginsmanager.sh -r false --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+  echo Done
+fi
 
 # generate secure link
 documentserver-update-securelink.sh -r false
