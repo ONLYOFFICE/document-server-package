@@ -301,7 +301,7 @@ save_wopi_params() {
 
 	[ ! -f "${WOPI_PRIVATE_KEY}" ] && echo -n "Generating WOPI private key..." && openssl genpkey -algorithm RSA -outform PEM -out "${WOPI_PRIVATE_KEY}" >/dev/null 2>&1 && echo "Done"
 	[ ! -f "${WOPI_PUBLIC_KEY}" ] && echo -n "Generating WOPI public key..." && openssl rsa -RSAPublicKey_out -in "${WOPI_PRIVATE_KEY}" -outform "MS PUBLICKEYBLOB" -out "${WOPI_PUBLIC_KEY}" >/dev/null 2>&1  && echo "Done"
-	WOPI_MODULUS=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "${WOPI_PUBLIC_KEY}" | sed 's/Modulus=//')
+	WOPI_MODULUS=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "${WOPI_PUBLIC_KEY}" | sed 's/Modulus=//' | xxd -r -p | openssl base64 -A)
 	WOPI_EXPONENT=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "${WOPI_PUBLIC_KEY}" | grep -oP '(?<=Exponent: )\d+')
 
 	${JSON} -e "if(this.wopi===undefined)this.wopi={};"
@@ -332,7 +332,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 `		save_redis_params
 ',)dnl
 		save_jwt_params
-		save_wopi_params
+		[ -z "$DS_DOCKER_INSTALLATION" ] && save_wopi_params
 
 		# configure ngninx for M4_ONLYOFFICE_VALUE
 		setup_nginx
@@ -370,6 +370,9 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 			echo Done
 		fi
 
+		# generate cache_tag
+		documentserver-flush-cache.sh false
+
 		#Deleting the cache left before updating the document server (Bug #60628)
 		CACHE_PATH="${APP_DIR}/App_Data/cache/files/data"
 		[ -d "${CACHE_PATH}" ] && rm -rf "${CACHE_PATH}"/*
@@ -395,6 +398,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 					systemctl restart $SVC >/dev/null 2>&1
 				fi
 			done
+			systemctl is-active --quiet ds-example && systemctl restart ds-example
 			service nginx restart >/dev/null 2>&1
 		fi
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
