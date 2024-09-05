@@ -102,8 +102,8 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	fi
 
 	db_get M4_ONLYOFFICE_VALUE/plugins-enabled || true
-	DS_PLUGIN_INSTALLATION="${DS_PLUGIN_INSTALLATION:-${RET:-$(dpkg --compare-versions "${OLD_VERSION}" lt "8.2.0" && echo "true" || echo "M4_DS_PLUGIN_INSTALLATION")}}"
-	db_set M4_ONLYOFFICE_VALUE/plugins-enabled ${DS_PLUGIN_INSTALLATION} || true
+	PLUGINS_ENABLED="${PLUGINS_ENABLED:-${RET:-$(dpkg --compare-versions "${OLD_VERSION}" lt "8.2.0" && echo "true" || echo "M4_DS_PLUGIN_INSTALLATION")}}"
+	db_set M4_ONLYOFFICE_VALUE/plugins-enabled ${PLUGINS_ENABLED} || true
 
 	db_get M4_ONLYOFFICE_VALUE/wopi-enabled || true
 	WOPI_ENABLED="$RET"
@@ -364,7 +364,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
 
 		# install/update plugins
-		if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
+		if [ "$PLUGINS_ENABLED" = "true" ]; then
 			echo -n Installing plugins, please wait...
 			documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
 			echo Done
