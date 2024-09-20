@@ -370,7 +370,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		fi
 
 		# generate cache_tag
-		documentserver-flush-cache.sh false
+		documentserver-flush-cache.sh -r false
 
 		#Deleting the cache left before updating the document server (Bug #60628)
 		CACHE_PATH="${APP_DIR}/App_Data/cache/files/data"

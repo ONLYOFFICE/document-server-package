@@ -338,7 +338,7 @@ if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
   echo Done
 fi
   # generate cache_tag
-  documentserver-flush-cache.sh false
+  documentserver-flush-cache.sh -r false
 
 #Deleting the cache left before updating the document server (Bug #60628)
 CACHE_PATH="/var/lib/%{_ds_prefix}/App_Data/cache/files/data"
