@@ -315,6 +315,8 @@ save_wopi_params() {
 	${JSON} -e "this.wopi.exponentOld = ${WOPI_EXPONENT}"
 }
 
+export LD_LIBRARY_PATH=/var/www/M4_DS_PREFIX/server/FileConverter/bin:$LD_LIBRARY_PATH
+
 case "$1" in
 	configure)
 		adduser --quiet --home "$DIR" --system --group ds
