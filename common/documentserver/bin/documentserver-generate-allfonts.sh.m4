@@ -7,6 +7,8 @@ fi
 
 DIR="/var/www/M4_DS_PREFIX"
 
+export LD_LIBRARY_PATH=/var/www/M4_DS_PREFIX/server/FileConverter/bin:$LD_LIBRARY_PATH
+
 #Start generate AllFonts.js, font thumbnails and font_selection.bin
 echo -n Generating AllFonts.js, please wait...
 
