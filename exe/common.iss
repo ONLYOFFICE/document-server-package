@@ -355,7 +355,8 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
 
 #ifdef DS_PLUGIN_INSTALLATION
-Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"; Check: IsPluginsEnabled;
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update-all"; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"; Check: not IsPluginsEnabled;
 #endif
 
 Filename: "{app}\bin\documentserver-flush-cache.bat"; Parameters: "-r false"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -506,6 +507,7 @@ var
   WopiPublicKey: String;
   WopiModulus: String;
   WopiExponent: String;
+  PluginsEnabled: String;
 
 function GetRandomDbPwd: String; forward;
 
@@ -540,6 +542,7 @@ procedure Init;
 begin
   IsJWTRegistryExists := False;
   LocalJsonExists := False;
+  PluginsEnabled := LowerCase(ExpandConstant('{param:PLUGINS_ENABLED|false}'));
 
   InitAmqpServerParams(
     ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
@@ -966,6 +969,15 @@ end;
 function GetWopiExponent(Param: string): string;
 begin
   Result := WopiExponent;
+end;
+
+function IsPluginsEnabled: Boolean;
+begin
+  Result := False;
+  if PluginsEnabled = 'true' then
+  begin
+    Result := True;
+  end;
 end;
 
 function IsCommercial: Boolean;
