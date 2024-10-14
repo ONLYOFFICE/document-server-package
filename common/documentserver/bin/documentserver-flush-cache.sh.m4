@@ -28,8 +28,11 @@ fi
 # Save the hash to a variable in the configuration file
 echo "set \$cache_tag \"$HASH\";" > /etc/nginx/includes/ds-cache.conf
 
-cp /var/www/M4_DS_PREFIX/web-apps/apps/api/documents/api.js.tpl /var/www/M4_DS_PREFIX/web-apps/apps/api/documents/api.js
-sed "s/{{HASH_POSTFIX}}/$HASH/g" -i /var/www/M4_DS_PREFIX/web-apps/apps/api/documents/api.js
+API_PATH="/var/www/M4_DS_PREFIX/web-apps/apps/api/documents/api.js"
+cp -f ${API_PATH}.tpl ${API_PATH}
+sed -i "s/{{HASH_POSTFIX}}/${HASH}/g" ${API_PATH}
+chown ds:ds ${API_PATH}
+rm -f ${API_PATH}.gz
 
 if [ "$RESTART_CONDITION" != "false" ]; then
 	[ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
