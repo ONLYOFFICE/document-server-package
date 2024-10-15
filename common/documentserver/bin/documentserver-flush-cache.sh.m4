@@ -21,9 +21,7 @@ while [ "$1" != "" ]; do
 	shift
 done
 
-if [ "$HASH" = "" ]; then
-    HASH=$(echo -n "$(date +'%Y.%m.%d-%H%M')" | md5sum | awk '{print $1}')
-fi
+HASH=${HASH:-$(date +'%Y.%m.%d-%H%M' | openssl md5 | awk '{print $2}')}
 
 # Save the hash to a variable in the configuration file
 echo "set \$cache_tag \"$HASH\";" > /etc/nginx/includes/ds-cache.conf
