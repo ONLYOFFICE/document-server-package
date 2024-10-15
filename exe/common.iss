@@ -542,7 +542,7 @@ procedure Init;
 begin
   IsJWTRegistryExists := False;
   LocalJsonExists := False;
-  PluginsEnabled := LowerCase(ExpandConstant('{param:PLUGINS_ENABLED|false}'));
+  PluginsEnabled := LowerCase(ExpandConstant('{param:PLUGINS_ENABLED|true}'));
 
   InitAmqpServerParams(
     ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
