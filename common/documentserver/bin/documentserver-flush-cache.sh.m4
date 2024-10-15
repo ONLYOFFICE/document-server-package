@@ -33,5 +33,9 @@ chown ds:ds ${API_PATH}
 rm -f ${API_PATH}.gz
 
 if [ "$RESTART_CONDITION" != "false" ]; then
-	[ $(pgrep -x ""systemd"" | wc -l) -gt 0 ] && systemctl reload nginx || service nginx reload
+    if (pgrep -x "systemd" > /dev/null) && systemctl is-active --quiet nginx; then
+        systemctl reload nginx
+    elif service nginx status > /dev/null 2>&1; then
+        service nginx reload
+    fi
 fi
