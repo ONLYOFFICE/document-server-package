@@ -64,6 +64,9 @@ mkdir -p "$DATA_DIR/App_Data/docbuilder"
 #make exchange dir
 mkdir -p "$HOME_DIR/fonts"
 
+#Create an empty api.js to fix issues with upgrading to 8.2.0 (Bug #70877)
+touch "$HOME_DIR/web-apps/apps/api/documents/api.js"
+
 #install systemd services
 mkdir -p %{buildroot}/usr/lib/systemd/system
 cp %{_builddir}/../../../common/documentserver/systemd/*.service %{buildroot}/usr/lib/systemd/system
