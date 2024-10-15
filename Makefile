@@ -275,7 +275,6 @@ M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
 M4_PARAMS += -D M4_DS_EXAMLE='$(DS_EXAMLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
 M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
-M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION='false'
 
 .PHONY: all clean clean-docker rpm deb packages deploy-bin
 
@@ -464,6 +463,9 @@ $(RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 M4_PARAMS += -D M4_DS_EXAMPLE_ENABLE=1
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=true
+else
+M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=false
 endif
 
 ifneq ($(PLUGIN_MANAGER_FILE),)
