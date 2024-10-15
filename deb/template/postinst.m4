@@ -359,8 +359,11 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
     chmod 644 ${CONF_DIR}/logrotate/*
     chown root:root ${CONF_DIR}/logrotate/*
 
-		# generate allfonts.js and thumbnail
-		[ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-generate-allfonts.sh true
+		# generate allfonts.js, thumbnail and cache_tag
+		if [ -z "$DS_DOCKER_INSTALLATION" ]; then
+			documentserver-generate-allfonts.sh true
+			documentserver-flush-cache.sh -r false
+		fi
 
 		# install/update plugins
 		if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
@@ -368,9 +371,6 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 			documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
 			echo Done
 		fi
-
-		# generate cache_tag
-		documentserver-flush-cache.sh -r false
 
 		#Deleting the cache left before updating the document server (Bug #60628)
 		CACHE_PATH="${APP_DIR}/App_Data/cache/files/data"
@@ -409,6 +409,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 	
 	triggered)
 		documentserver-generate-allfonts.sh true
+		documentserver-flush-cache.sh
 	;;
 	
 	*)
