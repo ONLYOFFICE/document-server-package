@@ -160,6 +160,7 @@ OutputDir                 =.\
 Compression               =zip
 PrivilegesRequired        =admin
 ChangesEnvironment        =yes
+SetupLogging              =yes
 SetupMutex                =ASC
 MinVersion                =6.1sp1
 WizardImageFile           ={#BRANDING_DIR}\data\dialogpicture.bmp
@@ -354,8 +355,11 @@ Root: HKLM; Subkey: "{#sAppRegPath}"; ValueType: "string"; ValueName: "{#REG_JWT
 Filename: "{app}\bin\documentserver-generate-allfonts.bat"; Parameters: "true"; Flags: runhidden; StatusMsg: "{cm:GenFonts}"
 
 #ifdef DS_PLUGIN_INSTALLATION
-Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update ""{#DEFAULT_PLUGINS_LIST}"""; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"; Check: IsPluginsEnabled;
+Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false --update-all"; Flags: runhidden; StatusMsg: "{cm:InstallPlugins}"; Check: not IsPluginsEnabled;
 #endif
+
+Filename: "{app}\bin\documentserver-flush-cache.bat"; Parameters: "-r false"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
@@ -503,6 +507,7 @@ var
   WopiPublicKey: String;
   WopiModulus: String;
   WopiExponent: String;
+  PluginsEnabled: String;
 
 function GetRandomDbPwd: String; forward;
 
@@ -537,6 +542,7 @@ procedure Init;
 begin
   IsJWTRegistryExists := False;
   LocalJsonExists := False;
+  PluginsEnabled := LowerCase(ExpandConstant('{param:PLUGINS_ENABLED|true}'));
 
   InitAmqpServerParams(
     ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
@@ -859,8 +865,20 @@ begin
       if Pos('Modulus=', Output) = 1 then
         Delete(Output, 1, 8);
       WopiModulus := Trim(Output);
+
+    SaveStringToFile(TempFileName, WopiModulus, False);
+    Command := 'certutil -decodehex -f "' + TempFileName + '" "'+ ExpandConstant('{tmp}\output.bin') +'"';
+    Exec('cmd.exe', '/C ' + Command, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+    Command := 'openssl base64 -in "'+ ExpandConstant('{tmp}\output.bin') +'" -A > "' + TempFileName + '"';
+    Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if FileExists(TempFileName) then
+    begin
+      Output := LoadStringFromFile(TempFileName);
+      WopiModulus := Trim(Output);
       DeleteFile(TempFileName);
     end;
+  end;
 
     Command := 'openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "' + WopiPublicKeyPath + '" | findstr "Exponent:" > "' + TempFileName + '"';
     Exec('cmd.exe', '/C ' + Command, ExpandConstant('{#OpenSslPath}'), SW_HIDE, ewWaitUntilTerminated, ResultCode);
@@ -951,6 +969,15 @@ end;
 function GetWopiExponent(Param: string): string;
 begin
   Result := WopiExponent;
+end;
+
+function IsPluginsEnabled: Boolean;
+begin
+  Result := False;
+  if PluginsEnabled = 'true' then
+  begin
+    Result := True;
+  end;
 end;
 
 function IsCommercial: Boolean;
@@ -1162,7 +1189,7 @@ begin
       ExpandConstant('{#Python}'),
       (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
       GetRabbitMqProto('') + ' ' +
-      GetRabbitMqUser('') + ' ' +
+      '"' + GetRabbitMqUser('') + '"' + ' ' +
       GetRabbitMqPwd('') + ' ' +
       GetRabbitMqHost('')),
       '',

@@ -64,6 +64,9 @@ mkdir -p "$DATA_DIR/App_Data/docbuilder"
 #make exchange dir
 mkdir -p "$HOME_DIR/fonts"
 
+#Create an empty api.js to fix issues with upgrading to 8.2.0 (Bug #70877)
+touch "$HOME_DIR/web-apps/apps/api/documents/api.js"
+
 #install systemd services
 mkdir -p %{buildroot}/usr/lib/systemd/system
 cp %{_builddir}/../../../common/documentserver/systemd/*.service %{buildroot}/usr/lib/systemd/system
@@ -320,10 +323,11 @@ if [ "$IS_UPGRADE" = "true" ]; then
   fi
 fi
 
-# generate allfonts.js and thumbnail
+# generate allfonts.js, thumbnail and cache_tag
 rpm_version=$(rpm -q --qf '%%{version}' rpm | awk -F. '{ printf("%%d%%03d%%03d%%03d", $1,$2,$3,$4); }';)
 if [[ "$rpm_version" -lt "4013001000" ]]; then
   documentserver-generate-allfonts.sh true
+  documentserver-flush-cache.sh -r false
 fi
 
 if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
@@ -372,6 +376,8 @@ for SVC in %{package_services}; do
   fi
 done
 
+systemctl is-active --quiet ds-example && systemctl restart ds-example
+
 if systemctl is-active --quiet nginx; then
   systemctl reload nginx >/dev/null 2>&1
 fi
@@ -380,9 +386,11 @@ echo "$JWT_MESSAGE"
 
 %transfiletriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
 %{_bindir}/documentserver-generate-allfonts.sh true
+%{_bindir}/documentserver-flush-cache.sh
 
 %transfiletriggerun -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
 %{_bindir}/documentserver-generate-allfonts.sh true
+%{_bindir}/documentserver-flush-cache.sh
 
 %preun
 case "$1" in
@@ -390,7 +398,7 @@ case "$1" in
     # Uninstall
     # disconnect all users and stop running services
     documentserver-prepare4shutdown.sh
-    for SVC in %{package_services}; do
+    for SVC in %{package_services} ds-example; do
       if [ -e /usr/lib/systemd/system/$SVC.service ]; then
         systemctl stop $SVC
       fi

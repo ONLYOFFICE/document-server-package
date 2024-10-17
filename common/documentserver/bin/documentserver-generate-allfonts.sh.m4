@@ -7,6 +7,8 @@ fi
 
 DIR="/var/www/M4_DS_PREFIX"
 
+export LD_LIBRARY_PATH=/var/www/M4_DS_PREFIX/server/FileConverter/bin:$LD_LIBRARY_PATH
+
 #Start generate AllFonts.js, font thumbnails and font_selection.bin
 echo -n Generating AllFonts.js, please wait...
 
@@ -59,6 +61,7 @@ chown -R ds:ds "$DIR/fonts"
 rm -f \
   $DIR/fonts/*.gz \
   $DIR/sdkjs/common/AllFonts.js.gz \
+  $DIR/sdkjs/common/Images/*.gz \ 
   $DIR/sdkjs/slide/themes/themes.js.gz
 
 #Restart web-site and converter
@@ -70,4 +73,5 @@ if [ "$ONLYOFFICE_DATA_CONTAINER" != "true" ]; then
     supervisorctl restart ds:docservice
     supervisorctl restart ds:converter
   fi
+  documentserver-flush-cache.sh
 fi

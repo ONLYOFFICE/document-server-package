@@ -17,6 +17,8 @@ while [ "$1" != "" ]; do
 	shift
 done
 
+export LD_LIBRARY_PATH=/var/www/M4_DS_PREFIX/server/FileConverter/bin:$LD_LIBRARY_PATH
+
 PLUGIN_MANAGER="/var/www/M4_DS_PREFIX/server/tools/pluginsmanager"
 PLUGIN_DIR="/var/www/M4_DS_PREFIX/sdkjs-plugins/"
 
@@ -30,4 +32,5 @@ if [ "$RESTART_CONDITION" != "false" ]; then
 	elif pgrep -x ""supervisord"" >/dev/null; then
 		supervisorctl restart ds:docservice
 	fi
+	documentserver-flush-cache.sh
 fi

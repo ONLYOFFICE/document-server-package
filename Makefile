@@ -257,6 +257,7 @@ endif
 M4_PARAMS += -D M4_COMPANY_NAME=$(COMPANY_NAME)
 M4_PARAMS += -D M4_PACKAGE_NAME=$(PACKAGE_NAME)
 M4_PARAMS += -D M4_PRODUCT_NAME=$(PRODUCT_NAME)
+M4_PARAMS += -D M4_PRODUCT_VERSION=$(PRODUCT_VERSION)
 M4_PARAMS += -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)
 M4_PARAMS += -D M4_PUBLISHER_NAME='$(PUBLISHER_NAME)'
 M4_PARAMS += -D M4_PUBLISHER_URL='$(PUBLISHER_URL)'
@@ -364,7 +365,7 @@ endif
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/allfontsgen$(EXEC_EXT)
 
-	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js
+	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js.tpl
 
 ifeq ($(PRODUCT_NAME_LOW), documentserver)
 	sed 's|\("packageType": \)[0-9]\+\(.*\)|\10\2|' -i $(DOCUMENTSERVER_CONFIG)/*.json

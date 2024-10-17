@@ -37,7 +37,7 @@ end;
 
 function IsCertbotInstalled(): Boolean;
 begin
-  Result := IsInstalled('Certbot$', '{#Registry32}');
+  Result := IsInstalled('Certbot$', '{#Registry32}') or IsInstalled('Certbot$', '{#Registry64}');
 end;
 
 function IsPythonInstalled(): Boolean;
@@ -164,10 +164,10 @@ begin
     Dependency_Add(
       'certbot.exe',
       '/S',
-      'Certbot beta win32',
+      'Certbot v2.6.0',
       Dependency_String(
         '',
-        'https://dl.eff.org/certbot-beta-installer-win32.exe'),
+        'https://github.com/certbot/certbot/releases/download/v2.6.0/certbot-beta-installer-win_amd64_signed.exe'),
       '',
       False,
       False);
