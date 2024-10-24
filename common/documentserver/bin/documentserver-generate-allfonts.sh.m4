@@ -61,7 +61,7 @@ chown -R ds:ds "$DIR/fonts"
 rm -f \
   $DIR/fonts/*.gz \
   $DIR/sdkjs/common/AllFonts.js.gz \
-  $DIR/sdkjs/common/Images/*.gz \ 
+  $DIR/sdkjs/common/Images/*.gz \
   $DIR/sdkjs/slide/themes/themes.js.gz
 
 #Restart web-site and converter
