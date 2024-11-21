@@ -1286,15 +1286,15 @@ begin
   Result := false;
   case PageID of
     DbPage.ID:
-      Result := WizardIsComponentSelected('Prerequisites\PostgreSQL');
+      Result := CheckDbConnection;
     RabbitMqPage.ID:
-      Result := WizardIsComponentSelected('Prerequisites\RabbitMq');
+      Result := CheckRabbitMqConnection;
   else
     if IsCommercial then
     begin
       if PageID = RedisPage.ID then
       begin
-        Result := WizardIsComponentSelected('Prerequisites\Redis') or UseLocalStorage;
+        Result := CheckRedisConnection or UseLocalStorage;
       end;
     end;
   end;
