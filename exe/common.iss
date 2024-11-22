@@ -424,9 +424,9 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL') and CreateDbDefUserAuth;
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: WizardIsComponentSelected('Prerequisites\PostgreSQL');
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsUsingDefaultDatabase and CreateDbDefUserAuth;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsUsingDefaultDatabase;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""GRANT ALL PRIVILEGES ON DATABASE {#DbDefName}  TO {#DbDefUser};"""; Flags: runhidden; Check: IsUsingDefaultDatabase;
 
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
 Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
@@ -508,8 +508,7 @@ var
   WopiModulus: String;
   WopiExponent: String;
   PluginsEnabled: String;
-
-function GetRandomDbPwd: String; forward;
+  IsDefaultDatabase: Boolean;
 
 procedure InitAmqpServerParams(Host, UserName, Password, Proto: String);
 begin
@@ -543,6 +542,7 @@ begin
   IsJWTRegistryExists := False;
   LocalJsonExists := False;
   PluginsEnabled := LowerCase(ExpandConstant('{param:PLUGINS_ENABLED|true}'));
+  IsDefaultDatabase := False;
 
   InitAmqpServerParams(
     ExpandConstant('{param:RABBITMQ_HOST|{reg:HKLM\{#sAppRegPath},{#REG_RABBITMQ_HOST}|{#AmqpServerHost}}}'),
@@ -553,9 +553,9 @@ begin
   InitDbParams(
     ExpandConstant('{param:DB_HOST|{reg:HKLM\{#sAppRegPath},{#REG_DB_HOST}|{#DbHost}}}'),
     ExpandConstant('{param:DB_PORT|{reg:HKLM\{#sAppRegPath},{#REG_DB_PORT}|{#DbDefPort}}}'),
-    ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#DbDefUser}}}'),
-    ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{code:GetRandomDbPwd}}}'),
-    ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbDefName}}}'));
+    ExpandConstant('{param:DB_USER|{reg:HKLM\{#sAppRegPath},{#REG_DB_USER}|{#DbAdminUserName}}}'),
+    ExpandConstant('{param:DB_PWD|{reg:HKLM\{#sAppRegPath},{#REG_DB_PWD}|{#DbAdminPassword}}}'),
+    ExpandConstant('{param:DB_NAME|{reg:HKLM\{#sAppRegPath},{#REG_DB_NAME}|{#DbAdminName}}}'));
 
   InitRedisParams(ExpandConstant('{param:REDIS_HOST|{reg:HKLM\{#sAppRegPath},{#REG_REDIS_HOST}|{#RedisHost}}}'));
 
@@ -744,6 +744,29 @@ begin
   until(Length(Result) = StringLen)
 end;
 
+function GetRandomDbPwd (Param: String): String;
+begin
+  Result := RandomString(30);
+end;
+
+function IsAdminDatabase: Boolean;
+begin
+  Result := False;
+  if (GetDbName('') = 'postgres') and (GetDbName('') = 'postgres') then
+  begin
+    DbName := ExpandConstant('{#DbDefName}');
+    DbUserName := ExpandConstant('{#DbDefUser}');
+    DbPassword := GetRandomDbPwd('');
+    IsDefaultDatabase := True;
+    Result := True;
+  end;
+end;
+
+function IsUsingDefaultDatabase: Boolean;
+begin
+  Result := IsDefaultDatabase;
+end;
+
 function SetJWTRandomString(Param: String): String;
 begin
   if JWTSecret = '' then
@@ -904,6 +927,7 @@ begin
   if CurStep = ssInstall then
   begin
     ssInstallExec();
+    IsAdminDatabase();
   end;
   if CurStep = ssPostInstall then
   begin
@@ -1042,11 +1066,6 @@ begin
 
     RedisPage.Values[0] := GetRedisHost('');
   end;
-end;
-
-function GetRandomDbPwd: String;
-begin
-  Result := RandomString(30);
 end;
 
 function SavePgPassConf(Host, Port, DatabaseName, Username, Password: String): Boolean;
