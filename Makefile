@@ -379,6 +379,7 @@ endif
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
 	chmod u+x $(DOCUMENTSERVER)/server/tools/allfontsgen$(EXEC_EXT)
 
+	mv -f $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js.tpl
 	sed "s|\(_dc=\)0|\1"$(PACKAGE_VERSION)"|"  -i $(DOCUMENTSERVER)/web-apps/apps/api/documents/api.js.tpl
 
 ifeq ($(PRODUCT_NAME_LOW), documentserver)
