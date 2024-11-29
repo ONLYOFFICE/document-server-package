@@ -91,7 +91,7 @@ RABBITMQ := $(EXE_BUILD_DIR)/redist/rabbitmq-server-3.12.11.exe
 ERLANG := $(EXE_BUILD_DIR)/redist/otp_win64_26.2.1.exe
 POSTGRESQL := $(EXE_BUILD_DIR)/redist/postgresql-12.17-1-windows-x64.exe
 REDIS := $(EXE_BUILD_DIR)/redist/Redis-x64-5.0.10.msi
-CERTBOT := $(EXE_BUILD_DIR)/redist/certbot-beta-installer-win_amd64_signed.exe
+CERTBOT := $(EXE_BUILD_DIR)/redist/certbot-2.6.0.exe
 VC2013 := $(EXE_BUILD_DIR)/redist/vcredist2013_x64.exe
 VC2022 := $(EXE_BUILD_DIR)/redist/vcredist2022_x64.exe
 
