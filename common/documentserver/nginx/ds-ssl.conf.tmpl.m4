@@ -6,7 +6,7 @@ server {
   listen [::]:80 default_server;
   server_name _;
   server_tokens off;
-  set $secure_link_secret verysecretstring;
+  set $secure_link_secret {{SECURE_LINK_SECRET}};
 
   ## Redirects all traffic to the HTTPS host
   root /nowhere; ## root doesn't have to be a valid path since we are redirecting
@@ -19,7 +19,7 @@ server {
   listen [::1]:80;
   server_name localhost;
   server_tokens off;
-  set $secure_link_secret verysecretstring;
+  set $secure_link_secret {{SECURE_LINK_SECRET}};
   
   include M4_NGINX_CONF/ds-common.conf;
   include M4_NGINX_CONF/ds-docservice.conf;
@@ -30,7 +30,7 @@ server {
   listen 0.0.0.0:443 ssl;
   listen [::]:443 ssl default_server;
   server_tokens off;
-  set $secure_link_secret verysecretstring;
+  set $secure_link_secret {{SECURE_LINK_SECRET}};
   root /usr/share/nginx/html;
 
   ## Strong SSL Security

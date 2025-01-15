@@ -4,6 +4,6 @@ server {
   listen [::]:80 default_server;
   server_tokens off;
   
-  set $secure_link_secret verysecretstring;
+  set $secure_link_secret {{SECURE_LINK_SECRET}};
   include M4_NGINX_CONF/ds-*.conf;
 }
