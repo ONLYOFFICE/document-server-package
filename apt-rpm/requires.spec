@@ -1,1 +1,1 @@
-Requires: nginx >= 1.3.13, postgresql >= 9.1, curl, wget, libstdc++ >= 4.8.4, libcurl, libxml2, zlib, libXScrnSaver, libatk, libgtk+3, xorg-xvfb, libXtst, libalsa, pwgen, libselinux-utils, policycoreutils, ca-certificates, lsof
+Requires: nginx >= 1.3.13, postgresql >= 9.1, curl, wget, libstdc++ >= 4.8.4, libcurl, libxml2, zlib, libXScrnSaver, libatk, libgtk+3, xorg-xvfb, libXtst, libalsa, libselinux-utils, policycoreutils, ca-certificates, lsof
