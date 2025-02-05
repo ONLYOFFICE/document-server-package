@@ -1,5 +1,5 @@
 PWD := $(shell pwd)
-CURL := curl -L -o
+CURL := curl -s -L -o
 TOUCH := touch
 
 COMPANY_NAME ?= ONLYOFFICE
@@ -47,6 +47,7 @@ APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(APT_RPM_REL
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE_SUFFIX).$(RPM_ARCH).rpm
 DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE_SUFFIX).deb
 EXE = $(EXE_BUILD_DIR)/$(COMPANY_NAME)-$(PRODUCT_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER)-x64.exe
+EXE_PR = $(EXE_BUILD_DIR)/$(COMPANY_NAME)-$(PRODUCT_NAME)-Prerequisites-$(PRODUCT_VERSION).$(BUILD_NUMBER)-x64.exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(TAR_RELEASE_SUFFIX)-$(TAR_ARCH).tar.gz
 
 PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
@@ -83,6 +84,16 @@ PSQL := $(DOCUMENTSERVER)/pgsql/bin
 PSQL_ZIP := postgresql-10.20-2-windows-x64-binaries.zip
 
 WINSW := $(EXE_BUILD_DIR)/winsw/WinSW-x64.exe
+
+PYTHON := $(EXE_BUILD_DIR)/redist/python-3.11.3-amd64.exe
+OPENSSL := $(EXE_BUILD_DIR)/redist/FireDaemon-OpenSSL-x64-3.3.0.exe
+RABBITMQ := $(EXE_BUILD_DIR)/redist/rabbitmq-server-3.12.11.exe
+ERLANG := $(EXE_BUILD_DIR)/redist/otp_win64_26.2.1.exe
+POSTGRESQL := $(EXE_BUILD_DIR)/redist/postgresql-12.17-1-windows-x64.exe
+REDIS := $(EXE_BUILD_DIR)/redist/Redis-x64-5.0.10.msi
+CERTBOT := $(EXE_BUILD_DIR)/redist/certbot-2.6.0.exe
+VC2013 := $(EXE_BUILD_DIR)/redist/vcredist2013_x64.exe
+VC2022 := $(EXE_BUILD_DIR)/redist/vcredist2022_x64.exe
 
 BUILD_DATE := $(shell date +%F-%H-%M)
 
@@ -188,6 +199,8 @@ ISCC_PARAMS += -DSIGN
 ISCC_PARAMS += -S'byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com $$f'
 endif
 
+EXE_PR_DEPS := $(POSTGRESQL) $(CERTBOT) $(REDIS) $(ERLANG) $(RABBITMQ) $(OPENSSL) $(PYTHON) $(VC2013) $(VC2022)
+
 DEB_DEPS += deb/build/debian/source/format
 DEB_DEPS += deb/build/debian/changelog
 DEB_DEPS += deb/build/debian/compat
@@ -276,7 +289,7 @@ M4_PARAMS += -D M4_DS_EXAMLE='$(DS_EXAMLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
 M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
 
-.PHONY: all clean clean-docker rpm deb packages deploy-bin
+.PHONY: all clean clean-docker rpm deb exe exe-pr packages deploy-bin
 
 all: rpm deb apt-rpm
 
@@ -291,6 +304,7 @@ rpm_aarch64 : $(RPM)
 deb: $(DEB)
 
 exe: $(EXE)
+exe-pr: $(EXE_PR)
 
 tar: $(TAR)
 
@@ -500,9 +514,13 @@ $(DEB): $(DEB_DEPS) $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-e
 	cd deb/build && dpkg-buildpackage -b -uc -us -a$(DEB_ARCH)
 
 %.exe:
-	cd $(@D) && $(ISCC) $(ISCC_PARAMS) common.iss
+	cd $(@D) && $(ISCC) $(ISCC_PARAMS) $(iss_file)
 
+$(EXE): iss_file = common.iss
 $(EXE): $(COMMON_DEPS) documentserver documentserver-example $(NGINX) $(PSQL) $(WINSW)
+
+$(EXE_PR): iss_file = prerequisites.iss
+$(EXE_PR): $(EXE_PR_DEPS)
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
@@ -532,8 +550,19 @@ $(DS_BIN): documentserver
 	mkdir -p $(@D)
 	$(AR) $@ ./$(DOCUMENTSERVER)/sdkjs ./$(DOCUMENTSERVER)/server/FileConverter/bin
 
-$(WINSW):
-	$(CURL) $(WINSW) https://github.com/winsw/winsw/releases/download/v3.0.0-alpha.11/WinSW-x64.exe
+$(WINSW)      : url = https://github.com/winsw/winsw/releases/download/v3.0.0-alpha.11/WinSW-x64.exe
+$(CERTBOT)    : url = https://github.com/certbot/certbot/releases/download/v2.6.0/certbot-beta-installer-win_amd64_signed.exe
+$(ERLANG)     : url = https://github.com/erlang/otp/releases/download/OTP-26.2.1/otp_win64_26.2.1.exe
+$(OPENSSL)    : url = https://download.firedaemon.com/FireDaemon-OpenSSL/FireDaemon-OpenSSL-x64-3.3.0.exe
+$(POSTGRESQL) : url = https://get.enterprisedb.com/postgresql/postgresql-12.17-1-windows-x64.exe
+$(PYTHON)     : url = https://www.python.org/ftp/python/3.11.3/python-3.11.3-amd64.exe
+$(RABBITMQ)   : url = https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.12.11/rabbitmq-server-3.12.11.exe
+$(REDIS)      : url = https://download.onlyoffice.com/install/windows/redist/Redis-x64-5.0.10.msi
+$(VC2013)     : url = https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe
+$(VC2022)     : url = https://aka.ms/vs/17/release/vc_redist.x64.exe
+
+$(WINSW) $(EXE_PR_DEPS):
+	mkdir -p $(@D) && $(CURL) $@ $(url)
 
 packages: $(PACKAGES)
 

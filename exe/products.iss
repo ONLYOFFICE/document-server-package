@@ -67,6 +67,64 @@ begin
   Result := IsInstalled('{8A79DC1B-5F6C-4C14-A33F-BD020AFD6739}', '{#Registry64}');
 end;
 
+function IsVC2013Installed(): Boolean;
+begin
+  Result := IsMsiProductInstalled(Dependency_String('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), PackVersionComponents(12, 0, 40664, 0));
+end;
+
+function IsVC2015To2022Installed(): Boolean;
+begin
+  Result := IsMsiProductInstalled(Dependency_String('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 30, 30704, 0));
+end;
+
+procedure Dependency_AddBundledVC2013;
+begin
+  if IsVC2013Installed() = False then
+  begin
+    ExtractTemporaryFile('vcredist2013_x64.exe');
+    Dependency_Add(
+      'vcredist2013_x64.exe',
+      '/quiet /norestart',
+      'Visual C++ 2013 Update 5 Redistributable',
+      '',
+      '',
+      False,
+      False);
+  end;
+end;
+
+procedure Dependency_AddBundledVC2015To2022;
+begin
+  if IsVC2015To2022Installed() = False then
+  begin
+    ExtractTemporaryFile('vcredist2022_x64.exe');
+    Dependency_Add(
+      'vcredist2022_x64.exe',
+      '/quiet /norestart',
+      'Visual C++ 2015-2022 Redistributable',
+      '',
+      '',
+      False,
+      False);
+  end;
+end;
+
+procedure Dependency_AddBundledErlang;
+begin
+  if IsErlangInstalled() = False then
+  begin
+    ExtractTemporaryFile('otp_win64_26.2.1.exe');
+    Dependency_Add(
+      'otp_win64_26.2.1.exe',
+      '/S',
+      'Erlang 26.2.1 x64',
+      '',
+      '',
+      False,
+      False);
+  end;
+end;
+
 procedure Dependency_AddErlang;
 begin
   if IsErlangInstalled() = False then
@@ -78,6 +136,22 @@ begin
       Dependency_String(
         '',
         'https://github.com/erlang/otp/releases/download/OTP-26.2.1/otp_win64_26.2.1.exe'),
+      '',
+      False,
+      False);
+  end;
+end;
+
+procedure Dependency_AddBundledRabbitMq;
+begin
+  if IsRabbitMQInstalled() = False then
+  begin
+    ExtractTemporaryFile('rabbitmq-server-3.12.11.exe');
+    Dependency_Add(
+      'rabbitmq-server-3.12.11.exe',
+      '/S',
+      'RabbitMQ 3.12.11',
+      '',
       '',
       False,
       False);
@@ -101,6 +175,22 @@ begin
   end;
 end;
 
+procedure Dependency_AddBundledPostgreSQL;
+begin
+  if IsPostgreSQLInstalled() = False then
+  begin
+    ExtractTemporaryFile('postgresql-12.17-1-windows-x64.exe');
+    Dependency_Add(
+      'postgresql-12.17-1-windows-x64.exe',
+      '--unattendedmodeui none --install_runtimes 0 --mode unattended',
+      'PostgreSQL 12.17 x64',
+      '',
+      '',
+      False,
+      False);
+  end;
+end;
+
 procedure Dependency_AddPostgreSQL;
 begin
   if IsPostgreSQLInstalled() = False then
@@ -118,6 +208,22 @@ begin
   end;
 end;
 
+procedure Dependency_AddBundledRedis;
+var
+  Version: String;
+begin
+  Version := '5.0.10';
+  ExtractTemporaryFile('Redis-x64-5.0.10.msi');
+  Dependency_Add(
+    'Redis-x64-5.0.10.msi',
+    '/quiet',
+    'Redis ' + Version + 'x64',
+    '',
+    '',
+    False,
+    False);
+end;
+
 procedure Dependency_AddRedis;
 var
   Version: String;
@@ -130,6 +236,27 @@ begin
     Dependency_String(
       '',
       'https://download.onlyoffice.com/install/windows/redist/Redis-x64-5.0.10.msi'),
+    '',
+    False,
+    False);
+end;
+
+procedure Dependency_AddBundledPython3;
+var
+  Version: String;
+  Patch: String;
+  SemVer: String;
+begin
+  Version := '3.11';
+  Patch := '3';
+  SemVer := Version + '.' + Patch;
+  ExtractTemporaryFile('python-3.11.3-amd64.exe');
+  Dependency_Add(
+    'python-' + SemVer + '-amd64.exe',
+    'PrependPath=1 DefaultJustForMeTargetDir=' +
+      ExpandConstant('{sd}') + '\Python  /quiet /norestart',
+    'Python ' + Version + Dependency_ArchTitle,
+    '',
     '',
     False,
     False);
@@ -157,6 +284,22 @@ begin
     False);
 end;
 
+procedure Dependency_AddBundledCertbot;
+begin
+  if IsCertbotInstalled() = False then
+  begin
+    ExtractTemporaryFile('certbot-2.6.0.exe');
+    Dependency_Add(
+      'certbot-2.6.0.exe',
+      '/S',
+      'Certbot v2.6.0',
+      '',
+      '',
+      False,
+      False);
+  end;
+end;
+
 procedure Dependency_AddCertbot;
 begin
   if IsCertbotInstalled() = False then
@@ -168,6 +311,22 @@ begin
       Dependency_String(
         '',
         'https://github.com/certbot/certbot/releases/download/v2.6.0/certbot-beta-installer-win_amd64_signed.exe'),
+      '',
+      False,
+      False);
+  end;
+end;
+
+procedure Dependency_AddBundledOpenSSL;
+begin
+  if IsOpenSSLInstalled() = False then
+  begin
+    ExtractTemporaryFile('FireDaemon-OpenSSL-x64-3.3.0.exe');
+    Dependency_Add(
+      'FireDaemon-OpenSSL-x64-3.3.0.exe',
+      '/exenoui /qn /norestart REBOOT=ReallySuppress ADJUSTSYSTEMPATHENV=yes',
+      'OpenSSL x64 3.3.0',
+      '',
       '',
       False,
       False);
