@@ -11,6 +11,12 @@ location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps\/apps\/api\/documents
   alias  M4_DS_ROOT/$2;
 }
 
+location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(document_editor_service_worker.js)$ {
+  expires 365d;
+  # gzip_static on;
+  alias  M4_DS_ROOT/sdkjs/common/serviceworker/$2;
+}
+
 #suppress logging the unsupported locale error in web-apps
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps)(\/.*\.json)$ {
   expires 365d;
