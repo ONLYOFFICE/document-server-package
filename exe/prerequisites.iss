@@ -85,15 +85,15 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
-Source: "redist\postgresql-12.17-1-windows-x64.exe"; Flags: dontcopy noencryption
-Source: "redist\certbot-2.6.0.exe"; Flags: dontcopy noencryption
-Source: "redist\Redis-x64-5.0.10.msi"; Flags: dontcopy noencryption
-Source: "redist\otp_win64_26.2.1.exe"; Flags: dontcopy noencryption
-Source: "redist\rabbitmq-server-3.12.11.exe"; Flags: dontcopy noencryption
-Source: "redist\FireDaemon-OpenSSL-x64-3.3.0.exe"; Flags: dontcopy noencryption
-Source: "redist\python-3.11.3-amd64.exe"; Flags: dontcopy noencryption
-Source: "redist\vcredist2013_x64.exe"; Flags: dontcopy noencryption
-Source: "redist\vcredist2022_x64.exe"; Flags: dontcopy noencryption
+Source: "redist\postgresql-12.17-1-windows-x64.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\certbot-2.6.0.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\Redis-x64-5.0.10.msi"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\otp_win64_26.2.1.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\rabbitmq-server-3.12.11.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\FireDaemon-OpenSSL-x64-3.3.0.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\python-3.11.3-amd64.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\vcredist2013_x64.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\vcredist2022_x64.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
 
 [Types]
 Name: full; Description: {cm:FullInstall}
