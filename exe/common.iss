@@ -762,7 +762,7 @@ end;
 function IsAdminDatabase: Boolean;
 begin
   Result := False;
-  if (GetDbName('') = 'postgres') and (GetDbName('') = 'postgres') then
+  if (GetDbName('') = 'postgres') and (GetDbName('') = 'postgres') and (WizardSilent() = false) then
   begin
     DbName := ExpandConstant('{#DbDefName}');
     DbUserName := ExpandConstant('{#DbDefUser}');
@@ -1313,6 +1313,8 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
+  if WizardSilent() = false then
+  begin
   case PageID of
     DbPage.ID:
       Result := CheckDbConnection;
@@ -1327,6 +1329,7 @@ begin
       end;
     end;
   end;
+ end;
 end;
 
 function ArrayLength(a: array of integer): Integer;
