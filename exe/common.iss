@@ -271,8 +271,8 @@ ru.PackageConnection=Укажите параметры подключения к
 en.CheckConnection=Connection to %1 failed! %n%2 return code %3%nCheck the connection settings and try again.
 ru.CheckConnection=Соединение с %1 не удалось! %n%2 вернул код ошибки %3%nПроверьте настройки соединения и попробуйте снова.
 
-en.NotAvailable=%1 isn't installed or unreachable,
-ru.NotAvailable=%1 не установлен или недоступен,
+en.NotAvailable=%1 isn't installed or there's no Internet connection,
+ru.NotAvailable=%1 не установлен или отсутствует подключение к Интернету,
 
 en.SkipValidation=%1 parameters validation will be skipped.
 ru.SkipValidation=будет пропущена проверка параметров %1
@@ -617,6 +617,16 @@ begin
   Result := true;
 end;
 
+function InternetConnection(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := False;
+  Exec('powershell.exe', '-Command "if ((Test-NetConnection -ComputerName www.onlyoffice.com -Port 80).TcpTestSucceeded) { exit 0 } else { exit 1 }"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  if ResultCode = 0 then
+    Result := True;
+end;
+
 function InitializeSetup(): Boolean;
 begin
  
@@ -752,7 +762,7 @@ end;
 function IsAdminDatabase: Boolean;
 begin
   Result := False;
-  if (GetDbName('') = 'postgres') and (GetDbName('') = 'postgres') then
+  if (GetDbName('') = 'postgres') and (GetDbName('') = 'postgres') and (WizardSilent() = false) then
   begin
     DbName := ExpandConstant('{#DbDefName}');
     DbUserName := ExpandConstant('{#DbDefUser}');
@@ -1174,7 +1184,7 @@ begin
     EwWaitUntilTerminated,
     ResultCode);
 
-  if ResultCode <> 0 then
+  if (ResultCode <> 0) or not InternetConnection() then
   begin
     if MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
@@ -1253,7 +1263,7 @@ begin
     EwWaitUntilTerminated,
     ResultCode);
 
-  if ResultCode <> 0 then
+  if (ResultCode <> 0) or not InternetConnection() then
   begin
     if MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
@@ -1303,6 +1313,8 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
+  if WizardSilent() = false then
+  begin
   case PageID of
     DbPage.ID:
       Result := CheckDbConnection;
@@ -1317,6 +1329,7 @@ begin
       end;
     end;
   end;
+ end;
 end;
 
 function ArrayLength(a: array of integer): Integer;

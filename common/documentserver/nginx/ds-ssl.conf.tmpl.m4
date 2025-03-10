@@ -27,8 +27,8 @@ server {
 
 ## HTTPS host
 server {
-  listen 0.0.0.0:443 ssl;
-  listen [::]:443 ssl default_server;
+  listen 0.0.0.0:443 ssl http2;
+  listen [::]:443 ssl default_server http2;
   server_tokens off;
   set $secure_link_secret verysecretstring;
   root /usr/share/nginx/html;
