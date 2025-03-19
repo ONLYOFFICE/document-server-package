@@ -47,8 +47,8 @@ if ( $args.Count -ge 2 )
   cmd.exe /c "certbot certonly --expand --webroot -w `"${root_dir}`" --noninteractive --agree-tos --email ${letsencrypt_mail} -d ${letsencrypt_domain}" > "${app}\letsencrypt\Logs\le-new.log"
 
   pushd "${letsencrypt_root_dir}\${letsencrypt_domain}"
-    $ssl_cert = Get-Item "${letsencrypt_root_dir}\${letsencrypt_domain}\fullchain.pem").FullName.Replace('\', '/')
-    $ssl_key = Get-Item "${letsencrypt_root_dir}\${letsencrypt_domain}\privkey.pem").FullName.Replace('\', '/')
+    $ssl_cert = (Get-Item "${letsencrypt_root_dir}\${letsencrypt_domain}\fullchain.pem").FullName.Replace('\', '/')
+    $ssl_key = (Get-Item "${letsencrypt_root_dir}\${letsencrypt_domain}\privkey.pem").FullName.Replace('\', '/')
   popd
 
   if ( [System.IO.File]::Exists($ssl_cert) -and [System.IO.File]::Exists($ssl_key) -and [System.IO.File]::Exists("${nginx_conf_dir}\${nginx_tmpl}"))
