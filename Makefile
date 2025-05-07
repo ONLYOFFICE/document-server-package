@@ -169,13 +169,14 @@ else
 	endif
 	ifeq ($(UNAME_M),x86_64)
 		ARCHITECTURE := 64
+		PKG_TARGET ?= node16-linux-x64
 	endif
 	ifneq ($(filter %86,$(UNAME_M)),)
 		ARCHITECTURE := 32
 	endif
 	ifneq ($(filter aarch%,$(UNAME_M)),)
 		ARCHITECTURE := arm64
-		PKG_TARGET := node10-linux-arm64
+		PKG_TARGET ?= node16-linux-arm64
 	endif
 endif
 
