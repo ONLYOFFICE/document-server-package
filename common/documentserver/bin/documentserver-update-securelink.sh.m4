@@ -32,7 +32,7 @@ while [ "$1" != "" ]; do
 done
 
 NGINX_CONF=/etc/M4_DS_PREFIX/nginx/ds.conf
-LOCAL_CONF=/etc/M4_DS_PREFIX/local.json
+LOCAL_CONF=${LOCAL_CONF:-"/etc/M4_DS_PREFIX/local.json"}
 JSON="/var/www/M4_DS_PREFIX/npm/json -q -f ${LOCAL_CONF}"
 
 SECURE_LINK_SECRET=${SECURE_LINK_SECRET:-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 20)}
