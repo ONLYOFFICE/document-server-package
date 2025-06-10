@@ -223,12 +223,7 @@ DIR="/var/www/%{_ds_prefix}"
 ln -sf %{_libdir}/libcurl.so.4 %{_libdir}/libcurl-gnutls.so.4
 
 #make exchange dir
-DATA_DIR="%{_localstatedir}/www/%{_ds_prefix}/../Data"
-if [ ! -d "${DATA_DIR}" ]; then
-  mkdir -m 755 -p "${DATA_DIR}"
-  chown ds:ds "${DATA_DIR}"
-fi
-
+mkdir -pm 755 "%{_localstatedir}/www/%{_ds_prefix}/../Data" && chown ds:ds "$_"
 chown -R ds:ds %{_localstatedir}/lib/%{_ds_prefix}
 
 %if %{defined example}
