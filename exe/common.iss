@@ -327,7 +327,7 @@ Name: "{#NGINX_SRV_LOG_DIR}";         Permissions: service-modify
 Name: "{#NGINX_SRV_DIR}\temp";        Permissions: service-modify
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: service-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
-Name: "{#LICENSE_PATH}";
+Name: "{#LICENSE_PATH}";              Permissions: service-modify
 
 [Icons]
 Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
@@ -383,6 +383,9 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.license===undefined)this.license={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.license.license_file = '{code:GetLicensePath}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.runtimeConfig===undefined)this.runtimeConfig={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.runtimeConfig.filePath = '{code:GetRuntimeConfigPath}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.utils===undefined)this.services.CoAuthoring.utils={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.utils.utils_common_fontdir = '{code:GetFontsPath}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -732,6 +735,15 @@ begin
   LicensePath := ExpandConstant('{param:LICENSE_PATH|{reg:HKLM\{#sAppRegPath},{#REG_LICENSE_PATH}|{#LICENSE_PATH}\license.lic}}');
   StringChangeEx(LicensePath, '\', '/', True);
   Result := LicensePath;
+end;
+
+function GetRuntimeConfigPath(Param: String): String;
+var
+  RuntimeConfig: String;
+begin
+  RuntimeConfig := ExpandConstant('{param:RUNTIMECONFIG_PATH|{#LICENSE_PATH}\runtime.json}');
+  StringChangeEx(RuntimeConfig, '\', '/', True);
+  Result := RuntimeConfig;
 end;
 
 function GetFontsPath(Param: String): String;
