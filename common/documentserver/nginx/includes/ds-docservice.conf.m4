@@ -63,11 +63,13 @@ location ~* ^(\/cache\/files.*)(\/.*) {
   proxy_pass http://docservice/$2$3;
 }
 
-# Allow "/info" interface only from 127.0.0.1 by default
-# Comment out lines allow 127.0.0.1; and deny all; 
-# of below section to turn on the info page
+# Allow "/info" interface only from localhost and private IP ranges
+# Comment out allow lines and deny all; to turn on the info page for everyone
 location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(info)(\/.*)$ {
   allow 127.0.0.1;
+  allow 10.0.0.0/8;
+  allow 172.16.0.0/12;
+  allow 192.168.0.0/16;
   deny all;
   proxy_pass http://docservice/$2$3;
 }
