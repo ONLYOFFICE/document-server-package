@@ -256,7 +256,7 @@ setup_nginx(){
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
 	  
 	  # generate secure link
-	  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(pwgen -s 20) -r false
+	  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(tr -dc A-Za-z0-9 </dev/urandom | head -c 20) -r false
   elif ! grep -q secure_link_secret $DS_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
@@ -351,7 +351,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		mkdir -p "$DIR/fonts"
 		
 		# grand owner rights for home dir for ds user
-		chown ds:ds -R "$DIR"*
+		chown ds:ds -R "$DIR/../Data" "$DIR"*
 		# set up read-only access to prevent modification ds's home directory
 		chmod a-w -R "$DIR"*
 

@@ -116,8 +116,6 @@ Name: "Prerequisites\VC2022"; Description: "Visual C++ 2015-2022 Redistributable
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
-  if WizardSilent() = false then
-  begin
     case CurPageID of
       wpWelcome:
         Result := true;
@@ -158,6 +156,5 @@ begin
         end;
        end;
     end;
-  end;
 end;
 

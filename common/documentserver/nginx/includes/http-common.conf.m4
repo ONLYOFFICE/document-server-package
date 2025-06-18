@@ -23,8 +23,8 @@ map $http_x_forwarded_host $the_host {
 }
 
 map $http_upgrade $proxy_connection {
-  default upgrade;
-  "" close;
+  websocket upgrade;
+  default close;
 }
 
 map $http_x_forwarded_prefix $the_prefix {

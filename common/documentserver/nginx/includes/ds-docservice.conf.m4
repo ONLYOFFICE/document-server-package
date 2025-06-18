@@ -2,7 +2,7 @@
 rewrite ^/$ $the_scheme://$the_host$the_prefix/welcome/ redirect;
 
 #script caching protection
-rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/).*)$ $the_scheme://$the_host$the_prefix/M4_PRODUCT_VERSION-$cache_tag$cache redirect;
+rewrite ^(?<cache>\/web-apps\/apps\/(?!api\/documents\/api\.js$).*)$ $the_scheme://$the_host$the_prefix/M4_PRODUCT_VERSION-$cache_tag$cache redirect;
 
 #disable caching for api.js
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$ {
