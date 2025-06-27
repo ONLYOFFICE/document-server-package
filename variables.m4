@@ -1,8 +1,7 @@
-define(`DEB[Summary]', `Online editors for text documents, spreadsheets, and presentations')dnl
-define(`DEB[Description]', ` Document Server is an open-source office suite that includes
- collaborative online editors for text documents, spreadsheets,
- and presentations.')dnl
-define(`RPM[Summary]', `Online editors for text documents, spreadsheets, and presentations')dnl
-define(`RPM[Description]', `Document Server is an open-source office suite that includes\
-collaborative online editors for text documents, spreadsheets,\
-and presentations.')dnl
+define(`DEB[Summary]', `Online editors for text docs, spreadsheets, presentations, PDFs, and PDF forms.')dnl
+define(`DEB[Description]', ` Open-source office suite pack that comprises all the tools you need to
+ work with documents, spreadsheets, presentations, PDFs, and PDF forms.')dnl
+
+define(`RPM[Summary]', `Online editors for text docs, spreadsheets, presentations, PDFs, and PDF forms.')dnl
+define(`RPM[Description]', `Open-source office suite pack that comprises all the tools you need to\
+work with documents, spreadsheets, presentations, PDFs, and PDF forms.')dnl
