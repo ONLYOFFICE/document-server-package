@@ -1,5 +1,5 @@
 include(variables.m4)
-License: AGPL
+License: ifelse(regexp(M4_PACKAGE_NAME, `documentserver$'), -1, Proprietary, AGPL-3.0-only and CC-BY-SA-4.0)
 
 ifelse('M4_DS_EXAMPLE_ENABLE', '1',
 %define example 1,)

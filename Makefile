@@ -102,6 +102,7 @@ SDKJS_DIR :=sdkjs
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 OFFICIAL_PRODUCT_NAME := 'Community Edition'
+RPM_PARAMS += --define 'cc_license 1'
 endif
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
@@ -301,6 +302,7 @@ M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
 M4_PARAMS += -D M4_DS_EXAMPLE='$(DS_EXAMPLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
 M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
+M4_PARAMS += -D M4_CURRENT_YEAR=$(shell date +"%Y")
 
 RPMBUILD_BINARY_PAYLOAD ?= w9T$(shell nproc).xzdio
 
@@ -402,11 +404,7 @@ ifeq ($(PLATFORM),win)
 	echo ; >> $(DOCUMENTSERVER)/3rd-Party.txt
 	cat exe/license/3rd-Party.txt ; >> $(DOCUMENTSERVER)/3rd-Party.txt
 endif
-
-	[ -f $(LICENSE_FILE) ] \
-		&& cp -f -t $(DOCUMENTSERVER) $(LICENSE_FILE) \
-		|| cp -f -t $(DOCUMENTSERVER) LICENSE.txt
-
+	cp -f -t $(DOCUMENTSERVER) $(LICENSE_FILE)
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
 	#chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
@@ -530,6 +528,14 @@ common/documentserver/nginx/ds.conf: common/documentserver/nginx/ds.conf.tmpl
 
 deb/build/debian/% : deb/template/%
 	mkdir -pv $(@D) && cp -fv $< $@
+
+CC_LICENSE_FILE = $(wildcard $(dir $(LICENSE_FILE))LICENSE-CC.txt)
+deb/build/debian/copyright : deb/template/copyright.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE_SUFFIX) $< > $@
+	awk -v MAIN_LICENSE="$(LICENSE_FILE)" -v CC_LICENSE="$(CC_LICENSE_FILE)" '\
+		/^License: CC-BY-SA-4.0$$/ { print; while ((getline l < CC_LICENSE)   > 0) print (l == "" ? " ." : " " l); next }\
+		/^License:/                { print; while ((getline l < MAIN_LICENSE) > 0) print (l == "" ? " ." : " " l); next }\
+		                           { print }' $@ > $@.tmp && mv $@.tmp $@
 
 deb/build/debian/% : deb/template/%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE_SUFFIX) $< > $@

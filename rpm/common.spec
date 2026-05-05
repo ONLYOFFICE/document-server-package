@@ -145,6 +145,13 @@ symlinks -c \
 sed 's/linux.html/linux-rpm.html/g' -i "$DSE_NGINX_CONF/ds-example.conf"
 %endif
 
+# install license file
+mkdir -p %{buildroot}%{_datadir}/licenses/%{_package_name}
+cp %{_builddir}/../../../common/documentserver/license/%{_package_name}/LICENSE.txt \
+    %{buildroot}%{_datadir}/licenses/%{_package_name}/LICENSE.txt
+%{?cc_license:cp %{_builddir}/../../../common/documentserver/license/%{_package_name}/LICENSE-CC.txt \
+    %{buildroot}%{_datadir}/licenses/%{_package_name}/LICENSE-CC.txt}
+
 %clean
 rm -rf "%{buildroot}"
 
@@ -182,6 +189,9 @@ rm -rf "%{buildroot}"
 %attr(-, root, root) %{_sysconfdir}/nginx/includes/*
 %attr(644, root, root) /usr/lib/systemd/system/*
 %attr(440, root, root) /etc/sudoers.d/documentserver
+
+%license %{_datadir}/licenses/%{_package_name}/LICENSE.txt
+%{?cc_license:%license %{_datadir}/licenses/%{_package_name}/LICENSE-CC.txt}
 
 %dir
 %attr(750, %{nginx_user}, %{nginx_user}) %{_localstatedir}/cache/nginx/%{_ds_prefix}
