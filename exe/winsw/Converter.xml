@@ -2,6 +2,7 @@
 	<id>{#CONVERTER_SRV}</id>
 	<name>{#CONVERTER_SRV_DISPLAY}</name>
 	<description>{#CONVERTER_SRV_DESCR}</description>
+	<autoRefresh>false</autoRefresh>
 	<priority>RealTime</priority>
 	<startmode>Automatic</startmode>
 	<delayedAutoStart>true</delayedAutoStart>

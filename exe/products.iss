@@ -35,9 +35,16 @@ begin
   Result := IsInstalled('PostgreSQL [0-9].*[^a-zA-Z]$', '{#Registry64}');
 end;
 
-function IsCertbotInstalled(): Boolean;
+function IsWinAcmeInstalled(): Boolean;
+var
+  Version: String;
 begin
-  Result := IsInstalled('Certbot$', '{#Registry32}') or IsInstalled('Certbot$', '{#Registry64}');
+  Version := '2';
+  Result := IsMsiProductInstalled(
+           Dependency_String(
+            '',
+            '{2F5D6A3A-9B1C-4E6B-9D5E-1A6E7F3D0B11}'),
+            StrToInt(Version));
 end;
 
 function IsPythonInstalled(): Boolean;
@@ -284,15 +291,15 @@ begin
     False);
 end;
 
-procedure Dependency_AddBundledCertbot;
+procedure Dependency_AddBundledWinAcme;
 begin
-  if IsCertbotInstalled() = False then
+  if IsWinAcmeInstalled() = False then
   begin
-    ExtractTemporaryFile('certbot-2.6.0.exe');
+    ExtractTemporaryFile('Win-acme-2.2.9.1701.msi');
     Dependency_Add(
-      'certbot-2.6.0.exe',
-      '/S',
-      'Certbot v2.6.0',
+      'Win-acme-2.2.9.1701.msi',
+      '/quiet',
+      'WinAcme v2.2.9.1701',
       '',
       '',
       False,
@@ -300,17 +307,17 @@ begin
   end;
 end;
 
-procedure Dependency_AddCertbot;
+procedure Dependency_AddWinAcme;
 begin
-  if IsCertbotInstalled() = False then
+  if IsWinAcmeInstalled() = False then
   begin
     Dependency_Add(
-      'certbot.exe',
-      '/S',
-      'Certbot v2.6.0',
+      'Win-acme-2.2.9.1701.msi',
+      '/quiet',
+      'WinAcme v2.2.9.1701',
       Dependency_String(
-        '',
-        'https://github.com/certbot/certbot/releases/download/v2.6.0/certbot-beta-installer-win_amd64_signed.exe'),
+      '',
+      'https://github.com/ONLYOFFICE/win-acme-installer/releases/download/v2.2.9.1701/Win-acme-2.2.9.1701.msi'),
       '',
       False,
       False);

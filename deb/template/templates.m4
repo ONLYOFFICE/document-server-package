@@ -1,4 +1,4 @@
-Template: M4_ONLYOFFICE_VALUE/db-type
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`Template: M4_ONLYOFFICE_VALUE/db-type
 Type: string
 Description: Choose database type (postgres, mariadb, mysql):
 
@@ -39,28 +39,11 @@ Default: false
 Description: Use cluster mode?
  Type true if M4_PRODUCT_NAME will use in cluster mode.
 
-Template: M4_ONLYOFFICE_VALUE/ds-port
-Type: string
-Default: 80
-Description: M4_PRODUCT_NAME listening port:
-
-Template: M4_ONLYOFFICE_VALUE/docservice-port
-Type: string
-Default: 8000
-Description: M4_PRODUCT_NAME docservice listening port:
-
-Template: M4_ONLYOFFICE_VALUE/example-port
-Type: string
-Default: 3000
-Description: M4_PRODUCT_NAME example listening port:
-
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
 Template: M4_ONLYOFFICE_VALUE/redis-host
 Type: string
 Default: localhost
 Description: Redis host:
 
-,)dnl
 Template: M4_ONLYOFFICE_VALUE/rabbitmq-proto
 Type: string
 Default: amqp
@@ -80,6 +63,22 @@ Template: M4_ONLYOFFICE_VALUE/rabbitmq-pwd
 Type: password
 Default: guest
 Description: RabbitMQ password:
+',)dnl
+
+Template: M4_ONLYOFFICE_VALUE/ds-port
+Type: string
+Default: 80
+Description: M4_PRODUCT_NAME listening port:
+
+Template: M4_ONLYOFFICE_VALUE/docservice-port
+Type: string
+Default: 8000
+Description: M4_PRODUCT_NAME docservice listening port:
+
+Template: M4_ONLYOFFICE_VALUE/example-port
+Type: string
+Default: 3000
+Description: M4_PRODUCT_NAME example listening port:
 
 Template: M4_ONLYOFFICE_VALUE/jwt-enabled
 Type: boolean

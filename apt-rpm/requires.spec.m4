@@ -1,0 +1,2 @@
+Requires: nginx >= 1.3.13, curl, wget, libstdc++ >= 4.8.4, libcurl, zlib, libXScrnSaver, libatk, libgtk+3, xorg-xvfb, libXtst, libalsa, libselinux-utils, policycoreutils, ca-certificates, lsof
+ifelse(regexp(M4_PACKAGE_NAME, `documentserver$'),-1,`Requires: /usr/bin/psql',)

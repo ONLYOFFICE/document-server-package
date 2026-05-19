@@ -22,13 +22,13 @@ if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
 . /usr/share/debconf/confmodule
 fi
 
-remove_postgres() {
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`remove_postgres() {
 	CONNECTION_PARAMS="-h$DB_HOST -p${DB_PORT:="5432"} -U$DB_USER -w"
 	if [ -n $DB_PWD ]; then
 		export PGPASSWORD="$DB_PWD"
 	fi
 	psql $CONNECTION_PARAMS $DB_NAME -t -c "DROP SCHEMA IF EXISTS public CASCADE;" &>/dev/null || \
-		{ echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database tables" >&2; }
+		{ echo "WARNING: cannot delete M4_ONLYOFFICE_VALUE database tables" >&2; }
 }
 
 remove_mysql() {
@@ -36,8 +36,9 @@ remove_mysql() {
 	MYSQL="mysql -q $CONNECTION_PARAMS"
 	$MYSQL -e \
 		"DROP DATABASE IF EXISTS $DB_NAME;" &>/dev/null || \
-		{ echo "WARNING: can't delete M4_ONLYOFFICE_VALUE database" >&2; }
+		{ echo "WARNING: cannot delete M4_ONLYOFFICE_VALUE database" >&2; }
 }
+')dnl
 
 clean_ds_files() {
 	DIR="/var/www/M4_DS_PREFIX"
@@ -76,7 +77,7 @@ case "$1" in
 			rm -rf $DIR/sdkjs-plugins/
 		fi
     
-		db_input high M4_ONLYOFFICE_VALUE/remove-db || true
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`		db_input high M4_ONLYOFFICE_VALUE/remove-db || true
 		db_go
 		db_get M4_ONLYOFFICE_VALUE/remove-db
 		if [ "$RET" = "true" ]; then
@@ -105,6 +106,7 @@ case "$1" in
 					;;
 			esac
 		fi
+',)dnl
 	;;
 
 	remove|upgrade)

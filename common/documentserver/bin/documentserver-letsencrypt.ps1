@@ -1,38 +1,32 @@
-# runas administrator
-if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
-{ 
-  Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+$wacs_cmd = Get-Command wacs -ErrorAction SilentlyContinue
+
+if (-not $wacs_cmd) {
+  Write-Output " Attention! Win-Acme (wacs) is not installed or not in PATH. "
+  Write-Output " Add wacs.exe to PATH or run script with full path to wacs.exe. "
   exit
 }
 
-function Test-RegistryValue($RegistryKey, $RegistryName)
-{
-  $exists = Get-ItemProperty -Path "$RegistryKey" -Name "$RegistryName" -ErrorAction SilentlyContinue
-  if (($exists -ne $null) -and ($exists.Length -ne 0)) { return $true }
-  return $false
+function Assert-ValidDomain {
+  param([Parameter(Mandatory)][string]$Domain)
+  if ($Domain -notmatch '^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$') {
+    throw "Bad DOMAIN: $Domain"
+  }
 }
 
-$certbot_path = if ((Test-RegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Certbot" "InstallLocation") -eq $true )
-{
-  (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Certbot" -ErrorAction Stop).InstallLocation
-}
-elseif ((Test-RegistryValue "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Certbot" "InstallLocation") -eq $true )
-{
-  (Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Certbot" -ErrorAction Stop).InstallLocation
-}
-
-if ( -not $certbot_path )
-{
-  Write-Output " Attention! Certbot is not installed on your computer. "
-  Write-Output " Certbot could be downloaded by this link 'https://dl.eff.org/certbot-beta-installer-win32.exe' "
-  exit
+function Assert-ValidEmailList {
+  param([Parameter(Mandatory)][string]$EmailList)
+  $pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$'
+  $emails = $EmailList -split '\s*,\s*' | Where-Object { $_ -and $_.Trim().Length -gt 0 }
+  if ($emails.Count -lt 1) { throw "Bad EMAIL list: empty" }
+  foreach ($e in $emails) {
+    if ($e -notmatch $pattern) { throw "Bad EMAIL in list: $e" }
+  }
 }
 
 if ( $args.Count -ge 2 )
 {
-  $letsencrypt_root_dir = "$env:SystemDrive\Certbot\live"
-  $app = Resolve-Path -Path ".\..\"
-  $root_dir = "${app}\letsencrypt"
+  $app = Split-Path -Parent $PSScriptRoot
+  $root_dir = "$env:ProgramData\ONLYOFFICE\letsencrypt"
   $nginx_conf_dir = "${app}\nginx\conf"
   $nginx_conf = "ds.conf"
   $nginx_tmpl = "ds-ssl.conf.tmpl"
@@ -41,14 +35,23 @@ if ( $args.Count -ge 2 )
   $letsencrypt_domain = $args[1]
   $letsencrypt_mail = $args[0]
 
+  Assert-ValidDomain -Domain $letsencrypt_domain
+  Assert-ValidEmailList -EmailList $letsencrypt_mail
+
   [void](New-Item -ItemType "directory" -Path "${root_dir}\Logs" -Force)
 
-  "certbot certonly --expand --webroot -w `"${root_dir}`" --noninteractive --agree-tos --email ${letsencrypt_mail} -d ${letsencrypt_domain}" > "${app}\letsencrypt\Logs\le-start.log"
-  cmd.exe /c "certbot certonly --expand --webroot -w `"${root_dir}`" --noninteractive --agree-tos --email ${letsencrypt_mail} -d ${letsencrypt_domain}" > "${app}\letsencrypt\Logs\le-new.log"
+  "wacs --target manual --host ${letsencrypt_domain} --validation filesystem --webroot `"${root_dir}`" --store pemfiles --pemfilespath `"${root_dir}`" --pemfilesname ${letsencrypt_domain} --installation none --emailaddress ${letsencrypt_mail} --accepttos --closeonfinish" > "${root_dir}\Logs\le-start.log"
+  & wacs --target manual --host ${letsencrypt_domain} --validation filesystem --webroot ${root_dir} --store pemfiles --pemfilespath ${root_dir} --pemfilesname ${letsencrypt_domain} --installation none --emailaddress ${letsencrypt_mail} --accepttos --closeonfinish *>> "${root_dir}\Logs\le-new.log"
 
-  pushd "${letsencrypt_root_dir}\${letsencrypt_domain}"
-    $ssl_cert = (Get-Item "${letsencrypt_root_dir}\${letsencrypt_domain}\fullchain.pem").FullName.Replace('\', '/')
-    $ssl_key = (Get-Item "${letsencrypt_root_dir}\${letsencrypt_domain}\privkey.pem").FullName.Replace('\', '/')
+  pushd "${root_dir}"
+    $certFile = Get-ChildItem $root_dir -File | ? { $_.Name -match "^$letsencrypt_domain.*(fullchain|chain)\.pem$" -and $_.Name -notmatch "chain-only" } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $keyFile = Get-ChildItem $root_dir -File | ? { $_.Name -match "^$letsencrypt_domain.*(key|privkey)\.pem$" } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if (-not $certFile -or -not $keyFile) {
+      throw "PEM files were not found in '$root_dir'. Check logs: $root_dir\Logs\le-new.log"
+    }
+
+    $ssl_cert = $certFile.FullName.Replace('\','/')
+    $ssl_key  = $keyFile.FullName.Replace('\','/')
   popd
 
   if ( [System.IO.File]::Exists($ssl_cert) -and [System.IO.File]::Exists($ssl_key) -and [System.IO.File]::Exists("${nginx_conf_dir}\${nginx_tmpl}"))
@@ -60,21 +63,17 @@ if ( $args.Count -ge 2 )
     ((Get-Content -Path "${nginx_conf_dir}\${nginx_conf}" -Raw) -replace '{{SSL_KEY_PATH}}', $ssl_key) | Set-Content -Path "${nginx_conf_dir}\${nginx_conf}"
   }
 
-  $acl = Get-Acl -Path "$env:SystemDrive\Certbot\archive\${letsencrypt_domain}"
-  $acl.SetSecurityDescriptorSddlForm('O:LAG:S-1-5-21-4011186057-2202358572-2315966083-513D:PAI(A;OI;0x1200a9;;;WD)(A;;FA;;;SY)(A;OI;0x1200a9;;;LS)(A;;FA;;;BA)(A;;FA;;;LA)')
-  Set-Acl -Path $acl.path -ACLObject $acl
-
   Restart-Service -Name $proxy_service
 
   @(
-    "certbot renew >> `"${app}\letsencrypt\Logs\le-renew.log`"",
+    "wacs --renew --baseuri `"https://acme-v02.api.letsencrypt.org/`" >> `"$root_dir\Logs\le-renew.log`"",
     "net stop $proxy_service",
     "net start $proxy_service"
-  ) | Set-Content -Path "${app}\letsencrypt\letsencrypt_cron.bat" -Encoding ascii
+  ) | Set-Content -Path "$root_dir\letsencrypt_cron.bat" -Encoding ascii
 
   $day = (Get-Date -Format "dddd").ToUpper().SubString(0, 3)
   $time = Get-Date -Format "HH:mm"
-  cmd.exe /c "SCHTASKS /F /CREATE /SC WEEKLY /D $day /TN `"Certbot renew`" /TR `"${app}\letsencrypt\letsencrypt_cron.bat`" /ST $time"
+  cmd.exe /c "SCHTASKS /F /CREATE /SC WEEKLY /D $day /TN `"Win-Acme renew`" /TR `"$root_dir\letsencrypt_cron.bat`" /ST $time"
 }
 else
 {

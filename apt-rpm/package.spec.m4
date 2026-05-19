@@ -3,8 +3,8 @@ License: AGPL
 
 ifelse('M4_DS_EXAMPLE_ENABLE', '1',
 %define example 1,)
-ifelse('M4_DS_ADMINPANEL_ENABLE', '1',
-%define adminpanel 1,)
+ifelse(regexp(M4_PACKAGE_NAME, `documentserver$'),-1,
+%define is_commercial 1,)
 %define _package_summary defn(`RPM[Summary]')
 %define _package_description defn(`RPM[Description]')
 

@@ -1,1 +1,0 @@
-Requires: nginx >= 1.3.13, /usr/bin/psql, curl, wget, libstdc++ >= 4.8.4, libcurl, libxml2, zlib, libXScrnSaver, atk, gtk3, xorg-x11-server-Xvfb, libXtst, alsa-lib, libselinux-utils, liberation-mono-fonts, logrotate, ca-certificates, certbot, msttcore-fonts-installer, openssl, vim-common

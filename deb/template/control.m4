@@ -19,14 +19,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
   libcurl3-gnutls,
   libgtk-3-0,
   libstdc++6 (>= 4.8.4),
-  libxml2,
   libxss1,
   libxtst6,
   logrotate,
   nginx-extras (>= 1.3.13),
-  postgresql-client (>= 9.1) | mysql-client | mysql-community-client | mariadb-client,
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
-`  redis-tools,'
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,
+`  postgresql-client (>= 9.1) | mysql-client | mysql-community-client | mariadb-client, 
+  redis-tools,'
 ,)dnl
   ttf-mscorefonts-installer,
   xvfb,

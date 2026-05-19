@@ -31,20 +31,6 @@ JSON_EXAMPLE="$JSON_BIN -I -q -f ${EXAMPLE_CONFIG}"
 
 OLD_VERSION="$2"
 
-DB_TYPE=""
-DB_HOST=""
-DB_PORT=""
-DB_USER=""
-DB_PWD=""
-DB_NAME=""
-
-RABBITMQ_PROTO=""
-RABBITMQ_HOST=""
-RABBITMQ_USER=""
-RABBITMQ_PWD=""
-
-REDIS_HOST=""
-
 CLUSTER_MODE=""
 
 create_local_configs(){
@@ -56,6 +42,7 @@ create_local_configs(){
 }
 
 read_saved_params(){
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`
 	db_get M4_ONLYOFFICE_VALUE/db-type || true
 	DB_TYPE="$RET"
 	db_get M4_ONLYOFFICE_VALUE/db-host || true
@@ -78,11 +65,10 @@ read_saved_params(){
 	db_get M4_ONLYOFFICE_VALUE/rabbitmq-pwd || true
 	RABBITMQ_PWD="$RET"
 
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
-`	db_get M4_ONLYOFFICE_VALUE/redis-host || true
+	db_get M4_ONLYOFFICE_VALUE/redis-host || true
 	REDIS_HOST="$RET"
 
-',)dnl
+')dnl
 	db_get M4_ONLYOFFICE_VALUE/cluster-mode || true
 	CLUSTER_MODE="$RET"
 
@@ -336,11 +322,11 @@ case "$1" in
 
 		read_saved_params
 		create_local_configs
-		install_db
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,
+`		install_db
 		save_db_params
 		save_rabbitmq_params
-ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-ie,1,0)||ifelse(M4_PRODUCT_NAME,documentserver-de,1,0)),1,
-`		save_redis_params
+		save_redis_params
 ',)dnl
 		save_jwt_params
 		[ -z "$DS_DOCKER_INSTALLATION" ] && save_wopi_params
@@ -353,7 +339,7 @@ ifelse(eval(ifelse(M4_PRODUCT_NAME,documentserver-ee,1,0)||ifelse(M4_PRODUCT_NAM
 		mkdir -p "$LOG_DIR-example"
 		mkdir -p "$LOG_DIR/converter"
 		mkdir -p "$LOG_DIR/metrics"
-ifelse('M4_DS_ADMINPANEL_ENABLE','1',`mkdir -p "$LOG_DIR/adminpanel"
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpanel"
 ')dnl
 
 		mkdir -p "$APP_DIR/App_Data"
@@ -414,9 +400,11 @@ ifelse('M4_DS_ADMINPANEL_ENABLE','1',`mkdir -p "$LOG_DIR/adminpanel"
 				fi
 			done
 			
-			for SVC in ds-example ifelse('M4_DS_ADMINPANEL_ENABLE','1',`ds-adminpanel',`'); do
+			for SVC in ds-metrics ds-example ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`ds-adminpanel',`'); do
 				if [ -e /usr/lib/systemd/system/$SVC.service ]; then
-					systemctl is-active --quiet "$SVC" && systemctl restart "$SVC"
+					if systemctl is-active --quiet "$SVC" || systemctl is-enabled --quiet "$SVC"; then
+						systemctl restart "$SVC"
+					fi
 				fi
 			done
 

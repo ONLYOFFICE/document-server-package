@@ -2,6 +2,7 @@
 	<id>{#ADMINPANEL_SRV}</id>
 	<name>{#ADMINPANEL_SRV_DISPLAY}</name>
 	<description>{#ADMINPANEL_SRV_DESCR}</description>
+	<autoRefresh>false</autoRefresh>
 	<priority>RealTime</priority>
 	<startmode>Manual</startmode>
 	<serviceaccount><username>NT AUTHORITY\LocalService</username></serviceaccount>

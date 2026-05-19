@@ -78,6 +78,7 @@ location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(info)(\/.*)$ {
 #document formats discovery
 location ~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(meta\/formats)$ {
   add_header Cache-Control "public, max-age=31536000, immutable" always;
+  default_type application/json;
   # gzip_static on;
   alias M4_DS_ROOT/document-formats/onlyoffice-docs-formats.json;
 }

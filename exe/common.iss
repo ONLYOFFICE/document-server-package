@@ -104,8 +104,10 @@
 #define NGINX_DS_CONF '{app}\nginx\conf\ds.conf'
 #define NGINX_DS_TMPL '{app}\nginx\conf\ds.conf.tmpl'
 #define NGINX_DS_SSL_TMPL '{app}\nginx\conf\ds-ssl.conf.tmpl'
+#define NGINX_LETSENCRYPT_CONF '{app}\nginx\conf\includes\ds-letsencrypt.conf'
 
 #define LICENSE_PATH str("{commonappdata}\" + sIntCompanyName + "\Data")
+#define LENSENCRYPT_PATH str("{commonappdata}\" + sIntCompanyName + "\letsencrypt")
 
 #define LogRotateTaskName str(sAppName + " Log Rotate Task")
 #define LOG_ROTATE_BYTES 10485760
@@ -144,7 +146,7 @@ DefaultGroupName        ={#sCompanyName}
 ;WizardImageFile         = data\dialogpicture.bmp
 ;WizardSmallImageFile    = data\dialogicon.bmp
 
-WizardSizePercent         = 110
+WizardSizePercent         = 115
 UsePreviousAppDir         = yes
 DirExistsWarning          =no
 DefaultDirName            ={commonpf}\{#sAppPath}
@@ -332,6 +334,8 @@ Name: "{#NGINX_SRV_DIR}\temp";        Permissions: service-modify
 Name: "{#NGINX_SRV_DIR}\logs";        Permissions: service-modify
 Name: "{#POSTGRESQL_DATA_DIR}";
 Name: "{#LICENSE_PATH}";              Permissions: service-modify
+Name: "{#LENSENCRYPT_PATH}";          Permissions: service-modify
+Name: "{commonappdata}\win-acme";     Permissions: service-modify
 
 [Icons]
 Name: "{group}\{cm:Uninstall}"; Filename: "{uninstallexe}"
@@ -368,15 +372,15 @@ Filename: "{app}\bin\documentserver-flush-cache.bat"; Parameters: "-r false"; Fl
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring===undefined)this.services.CoAuthoring={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPort = '{code:GetDbPort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.sql===undefined)this.services.CoAuthoring.sql={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbHost = '{code:GetDbHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPort = '{code:GetDbPort}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbUser = '{code:GetDbUser}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbPass = '{code:GetDbPwd}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.sql.dbName = '{code:GetDbName}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
 
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.rabbitmq===undefined)this.rabbitmq={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
+Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.rabbitmq.url = '{code:GetRabbitMqProto}://{code:GetRabbitMqUser}:{code:GetRabbitMqPwd}@{code:GetRabbitMqHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services.CoAuthoring.redis===undefined)this.services.CoAuthoring.redis={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.services.CoAuthoring.redis.host = '{code:GetRedisHost}'"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"; Check: IsCommercial;
@@ -428,6 +432,7 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponent = {code
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponentOld = {code:GetWopiExponent}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}";
 
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+Filename: "{#REPLACE}"; Parameters: """root\s+\.\./letsencrypt/;"" ""root {#LENSENCRYPT_PATH};"" ""{#NGINX_LETSENCRYPT_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 ; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
@@ -436,12 +441,12 @@ Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:
 
 Filename: "{cmd}"; Parameters: "/C icacls ""{#NGINX_SRV_DIR}"" /remove:g *S-1-5-32-545"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsUsingDefaultDatabase and CreateDbDefUserAuth;
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsUsingDefaultDatabase;
-Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""ALTER DATABASE {#DbDefName} OWNER TO {#DbDefUser};"""; Flags: runhidden; Check: IsUsingDefaultDatabase;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE USER {#DbDefUser} WITH PASSWORD '{code:GetDbPwd}';"""; Flags: runhidden; Check: IsUsingDefaultDatabase and CreateDbDefUserAuth and IsCommercial;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""CREATE DATABASE {#DbDefName};"""; Flags: runhidden; Check: IsUsingDefaultDatabase and IsCommercial;
+Filename: "{#PSQL}"; Parameters: "-U {#DbAdminUserName} -w -q -c ""ALTER DATABASE {#DbDefName} OWNER TO {#DbDefUser};"""; Flags: runhidden; Check: IsUsingDefaultDatabase and IsCommercial;
 
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode; StatusMsg: "{cm:RemoveDb}"
-Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth; StatusMsg: "{cm:CreateDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\removetbl.sql"""; Flags: runhidden; Check: IsNotClusterMode and IsCommercial; StatusMsg: "{cm:RemoveDb}"
+Filename: "{#PSQL}"; Parameters: "-h {code:GetDbHost} -U {code:GetDbUser} -d {code:GetDbName} -p {code:GetDbPort} -w -q -f ""{app}\server\schema\postgresql\createdb.sql"""; Flags: runhidden; Check: CreateDbAuth and IsCommercial; StatusMsg: "{cm:CreateDb}"
 
 Filename: "{#WINSW}";   Parameters: "install ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#CONVERTER_SRV}}"
 Filename: "{#WINSW}";   Parameters: "start ""{#CONVERTER_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:StartSrv,{#CONVERTER_SRV}}"
@@ -463,6 +468,8 @@ Filename: "sc"; Parameters: "failure ""{#NGINX_SRV}"" actions= restart/60000/res
 Filename: "schtasks"; Parameters: "/Create /F /RU ""{#LOCAL_SERVICE}"" /SC DAILY /TN ""{#LogRotateTaskName}"" /TR ""powershell.exe -NoProfile -ExecutionPolicy Bypass -File \""{app}\bin\documentserver-log-rotate.ps1\"" """; Flags: runhidden; StatusMsg: "{cm:AddRotateTask}"
 
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#NGINX_SRV_DESCR}"" program=""{#NGINX_SRV_DIR}\nginx.exe"" dir=in action=allow protocol=tcp localport={code:GetDefaultPorts}"; Flags: runhidden; StatusMsg: "{cm:FireWallExt}"
+
+Filename: "{cmd}"; Parameters: "/C icacls ""{pf}\Win-Acme"" /grant ""NT AUTHORITY\LOCAL SERVICE:(OI)(CI)M"" /T"; Flags: runhidden waituntilterminated
 
 [UninstallRun]
 Filename: "{app}\bin\documentserver-prepare4shutdown.bat"; Flags: runhidden
@@ -496,11 +503,11 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
+Name: "Prerequisites\WinAcme"; Description: "WinAcme v2.2.9.1701"; Flags: checkablealone; Types: full; Check: not IsWinAcmeInstalled;
 Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: fixed; Types: full custom compact; Check: not IsOpenSSLInstalled;
-Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: not IsPythonInstalled;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 18.1"; Flags: checkablealone; Types: full; Check: not IsPostgreSQLInstalled;
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 4.2.1"; Flags: checkablealone; Types: full; Check: not IsRabbitMQInstalled;
+Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: IsCommercial and not IsPythonInstalled;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 18.1"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsPostgreSQLInstalled;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 4.2.1"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRabbitMQInstalled;
 Name: "Prerequisites\Redis"; Description: "Redis 7.4.0"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRedisInstalled and not UseLocalStorage;
 
 [Code]
@@ -1083,40 +1090,40 @@ end;
 
 procedure InitializeWizard;
 begin
-  DbPage := CreateInputQueryPage(
-    wpPreparing,
-    ExpandConstant('{cm:Postgre}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
-  DbPage.Add(ExpandConstant('{cm:Host}'), False);
-  DbPage.Add(ExpandConstant('{cm:Port}'), False);
-  DbPage.Add(ExpandConstant('{cm:User}'), False);
-  DbPage.Add(ExpandConstant('{cm:Password}'), True);
-  DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
-
-  DbPage.Values[0] := GetDbHost('');
-  DbPage.Values[1] := GetDbPort('');
-  DbPage.Values[2] := GetDbUser('');
-  DbPage.Values[3] := GetDbPwd('');
-  DbPage.Values[4] := GetDbName('');
-
-  RabbitMqPage := CreateInputQueryPage(
-    DbPage.ID,
-    ExpandConstant('{cm:RabbitMq}'),
-    FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
-    FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
-  RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
-  RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
-  RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
-  RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
-
-  RabbitMqPage.Values[0] := GetRabbitMqHost('');
-  RabbitMqPage.Values[1] := GetRabbitMqUser('');
-  RabbitMqPage.Values[2] := GetRabbitMqPwd('');
-  RabbitMqPage.Values[3] := GetRabbitMqProto('');
-
   if IsCommercial then
   begin
+    DbPage := CreateInputQueryPage(
+      wpPreparing,
+      ExpandConstant('{cm:Postgre}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#PostgreSQL}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#PostgreSQL}']));
+    DbPage.Add(ExpandConstant('{cm:Host}'), False);
+    DbPage.Add(ExpandConstant('{cm:Port}'), False);
+    DbPage.Add(ExpandConstant('{cm:User}'), False);
+    DbPage.Add(ExpandConstant('{cm:Password}'), True);
+    DbPage.Add(ExpandConstant('{cm:PostgreDb}'), False);
+
+    DbPage.Values[0] := GetDbHost('');
+    DbPage.Values[1] := GetDbPort('');
+    DbPage.Values[2] := GetDbUser('');
+    DbPage.Values[3] := GetDbPwd('');
+    DbPage.Values[4] := GetDbName('');
+
+    RabbitMqPage := CreateInputQueryPage(
+      DbPage.ID,
+      ExpandConstant('{cm:RabbitMq}'),
+      FmtMessage(ExpandConstant('{cm:PackageConfigure}'), ['{#RabbitMQ}' + '...']),
+      FmtMessage(ExpandConstant('{cm:PackageConnection}'), ['{#RabbitMQ}']));
+    RabbitMqPage.Add(ExpandConstant('{cm:Host}'), False);
+    RabbitMqPage.Add(ExpandConstant('{cm:User}'), False);
+    RabbitMqPage.Add(ExpandConstant('{cm:Password}'), True);
+    RabbitMqPage.Add(ExpandConstant('{cm:Protocol}'), False);
+
+    RabbitMqPage.Values[0] := GetRabbitMqHost('');
+    RabbitMqPage.Values[1] := GetRabbitMqUser('');
+    RabbitMqPage.Values[2] := GetRabbitMqPwd('');
+    RabbitMqPage.Values[3] := GetRabbitMqProto('');
+
     RedisPage := CreateInputQueryPage(
       RabbitMqPage.ID,
       ExpandConstant('{cm:Redis}'),
@@ -1363,23 +1370,23 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := false;
-  if WizardSilent() = false then
+
+  if not WizardSilent() then
   begin
-  case PageID of
-    DbPage.ID:
-      Result := CheckDbConnection;
-    RabbitMqPage.ID:
-      Result := CheckRabbitMqConnection;
-  else
     if IsCommercial then
     begin
-      if PageID = RedisPage.ID then
-      begin
-        Result := CheckRedisConnection or UseLocalStorage;
+      case PageID of
+        DbPage.ID:
+          Result := CheckDbConnection;
+
+        RabbitMqPage.ID:
+          Result := CheckRabbitMqConnection;
+
+        RedisPage.ID:
+          Result := CheckRedisConnection or UseLocalStorage;
       end;
     end;
   end;
- end;
 end;
 
 function ArrayLength(a: array of integer): Integer;
@@ -1424,39 +1431,30 @@ end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := true;
-  if WizardSilent() = false then
+
+  if not WizardSilent() then
   begin
     case CurPageID of
-      DbPage.ID:
-      begin
-        InitDbParams(DbPage.Values[0], DbPage.Values[1], DbPage.Values[2], DbPage.Values[3], DbPage.Values[4]);
-        Result := CheckDbConnection();
-      end;
-      RabbitMqPage.ID:
-      begin
-        InitAmqpServerParams(RabbitMqPage.Values[0], RabbitMqPage.Values[1], RabbitMqPage.Values[2], RabbitMqPage.Values[3]);
-        Result := CheckRabbitMqConnection();
-      end;
       wpWelcome:
         Result := CheckPortOccupied();
       wpSelectComponents:
       begin
-           if WizardIsComponentSelected('Prerequisites\Redis') then
-           begin
-             Dependency_AddRedis;
-           end;
-           if WizardIsComponentSelected('Prerequisites\RabbitMq') then
-           begin
-             Dependency_AddErlang;
-             Dependency_AddRabbitMq;
-           end;
-           if WizardIsComponentSelected('Prerequisites\PostgreSQL') then
-           begin
-             Dependency_AddPostgreSQL;
-           end;
-        if WizardIsComponentSelected('Prerequisites\Certbot') then
+        if WizardIsComponentSelected('Prerequisites\Redis') then
         begin
-          Dependency_AddCertbot;
+          Dependency_AddRedis;
+        end;
+        if WizardIsComponentSelected('Prerequisites\RabbitMq') then
+        begin
+          Dependency_AddErlang;
+          Dependency_AddRabbitMq;
+        end;
+        if WizardIsComponentSelected('Prerequisites\PostgreSQL') then
+        begin
+          Dependency_AddPostgreSQL;
+        end;
+        if WizardIsComponentSelected('Prerequisites\WinAcme') then
+        begin
+          Dependency_AddWinAcme;
         end;
         if WizardIsComponentSelected('Prerequisites\Python') then
         begin
@@ -1466,16 +1464,30 @@ begin
         begin
           Dependency_AddOpenSSL;
         end;
-       end;
-       else
-         if IsCommercial then
+      end;
+    else
+      if IsCommercial then
+      begin
+        case CurPageID of
+          DbPage.ID:
           begin
-            if CurPageID = RedisPage.ID then
-            begin
-              InitRedisParams(RedisPage.Values[0]);
-              Result := CheckRedisConnection();
-            end;
-         end;
+            InitDbParams(DbPage.Values[0], DbPage.Values[1], DbPage.Values[2], DbPage.Values[3], DbPage.Values[4]);
+            Result := CheckDbConnection();
+          end;
+
+          RabbitMqPage.ID:
+          begin
+            InitAmqpServerParams(RabbitMqPage.Values[0], RabbitMqPage.Values[1], RabbitMqPage.Values[2], RabbitMqPage.Values[3]);
+            Result := CheckRabbitMqConnection();
+          end;
+
+          RedisPage.ID:
+          begin
+            InitRedisParams(RedisPage.Values[0]);
+            Result := CheckRedisConnection();
+          end;
+        end;
+      end;
     end;
   end;
 end;

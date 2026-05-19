@@ -19,6 +19,7 @@ map $http_cloudfront_forwarded_proto:$http_x_forwarded_proto $the_scheme {
      default $scheme;
      "~^https?:.*" $http_cloudfront_forwarded_proto;
      "~^:https?$" $http_x_forwarded_proto;
+     "~^:wss$" https;
 }
 
 map $http_x_forwarded_host $the_host {

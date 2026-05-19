@@ -86,7 +86,7 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: "redist\postgresql-18.1-2-windows-x64.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
-Source: "redist\certbot-2.6.0.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
+Source: "redist\Win-acme-2.2.9.1701.msi"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
 Source: "redist\Redis-7.4.0-Windows-x64.msi"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
 Source: "redist\otp_win64_27.3.4.6.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
 Source: "redist\rabbitmq-server-4.2.1.exe"; DestDir: "{tmp}"; Flags: noencryption deleteafterinstall
@@ -103,7 +103,7 @@ Name: custom; Description: {cm:CustomInstall}; Flags: iscustom
 [Components]
 Name: "Program"; Description: "{cm:Program}"; Types: full compact custom; Flags: fixed
 Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
-Name: "Prerequisites\Certbot"; Description: "Certbot"; Flags: checkablealone; Types: full; Check: not IsCertbotInstalled;
+Name: "Prerequisites\WinAcme"; Description: "WinAcme"; Flags: checkablealone; Types: full; Check: not IsWinAcmeInstalled;
 Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: checkablealone; Types: full custom compact; Check: not IsOpenSSLInstalled;
 Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: not IsPythonInstalled;
 Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 18.1"; Flags: checkablealone; Types: full; Check: not IsPostgreSQLInstalled;
@@ -142,9 +142,9 @@ begin
         begin
           Dependency_AddBundledPostgreSQL;
         end;
-        if WizardIsComponentSelected('Prerequisites\Certbot') then
+        if WizardIsComponentSelected('Prerequisites\WinAcme') then
         begin
-          Dependency_AddBundledCertbot;
+          Dependency_AddBundledWinAcme;
         end;
         if WizardIsComponentSelected('Prerequisites\Python') then
         begin

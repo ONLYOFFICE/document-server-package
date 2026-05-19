@@ -7,7 +7,7 @@
 ../../common/documentserver/systemd/ds-docservice.service /usr/lib/systemd/system
 ../../common/documentserver/systemd/ds-converter.service /usr/lib/systemd/system
 ../../common/documentserver/systemd/ds-metrics.service /usr/lib/systemd/system
-ifelse('M4_DS_ADMINPANEL_ENABLE', '1',
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,
 ../../common/documentserver/systemd/ds-adminpanel.service /usr/lib/systemd/system,)
 
 ../../common/documentserver/sudoers/documentserver /etc/sudoers.d

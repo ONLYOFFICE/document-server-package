@@ -2,6 +2,7 @@
 	<id>{#DOCSERVICE_SRV}</id>
 	<name>{#DOCSERVICE_SRV_DISPLAY}</name>
 	<description>{#DOCSERVICE_SRV_DESCR}</description>
+	<autoRefresh>false</autoRefresh>
 	<priority>RealTime</priority>
 	<startmode>Automatic</startmode>
 	<delayedAutoStart>true</delayedAutoStart>

@@ -50,7 +50,7 @@ EXE = $(EXE_BUILD_DIR)/$(COMPANY_NAME)-$(PRODUCT_NAME)-$(PRODUCT_VERSION).$(BUIL
 EXE_PR = $(EXE_BUILD_DIR)/$(COMPANY_NAME)-$(PRODUCT_NAME)-Prerequisites-$(PRODUCT_VERSION).$(BUILD_NUMBER)-x64.exe
 TAR = $(TAR_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(TAR_RELEASE_SUFFIX)-$(TAR_ARCH).tar.gz
 
-PACKAGE_SERVICES ?= ds-docservice ds-converter ds-metrics
+PACKAGE_SERVICES ?= ds-docservice ds-converter
 
 DOCUMENTSERVER = common/documentserver/home
 DOCUMENTSERVER_BIN = common/documentserver/bin
@@ -91,7 +91,7 @@ RABBITMQ := $(EXE_BUILD_DIR)/redist/rabbitmq-server-4.2.1.exe
 ERLANG := $(EXE_BUILD_DIR)/redist/otp_win64_27.3.4.6.exe
 POSTGRESQL := $(EXE_BUILD_DIR)/redist/postgresql-18.1-2-windows-x64.exe
 REDIS := $(EXE_BUILD_DIR)/redist/Redis-7.4.0-Windows-x64.msi
-CERTBOT := $(EXE_BUILD_DIR)/redist/certbot-2.6.0.exe
+WINACME := $(EXE_BUILD_DIR)/redist/Win-acme-2.2.9.1701.msi
 VC2013 := $(EXE_BUILD_DIR)/redist/vcredist2013_x64.exe
 VC2022 := $(EXE_BUILD_DIR)/redist/vcredist2022_x64.exe
 
@@ -102,6 +102,7 @@ SDKJS_DIR :=sdkjs
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 OFFICIAL_PRODUCT_NAME := 'Community Edition'
+RPM_PARAMS += --define 'cc_license 1'
 endif
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-ee))
@@ -193,7 +194,6 @@ else
 endif
 
 ISCC := iscc
-ISCC_PARAMS += -Qp
 ISCC_PARAMS += -DVERSION=$(PRODUCT_VERSION).$(BUILD_NUMBER)
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 ISCC_PARAMS += -DEDITION=community
@@ -205,10 +205,10 @@ endif
 ISCC_PARAMS += -DBRANDING_DIR='$(shell cygpath -a -w "$(BRANDING_DIR)/exe")'
 ifdef ENABLE_SIGNING
 ISCC_PARAMS += -DSIGN
-ISCC_PARAMS += -S'byparam=signtool.exe sign /a /v /n $(firstword $(PUBLISHER_NAME)) /t http://timestamp.digicert.com $$f'
+ISCC_PARAMS += -S'byparam=powershell -ExecutionPolicy Bypass -File $$q$(WORKSPACE)\documents-pipeline\scripts\Sign.ps1$$q -File $$f'
 endif
 
-EXE_PR_DEPS := $(POSTGRESQL) $(CERTBOT) $(REDIS) $(ERLANG) $(RABBITMQ) $(OPENSSL) $(PYTHON) $(VC2013) $(VC2022)
+EXE_PR_DEPS := $(POSTGRESQL) $(WINACME) $(REDIS) $(ERLANG) $(RABBITMQ) $(OPENSSL) $(PYTHON) $(VC2013) $(VC2022)
 
 DEB_DEPS += deb/build/debian/source/format
 DEB_DEPS += deb/build/debian/changelog
@@ -236,7 +236,7 @@ COMMON_DEPS += common/documentserver/nginx/ds.conf
 COMMON_DEPS += common/documentserver-example/nginx/includes/ds-example.conf
 COMMON_DEPS += $(DS_MIME_TYPES)
 
-ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ee))
+ifneq ($(PRODUCT_NAME_LOW),documentserver)
 LINUX_DEPS += common/documentserver/systemd/ds-adminpanel.service
 COMMON_DEPS += common/documentserver/nginx/includes/ds-adminpanel.conf
 endif
@@ -253,6 +253,7 @@ LINUX_DEPS += common/documentserver-example/systemd/ds-example.service
 
 LINUX_DEPS_CLEAN += common/documentserver/systemd/*.service
 LINUX_DEPS_CLEAN += common/documentserver-example/systemd/*.service
+LINUX_DEPS_CLEAN += common/documentserver/nginx/includes/*.conf
 
 LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
 
@@ -263,9 +264,13 @@ endif
 
 LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
 
+LINUX_DEPS += rpm/requires.spec
+LINUX_DEPS += apt-rpm/requires.spec
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 
+LINUX_DEPS_CLEAN += rpm/requires.spec
+LINUX_DEPS_CLEAN += apt-rpm/requires.spec
 LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
 LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
 
@@ -302,6 +307,7 @@ M4_PARAMS += -D M4_DS_FILES='$(DS_FILES)'
 M4_PARAMS += -D M4_DS_EXAMPLE='$(DS_EXAMPLE)'
 M4_PARAMS += -D M4_DEV_NULL='$(DEV_NULL)'
 M4_PARAMS += -D M4_PACKAGE_SERVICES='$(PACKAGE_SERVICES)'
+M4_PARAMS += -D M4_CURRENT_YEAR=$(shell date +"%Y")
 
 RPMBUILD_BINARY_PAYLOAD ?= w9T$(shell nproc).xzdio
 
@@ -366,7 +372,7 @@ documentserver:
 	mkdir -p $(DOCUMENTSERVER_FILES)
 	cp -rf -t $(DOCUMENTSERVER) ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)/*
 
-ifneq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ee))
+ifeq ($(PRODUCT_NAME_LOW),documentserver)
 	rm -rf $(DOCUMENTSERVER)/server/AdminPanel
 endif
 
@@ -382,11 +388,13 @@ endif
 	# rename db account params
 	sed 's|\("db.*": "\)onlyoffice\("\)|\1'$(ONLYOFFICE_VALUE)'\2|'  -i $(DOCUMENTSERVER_CONFIG)/*.json
 
+ifneq ($(PRODUCT_NAME_LOW),documentserver)
 	# rename db schema name
 	sed 's|onlyoffice|'$(ONLYOFFICE_VALUE)'|'  -i $(DOCUMENTSERVER)/server/schema/**/*.sql
 
 	# ignore CREATE DATABASE commands in MySQL
 	sed -r "s/^(CREATE DATABASE|USE)/-- \1/" -i $(DOCUMENTSERVER)/server/schema/mysql/*.sql
+endif
 
 	# rename product in license
 	sed 's|ONLYOFFICE|'$(COMPANY_NAME)'|'  -i $(DOCUMENTSERVER)/server/3rd-Party.txt
@@ -403,11 +411,7 @@ ifeq ($(PLATFORM),win)
 	echo ; >> $(DOCUMENTSERVER)/3rd-Party.txt
 	cat exe/license/3rd-Party.txt ; >> $(DOCUMENTSERVER)/3rd-Party.txt
 endif
-
-	[ -f $(LICENSE_FILE) ] \
-		&& cp -f -t $(DOCUMENTSERVER) $(LICENSE_FILE) \
-		|| cp -f -t $(DOCUMENTSERVER) LICENSE.txt
-
+	cp -f -t $(DOCUMENTSERVER) $(LICENSE_FILE)
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
 	#chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/docbuilder$(EXEC_EXT)
 	[ -f $(HTMLFILEINTERNAL)$(EXEC_EXT) ] && chmod u+x $(HTMLFILEINTERNAL)$(EXEC_EXT) || true
@@ -461,7 +465,7 @@ documentserver-example:
 	/usr/bin/find $(DOCUMENTSERVER_EXAMPLE)/welcome -depth -type f -exec sed -i "s_{{year}}_$(shell date +"%Y")_g" {} \;
 	sed -i "s|{{EXAMPLE_DISABLED_COMMANDS}}|$(EXAMPLE_DISABLED_COMMANDS)|g" $(DOCUMENTSERVER_EXAMPLE)/welcome/example-disabled.html
 
-ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ee))
+ifneq ($(PRODUCT_NAME_LOW),documentserver)
 	sed -i "s|{{ADMIN_DISABLED_COMMANDS}}|$(ADMIN_DISABLED_COMMANDS)|g" $(DOCUMENTSERVER_EXAMPLE)/welcome/admin-disabled.html
 else
 	rm -f $(DOCUMENTSERVER_EXAMPLE)/welcome/admin-disabled.html
@@ -507,10 +511,6 @@ else
 M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=false
 endif
 
-ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver-de documentserver-ee))
-M4_PARAMS += -D M4_DS_ADMINPANEL_ENABLE=1
-endif
-
 ifneq ($(PLUGIN_MANAGER_FILE),)
 %.sh : %.sh.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
@@ -531,6 +531,14 @@ common/documentserver/nginx/ds.conf: common/documentserver/nginx/ds.conf.tmpl
 
 deb/build/debian/% : deb/template/%
 	mkdir -pv $(@D) && cp -fv $< $@
+
+CC_LICENSE_FILE = $(wildcard $(dir $(LICENSE_FILE))LICENSE-CC.txt)
+deb/build/debian/copyright : deb/template/copyright.m4
+	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE_SUFFIX) $< > $@
+	awk -v MAIN_LICENSE="$(LICENSE_FILE)" -v CC_LICENSE="$(CC_LICENSE_FILE)" '\
+		/^License: CC-BY-SA-4.0$$/ { print; while ((getline l < CC_LICENSE)   > 0) print (l == "" ? " ." : " " l); next }\
+		/^License:/                { print; while ((getline l < MAIN_LICENSE) > 0) print (l == "" ? " ." : " " l); next }\
+		                           { print }' $@ > $@.tmp && mv $@.tmp $@
 
 deb/build/debian/% : deb/template/%.m4
 	mkdir -pv $(@D) && m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) -D M4_PACKAGE_VERSION=$(PACKAGE_VERSION)$(DEB_RELEASE_SUFFIX) $< > $@
@@ -579,7 +587,7 @@ $(DS_BIN): documentserver
 	$(AR) $@ ./$(DOCUMENTSERVER)/sdkjs ./$(DOCUMENTSERVER)/server/FileConverter/bin
 
 $(WINSW)      : url = https://github.com/winsw/winsw/releases/download/v3.0.0-alpha.11/WinSW-x64.exe
-$(CERTBOT)    : url = https://github.com/certbot/certbot/releases/download/v2.6.0/certbot-beta-installer-win_amd64_signed.exe
+$(WINACME)    : url = https://github.com/ONLYOFFICE/win-acme-installer/releases/download/v2.2.9.1701/Win-acme-2.2.9.1701.msi
 $(ERLANG)     : url = https://github.com/erlang/otp/releases/download/OTP-27.3.4.6/otp_win64_27.3.4.6.exe
 $(OPENSSL)    : url = https://download.onlyoffice.com/install/windows/redist/FireDaemon-OpenSSL-x64-3.3.0.exe
 $(POSTGRESQL) : url = https://get.enterprisedb.com/postgresql/postgresql-18.1-2-windows-x64.exe
