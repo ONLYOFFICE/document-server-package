@@ -70,16 +70,6 @@ Type: string
 Default: 8083
 Description: M4_PRODUCT_NAME listening port:
 
-Template: M4_ONLYOFFICE_VALUE/docservice-port
-Type: string
-Default: 8000
-Description: M4_PRODUCT_NAME docservice listening port:
-
-Template: M4_ONLYOFFICE_VALUE/example-port
-Type: string
-Default: 3000
-Description: M4_PRODUCT_NAME example listening port:
-
 Template: M4_ONLYOFFICE_VALUE/jwt-enabled
 Type: boolean
 Default: true

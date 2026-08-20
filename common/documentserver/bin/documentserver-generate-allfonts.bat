@@ -51,6 +51,9 @@ ECHO | SET /p="Generating js caches, please wait..."
 
 ECHO Done
 
+ECHO | SET /p="Remove gzipped files..."
+del /f /q "%~dp0..\fonts\*.gz" "%~dp0..\sdkjs\common\AllFonts.js.gz" "%~dp0..\sdkjs\common\Images\*.gz" "%~dp0..\sdkjs\slide\themes\themes.js.gz" 2>nul
+
 rem Restart web-site and converter
 IF NOT "%ONLYOFFICE_DATA_CONTAINER%"=="true" (  
   net stop DsDocServiceSvc

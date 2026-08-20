@@ -1,6 +1,6 @@
 ## Project Overview
 
-ONLYOFFICE document-server-package — build and packaging system for ONLYOFFICE Docs across multiple platforms: DEB (Debian/Ubuntu), RPM (RHEL/CentOS/Fedora), APT-RPM, Windows EXE (Inno Setup), and TAR archives.
+ONLYOFFICE document-server-package — build and packaging system for ONLYOFFICE Docs across multiple platforms: DEB (Debian/Ubuntu), RPM (RHEL/CentOS/Fedora), Windows EXE (Inno Setup), and TAR archives.
 
 ## Tech Stack
 
@@ -9,7 +9,7 @@ GNU Make, M4 macro processor, Bash, Inno Setup (Windows), dpkg/rpmbuild, systemd
 ## Project Structure
 
 ```
-Makefile            — Main build system (602 lines)
+Makefile            — Main build system
 variables.m4        — M4 build variable definitions
 common/documentserver/
   bin/              — Shell/batch/PS1 scripts (M4 templates)
@@ -22,11 +22,10 @@ common/documentserver/
 common/documentserver-example/  — Example app packaging
 deb/template/       — Debian package templates (control, postinst, prerm, etc.)
 rpm/                — RPM spec files and templates
-apt-rpm/            — APT-RPM spec files
 exe/                — Windows installer (Inno Setup scripts, data, nginx configs)
   InnoDependencyInstaller/  — Git submodule for Windows deps
   winsw/            — WinSW XML service configs (AdminPanel, Converter, DocService, Example, Proxy)
-  scripts/          — Python helper scripts (e.g. connectionRabbit.py)
+  scripts/          — Python helper scripts (e.g. connection.py)
 ```
 
 ## Build
@@ -50,7 +49,7 @@ make clean
 
 - M4 macro processor generates platform-specific files from `.m4` templates
 - Expects binaries in `../build_tools/out/` — does NOT contain DocumentServer source code
-- Four editions: Community, Enterprise (-EE), Integration (-IE), Developer (-DE)
+- Three editions: Community, Enterprise (-EE), Developer (-DE)
 - Multi-arch: x86_64, aarch64
 - Windows installer uses Inno Setup with InnoDependencyInstaller submodule
 - systemd services: ds-converter, ds-docservice, ds-metrics, ds-adminpanel

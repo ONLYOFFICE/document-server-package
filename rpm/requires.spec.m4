@@ -1,2 +1,19 @@
-Requires: nginx >= 1.3.13, curl, wget, iproute, libstdc++ >= 4.8.4, libcurl, zlib, libXScrnSaver, atk, gtk3, xorg-x11-server-Xvfb, libXtst, alsa-lib, libselinux-utils, liberation-mono-fonts, logrotate, ca-certificates, msttcore-fonts-installer, openssl, vim-common
-ifelse(regexp(M4_PACKAGE_NAME, `documentserver$'),-1,`Requires: certbot, /usr/bin/psql',)
+# -- system
+Requires: libselinux-utils
+Requires: /usr/sbin/semanage
+Requires: ca-certificates
+Requires: libstdc++ >= 4.8.4
+# -- web server
+Requires: nginx >= 1.18
+# -- tools
+# vim-common provides xxd, used for WOPI modulus decoding
+Requires: vim-common
+Requires: logrotate
+Requires: openssl
+Requires: curl
+Requires: iproute
+# -- fonts
+Requires: liberation-mono-fonts
+Requires: msttcore-fonts-installer
+# -- enterprise/developer editions only
+ifelse(regexp(M4_PACKAGE_NAME, `documentserver$'),-1,`Requires: certbot',)

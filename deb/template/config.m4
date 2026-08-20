@@ -12,12 +12,17 @@ DB_USER=""
 DB_PWD=""
 
 db_fset M4_ONLYOFFICE_VALUE/ds-port seen true
-db_fset M4_ONLYOFFICE_VALUE/docservice-port seen true
-db_fset M4_ONLYOFFICE_VALUE/example-port seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-enabled seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-secret seen true
 db_fset M4_ONLYOFFICE_VALUE/jwt-header seen true
 db_fset M4_ONLYOFFICE_VALUE/wopi-enabled seen true
+
+db_get M4_ONLYOFFICE_VALUE/ds-port
+DS_PORT="$RET"
+if [ "$1" = configure ] && [ -f /etc/M4_DS_PREFIX/nginx/ds.conf ]; then
+	DS_PORT=$(sed -n 's/^[[:space:]]*listen .*:\([0-9]\{2,5\}\).*/\1/p' /etc/M4_DS_PREFIX/nginx/ds.conf | head -n 1)
+fi
+db_set M4_ONLYOFFICE_VALUE/ds-port "${DS_PORT:-$RET}"
 
 ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,
 `db_fset M4_ONLYOFFICE_VALUE/db-type seen true

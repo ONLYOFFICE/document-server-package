@@ -29,13 +29,12 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f ${EXAMPLE_CONFIG}"
 
-OLD_VERSION="$2"
-
 CLUSTER_MODE=""
 
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ -d $(dirname ${i}) -a ! -f ${i} ]; then
+			install -m 600 -D /dev/null ${i}
 			echo {} > ${i}
 		fi
   	done
@@ -80,7 +79,7 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`
 	JWT_HEADER="$RET"
 
 	if [ $JWT_ENABLED = "true" ] && [ -z $JWT_SECRET ]; then
-		JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
+		JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status' to get information about JWT."
 		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
 		db_set M4_ONLYOFFICE_VALUE/jwt-secret $JWT_SECRET || true
 	elif [ $JWT_ENABLED = "false" ]; then
@@ -249,12 +248,15 @@ save_jwt_params(){
 
 setup_nginx(){
    DS_CONF=$CONF_DIR/nginx/ds.conf
-  
+
+  # pre-declare cache_tag; flush-cache.sh sets the real value later
+  [ -e /etc/nginx/includes/ds-cache.conf ] || echo 'set $cache_tag "";' > /etc/nginx/includes/ds-cache.conf
+
   if [ ! -e $DS_CONF ]; then
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
 	  
 	  # generate secure link
-	  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(tr -dc A-Za-z0-9 </dev/urandom | head -c 20) -r false
+	  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink -s $(tr -dc A-Za-z0-9 </dev/urandom | head -c 20) -r false
   elif ! grep -q secure_link_secret $DS_CONF; then
 	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
   fi
@@ -262,18 +264,29 @@ setup_nginx(){
   db_get M4_ONLYOFFICE_VALUE/ds-port || true
   DS_PORT="$RET"
   
-  # db_get M4_ONLYOFFICE_VALUE/docservice-port || true
-  # DOCSERVICE_PORT="$RET"
-  
-  # db_get M4_ONLYOFFICE_VALUE/example-port || true
-  # EXAMPLE_PORT="$RET"
-  
   if ss -tlnp 2>/dev/null | grep -q ":${DS_PORT} "; then
-    echo "Error: port $DS_PORT is already in use. Nginx configuration skipped." >&2
+    PORT_ERROR=false
+
+    if [ "${DS_PORT}" = "8083" ]; then
+      PORT_ERROR=true
+      echo "Error: port ${DS_PORT} is already in use. Nginx configuration skipped." >&2
+    else
+      REQUESTED_PORT="$DS_PORT" DS_PORT=8083
+
+      if ss -tlnp 2>/dev/null | grep -q ":${DS_PORT} "; then
+        PORT_ERROR=true
+        echo "Error: port ${REQUESTED_PORT} is already in use, and so is the fallback port ${DS_PORT}. Nginx configuration skipped." >&2
+      else
+        db_set M4_ONLYOFFICE_VALUE/ds-port "${DS_PORT}" || true
+        echo "Warning: port ${REQUESTED_PORT} is already in use, falling back to port ${DS_PORT}." >&2
+      fi
+    fi
+
     echo "  To reconfigure, run:" >&2
-    echo "    echo 'M4_ONLYOFFICE_VALUE/ds-port string <PORT>' | debconf-set-selections" >&2
+    echo "    echo 'M4_PACKAGE_NAME M4_ONLYOFFICE_VALUE/ds-port string <PORT>' | debconf-set-selections" >&2
     echo "    dpkg-reconfigure -f noninteractive M4_PACKAGE_NAME" >&2
-    return 0
+
+    [ "${PORT_ERROR}" = true ] && return 0
   fi
 
   # setup ds port
@@ -290,12 +303,11 @@ setup_nginx(){
   fi
 
   # validate the generated nginx configuration before it is applied
-  if ! nginx -t >/dev/null 2>&1; then
-    echo "Error: nginx configuration test failed. Run 'nginx -t' for details." >&2
+  mkdir -p "$LOG_DIR"
+  if ! NGINX_TEST_OUTPUT=$(nginx -t 2>&1); then
+    echo "Error: nginx configuration test failed:" >&2
+    echo "$NGINX_TEST_OUTPUT" >&2
   fi
-
-  # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
-  # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
 }
 
 save_wopi_params() {
@@ -359,6 +371,11 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 		# set up read-only access to prevent modification ds's home directory
 		chmod a-w -R "$DIR"*
 		chown ds:ds "$CONF_DIR"/*.json
+		chmod u=rw,go= "$CONF_DIR"/*.json
+ifelse('M4_DS_EXAMPLE_ENABLE', '1',
+`		chown ds:ds "$CONF_DIR-example"/*.json
+		chmod u=rw,go= "$CONF_DIR-example"/*.json
+')dnl
 
 		getent group onlyoffice >/dev/null && { DATA_OWNER="onlyoffice:onlyoffice"; usermod -aG onlyoffice ds; } || DATA_OWNER="ds:ds"
 		mkdir -p "$DIR/../Data" && chown -R "$DATA_OWNER" "$DIR/../Data" && chmod g+rwxs "$DIR/../Data"
@@ -369,14 +386,14 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 
 		# generate allfonts.js, thumbnail and cache_tag
 		if [ -z "$DS_DOCKER_INSTALLATION" ]; then
-			documentserver-generate-allfonts.sh true
-			documentserver-flush-cache.sh -r false
+			documentserver-generate-allfonts true
+			documentserver-flush-cache -r false
 		fi
 
 		# install/update plugins
 		if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
 			echo -n Installing plugins, please wait...
-			documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+			documentserver-pluginsmanager -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
 			echo Done
 		fi
 
@@ -414,7 +431,7 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 				fi
 			done
 
-			service nginx restart >/dev/null 2>&1
+			service nginx reload 2>/dev/null || service nginx start >/dev/null 2>&1
 		fi
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 		echo "$JWT_MESSAGE"
@@ -424,8 +441,8 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 	;;
 	
 	triggered)
-		documentserver-generate-allfonts.sh true
-		documentserver-flush-cache.sh
+		documentserver-generate-allfonts true
+		documentserver-flush-cache
 	;;
 	
 	*)

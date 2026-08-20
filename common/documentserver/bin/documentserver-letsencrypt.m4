@@ -71,7 +71,7 @@ END
 else
     echo "This script provided to automatically get Let's Encrypt SSL Certificates for Document Server"
     echo "usage:"
-    echo "  documentserver-letsencrypt.sh EMAIL DOMAIN"
+    echo "  documentserver-letsencrypt EMAIL DOMAIN"
     echo "      EMAIL       Email used for registration and recovery contact. Use"
     echo "                  comma to register multiple emails, ex:"
     echo "                  u1@example.com,u2@example.com."

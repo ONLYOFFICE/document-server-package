@@ -1,10 +1,9 @@
 Defaults:ds env_reset,secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-Defaults:ds !requiretty
 
 Cmnd_Alias DS_ROOT_SCRIPTS = \
-  /usr/bin/documentserver-letsencrypt.sh *, \
-  /usr/bin/documentserver-generate-allfonts.sh *, \
-  /usr/bin/documentserver-flush-cache.sh *, \
-  /usr/bin/documentserver-example.sh *
+  /usr/bin/documentserver-letsencrypt *, \
+  /usr/bin/documentserver-generate-allfonts *, \
+  /usr/bin/documentserver-flush-cache *, \
+  /usr/bin/documentserver-example *
 
 ds ALL=(root) NOPASSWD: DS_ROOT_SCRIPTS

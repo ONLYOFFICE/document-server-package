@@ -149,7 +149,7 @@ DefaultGroupName        ={#sCompanyName}
 WizardSizePercent         = 115
 UsePreviousAppDir         = yes
 DirExistsWarning          =no
-DefaultDirName            ={commonpf}\{#sAppPath}
+DefaultDirName            ={code:GetDefaultDirName}
 DisableProgramGroupPage   = yes
 DisableWelcomePage        = no
 DEPCompatible             = no
@@ -273,8 +273,11 @@ ru.PackageConnection=Укажите параметры подключения к
 en.CheckConnection=Connection to %1 failed! %n%2 return code %3%nCheck the connection settings and try again.
 ru.CheckConnection=Соединение с %1 не удалось! %n%2 вернул код ошибки %3%nПроверьте настройки соединения и попробуйте снова.
 
-en.NotAvailable=%1 isn't installed or there's no Internet connection,
-ru.NotAvailable=%1 не установлен или отсутствует подключение к Интернету,
+en.NotAvailable=%1 isn't installed.%n
+ru.NotAvailable=%1 не установлен.%n
+
+en.PythonModuleInstallFailed=Failed to install required Python module '%1' (pip return code %2).%nInstall '%1' offline or grant access to PyPI.
+ru.PythonModuleInstallFailed=Не удалось установить необходимый модуль Python '%1' (pip вернул код %2).%nУстановите '%1' офлайн или разрешите доступ к PyPI.
 
 en.SkipValidation=%1 parameters validation will be skipped.
 ru.SkipValidation=будет пропущена проверка параметров %1
@@ -302,17 +305,20 @@ Source: ..\common\documentserver\home\*;            DestDir: {app}; Excludes: "A
 Source: ..\common\documentserver\home\*.exe;        DestDir: {app}; Excludes: "adminpanel.exe"; Flags: ignoreversion recursesubdirs signonce; Components: Program
 Source: ..\common\documentserver\config\*;          DestDir: {app}\config; Flags: ignoreversion recursesubdirs; Permissions: users-readexec; Components: Program
 Source: local\local.json;                           DestDir: {app}\config; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
-Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Excludes: "documentserver-pluginsmanager.bat documentserver-generate-allfonts.bat"; Flags: ignoreversion recursesubdirs; Components: Program
+Source: ..\common\documentserver\bin\*.bat;         DestDir: {app}\bin; Excludes: "documentserver-pluginsmanager.bat documentserver-generate-allfonts.bat documentserver-admin.bat"; Flags: ignoreversion recursesubdirs; Components: Program
 Source: {#file "..\common\documentserver\bin\documentserver-generate-allfonts.bat"};         DestDir: {app}\bin; Excludes: "documentserver-pluginsmanager.bat"; Flags: ignoreversion; Components: Program; DestName: "documentserver-generate-allfonts.bat"
 #ifdef DS_PLUGIN_INSTALLATION
 Source: ..\common\documentserver\bin\documentserver-pluginsmanager.bat;    DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
+#endif
+#ifdef DS_ADMIN
+Source: ..\common\documentserver\bin\documentserver-admin.bat;    DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
 #endif
 Source: ..\common\documentserver\bin\*.ps1;         DestDir: {app}\bin; Flags: ignoreversion recursesubdirs; Components: Program
 Source: nginx\nginx.conf;                           DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\includes\*.conf;  DestDir: {#NGINX_SRV_DIR}\conf\includes; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\*.tmpl;  DestDir: {#NGINX_SRV_DIR}\conf; Flags: ignoreversion recursesubdirs; Components: Program
 Source: ..\common\documentserver\nginx\ds.conf; DestDir: {#NGINX_SRV_DIR}\conf; Flags: onlyifdoesntexist uninsneveruninstall; Components: Program
-Source: scripts\connectionRabbit.py;            DestDir: "{app}"; Flags: ignoreversion; Components: Program
+Source: scripts\connection.py;                  DestDir: "{app}"; Flags: ignoreversion; Components: Program
 Source: winsw\WinSW-x64.exe;                    DestDir: "{app}\winsw"; Flags: ignoreversion; Components: Program
 Source: {#file "winsw\Converter.xml"};          DestDir: "{app}\winsw"; Flags: ignoreversion; DestName: "Converter.xml"
 Source: {#file "winsw\DocService.xml"};         DestDir: "{app}\winsw"; Flags: ignoreversion; DestName: "DocService.xml"
@@ -368,6 +374,8 @@ Filename: "{app}\bin\documentserver-pluginsmanager.bat"; Parameters: "-r false -
 #endif
 
 Filename: "{app}\bin\documentserver-flush-cache.bat"; Parameters: "-r false"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
+
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\bin\documentserver-static-gzip.ps1"" -NoRestartService"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""if(this.services===undefined)this.services={{};"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
@@ -433,9 +441,6 @@ Filename: "{#JSON}"; Parameters: "{#JSON_PARAMS} -e ""this.wopi.exponentOld = {c
 
 Filename: "{#REPLACE}"; Parameters: """(listen .*:)(\d{{2,5}\b)(?! ssl)(.*)"" ""$1""{code:GetDefaultPort}""$3"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 Filename: "{#REPLACE}"; Parameters: """root\s+\.\./letsencrypt/;"" ""root {#LENSENCRYPT_PATH};"" ""{#NGINX_LETSENCRYPT_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-; Filename: "{cmd}"; Parameters: "/C COPY /Y ""{#NGINX_DS_TMPL}"" ""{#NGINX_DS_CONF}"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-; Filename: "{#REPLACE}"; Parameters: "{{{{DOCSERVICE_PORT}} {code:GetDocServicePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
-; Filename: "{#REPLACE}"; Parameters: "{{{{EXAMPLE_PORT}} {code:GetExamplePort} ""{#NGINX_SRV_DIR}\conf\includes\onlyoffice-http.conf"""; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
 Filename: "{app}\bin\documentserver-update-securelink.bat"; Parameters: "{param:SECURE_LINK_SECRET}"; Flags: runhidden; StatusMsg: "{cm:CfgDs}"
 
@@ -506,8 +511,8 @@ Name: "Prerequisites"; Description: "{cm:Prerequisites}"; Types: full
 Name: "Prerequisites\WinAcme"; Description: "WinAcme v2.2.9.1701"; Flags: checkablealone; Types: full; Check: not IsWinAcmeInstalled;
 Name: "Prerequisites\OpenSSL"; Description: "OpenSSL"; Flags: fixed; Types: full custom compact; Check: not IsOpenSSLInstalled;
 Name: "Prerequisites\Python"; Description: "Python 3.11.3 "; Flags: checkablealone; Types: full; Check: IsCommercial and not IsPythonInstalled;
-Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 18.1"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsPostgreSQLInstalled;
-Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 4.2.1"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRabbitMQInstalled;
+Name: "Prerequisites\PostgreSQL"; Description: "PostgreSQL 18.6"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsPostgreSQLInstalled;
+Name: "Prerequisites\RabbitMq"; Description: "RabbitMQ 4.3.5"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRabbitMQInstalled;
 Name: "Prerequisites\Redis"; Description: "Redis 7.4.0"; Flags: checkablealone; Types: full; Check: IsCommercial and not IsRedisInstalled and not UseLocalStorage;
 
 [Code]
@@ -532,6 +537,29 @@ var
   WopiExponent: String;
   PluginsEnabled: String;
   IsDefaultDatabase: Boolean;
+  PreviousAppDir: String;
+
+procedure SavePreviousAppDir;
+var
+  UninstallSubKey: String;
+begin
+  UninstallSubKey := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#sAppId}_is1';
+
+  if not RegQueryStringValue(
+    HKLM64, UninstallSubKey, 'Inno Setup: App Path', PreviousAppDir) then
+  begin
+    RegQueryStringValue(
+      HKLM32, UninstallSubKey, 'Inno Setup: App Path', PreviousAppDir);
+  end;
+end;
+
+function GetDefaultDirName(Param: String): String;
+begin
+  if PreviousAppDir <> '' then
+    Result := PreviousAppDir
+  else
+    Result := ExpandConstant('{commonpf}\{#sAppPath}');
+end;
 
 procedure InitAmqpServerParams(Host, UserName, Password, Proto: String);
 begin
@@ -630,7 +658,7 @@ end;
 
 function ExtractFiles(): Boolean;
 begin
-  ExtractTemporaryFile('connectionRabbit.py');
+  ExtractTemporaryFile('connection.py');
   ExtractTemporaryFile('psql.exe');
   ExtractTemporaryFile('libintl-9.dll');
   ExtractTemporaryFile('libpq.dll');
@@ -641,19 +669,40 @@ begin
   Result := true;
 end;
 
-function InternetConnection(): Boolean;
+function EnsurePythonModule(ModuleName: String): Boolean;
 var
   ResultCode: Integer;
 begin
-  Result := False;
-  Exec('powershell.exe', '-Command "if ((Test-NetConnection -ComputerName www.onlyoffice.com -Port 80).TcpTestSucceeded) { exit 0 } else { exit 1 }"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  if ResultCode = 0 then
-    Result := True;
+  Result := DirExists(
+    ExpandConstant('{sd}') + '\Python\Lib\site-packages\' + ModuleName);
+  if Result then
+    Exit;
+
+  ResultCode := -1;
+  if not Exec(
+    ExpandConstant('{#Pip}'),
+    'install ' + ModuleName,
+    '',
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode) then
+    ResultCode := -1;
+
+  Result := ResultCode = 0;
+  if not Result then
+  begin
+    MsgBox(
+      FmtMessage(
+        ExpandConstant('{cm:PythonModuleInstallFailed}'),
+        ([ModuleName, IntToStr(ResultCode)])),
+      mbError,
+      MB_OK);
+  end;
 end;
 
 function InitializeSetup(): Boolean;
 begin
- 
+  SavePreviousAppDir();
   ExtractFiles();
   Init();
   
@@ -1241,7 +1290,7 @@ begin
     EwWaitUntilTerminated,
     ResultCode);
 
-  if (ResultCode <> 0) or not InternetConnection() then
+  if ResultCode <> 0 then
   begin
     if MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
@@ -1257,27 +1306,22 @@ begin
     end;
   end;
 
-  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\pika') = false then
+  if not EnsurePythonModule('pika') then
   begin
-    Exec(
-    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
-    'install pika',
-    '',
-    SW_HIDE,
-    EwWaitUntilTerminated,
-    ResultCode);
+    Result := false;
+    Exit;
   end;
 
-  if FileExists(ExpandConstant('{tmp}\connectionRabbit.py')) = true then
+  if FileExists(ExpandConstant('{tmp}\connection.py')) = true then
   begin
     ShellExec(
       '',
       ExpandConstant('{#Python}'),
-      (ExpandConstant('{tmp}\connectionRabbit.py') + ' ' +
+      ('"' + ExpandConstant('{tmp}\connection.py') + '" rabbitmq ' +
       GetRabbitMqProto('') + ' ' +
       '"' + GetRabbitMqUser('') + '"' + ' ' +
-      GetRabbitMqPwd('') + ' ' +
-      GetRabbitMqHost('')),
+      '"' + GetRabbitMqPwd('') + '"' + ' ' +
+      '"' + GetRabbitMqHost('') + '"'),
       '',
       SW_HIDE,
       EwWaitUntilTerminated,
@@ -1320,7 +1364,7 @@ begin
     EwWaitUntilTerminated,
     ResultCode);
 
-  if (ResultCode <> 0) or not InternetConnection() then
+  if ResultCode <> 0 then
   begin
     if MsgBox(
       FmtMessage(ExpandConstant('{cm:NotAvailable}'), ['Python']) +
@@ -1336,24 +1380,33 @@ begin
     end;
   end;
 
-  if DirExists(ExpandConstant('{sd}') + '\Python\Lib\site-packages\iredis') = false then
+  if not EnsurePythonModule('redis') then
   begin
-    Exec(
-    ExpandConstant('{sd}') + '\Python\scripts\pip.exe',
-    'install iredis',
-    '',
-    SW_HIDE,
-    EwWaitUntilTerminated,
-    ResultCode);
+    Result := false;
+    Exit;
   end;
 
-  Exec(
-  ExpandConstant('{sd}') + '\Python\scripts\iredis.exe',
-  '-h ' + GetRedisHost('') + ' quit',
-  '',
-  SW_HIDE,
-  EwWaitUntilTerminated,
-  ResultCode);
+  if FileExists(ExpandConstant('{tmp}\connection.py')) = true then
+  begin
+    ShellExec(
+      '',
+      ExpandConstant('{#Python}'),
+      '"' + ExpandConstant('{tmp}\connection.py') + '" redis "' +
+        GetRedisHost('') + '"',
+      '',
+      SW_HIDE,
+      EwWaitUntilTerminated,
+      ResultCode);
+  end
+  else
+  begin
+    MsgBox(
+      ExpandConstant('{cm:CheckFailed}') + ' ' +
+      FmtMessage(ExpandConstant('{cm:SkipValidation}'), ['{#Redis}']),
+      mbInformation,
+      MB_OK);
+    Exit;
+  end;
 
   if ResultCode <> 0 then
   begin

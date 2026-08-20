@@ -35,15 +35,12 @@ ifneq ($(filter aarch%,$(UNAME_M)),)
 	TAR_ARCH := aarch64
 endif
 
-APT_RPM_BUILD_DIR = $(PWD)/apt-rpm/builddir
 RPM_BUILD_DIR = $(PWD)/rpm/builddir
 EXE_BUILD_DIR = exe
 
-APT_RPM_PACKAGE_DIR = $(APT_RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 RPM_PACKAGE_DIR = $(RPM_BUILD_DIR)/RPMS/$(RPM_ARCH)
 TAR_PACKAGE_DIR = $(PWD)
 
-APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(APT_RPM_RELEASE_SUFFIX).$(RPM_ARCH).rpm
 RPM = $(RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)$(RPM_RELEASE_SUFFIX).$(RPM_ARCH).rpm
 DEB = deb/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH)$(DEB_RELEASE_SUFFIX).deb
 EXE = $(EXE_BUILD_DIR)/$(COMPANY_NAME)-$(PRODUCT_NAME)-$(PRODUCT_VERSION).$(BUILD_NUMBER)-x64.exe
@@ -57,7 +54,6 @@ else
 endif
 
 DOCUMENTSERVER = common/documentserver/home
-DOCUMENTSERVER_BIN = common/documentserver/bin
 DOCUMENTSERVER_CONFIG = common/documentserver/config
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/core-fonts
 DOCUMENTSERVER_FILES += $(DOCUMENTSERVER)/license
@@ -76,8 +72,6 @@ HTMLFILEINTERNAL = $(DOCUMENTSERVER)/server/FileConverter/bin/HtmlFileInternal/H
 DOCUMENTSERVER_EXAMPLE = common/documentserver-example/home
 DOCUMENTSERVER_EXAMPLE_CONFIG = common/documentserver-example/config
 
-FONTS = common/fonts
-
 NGINX_VER := nginx-1.21.3
 NGINX_ZIP := $(NGINX_VER).zip
 NGINX := $(DOCUMENTSERVER)/nginx
@@ -90,19 +84,18 @@ PSQL_ZIP := postgresql-18.0-1-windows-x64-binaries.zip
 WINSW := $(EXE_BUILD_DIR)/winsw/WinSW-x64.exe
 
 PYTHON := $(EXE_BUILD_DIR)/redist/python-3.11.3-amd64.exe
+PYTHON_REQUIREMENTS := $(EXE_BUILD_DIR)/scripts/python-requirements.txt
+PYTHON_WHEELS_DIR := $(EXE_BUILD_DIR)/redist/python-wheels
+PYTHON_WHEELS_STAMP := $(PYTHON_WHEELS_DIR)/.downloaded
+PIP_DOWNLOAD ?= python -m pip download
 OPENSSL := $(EXE_BUILD_DIR)/redist/FireDaemon-OpenSSL-x64-3.3.0.exe
-RABBITMQ := $(EXE_BUILD_DIR)/redist/rabbitmq-server-4.2.1.exe
-ERLANG := $(EXE_BUILD_DIR)/redist/otp_win64_27.3.4.6.exe
-POSTGRESQL := $(EXE_BUILD_DIR)/redist/postgresql-18.1-2-windows-x64.exe
+RABBITMQ := $(EXE_BUILD_DIR)/redist/rabbitmq-server-4.3.5.exe
+ERLANG := $(EXE_BUILD_DIR)/redist/otp_win64_27.3.4.16.exe
+POSTGRESQL := $(EXE_BUILD_DIR)/redist/postgresql-18.6-1-windows-x64.exe
 REDIS := $(EXE_BUILD_DIR)/redist/Redis-7.4.0-Windows-x64.msi
 WINACME := $(EXE_BUILD_DIR)/redist/Win-acme-2.2.9.1701.msi
 VC2013 := $(EXE_BUILD_DIR)/redist/vcredist2013_x64.exe
 VC2022 := $(EXE_BUILD_DIR)/redist/vcredist2022_x64.exe
-
-BUILD_DATE := $(shell date +%F-%H-%M)
-
-WEBAPPS_DIR := web-apps
-SDKJS_DIR :=sdkjs
 
 ifeq ($(PRODUCT_NAME_LOW),$(filter $(PRODUCT_NAME_LOW),documentserver))
 OFFICIAL_PRODUCT_NAME := 'Community Edition'
@@ -124,8 +117,6 @@ endif
 ifeq ($(OS),Windows_NT)
 	PLATFORM := win
 	EXEC_EXT := .exe
-	SHELL_EXT := .bat
-	SHARED_EXT := .dll
 	ARCH_EXT := .zip
 	AR := 7z a -y
 	PACKAGES = exe
@@ -145,11 +136,9 @@ else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
 		PLATFORM := linux
-		SHARED_EXT := .so*
-		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
-		PACKAGES = deb rpm tar apt-rpm
+		PACKAGES = deb rpm tar
 		DS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_SHORT_NAME_LOW)
 		NGINX_CONF := /etc/nginx/includes
 		NGINX_LOG := /var/log/$(DS_PREFIX)
@@ -160,13 +149,10 @@ else
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		PLATFORM := mac
-		SHARED_EXT := .dylib
-		SHELL_EXT := .sh
 		ARCH_EXT := .zip
 		AR := 7z a -y
 		NGINX_CONF := /etc/nginx/
 		NGINX_LOG := /var/log/onlyoffice/documentserver/
-		NGINX_CASH := /var/cache/nginx/onlyoffice/documentserver/
 		DS_ROOT := /var/www/onlyoffice/documentserver/
 		DS_FILES := /var/lib/onlyoffice/documentserver/
 		DS_EXAMPLE := /var/www/onlyoffice/documentserver-example
@@ -174,14 +160,14 @@ else
 	endif
 	ifeq ($(UNAME_M),x86_64)
 		ARCHITECTURE := 64
-		PKG_TARGET ?= node18-linux-x64
+		PKG_TARGET ?= node18-linuxstatic-x64
 	endif
 	ifneq ($(filter %86,$(UNAME_M)),)
 		ARCHITECTURE := 32
 	endif
 	ifneq ($(filter aarch%,$(UNAME_M)),)
 		ARCHITECTURE := arm64
-		PKG_TARGET ?= node18-linux-arm64
+		PKG_TARGET ?= node18-linuxstatic-arm64
 	endif
 endif
 
@@ -228,7 +214,6 @@ DEB_DEPS += deb/build/debian/templates
 DEB_DEPS += deb/build/debian/triggers
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).install
 DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).links
-DEB_DEPS += deb/build/debian/$(PACKAGE_NAME).dirs
 
 COMMON_DEPS += common/documentserver/nginx/includes/ds-common.conf
 COMMON_DEPS += common/documentserver/nginx/includes/ds-docservice.conf
@@ -246,6 +231,7 @@ COMMON_DEPS += common/documentserver/nginx/includes/ds-adminpanel.conf
 endif
 
 LINUX_DEPS += common/documentserver/logrotate/ds.conf
+LINUX_DEPS += common/documentserver/fontconfig/09-documentserver-fonts.conf
 
 #Prevent copy old artifacts
 LINUX_DEPS_CLEAN += common/documentserver/logrotate/*.conf
@@ -259,35 +245,28 @@ LINUX_DEPS_CLEAN += common/documentserver/systemd/*.service
 LINUX_DEPS_CLEAN += common/documentserver-example/systemd/*.service
 LINUX_DEPS_CLEAN += common/documentserver/nginx/includes/*.conf
 
-LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.sh.m4))
+LINUX_DEPS += $(basename $(wildcard common/documentserver/bin/*.m4))
 
 ifneq ($(COMPANY_NAME_LOW),onlyoffice)
-LINUX_DEPS := $(filter-out common/documentserver/bin/documentserver-pluginsmanager.sh,$(LINUX_DEPS))
-PLUGIN_MANAGER_FILE := $(wildcard common/documentserver/bin/documentserver-pluginsmanager.sh.m4)
+LINUX_DEPS := $(filter-out common/documentserver/bin/documentserver-pluginsmanager,$(LINUX_DEPS))
 endif
 
 # CE has no AdminPanel, so the host-side CLI wrapper is excluded from CE builds.
 ifeq ($(PRODUCT_NAME_LOW),documentserver)
-LINUX_DEPS := $(filter-out common/documentserver/bin/documentserver-admin.sh,$(LINUX_DEPS))
+LINUX_DEPS := $(filter-out common/documentserver/bin/documentserver-admin,$(LINUX_DEPS))
 endif
 
-LINUX_DEPS_CLEAN += common/documentserver/bin/*.sh
+LINUX_DEPS_CLEAN += $(basename $(wildcard common/documentserver/bin/*.m4))
 
 LINUX_DEPS += rpm/requires.spec
-LINUX_DEPS += apt-rpm/requires.spec
 LINUX_DEPS += rpm/$(PACKAGE_NAME).spec
-LINUX_DEPS += apt-rpm/$(PACKAGE_NAME).spec
 
 LINUX_DEPS_CLEAN += rpm/requires.spec
-LINUX_DEPS_CLEAN += apt-rpm/requires.spec
 LINUX_DEPS_CLEAN += rpm/$(PACKAGE_NAME).spec
-LINUX_DEPS_CLEAN += apt-rpm/$(PACKAGE_NAME).spec
 
-LINUX_DEPS += rpm/bin/documentserver-configure.sh
-LINUX_DEPS += apt-rpm/bin/documentserver-configure.sh
+LINUX_DEPS += rpm/bin/documentserver-configure
 
-LINUX_DEPS_CLEAN += rpm/bin/*.sh
-LINUX_DEPS_CLEAN += apt-rpm/bin/*.sh
+LINUX_DEPS_CLEAN += rpm/bin/documentserver-configure
 
 ifeq ($(COMPANY_NAME_LOW),onlyoffice)
 ONLYOFFICE_VALUE := onlyoffice
@@ -338,11 +317,9 @@ RPM_PARAMS += --define '_ds_prefix $(DS_PREFIX)'
 RPM_PARAMS += --define '_binary_payload $(RPMBUILD_BINARY_PAYLOAD)'
 RPM_PARAMS += --define "__strip /bin/true"
 
-.PHONY: all clean clean-docker rpm deb exe exe-pr packages deploy-bin
+.PHONY: all clean rpm deb exe exe-pr packages deploy-bin
 
-all: rpm deb apt-rpm
-
-apt-rpm:$(APT_RPM)
+all: rpm deb
 
 rpm: $(RPM)
 
@@ -364,7 +341,6 @@ clean:
 		deb/*.changes \
 		deb/*.ddeb \
 		deb/*.deb \
-		$(APT_RPM_BUILD_DIR)\
 		$(RPM_BUILD_DIR)\
 		$(TAR_PACKAGE_DIR)/*.tar.gz\
 		$(EXE_BUILD_DIR)/*.exe\
@@ -375,7 +351,6 @@ clean:
 		$(DOCUMENTSERVER_FILES)\
 		$(DOCUMENTSERVER_EXAMPLE)\
 		$(DS_BIN)\
-		$(FONTS)\
 		$(COMMON_DEPS)\
 		$(LINUX_DEPS_CLEAN)\
 		documentserver\
@@ -421,8 +396,8 @@ endif
 
 ifeq ($(PLATFORM),win)
 	cp -fr -t $(DOCUMENTSERVER)/license exe/license/*.license
-	echo ; >> $(DOCUMENTSERVER)/3rd-Party.txt
-	cat exe/license/3rd-Party.txt ; >> $(DOCUMENTSERVER)/3rd-Party.txt
+	echo >> $(DOCUMENTSERVER)/3rd-Party.txt
+	cat exe/license/3rd-Party.txt >> $(DOCUMENTSERVER)/3rd-Party.txt
 endif
 	cp -f -t $(DOCUMENTSERVER) $(LICENSE_FILE)
 	chmod u+x $(DOCUMENTSERVER)/server/FileConverter/bin/x2t$(EXEC_EXT)
@@ -481,7 +456,7 @@ documentserver-example:
 	sed -i "s|{{HAS_ADMIN_PANEL}}|$(HAS_ADMIN_PANEL)|g"   $(DOCUMENTSERVER_EXAMPLE)/welcome/index.html
 	sed -i "s|{{PRODUCT_VERSION}}|$(PRODUCT_VERSION)|g"   $(DOCUMENTSERVER_EXAMPLE)/welcome/index.html
 
-	/usr/bin/find $(DOCUMENTSERVER_EXAMPLE)/welcome -depth -type f -exec sed -i "s_{{year}}_$(shell date +"%Y")_g" {} \;
+	/usr/bin/find $(DOCUMENTSERVER_EXAMPLE)/welcome -depth -type f -name "*.html" -exec sed -i "s_{{year}}_$(shell date +"%Y")_g" {} \;
 	sed -i "s|{{EXAMPLE_DISABLED_COMMANDS}}|$(EXAMPLE_DISABLED_COMMANDS)|g" $(DOCUMENTSERVER_EXAMPLE)/welcome/example-disabled.html
 
 ifneq ($(PRODUCT_NAME_LOW),documentserver)
@@ -496,19 +471,6 @@ else
 endif
 
 	echo "Done" > $@
-
-apt-rpm/$(PACKAGE_NAME).spec : apt-rpm/package.spec
-	mv -f $< $@
-
-$(APT_RPM): $(COMMON_DEPS) $(LINUX_DEPS) documentserver documentserver-example
-	mkdir -p $(@D)
-	cd $(@D)/../../.. && rpmbuild \
-		-bb \
-		--define '_topdir $(@D)/../../../builddir' \
-		--define '_build_number $(BUILD_NUMBER)$(APT_RPM_RELEASE_SUFFIX)' \
-		--target $(RPM_ARCH) \
-		$(RPM_PARAMS) \
-		$(PACKAGE_NAME).spec
 
 rpm/$(PACKAGE_NAME).spec : rpm/package.spec
 	mv -f $< $@
@@ -530,15 +492,13 @@ else
 M4_PARAMS += -D M4_DS_PLUGIN_INSTALLATION=false
 endif
 
-ifneq ($(PLUGIN_MANAGER_FILE),)
-%.sh : %.sh.m4
+common/documentserver/bin/% : common/documentserver/bin/%.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 	chmod u+x $@
-else ifeq ($(strip $(PLUGIN_MANAGER_FILE)),)
-%.sh : %.sh.m4
+
+rpm/bin/% : rpm/bin/%.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
 	chmod u+x $@
-endif
 
 % : %.m4
 	m4 -I"$(BRANDING_DIR)" $(M4_PARAMS) $< > $@
@@ -575,7 +535,7 @@ $(EXE): iss_file = common.iss
 $(EXE): $(COMMON_DEPS) documentserver documentserver-example $(NGINX) $(PSQL) $(WINSW)
 
 $(EXE_PR): iss_file = prerequisites.iss
-$(EXE_PR): $(EXE_PR_DEPS)
+$(EXE_PR): $(EXE_PR_DEPS) $(PYTHON_WHEELS_STAMP)
 
 $(TAR):
 	cd ../build_tools/out/$(TARGET)/$(COMPANY_NAME_LOW) && \
@@ -607,17 +567,25 @@ $(DS_BIN): documentserver
 
 $(WINSW)      : url = https://github.com/winsw/winsw/releases/download/v3.0.0-alpha.11/WinSW-x64.exe
 $(WINACME)    : url = https://github.com/ONLYOFFICE/win-acme-installer/releases/download/v2.2.9.1701/Win-acme-2.2.9.1701.msi
-$(ERLANG)     : url = https://github.com/erlang/otp/releases/download/OTP-27.3.4.6/otp_win64_27.3.4.6.exe
+$(ERLANG)     : url = https://github.com/erlang/otp/releases/download/OTP-27.3.4.16/otp_win64_27.3.4.16.exe
 $(OPENSSL)    : url = https://download.onlyoffice.com/install/windows/redist/FireDaemon-OpenSSL-x64-3.3.0.exe
-$(POSTGRESQL) : url = https://get.enterprisedb.com/postgresql/postgresql-18.1-2-windows-x64.exe
+$(POSTGRESQL) : url = https://get.enterprisedb.com/postgresql/postgresql-18.6-1-windows-x64.exe
 $(PYTHON)     : url = https://www.python.org/ftp/python/3.11.3/python-3.11.3-amd64.exe
-$(RABBITMQ)   : url = https://github.com/rabbitmq/rabbitmq-server/releases/download/v4.2.1/rabbitmq-server-4.2.1.exe
+$(RABBITMQ)   : url = https://github.com/rabbitmq/rabbitmq-server/releases/download/v4.3.5/rabbitmq-server-4.3.5.exe
 $(REDIS)      : url = https://github.com/ONLYOFFICE/redis-windows/releases/download/7.4.0/Redis-7.4.0-Windows-x64.msi
 $(VC2013)     : url = https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe
 $(VC2022)     : url = https://aka.ms/vs/17/release/vc_redist.x64.exe
 
 $(WINSW) $(EXE_PR_DEPS):
 	mkdir -p $(@D) && $(CURL) $@ $(url)
+
+$(PYTHON_WHEELS_STAMP): $(PYTHON_REQUIREMENTS)
+	mkdir -p $(PYTHON_WHEELS_DIR) && \
+	rm -f $(PYTHON_WHEELS_DIR)/*.whl && \
+	$(PIP_DOWNLOAD) --dest $(PYTHON_WHEELS_DIR) --only-binary=:all: \
+		--platform win_amd64 --python-version 311 --implementation cp --abi cp311 \
+		--requirement $(PYTHON_REQUIREMENTS) && \
+	touch $@
 
 packages: $(PACKAGES)
 

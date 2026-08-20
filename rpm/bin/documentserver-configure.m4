@@ -153,7 +153,7 @@ while [ "$1" != "" ]; do
 		;;
 
 		-? | -h | --help )
-			echo "  Usage: bash documentserver-configure.sh [PARAMETER] [[PARAMETER], ...]"
+			echo "  Usage: documentserver-configure [PARAMETER] [[PARAMETER], ...]"
 			echo
 			echo "    Parameters:"
 			echo "      -p, --dsport                 The value by that incoming connections are listened                             ( Defaults to 8083 )"
@@ -194,11 +194,9 @@ AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
 DB_TYPE=${DB_TYPE:-postgres}
 DS_PORT=${DS_PORT:-8083}
-# DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
-# EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
 
 if [ -z $JWT_SECRET ] && [ -z $JWT_ENABLED ]; then
-	JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
+	JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status' to get information about JWT."
 fi
 
 JWT_ENABLED=${JWT_ENABLED:-true}
@@ -210,7 +208,7 @@ WOPI_ENABLED=${WOPI_ENABLED:-false}
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ ! -f ${i} ]; then
-			install -m 640 -D /dev/null ${i}
+			install -m 600 -D /dev/null ${i}
 			echo {} > ${i}
 		fi
   	done
@@ -220,6 +218,7 @@ tune_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ -f ${i} ]; then
 			chown ds:ds -R ${i}
+			chmod u=rw,go= ${i}
 		fi
   	done
 }
@@ -404,13 +403,14 @@ execute_postgres_scripts(){
 establish_postgres_conn() {
 	echo -n "Trying to establish PostgreSQL connection... "
 
-	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
+	PSQL=$(command -v psql 2>/dev/null || ls -1 /usr/pgsql-*/bin/psql 2>/dev/null | sort -V | tail -n 1)
+	[ -x "$PSQL" ] || { echo "PostgreSQL client not found"; exit 1; }
 
         if [ -n "$DB_PWD" ]; then
                 export PGPASSWORD=$DB_PWD
         fi
 
-	PSQL="psql -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
+	PSQL="$PSQL -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
 	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
 	echo "OK"
@@ -445,12 +445,12 @@ execute_db_script(){
 			establish_postgres_conn || exit $?
 			execute_postgres_scripts || exit $?
 			;;	
-		mysql) 
+		mysql|mariadb)
 			establish_mysql_conn || exit $?
 			execute_mysql_sqript || exit $?
 			;;   
 		*)
-			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres', 'mysql' or 'mariadb'."
 			exit 1	  
 	esac
 }
@@ -501,10 +501,29 @@ setup_nginx(){
   DS_CONF_TMPL=$NGINX_CONF_DIR/ds.conf.tmpl
   DS_CONF=$NGINX_CONF_DIR/ds.conf
 
+  # pre-declare cache_tag; flush-cache.sh sets the real value later
+  [ -e /etc/nginx/includes/ds-cache.conf ] || echo 'set $cache_tag "";' > /etc/nginx/includes/ds-cache.conf
+
   if ss -tlnp 2>/dev/null | grep -q ":${DS_PORT} "; then
-    echo "Error: port $DS_PORT is already in use. Nginx configuration skipped." >&2
-    echo "  To reconfigure, run: documentserver-configure.sh --dsport <PORT>" >&2
-    return 0
+    PORT_ERROR=false
+
+    if [ "${DS_PORT}" = "8083" ]; then
+      PORT_ERROR=true
+      echo "Error: port ${DS_PORT} is already in use. Nginx configuration skipped." >&2
+    else
+      REQUESTED_PORT="$DS_PORT" DS_PORT=8083
+
+      if ss -tlnp 2>/dev/null | grep -q ":${DS_PORT} "; then
+        PORT_ERROR=true
+        echo "Error: port ${REQUESTED_PORT} is already in use, and so is the fallback port ${DS_PORT}. Nginx configuration skipped." >&2
+      else
+        echo "Warning: port ${REQUESTED_PORT} is already in use, falling back to port ${DS_PORT}." >&2
+      fi
+    fi
+
+    echo "  To reconfigure, run: documentserver-configure --dsport <PORT>" >&2
+
+    [ "${PORT_ERROR}" = true ] && return 0
   fi
 
   cp -f ${DS_CONF_TMPL} ${DS_CONF}
@@ -514,9 +533,6 @@ setup_nginx(){
   if [ ! -f /proc/net/if_inet6 ]; then
     sed '/listen\s\+\[::[0-9]*\].\+/d' -i $DS_CONF
   fi
-
-  # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
-  # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
 
   # check whethere enabled
   shopt -s nocasematch
@@ -541,8 +557,9 @@ setup_nginx(){
   done
 
   # validate the generated nginx configuration before it is applied
-  if ! nginx -t >/dev/null 2>&1; then
-    echo "Error: nginx configuration test failed. Run 'nginx -t' for details." >&2
+  if ! NGINX_TEST_OUTPUT=$(nginx -t 2>&1); then
+    echo "Error: nginx configuration test failed:" >&2
+    echo "$NGINX_TEST_OUTPUT" >&2
   fi
 
   systemctl enable nginx
@@ -590,7 +607,7 @@ tune_local_configs
 setup_nginx
 
 # generate secure link
-documentserver-update-securelink.sh -r false
+documentserver-update-securelink -r false
 
 restart_services
 

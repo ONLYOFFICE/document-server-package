@@ -120,9 +120,9 @@ procedure Dependency_AddBundledErlang;
 begin
   if IsErlangInstalled() = False then
   begin
-    ExtractTemporaryFile('otp_win64_27.3.4.6.exe');
+    ExtractTemporaryFile('otp_win64_27.3.4.16.exe');
     Dependency_Add(
-      'otp_win64_27.3.4.6.exe',
+      'otp_win64_27.3.4.16.exe',
       '/S',
       'Erlang 27.3.4 x64',
       '',
@@ -142,7 +142,7 @@ begin
       'Erlang 27.3.4 x64',
       Dependency_String(
         '',
-        'https://github.com/erlang/otp/releases/download/OTP-27.3.4.6/otp_win64_27.3.4.6.exe'),
+        'https://github.com/erlang/otp/releases/download/OTP-27.3.4.16/otp_win64_27.3.4.16.exe'),
       '',
       False,
       False);
@@ -153,11 +153,11 @@ procedure Dependency_AddBundledRabbitMq;
 begin
   if IsRabbitMQInstalled() = False then
   begin
-    ExtractTemporaryFile('rabbitmq-server-4.2.1.exe');
+    ExtractTemporaryFile('rabbitmq-server-4.3.5.exe');
     Dependency_Add(
-      'rabbitmq-server-4.2.1.exe',
+      'rabbitmq-server-4.3.5.exe',
       '/S',
-      'RabbitMQ 4.2.1',
+      'RabbitMQ 4.3.5',
       '',
       '',
       False,
@@ -170,12 +170,12 @@ begin
   if IsRabbitMQInstalled() = False then
   begin
     Dependency_Add(
-      'rabbitmq-server-4.2.1.exe',
+      'rabbitmq-server-4.3.5.exe',
       '/S',
-      'RabbitMQ 4.2.1',
+      'RabbitMQ 4.3.5',
       Dependency_String(
         '',
-        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v4.2.1/rabbitmq-server-4.2.1.exe'),
+        'https://github.com/rabbitmq/rabbitmq-server/releases/download/v4.3.5/rabbitmq-server-4.3.5.exe'),
       '',
       False,
       False);
@@ -186,11 +186,11 @@ procedure Dependency_AddBundledPostgreSQL;
 begin
   if IsPostgreSQLInstalled() = False then
   begin
-    ExtractTemporaryFile('postgresql-18.1-2-windows-x64.exe');
+    ExtractTemporaryFile('postgresql-18.6-1-windows-x64.exe');
     Dependency_Add(
-      'postgresql-18.1-2-windows-x64.exe',
+      'postgresql-18.6-1-windows-x64.exe',
       '--unattendedmodeui none --install_runtimes 0 --mode unattended',
-      'PostgreSQL 18.1 x64',
+      'PostgreSQL 18.6 x64',
       '',
       '',
       False,
@@ -205,10 +205,10 @@ begin
     Dependency_Add(
       'postgresql.exe',
       '--unattendedmodeui none --install_runtimes 0 --mode unattended',
-      'PostgreSQL 18.1 x64',
+      'PostgreSQL 18.6 x64',
       Dependency_String(
         '',
-        'https://get.enterprisedb.com/postgresql/postgresql-18.1-2-windows-x64.exe'),
+        'https://get.enterprisedb.com/postgresql/postgresql-18.6-1-windows-x64.exe'),
       '',
       False,
       False);
