@@ -1,3 +1,15 @@
+# Temporary compatibility aliases for legacy .sh command names
+usr/bin/documentserver-example usr/bin/documentserver-example.sh
+usr/bin/documentserver-flush-cache usr/bin/documentserver-flush-cache.sh
+usr/bin/documentserver-generate-allfonts usr/bin/documentserver-generate-allfonts.sh
+usr/bin/documentserver-jwt-status usr/bin/documentserver-jwt-status.sh
+usr/bin/documentserver-letsencrypt usr/bin/documentserver-letsencrypt.sh
+usr/bin/documentserver-prepare4shutdown usr/bin/documentserver-prepare4shutdown.sh
+usr/bin/documentserver-static-gzip usr/bin/documentserver-static-gzip.sh
+usr/bin/documentserver-update-securelink usr/bin/documentserver-update-securelink.sh
+ifelse('M4_DS_PLUGIN_INSTALLATION','true', usr/bin/documentserver-pluginsmanager usr/bin/documentserver-pluginsmanager.sh,)
+ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1, usr/bin/documentserver-admin usr/bin/documentserver-admin.sh,)
+
 etc/M4_DS_PREFIX/logrotate/ds.conf etc/logrotate.d/ds.conf
 
 etc/M4_DS_PREFIX/nginx/includes/ds-common.conf etc/nginx/includes/ds-common.conf

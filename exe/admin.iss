@@ -14,6 +14,7 @@ Name: "{#ADMINPANEL_SRV_LOG_DIR}";    Permissions: service-modify
 
 [Run]
 Filename: "{#WINSW}";   Parameters: "install ""{#ADMINPANEL_SRV_FILE}"""; Flags: runhidden; StatusMsg: "{cm:InstallSrv,{#ADMINPANEL_SRV}}"
+Filename: "{#WINSW}";   Parameters: "start ""{#ADMINPANEL_SRV_FILE}""";   Flags: runhidden; StatusMsg: "{cm:StartSrv,{#ADMINPANEL_SRV}}"
 
 [UninstallRun]
 Filename: "{#WINSW}"; Parameters: "stop ""{#ADMINPANEL_SRV_FILE}"""; Flags: runhidden

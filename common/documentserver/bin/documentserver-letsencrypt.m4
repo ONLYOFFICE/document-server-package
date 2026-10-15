@@ -3,7 +3,6 @@ set -euo pipefail
 umask 022
 
 LETSENCRYPT_ROOT_DIR="/etc/letsencrypt/live"
-ROOT_DIR="M4_DS_ROOT/letsencrypt"
 NGINX_CONF_DIR="/etc/M4_DS_PREFIX/nginx"
 
 if [ "$#" -ge "2" ]; then
@@ -25,16 +24,17 @@ if [ "$#" -ge "2" ]; then
 
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-    mkdir -p -- "$ROOT_DIR"
-
     command -v certbot >/dev/null 2>&1 || { echo "certbot not found" >&2; exit 5; }
-    printf 'certbot certonly --expand --webroot -w %q --noninteractive --agree-tos --email %q -d %q\n' "$ROOT_DIR" "$LETS_ENCRYPT_MAIL" "$LETS_ENCRYPT_DOMAIN" > /var/log/le-start.log
-    certbot certonly --expand --webroot -w "$ROOT_DIR" --noninteractive --agree-tos --email "$LETS_ENCRYPT_MAIL" -d "$LETS_ENCRYPT_DOMAIN" 2>&1 | tee /var/log/le-new.log
+    printf 'certbot certonly --expand --nginx --noninteractive --agree-tos --email %q -d %q\n' "$LETS_ENCRYPT_MAIL" "$LETS_ENCRYPT_DOMAIN" > /var/log/le-start.log
+    certbot certonly --expand --nginx --noninteractive --agree-tos --email "$LETS_ENCRYPT_MAIL" -d "$LETS_ENCRYPT_DOMAIN" 2>&1 | tee /var/log/le-new.log
 
     if [ -f "$SSL_CERT" ] && [ -f "$SSL_KEY" ]; then
         if [ -f "${NGINX_CONF_DIR}/ds-ssl.conf.tmpl" ]; then
             SECURE_LINK_SECRET="$(grep -oP '(?<=secure_link_secret ).*(?=;)' "${NGINX_CONF_DIR}/ds.conf" | head -n 1 || true)"
             [ -z "$SECURE_LINK_SECRET" ] && { echo "secure_link_secret not found in ${NGINX_CONF_DIR}/ds.conf" >&2; exit 3; }
+
+            LISTEN_ADDRESS="$(sed -n 's/^[[:space:]]*listen[[:space:]]\+\([0-9.]\+\):[0-9]\+.*;/\1/p' "${NGINX_CONF_DIR}/ds.conf" | head -n 1)"
+            [ -z "$LISTEN_ADDRESS" ] && { echo "listen address not found in ${NGINX_CONF_DIR}/ds.conf" >&2; exit 3; }
 
             SECURE_LINK_SECRET_ESC="$(printf '%s' "$SECURE_LINK_SECRET" | tr -d '\r\n' | sed 's/^"\(.*\)"$/\1/; s/[\\&|]/\\&/g')"
             SSL_CERT_ESC="$(printf '%s' "$SSL_CERT" | sed 's/[\\&|]/\\&/g')"
@@ -42,8 +42,13 @@ if [ "$#" -ge "2" ]; then
 
             cp -f -- "${NGINX_CONF_DIR}/ds-ssl.conf.tmpl" "${NGINX_CONF_DIR}/ds.conf"
             sed -e "s|^[[:space:]]*set[[:space:]]\+\$secure_link_secret[[:space:]]\+.*;|set \$secure_link_secret \"${SECURE_LINK_SECRET_ESC}\";|" \
+                -e "s|listen \[::\]:80 default_server;|listen [::]:80;|" \
+                -e "s|listen 0\.0\.0\.0:|listen ${LISTEN_ADDRESS}:|g" \
+                -e "s|^[[:space:]]*server_name[[:space:]]\+_;|  server_name ${LETS_ENCRYPT_DOMAIN};|" \
                 -e "s|{{SSL_CERTIFICATE_PATH}}|${SSL_CERT_ESC}|g" \
                 -e "s|{{SSL_KEY_PATH}}|${SSL_KEY_ESC}|g" -i "${NGINX_CONF_DIR}/ds.conf" 
+
+            [ "$LISTEN_ADDRESS" = "0.0.0.0" ] || sed 's|listen \[::\]:|listen [::1]:|' -i "${NGINX_CONF_DIR}/ds.conf"
         fi
     fi
 
@@ -71,7 +76,7 @@ END
 else
     echo "This script provided to automatically get Let's Encrypt SSL Certificates for Document Server"
     echo "usage:"
-    echo "  documentserver-letsencrypt.sh EMAIL DOMAIN"
+    echo "  documentserver-letsencrypt EMAIL DOMAIN"
     echo "      EMAIL       Email used for registration and recovery contact. Use"
     echo "                  comma to register multiple emails, ex:"
     echo "                  u1@example.com,u2@example.com."

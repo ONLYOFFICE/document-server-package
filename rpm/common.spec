@@ -30,7 +30,6 @@ BIN_DIR=%{buildroot}%{_bindir}
 DATA_DIR=%{buildroot}%{_localstatedir}/lib/%{_ds_prefix}
 CONF_DIR=%{buildroot}%{_sysconfdir}/%{_ds_prefix}
 HOME_DIR=%{buildroot}%{_localstatedir}/www/%{_ds_prefix}
-LIB_DIR=%{buildroot}%{_libdir}
 LOG_DIR=%{buildroot}%{_localstatedir}/log/%{_ds_prefix}
 
 #install documentserver files
@@ -39,8 +38,12 @@ cp -r $DOCUMENTSERVER_HOME/* "$HOME_DIR/"
 
 #install documentserver bin
 mkdir -p "$BIN_DIR/"
-cp -r $DOCUMENTSERVER_BIN/*.sh "$BIN_DIR/"
-cp -r %{_builddir}/../../bin/*.sh "$BIN_DIR/"
+find "$DOCUMENTSERVER_BIN" -maxdepth 1 -type f ! -name '*.*' -exec cp -r -t "$BIN_DIR/" {} +
+cp -r %{_builddir}/../../bin/documentserver-configure "$BIN_DIR/"
+# Temporary compatibility aliases for legacy .sh command names
+for bin in "$BIN_DIR"/documentserver-*; do
+  [ -f "$bin" ] && ln -s "$(basename "$bin")" "$bin.sh"
+done
 
 #install configs
 mkdir -p "$CONF_DIR/"
@@ -92,6 +95,10 @@ DS_LOGROTATE_CONF=$CONF_DIR/logrotate/
 mkdir -p "$DS_LOGROTATE_CONF"
 cp -r %{_builddir}/../../../common/documentserver/logrotate/*.conf "$DS_LOGROTATE_CONF"
 
+#install fontconfig config for custom fonts
+mkdir -p "%{buildroot}%{_sysconfdir}/fonts/conf.d"
+cp %{_builddir}/../../../common/documentserver/fontconfig/09-documentserver-fonts.conf "%{buildroot}%{_sysconfdir}/fonts/conf.d/"
+
 %if %{defined example}
 #install documentserver example files
 mkdir -p "${HOME_DIR}-example/"
@@ -140,10 +147,6 @@ symlinks -c \
   %{buildroot}%{_sysconfdir}/nginx/includes \
   %{buildroot}%{_sysconfdir}/logrotate.d 
 
-%if %{defined example}
-# index.html for rpm
-sed 's/linux.html/linux-rpm.html/g' -i "$DSE_NGINX_CONF/ds-example.conf"
-%endif
 
 # install license file
 mkdir -p %{buildroot}%{_datadir}/licenses/%{_package_name}
@@ -182,8 +185,10 @@ rm -rf "%{buildroot}"
 
 %config %attr(644, root, root) %{_sysconfdir}/%{_ds_prefix}/logrotate/*
 
+%config %attr(644, root, root) %{_sysconfdir}/fonts/conf.d/09-documentserver-fonts.conf
+
 %attr(755, root, root) %{_localstatedir}/www/%{_ds_prefix}/server/FileConverter/bin/*.so*
-%attr(744, root, root) %{_bindir}/documentserver-*.sh
+%attr(744, root, root) %{_bindir}/documentserver-*
 %attr(-, root, root) %{_sysconfdir}/logrotate.d/*
 %attr(-, root, root) %{_sysconfdir}/nginx/%{nginx_conf_d}/*
 %attr(-, root, root) %{_sysconfdir}/nginx/includes/*
@@ -205,6 +210,13 @@ rm -rf "%{buildroot}"
 %endif
 
 %pre
+%if %{defined is_commercial}
+if ! command -v psql >/dev/null 2>&1 && ! command -v mysql >/dev/null 2>&1 && ! ls /usr/pgsql-*/bin/psql >/dev/null 2>&1; then
+  echo "Error: install PostgreSQL or MySQL/MariaDB client before installing %{name}." >&2
+  exit 1
+fi
+%endif
+
 # add group and user for onlyoffice app
 getent group ds >/dev/null || groupadd -r ds
 getent passwd ds >/dev/null || useradd -r -g ds -d %{_localstatedir}/www/%{_ds_prefix}/ -s /sbin/nologin ds
@@ -218,7 +230,7 @@ case "$1" in
   2)
     # Upgrade
     # disconnect all users and stop running services
-    documentserver-prepare4shutdown.sh || true
+    documentserver-prepare4shutdown || documentserver-prepare4shutdown.sh || true
 
     echo "Stopping documentserver services..."
     for SVC in %{package_services}; do
@@ -257,9 +269,7 @@ esac
 
 if [ "$IS_UPGRADE" = "true" ]; then
   NGINX_CONF=%{_sysconfdir}/%{_ds_prefix}/nginx/ds.conf
-  if [ -e $NGINX_CONF ] && ! grep -q secure_link_secret $NGINX_CONF; then
-	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $NGINX_CONF
-  fi
+  [ -e $NGINX_CONF ] && documentserver-update-securelink --generate-secret -r false
 
   chown ds:ds %{_localstatedir}/log/%{_ds_prefix}/**/*.log
 
@@ -296,12 +306,13 @@ if [ "$IS_UPGRADE" = "true" ]; then
     case $DB_TYPE in
       postgres)
         echo -n "Trying to establish PostgreSQL connection... "
-        command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
+        PSQL=$(command -v psql 2>/dev/null || ls -1 /usr/pgsql-*/bin/psql 2>/dev/null | sort -V | tail -n 1)
+        [ -x "$PSQL" ] || { echo "PostgreSQL client not found"; exit 1; }
         CONNECTION_PARAMS="-h$DB_HOST -U$DB_USER -w"
         if [ -n "$DB_PWD" ]; then
           export PGPASSWORD=$DB_PWD
         fi
-        PSQL="psql -q $CONNECTION_PARAMS"
+        PSQL="$PSQL -q $CONNECTION_PARAMS"
         $PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
         echo "OK"
 
@@ -319,7 +330,7 @@ if [ "$IS_UPGRADE" = "true" ]; then
         echo "OK"
         ;;
 
-      mysql)
+      mysql|mariadb)
         echo -n "Trying to database MySQL connection... "
         command -v mysql >/dev/null 2>&1 || { echo "MySQL client not found"; exit 1; }
         MYSQL="mysql -h$DB_HOST -u$DB_USER"
@@ -336,13 +347,13 @@ if [ "$IS_UPGRADE" = "true" ]; then
         ;;
 
       *)
-        echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+        echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres', 'mysql' or 'mariadb'."
         exit 1
     esac
   else
     echo ""
     echo "Update of %{_package_name} ended with a problem"
-    echo "You should reconfigure the package using script \"/usr/bin/documentserver-configure.sh\""
+    echo "You should reconfigure the package using script \"/usr/bin/documentserver-configure\""
     echo ""
   fi
 %endif
@@ -352,8 +363,8 @@ fi
 # generate allfonts.js, thumbnail and cache_tag
 rpm_version=$(rpm -q --qf '%%{version}' rpm | awk -F. '{ printf("%%d%%03d%%03d%%03d", $1,$2,$3,$4); }';)
 if [[ "$rpm_version" -lt "4013001000" ]]; then
-  documentserver-generate-allfonts.sh true
-  documentserver-flush-cache.sh -r false
+  documentserver-generate-allfonts true
+  documentserver-flush-cache -r false
 fi
 
 if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
@@ -364,7 +375,7 @@ if [ "%{DS_PLUGIN_INSTALLATION}" = "true" ]; then
 
   # install/update plugins
   echo -n Installing plugins, please wait...
-  documentserver-pluginsmanager.sh -r false --ignore=\"${IGNORED_PLUGINS_LIST[@]}\" --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+  documentserver-pluginsmanager -r false --ignore=\"${IGNORED_PLUGINS_LIST[@]}\" --update=\"${DIR}/sdkjs-plugins/plugin-list-default.json\" >/dev/null
   echo Done
 fi
 
@@ -404,7 +415,7 @@ for SVC in %{package_services}; do
   fi
 done
 
-for SVC in ds-metrics ds-example %{?is_commercial:ds-adminpanel}; do
+for SVC in ds-metrics ds-example; do
   if [ -e /usr/lib/systemd/system/$SVC.service ]; then
     systemctl is-active --quiet "$SVC" && systemctl restart "$SVC"
   fi
@@ -417,20 +428,20 @@ fi
 echo "$JWT_MESSAGE"
 
 %transfiletriggerin -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
-%{_bindir}/documentserver-generate-allfonts.sh true
-%{_bindir}/documentserver-flush-cache.sh
+%{_bindir}/documentserver-generate-allfonts true
+%{_bindir}/documentserver-flush-cache
 
 %transfiletriggerun -- /usr/share/fonts /usr/share/ghostscript/fonts /usr/share/texmf/fonts
-%{_bindir}/documentserver-generate-allfonts.sh true
-%{_bindir}/documentserver-flush-cache.sh
+%{_bindir}/documentserver-generate-allfonts true
+%{_bindir}/documentserver-flush-cache
 
 %preun
 case "$1" in
   0)
     # Uninstall
     # disconnect all users and stop running services
-    documentserver-prepare4shutdown.sh
-    for SVC in %{package_services} ds-metrics ds-example %{?is_commercial:ds-adminpanel}; do
+    documentserver-prepare4shutdown
+    for SVC in %{package_services} ds-metrics ds-example; do
       if [ -e /usr/lib/systemd/system/$SVC.service ]; then
         systemctl stop $SVC
       fi
@@ -453,7 +464,6 @@ case "$1" in
     # Uninstall
     rm -f $DIR/sdkjs/common/AllFonts.js
     rm -f $DIR/sdkjs/common/Images/fonts_thumbnail*
-    rm -f $DIR/sdkjs/*/sdk-all.cache
     rm -f $DIR/server/FileConverter/bin/font_selection.bin
     rm -f $DIR/server/FileConverter/bin/AllFonts.js
     rm -f $DIR/fonts/*

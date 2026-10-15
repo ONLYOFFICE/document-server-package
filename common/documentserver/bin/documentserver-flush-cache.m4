@@ -21,6 +21,21 @@ while [ "$1" != "" ]; do
 	shift
 done
 
+# Validate the user-supplied hash before it reaches the sed/nginx config.
+# HASH ends up in a sed replacement string (sed -i "s/.../${HASH}/g" ...);
+# an unrestricted value can break out of the s/// syntax and, combined with
+# GNU sed's `e` flag, execute arbitrary shell commands as root (this script
+# is invoked via `sudo ... NOPASSWD`). Restrict to a safe, hash/tag-like charset.
+# (RESTART_CONDITION is only ever compared with `[ ... != "false" ]` below,
+# never interpolated into a command, so it does not need sanitizing.)
+case "$HASH" in
+	'') ;;
+	*[!A-Za-z0-9._-]*)
+		echo "documentserver-flush-cache: invalid --hash value '${HASH}': only [A-Za-z0-9._-] characters are allowed" >&2
+		exit 1
+		;;
+esac
+
 HASH=${HASH:-$(date +'%Y.%m.%d-%H%M' | openssl md5 | awk '{print $2}')}
 
 # Save the hash to a variable in the configuration file

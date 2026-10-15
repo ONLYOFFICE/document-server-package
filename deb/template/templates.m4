@@ -67,18 +67,14 @@ Description: RabbitMQ password:
 
 Template: M4_ONLYOFFICE_VALUE/ds-port
 Type: string
-Default: 80
-Description: M4_PRODUCT_NAME listening port:
+Default: M4_DS_DEFAULT_PORT
+Description: Legacy M4_PRODUCT_NAME listening port:
+ Use M4_ONLYOFFICE_VALUE/listenaddress instead.
 
-Template: M4_ONLYOFFICE_VALUE/docservice-port
+Template: M4_ONLYOFFICE_VALUE/listenaddress
 Type: string
-Default: 8000
-Description: M4_PRODUCT_NAME docservice listening port:
-
-Template: M4_ONLYOFFICE_VALUE/example-port
-Type: string
-Default: 3000
-Description: M4_PRODUCT_NAME example listening port:
+Default: 0.0.0.0:M4_DS_DEFAULT_PORT
+Description: M4_PRODUCT_NAME listening address and port:
 
 Template: M4_ONLYOFFICE_VALUE/jwt-enabled
 Type: boolean

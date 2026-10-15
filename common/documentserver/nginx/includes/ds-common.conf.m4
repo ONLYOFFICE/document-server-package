@@ -5,6 +5,7 @@ underscores_in_headers on;
 
 gzip on;
 gzip_vary on;
+gzip_proxied any;
 gzip_min_length 1024;
 gzip_comp_level 5;
 gzip_disable "msie6";
@@ -22,5 +23,5 @@ gzip_types  text/plain
             application/rtf
             application/wasm;
 
-access_log off;
+access_log M4_NGINX_LOG/nginx.access.log ds_access if=$ds_access_loggable;
 error_log M4_NGINX_LOG/nginx.error.log;

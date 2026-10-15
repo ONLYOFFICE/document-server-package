@@ -19,7 +19,7 @@ execute_after_dh_fixperms:
 	chmod o-rwx debian/M4_PACKAGE_NAME/etc/M4_DS_PREFIX/*.json
 
 override_dh_builddeb:
-	dh_builddeb -- -z9 -Zxz --threads-max=$(shell nproc)
+	dh_builddeb -- -z9 -Zxz --threads-max=$(shell n=$$(nproc); [ $$n -gt 4 ] && echo 4 || echo $$n)
 
 override_dh_systemd_enable:
 	dh_systemd_enable --no-enable

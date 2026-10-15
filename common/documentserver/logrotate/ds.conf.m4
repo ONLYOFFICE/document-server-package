@@ -1,4 +1,5 @@
-/var/log/M4_DS_PREFIX/nginx.error.log {
+/var/log/M4_DS_PREFIX/nginx.error.log
+/var/log/M4_DS_PREFIX/nginx.access.log {
         daily
         missingok
         rotate 30

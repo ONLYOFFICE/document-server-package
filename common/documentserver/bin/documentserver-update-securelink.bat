@@ -11,9 +11,9 @@ set "NGINX_CONF=..\nginx\conf\ds.conf"
 set "DOCSERVICE_CONF=..\config\local.json"
 set "JSON=json.exe -q -f"
 set "REPLACE=replace.exe"
-set "NPM_PATH=..\npm"
+set "NPM_PATH=%~dp0..\npm"
 
-pushd %NPM_PATH%
+pushd "%NPM_PATH%" || exit /b 1
   if exist %NGINX_CONF% (
     >nul find "secure_link_secret" %NGINX_CONF% && (echo:) || (%REPLACE% "(server_tokens.*;\s)" "$1  set $secure_link_secret verysecretstring;" %NGINX_CONF%)
   )

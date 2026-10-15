@@ -1,5 +1,11 @@
 #welcome page
-location = / { return 302 $the_scheme://$the_host$the_prefix/welcome/; }
+location = / {
+  add_header Strict-Transport-Security $hsts_header always;
+  add_header X-Content-Type-Options nosniff always;
+  add_header Set-Cookie "ds_cache_reset=1; Path=/; Max-Age=31536000; SameSite=Lax" always;
+  add_header Clear-Site-Data $clear_site_data always;
+  return 302 $the_scheme://$the_host$the_prefix/welcome/;
+}
 
 #script caching protection
 location ~ ^(?<cache>\/web-apps\/apps\/(?!api\/documents\/api\.js$).*)$ {
@@ -105,7 +111,7 @@ location ~* ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\w]+)?\/(ai-proxy)(\/.*)?$ {
   send_timeout          300s;
 }
 
-location ~ ^/([\d]+\.[\d]+\.[\d]+[\.|-][\w]+)/(?<path>.*)$ {
+location ~ ^/([\d]+\.[\d]+\.[\d]+[\.|-][\w]+)/(?!welcome(?:/|$))(?<path>.*)$ {
   proxy_pass http://docservice/$path$is_args$args;
   proxy_http_version 1.1;
 }

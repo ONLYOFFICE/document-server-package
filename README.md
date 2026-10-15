@@ -14,7 +14,7 @@ Official website: [https://www.onlyoffice.com](https://www.onlyoffice.com/?utm_s
 
 Code repository: [https://github.com/ONLYOFFICE/DocumentServer](https://github.com/ONLYOFFICE/DocumentServer "https://github.com/ONLYOFFICE/DocumentServer")
 
-License: [GNU AGPL v3.0](https://onlyo.co/38YZGJh)
+License: [GNU AGPL v3.0](https://docspace.onlyoffice.com/s/wjQ94v2GWfm65wH)
 
 ONLYOFFICE Docs on official website: [http://www.onlyoffice.com/office-suite.aspx](http://www.onlyoffice.com/office-suite.aspx?utm_source=github&utm_medium=cpc&utm_campaign=GitHubDS)
 

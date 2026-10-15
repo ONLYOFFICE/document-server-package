@@ -19,6 +19,13 @@ while [ "$1" != "" ]; do
 			fi
 		;;
 
+		--listenaddress )
+			if [ "$2" != "" ]; then
+				LISTEN_ADDRESS=$2
+				shift
+			fi
+		;;
+
 		-dbt | --databasetype )
 			if [ "$2" != "" ]; then
 				DB_TYPE=$2
@@ -138,6 +145,13 @@ while [ "$1" != "" ]; do
 			fi
 		;;
 
+		-we | --wopienabled )
+			if [ "$2" != "" ]; then
+				WOPI_ENABLED=$2
+				shift
+			fi
+		;;
+
 		-dbsh | --databaseschema )
 			if [ "$2" != "" ]; then
 				DB_SCHEMA=$2
@@ -146,10 +160,10 @@ while [ "$1" != "" ]; do
 		;;
 
 		-? | -h | --help )
-			echo "  Usage: bash documentserver-configure.sh [PARAMETER] [[PARAMETER], ...]"
+			echo "  Usage: documentserver-configure [PARAMETER] [[PARAMETER], ...]"
 			echo
 			echo "    Parameters:"
-			echo "      -p, --dsport                 The value by that incoming connections are listened                             ( Defaults to 80 )"
+			echo "           --listenaddress         The address and port on which incoming connections are listened                 ( Defaults to 0.0.0.0:8083 )"
 			echo "      -je, --jwtenabled            Specifies the enabling the JSON Web Token validation                            ( Defaults to true )"
 			echo "      -js, --jwtsecret             Defines the secret key to validate the JSON Web Token in the request            ( Defaults to random secret )"
 			echo "      -jh, --jwtheader             Defines the http header that will be used to send the JSON Web Token            ( Defaults to Authorization )"
@@ -168,6 +182,7 @@ while [ "$1" != "" ]; do
 			echo "      -ap, --amqpport              The port for the connection to AMQP server                                      ( Defaults to 5672 )"
 			echo "      -rh, --redishost             The IP address or the name of the host where the Redis server is running"
 			echo "      -rp, --redisport             The port for the connection to Redis server                                     ( Defaults to 6379 )"
+			echo "      -we, --wopienabled           Specifies the enabling the Web Application Open Platform Interface Protocol     ( Defaults to false )"
 			echo "      -?, -h, --help               this help"
 			echo
 			exit 0
@@ -185,22 +200,33 @@ AMQP_SERVER_PROTO=${AMQP_SERVER_PROTO:-amqp}
 AMQP_SERVER_TYPE=${AMQP_SERVER_TYPE:-rabbitmq}
 
 DB_TYPE=${DB_TYPE:-postgres}
-DS_PORT=${DS_PORT:-80}
-# DOCSERVICE_PORT=${DOCSERVICE_PORT:-8000}
-# EXAMPLE_PORT=${EXAMPLE_PORT:-3000}
+DS_PORT=${DS_PORT:-8083}
+LISTEN_ADDRESS=${LISTEN_ADDRESS:-0.0.0.0:${DS_PORT}}
+if ! printf '%s\n' "$LISTEN_ADDRESS" | awk -F '[:.]' '
+	NF != 5 || NR > 1 { exit 1 }
+	$5 !~ /^[0-9]+$/ || $5 < 1 || $5 > 65535 { exit 1 }
+	{ for (i = 1; i <= 4; i++) if ($i !~ /^[0-9]+$/ || $i > 255) exit 1 }
+'; then
+	echo "Error: invalid listenaddress '${LISTEN_ADDRESS}' (example: 127.0.0.1:8083)." >&2
+	exit 1
+fi
+DS_PORT=${LISTEN_ADDRESS##*:}
+LISTEN_ADDRESS=${LISTEN_ADDRESS%:*}
 
 if [ -z $JWT_SECRET ] && [ -z $JWT_ENABLED ]; then
-	JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
+	JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status' to get information about JWT."
 fi
 
 JWT_ENABLED=${JWT_ENABLED:-true}
 JWT_SECRET=${JWT_SECRET:-$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)}
 JWT_HEADER=${JWT_HEADER:-Authorization}
 
+WOPI_ENABLED=${WOPI_ENABLED:-false}
+
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ ! -f ${i} ]; then
-			install -m 640 -D /dev/null ${i}
+			install -m 600 -D /dev/null ${i}
 			echo {} > ${i}
 		fi
   	done
@@ -210,17 +236,12 @@ tune_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ -f ${i} ]; then
 			chown ds:ds -R ${i}
+			chmod u=rw,go= ${i}
 		fi
   	done
 }
 
 restart_services() {
-	[ -a /etc/nginx/sites-available.d/default.conf ] && \
-	mv /etc/nginx/sites-available.d/default.conf /etc/nginx/sites-available.d/default.conf.old
-
-	[ -a /etc/nginx/sites-available.d/onlyoffice-documentserver.conf ] && \
-	mv /etc/nginx/sites-available.d/onlyoffice-documentserver.conf /etc/nginx/sites-available.d/onlyoffice-documentserver.conf.old
-
 	echo -n "Restarting services... "
 	for SVC in M4_PACKAGE_SERVICES nginx; do
 		if [ -e /usr/lib/systemd/system/$SVC.service ]; then
@@ -240,6 +261,10 @@ save_db_params(){
 	$JSON -e "this.services.CoAuthoring.sql.dbPass = '$DB_PWD'"
 	$JSON -e "this.services.CoAuthoring.sql.type = '$DB_TYPE'"
 	$JSON -e "this.services.CoAuthoring.sql.dbPort = '$DB_PORT'"
+	if [ -n "${DB_SCHEMA}" ]; then
+		$JSON -e "if(this.services.CoAuthoring.sql.pgPoolExtraOptions===undefined)this.services.CoAuthoring.sql.pgPoolExtraOptions={};"
+		$JSON -e "this.services.CoAuthoring.sql.pgPoolExtraOptions.options = '-c search_path=${DB_SCHEMA}'"
+	fi
 }
 
 save_rabbitmq_params(){
@@ -273,6 +298,15 @@ save_activemq_params(){
 	else
 		$JSON -e "delete this.activemq.connectOptions.password"
 	fi
+
+	case "${AMQP_SERVER_PROTO}" in
+		amqp+ssl|amqps)
+			$JSON -e "this.activemq.connectOptions.transport = 'tls'"
+		;;
+		*)
+			$JSON -e "delete this.activemq.connectOptions.transport"
+		;;
+	esac 
 }
 
 save_redis_params(){
@@ -297,6 +331,9 @@ save_jwt_params(){
   fi
   
 	${JSON} -e "if(this.services.CoAuthoring.secret===undefined)this.services.CoAuthoring.secret={};"
+
+	${JSON} -e "if(this.services.CoAuthoring.secret.browser===undefined)this.services.CoAuthoring.secret.browser={};"
+	${JSON} -e "this.services.CoAuthoring.secret.browser.string = '${JWT_SECRET}'"
 
 	${JSON} -e "if(this.services.CoAuthoring.secret.inbox===undefined)this.services.CoAuthoring.secret.inbox={};"
 	${JSON} -e "this.services.CoAuthoring.secret.inbox.string = '${JWT_SECRET}'"
@@ -327,73 +364,40 @@ save_jwt_params(){
 
 input_db_params(){
 	echo "Configuring database access... "
-
-	if [ -z $DB_HOST ]; then 
-		read -e -p "Host [${DB_HOST}]: " USER_INPUT
-		DB_HOST=${USER_INPUT:-${DB_HOST}}
-	fi
-
-	if [ -z $DB_NAME ]; then 
-		read -e -p "Database name [${DB_NAME}]: " USER_INPUT
-		DB_NAME=${USER_INPUT:-${DB_NAME}}
-	fi
-
-	if [ -z $DB_USER ]; then 
-		read -e -p "User [${DB_USER}]: " USER_INPUT
-		DB_USER=${USER_INPUT:-${DB_USER}}
-	fi
-
-	if [ -z $DB_PWD ]; then 
-		read -e -p "Password []: " USER_INPUT
-		DB_PWD=${USER_INPUT:-${DB_PWD}}
-	fi
-
+    
+	[ -z $DB_HOST ] && read -e -p "Host: " -i "$DB_HOST" DB_HOST
+	[ -z $DB_NAME ] && read -e -p "Database name: " -i "$DB_NAME" DB_NAME
+	[ -z $DB_USER ] && read -e -p "User: " -i "$DB_USER" DB_USER 
+	[ -z $DB_PWD  ] && read -e -p "Password: " -s DB_PWD
 	echo
 }
 
 input_redis_params(){
 	echo "Configuring redis access... "
-	
-	if [ -z $REDIS_HOST ]; then 
-		read -e -p "Host [${REDIS_HOST}]: " USER_INPUT
-		REDIS_HOST=${USER_INPUT:-${REDIS_HOST}}
-	fi
-	
+	[ -z $REDIS_HOST  ] && read -e -p "Host: " -i "$REDIS_HOST" REDIS_HOST
+
 	#Parse port from host string
 	REDIS_PORT=${REDIS_PORT:-$(echo $REDIS_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
 	REDIS_HOST="${REDIS_HOST/:*/}"
-
 	echo
 }
 
 input_amqp_params(){
 	echo "Configuring AMQP access... "
-
-	if [ -z $AMQP_SERVER_HOST ]; then 
-		read -e -p "Host [${AMQP_SERVER_HOST}]: " USER_INPUT
-		AMQP_SERVER_HOST=${USER_INPUT:-${AMQP_SERVER_HOST}}
-	fi
-
-	if [ -z $AMQP_SERVER_USER ]; then 
-		read -e -p "User [${AMQP_SERVER_USER}]: " USER_INPUT
-		AMQP_SERVER_USER=${USER_INPUT:-${AMQP_SERVER_USER}}
-	fi
-
-	if [ -z $AMQP_SERVER_PWD ]; then 
-		read -e -p "Password []: " -s USER_INPUT
-		AMQP_SERVER_PWD=${USER_INPUT:-${AMQP_SERVER_PWD}}
-	fi
-
- 	#Parse port from host string
+	[ -z $AMQP_SERVER_HOST  ] && read -e -p "Host: " -i "$AMQP_SERVER_HOST" AMQP_SERVER_HOST
+	[ -z $AMQP_SERVER_USER  ] && read -e -p "User: " -i "$AMQP_SERVER_USER" AMQP_SERVER_USER 
+	[ -z $AMQP_SERVER_PWD   ] && read -e -p "Password: " -s AMQP_SERVER_PWD
+	
+	#Parse port from host string
 	AMQP_SERVER_PORT=${AMQP_SERVER_PORT:-$(echo $AMQP_SERVER_HOST | grep : | sed -r 's_^.*:+|/.*$__g')}
 	AMQP_SERVER_PATH="$(echo $AMQP_SERVER_HOST | grep / | cut -d/ -f2-)"
 	AMQP_SERVER_HOST="${AMQP_SERVER_HOST/:*/}"
-
+	
 	AMQP_SERVER_URL=$AMQP_SERVER_PROTO://$AMQP_SERVER_USER:$AMQP_SERVER_PWD@$AMQP_SERVER_HOST
 	[ ! -z $AMQP_SERVER_PORT ] && AMQP_SERVER_URL="$AMQP_SERVER_URL:$AMQP_SERVER_PORT"
     [ ! -z $AMQP_SERVER_PATH ] && AMQP_SERVER_URL="$AMQP_SERVER_URL/$AMQP_SERVER_PATH"
-
-	echo
+    
+    echo
 }
 
 execute_postgres_scripts(){
@@ -404,7 +408,6 @@ execute_postgres_scripts(){
 	if [ -n "${DB_SCHEMA}" ]; then
 		export PGOPTIONS="-c search_path=${DB_SCHEMA}"
 		$PSQL -c "CREATE SCHEMA IF NOT EXISTS ${DB_SCHEMA};" >/dev/null 2>&1
-		$JSON -e "this.services.CoAuthoring.sql.pgPoolExtraOptions ||= {}; this.services.CoAuthoring.sql.pgPoolExtraOptions.options = '${PGOPTIONS}'"
 	fi
 
         if [ ! "$CLUSTER_MODE" = true ]; then
@@ -412,20 +415,20 @@ execute_postgres_scripts(){
         fi
 
 	$PSQL -f "$DIR/server/schema/postgresql/createdb.sql" >/dev/null 2>&1
-
 	echo "OK"
 }
 
 establish_postgres_conn() {
 	echo -n "Trying to establish PostgreSQL connection... "
 
-	command -v psql >/dev/null 2>&1 || { echo "PostgreSQL client not found"; exit 1; }
+	PSQL=$(command -v psql 2>/dev/null || ls -1 /usr/pgsql-*/bin/psql 2>/dev/null | sort -V | tail -n 1)
+	[ -x "$PSQL" ] || { echo "PostgreSQL client not found"; exit 1; }
 
         if [ -n "$DB_PWD" ]; then
                 export PGPASSWORD=$DB_PWD
         fi
 
-	PSQL="psql -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
+	PSQL="$PSQL -q -h$DB_HOST -p${DB_PORT:="5432"} -d$DB_NAME -U$DB_USER -w"
 	$PSQL -c ";" >/dev/null 2>&1 || { echo "FAILURE"; exit 1; }
 
 	echo "OK"
@@ -452,6 +455,7 @@ establish_mysql_conn(){
 }
 
 execute_db_script(){
+	#Parse port from host string
 	DB_PORT=${DB_PORT:-$(echo $DB_HOST | sed -r 's/^[^:]+|[^[:digit:]]//g')}
 	DB_HOST="${DB_HOST/:*/}"
 	case $DB_TYPE in
@@ -459,12 +463,12 @@ execute_db_script(){
 			establish_postgres_conn || exit $?
 			execute_postgres_scripts || exit $?
 			;;	
-		mysql) 
+		mysql|mariadb)
 			establish_mysql_conn || exit $?
 			execute_mysql_sqript || exit $?
 			;;   
 		*)
-			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres' or 'mysql'."
+			echo "Incorrect DB_TYPE value! Possible value of DB_TYPE is 'postgres', 'mysql' or 'mariadb'."
 			exit 1	  
 	esac
 }
@@ -472,7 +476,7 @@ execute_db_script(){
 establish_redis_conn() {
 	echo -n "Trying to establish redis connection... "
 
-	lsof -iTCP:${REDIS_PORT:="6379"} -sTCP:LISTEN -P -n >/dev/null
+	exec {FD}<> /dev/tcp/$REDIS_HOST/${REDIS_PORT:="6379"} && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -485,7 +489,7 @@ establish_redis_conn() {
 establish_amqp_conn() {
 	echo -n "Trying to establish AMQP connection... "
   
-	lsof -iTCP:${AMQP_SERVER_PORT:="5672"} -sTCP:LISTEN -P -n >/dev/null
+	exec {FD}<> /dev/tcp/$AMQP_SERVER_HOST/${AMQP_SERVER_PORT:="5672"} && exec {FD}>&-
 
 	if [ "$?" != 0 ]; then
 		echo "FAILURE";
@@ -515,25 +519,62 @@ setup_nginx(){
   DS_CONF_TMPL=$NGINX_CONF_DIR/ds.conf.tmpl
   DS_CONF=$NGINX_CONF_DIR/ds.conf
 
+  port_conflict(){
+    ss -tlnp 2>/dev/null | grep ":$1 " | grep -Fqv 'users:(("nginx",' ||
+      { ! grep -q "listen .*:$1\([ ;]\)" "$DS_CONF" 2>/dev/null && ss -tlnp 2>/dev/null | grep -q ":$1 "; }
+  }
+
+  # pre-declare cache_tag; flush-cache.sh sets the real value later
+  [ -e /etc/nginx/includes/ds-cache.conf ] || echo 'set $cache_tag "";' > /etc/nginx/includes/ds-cache.conf
+
+  if port_conflict "$DS_PORT"; then
+    PORT_ERROR=false
+
+    if [ "${DS_PORT}" = "8083" ]; then
+      PORT_ERROR=true
+      echo "Error: port ${DS_PORT} is already in use. Nginx configuration skipped." >&2
+    else
+      REQUESTED_PORT="$DS_PORT" DS_PORT=8083
+
+      if port_conflict "$DS_PORT"; then
+        PORT_ERROR=true
+        echo "Error: port ${REQUESTED_PORT} is already in use, and so is the fallback port ${DS_PORT}. Nginx configuration skipped." >&2
+      else
+        echo "Warning: port ${REQUESTED_PORT} is already in use, falling back to port ${DS_PORT}." >&2
+      fi
+    fi
+
+    echo "  To reconfigure, run: documentserver-configure --listenaddress <ADDRESS:PORT>" >&2
+
+    [ "${PORT_ERROR}" = true ] && return 0
+  fi
+
   cp -f ${DS_CONF_TMPL} ${DS_CONF}
   sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
+  sed "s/listen [0-9.]\+:/listen ${LISTEN_ADDRESS}:/" -i $DS_CONF
+  if [ "${LISTEN_ADDRESS}" = "0.0.0.0" ]; then
+    sed 's/listen \[::1\]:/listen [::]:/' -i $DS_CONF
+  elif [ -f /proc/net/if_inet6 ] && ip -6 addr show lo 2>/dev/null | grep -q '::1'; then
+    sed 's/listen \[::\]:/listen [::1]:/' -i $DS_CONF
+  else
+    # IPv6 loopback isn't actually bindable on this host — an unconditional listen [::1]: would fail nginx's bind() and take the whole master process down, including the IPv4 listener
+    sed '/listen\s\+\[::\]:.\+/d' -i $DS_CONF
+  fi
 
   # check if ipv6 supported otherwise remove it from nginx config
   if [ ! -f /proc/net/if_inet6 ]; then
     sed '/listen\s\+\[::[0-9]*\].\+/d' -i $DS_CONF
   fi
 
-  # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/' -i $OO_CONF
-  # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/' -i $OO_CONF
-
   # check whethere enabled
   shopt -s nocasematch
   PORTS=()
-  case $(/usr/sbin/getenforce) in
+  case $(getenforce) in
     enforcing|permissive)
+      PORTS+=("$DS_PORT")
       PORTS+=('8000')
       PORTS+=('3000')
-	  /usr/sbin/setsebool -P httpd_can_network_connect on
+	  setsebool -P httpd_can_network_connect on
     ;;
     disabled)
       :
@@ -542,10 +583,39 @@ setup_nginx(){
 
   # add selinux extentions
   for PORT in ${PORTS[@]}; do
-    /usr/sbin/semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
-      /usr/sbin/semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+    semanage port -a -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
+      semanage port -m -t http_port_t -p tcp $PORT >/dev/null 2>&1 || \
       true
   done
+
+  # validate the generated nginx configuration before it is applied
+  if ! NGINX_TEST_OUTPUT=$(nginx -t 2>&1); then
+    echo "Error: nginx configuration test failed:" >&2
+    echo "$NGINX_TEST_OUTPUT" >&2
+  fi
+
+  systemctl enable nginx
+}
+
+save_wopi_params() {
+	WOPI_PRIVATE_KEY="/etc/M4_DS_PREFIX/wopi_private.key"
+	WOPI_PUBLIC_KEY="/etc/M4_DS_PREFIX/wopi_public.key"
+
+	[ ! -f "${WOPI_PRIVATE_KEY}" ] && echo -n "Generating WOPI private key..." && openssl genpkey -algorithm RSA -outform PEM -out "${WOPI_PRIVATE_KEY}" >/dev/null 2>&1 && echo "Done"
+	[ ! -f "${WOPI_PUBLIC_KEY}" ] && echo -n "Generating WOPI public key..." && openssl rsa -RSAPublicKey_out -in "${WOPI_PRIVATE_KEY}" -outform "MS PUBLICKEYBLOB" -out "${WOPI_PUBLIC_KEY}" >/dev/null 2>&1  && echo "Done"
+	WOPI_MODULUS=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -modulus -noout -in "${WOPI_PUBLIC_KEY}" | sed 's/Modulus=//' | xxd -r -p | openssl base64 -A)
+	WOPI_EXPONENT=$(openssl rsa -pubin -inform "MS PUBLICKEYBLOB" -text -noout -in "${WOPI_PUBLIC_KEY}" | grep -oP '(?<=Exponent: )\d+')
+
+	${JSON} -e "if(this.wopi===undefined)this.wopi={};"
+	${JSON} -e "this.wopi.enable = ${WOPI_ENABLED}"
+	${JSON} -e "this.wopi.privateKey = '$(awk '{printf "%s\\n", $0}' ${WOPI_PRIVATE_KEY})'"
+	${JSON} -e "this.wopi.privateKeyOld = '$(awk '{printf "%s\\n", $0}' ${WOPI_PRIVATE_KEY})'"
+	${JSON} -e "this.wopi.publicKey = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.publicKeyOld = '$(openssl base64 -in ${WOPI_PUBLIC_KEY} -A)'"
+	${JSON} -e "this.wopi.modulus = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.modulusOld = '${WOPI_MODULUS}'"
+	${JSON} -e "this.wopi.exponent = ${WOPI_EXPONENT}"
+	${JSON} -e "this.wopi.exponentOld = ${WOPI_EXPONENT}"
 }
 
 create_local_configs
@@ -553,25 +623,23 @@ create_local_configs
 ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,
 input_db_params
 execute_db_script
-
 input_redis_params
 establish_redis_conn || exit $?
-
 input_amqp_params
 establish_amqp_conn || exit $?
-
 save_db_params
 save_amqp_params
 save_redis_params
 ,)dnl
 save_jwt_params
+save_wopi_params
 
 tune_local_configs
 
 setup_nginx
 
 # generate secure link
-documentserver-update-securelink.sh
+documentserver-update-securelink -r false
 
 restart_services
 

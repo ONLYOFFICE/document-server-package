@@ -6,6 +6,8 @@ if (-not $wacs_cmd) {
   exit
 }
 
+$wacs_path = $wacs_cmd.Source
+
 function Assert-ValidDomain {
   param([Parameter(Mandatory)][string]$Domain)
   if ($Domain -notmatch '^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$') {
@@ -40,8 +42,8 @@ if ( $args.Count -ge 2 )
 
   [void](New-Item -ItemType "directory" -Path "${root_dir}\Logs" -Force)
 
-  "wacs --target manual --host ${letsencrypt_domain} --validation filesystem --webroot `"${root_dir}`" --store pemfiles --pemfilespath `"${root_dir}`" --pemfilesname ${letsencrypt_domain} --installation none --emailaddress ${letsencrypt_mail} --accepttos --closeonfinish" > "${root_dir}\Logs\le-start.log"
-  & wacs --target manual --host ${letsencrypt_domain} --validation filesystem --webroot ${root_dir} --store pemfiles --pemfilespath ${root_dir} --pemfilesname ${letsencrypt_domain} --installation none --emailaddress ${letsencrypt_mail} --accepttos --closeonfinish *>> "${root_dir}\Logs\le-new.log"
+  "wacs --target manual --host ${letsencrypt_domain} --validation filesystem --webroot `"${root_dir}`" --store pemfiles --pemfilespath `"${root_dir}`" --pemfilesname ${letsencrypt_domain} --installation none --emailaddress ${letsencrypt_mail} --accepttos --closeonfinish --notaskscheduler" > "${root_dir}\Logs\le-start.log"
+  & $wacs_path --target manual --host ${letsencrypt_domain} --validation filesystem --webroot ${root_dir} --store pemfiles --pemfilespath ${root_dir} --pemfilesname ${letsencrypt_domain} --installation none --emailaddress ${letsencrypt_mail} --accepttos --closeonfinish --notaskscheduler *>> "${root_dir}\Logs\le-new.log"
 
   pushd "${root_dir}"
     $certFile = Get-ChildItem $root_dir -File | ? { $_.Name -match "^$letsencrypt_domain.*(fullchain|chain)\.pem$" -and $_.Name -notmatch "chain-only" } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
@@ -66,14 +68,27 @@ if ( $args.Count -ge 2 )
   Restart-Service -Name $proxy_service
 
   @(
-    "wacs --renew --baseuri `"https://acme-v02.api.letsencrypt.org/`" >> `"$root_dir\Logs\le-renew.log`"",
+    "`"$wacs_path`" --renew --baseuri `"https://acme-v02.api.letsencrypt.org/`" >> `"$root_dir\Logs\le-renew.log`" 2>&1",
     "net stop $proxy_service",
     "net start $proxy_service"
   ) | Set-Content -Path "$root_dir\letsencrypt_cron.bat" -Encoding ascii
 
-  $day = (Get-Date -Format "dddd").ToUpper().SubString(0, 3)
+  $day = (Get-Date).DayOfWeek.ToString().ToUpperInvariant().SubString(0, 3)
   $time = Get-Date -Format "HH:mm"
-  cmd.exe /c "SCHTASKS /F /CREATE /SC WEEKLY /D $day /TN `"Win-Acme renew`" /TR `"$root_dir\letsencrypt_cron.bat`" /ST $time"
+  & "$env:SystemRoot\System32\schtasks.exe" /F /CREATE /SC WEEKLY /D $day /TN "Win-Acme renew" /TR "$root_dir\letsencrypt_cron.bat" /ST $time 2>&1
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Unable to create the 'Win-Acme renew' scheduled task (SCHTASKS exit code: $LASTEXITCODE). Automatic certificate renewal will not run; please create the task manually."
+  }
+}
+elseif ($args[0] -eq "-d" -or $args[0] -eq "--default") {
+  $app = Split-Path -Parent $PSScriptRoot
+  $nginx_conf_dir = "${app}\nginx\conf"
+  $config = "${nginx_conf_dir}\ds.conf"
+  $secure_link_secret = (Select-String -Path $config -Pattern 'secure_link_secret (.*)' | Select-Object -First 1).Matches.Groups[1].Value
+  Copy-Item "${nginx_conf_dir}\ds.conf.tmpl" -Destination $config
+  ((Get-Content -Path $config -Raw) -replace 'secure_link_secret (.*)', "secure_link_secret $secure_link_secret") | Set-Content -Path $config
+  Restart-Service -Name "DsProxySvc"
+  Write-Output "Returned to the default proxy configuration."
 }
 else
 {
@@ -84,4 +99,8 @@ else
   Write-Output "                  comma to register multiple emails, ex: "
   Write-Output "                  u1@example.com,u2@example.com. "
   Write-Output "      DOMAIN      Domain name to apply "
+  Write-Output " "
+  Write-Output " Return to the default HTTP proxy configuration: "
+  Write-Output "   documentserver-letsencrypt.ps1 -d | --default "
+  Write-Output " Certificates and automatic renewal settings are preserved. "
 }

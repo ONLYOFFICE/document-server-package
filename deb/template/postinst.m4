@@ -29,13 +29,12 @@ JSON_BIN="$DIR/npm/json"
 JSON="$JSON_BIN -I -q -f $LOCAL_CONFIG"
 JSON_EXAMPLE="$JSON_BIN -I -q -f ${EXAMPLE_CONFIG}"
 
-OLD_VERSION="$2"
-
 CLUSTER_MODE=""
 
 create_local_configs(){
 	for i in $LOCAL_CONFIG $EXAMPLE_CONFIG; do
 		if [ -d $(dirname ${i}) -a ! -f ${i} ]; then
+			install -m 600 -D /dev/null ${i}
 			echo {} > ${i}
 		fi
   	done
@@ -80,7 +79,7 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`
 	JWT_HEADER="$RET"
 
 	if [ $JWT_ENABLED = "true" ] && [ -z $JWT_SECRET ]; then
-		JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status.sh' to get information about JWT."
+		JWT_MESSAGE="JWT is enabled by default. A random secret is generated automatically. Run the command '# documentserver-jwt-status' to get information about JWT."
 		JWT_SECRET=$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
 		db_set M4_ONLYOFFICE_VALUE/jwt-secret $JWT_SECRET || true
 	elif [ $JWT_ENABLED = "false" ]; then
@@ -249,27 +248,81 @@ save_jwt_params(){
 
 setup_nginx(){
    DS_CONF=$CONF_DIR/nginx/ds.conf
-  
+
+  port_conflict(){
+    ss -tlnp 2>/dev/null | grep ":$1 " | grep -Fqv 'users:(("nginx",' ||
+      { { [ "$FRESH_DS_CONF" = true ] || ! grep -q "listen .*:$1\([ ;]\)" "$DS_CONF" 2>/dev/null; } && ss -tlnp 2>/dev/null | grep -q ":$1 "; }
+  }
+
+  # pre-declare cache_tag; flush-cache.sh sets the real value later
+  [ -e /etc/nginx/includes/ds-cache.conf ] || echo 'set $cache_tag "";' > /etc/nginx/includes/ds-cache.conf
+
   if [ ! -e $DS_CONF ]; then
 	  cp -f ${DS_CONF}.tmpl ${DS_CONF}
-	  
-	  # generate secure link
-	  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink.sh -s $(tr -dc A-Za-z0-9 </dev/urandom | head -c 20) -r false
-  elif ! grep -q secure_link_secret $DS_CONF; then
-	  sed '/server_tokens/a \ \ set $secure_link_secret verysecretstring;' -i $DS_CONF
+	  FRESH_DS_CONF=true
+  else
+    OLD_LISTEN_ADDRESS=$(sed -n 's/^[[:space:]]*listen[[:space:]]\+\([0-9.]\+\):[0-9]\+.*/\1/p' "$DS_CONF" | head -n 1)
   fi
 
-  db_get M4_ONLYOFFICE_VALUE/ds-port || true
-  DS_PORT="$RET"
-  
-  # db_get M4_ONLYOFFICE_VALUE/docservice-port || true
-  # DOCSERVICE_PORT="$RET"
-  
-  # db_get M4_ONLYOFFICE_VALUE/example-port || true
-  # EXAMPLE_PORT="$RET"
-  
+  # generate secure link
+  [ -z "$DS_DOCKER_INSTALLATION" ] && documentserver-update-securelink --generate-secret -r false
+
+  db_get M4_ONLYOFFICE_VALUE/listenaddress || true
+  LISTEN_ADDRESS="$RET"
+  if ! printf '%s\n' "$LISTEN_ADDRESS" | awk -F '[:.]' '
+    NF != 5 || NR > 1 { exit 1 }
+    $5 !~ /^[0-9]+$/ || $5 < 1 || $5 > 65535 { exit 1 }
+    { for (i = 1; i <= 4; i++) if ($i !~ /^[0-9]+$/ || $i > 255) exit 1 }
+  '; then
+    echo "Error: invalid listenaddress '${LISTEN_ADDRESS}' (example: 127.0.0.1:M4_DS_DEFAULT_PORT)." >&2
+    return 1
+  fi
+  DS_PORT="${LISTEN_ADDRESS##*:}"
+  LISTEN_ADDRESS="${LISTEN_ADDRESS%:*}"
+
+  if port_conflict "$DS_PORT"; then
+    PORT_ERROR=false
+
+    if [ "${DS_PORT}" = "M4_DS_DEFAULT_PORT" ]; then
+      PORT_ERROR=true
+      echo "Error: port ${DS_PORT} is already in use. Nginx configuration skipped." >&2
+    else
+      REQUESTED_PORT="$DS_PORT" DS_PORT=M4_DS_DEFAULT_PORT
+
+      if port_conflict "$DS_PORT"; then
+        PORT_ERROR=true
+        echo "Error: port ${REQUESTED_PORT} is already in use, and so is the fallback port ${DS_PORT}. Nginx configuration skipped." >&2
+      else
+        db_set M4_ONLYOFFICE_VALUE/ds-port "${DS_PORT}" || true
+        db_set M4_ONLYOFFICE_VALUE/listenaddress "${LISTEN_ADDRESS}:${DS_PORT}" || true
+        echo "Warning: port ${REQUESTED_PORT} is already in use, falling back to port ${DS_PORT}." >&2
+        if [ "${REQUESTED_PORT}" = "80" ] && { [ -e /etc/nginx/sites-enabled/default ] || [ -e /etc/nginx/conf.d/default.conf ]; }; then
+          echo "  To get M4_PRODUCT_NAME on port ${REQUESTED_PORT} instead, free it and reconfigure, e.g.:" >&2
+          [ -e /etc/nginx/sites-enabled/default ] && echo "    mv -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default.disabled" >&2
+          [ -e /etc/nginx/conf.d/default.conf ]   && echo "    mv -f /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.disabled" >&2
+        fi
+      fi
+    fi
+
+    echo "  To reconfigure, run:" >&2
+    echo "    echo 'M4_PACKAGE_NAME M4_ONLYOFFICE_VALUE/listenaddress string <ADDRESS:PORT>' | debconf-set-selections" >&2
+    echo "    dpkg-reconfigure -f noninteractive M4_PACKAGE_NAME" >&2
+
+    [ "${PORT_ERROR}" = true ] && { OLD_LISTEN_ADDRESS=; return 0; }
+  fi
+
   # setup ds port
   sed 's/\(listen .*:\)\([0-9]\{2,5\}\b\)\( default_server\)\?\(;\)/\1'${DS_PORT}'\3\4/' -i $DS_CONF
+  sed -e "0,/listen [0-9.]\+:/{s/listen [0-9.]\+:/listen ${LISTEN_ADDRESS}:/}" \
+      -e "/listen [0-9.]\+:.* ssl/s/listen [0-9.]\+:/listen ${LISTEN_ADDRESS}:/" -i $DS_CONF
+  if [ "${LISTEN_ADDRESS}" = "0.0.0.0" ]; then
+    sed '/internal services/,/^}/!s/listen \[::1\]:/listen [::]:/' -i "$DS_CONF"
+  elif [ -f /proc/net/if_inet6 ] && ip -6 addr show lo 2>/dev/null | grep -q '::1'; then
+    sed '/internal services/,/^}/!s/listen \[::\]:/listen [::1]:/' -i "$DS_CONF"
+  else
+    # IPv6 loopback isn't actually bindable on this host — an unconditional listen [::1]: would fail nginx's bind() and take the whole master process down, including the IPv4 listener
+    sed '/internal services/,/^}/!{/listen\s\+\[::\]:.\+/d}' -i "$DS_CONF"
+  fi
 
   # check if ipv6 supported otherwise remove it from nginx config
   if [ ! -f /proc/net/if_inet6 ]; then
@@ -277,19 +330,16 @@ setup_nginx(){
   fi
 
   # install nginx config
-  if [ -d /etc/nginx/conf.d ] && [ -e /etc/nginx/conf.d/onlyoffice-documentserver.conf ]; then
-    mv /etc/nginx/conf.d/onlyoffice-documentserver.conf /etc/nginx/conf.d/onlyoffice-documentserver.conf.old
-  fi
-
   if [ -d /etc/nginx/conf.d ] && [ ! -e /etc/nginx/conf.d/ds.conf ]; then
 	  ln -s $DS_CONF /etc/nginx/conf.d/ds.conf
   fi
 
-  # sed 's/{{DOCSERVICE_PORT}}/'${DOCSERVICE_PORT}'/'  -i $OO_CONF
-  # sed 's/{{EXAMPLE_PORT}}/'${EXAMPLE_PORT}'/'  -i $OO_CONF
-		
-  rm -f /etc/nginx/sites-enabled/default
-
+  # validate the generated nginx configuration before it is applied
+  mkdir -p "$LOG_DIR"
+  if ! NGINX_TEST_OUTPUT=$(nginx -t 2>&1); then
+    echo "Error: nginx configuration test failed:" >&2
+    echo "$NGINX_TEST_OUTPUT" >&2
+  fi
 }
 
 save_wopi_params() {
@@ -353,6 +403,11 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 		# set up read-only access to prevent modification ds's home directory
 		chmod a-w -R "$DIR"*
 		chown ds:ds "$CONF_DIR"/*.json
+		chmod u=rw,go= "$CONF_DIR"/*.json
+ifelse('M4_DS_EXAMPLE_ENABLE', '1',
+`		chown ds:ds "$CONF_DIR-example"/*.json
+		chmod u=rw,go= "$CONF_DIR-example"/*.json
+')dnl
 
 		getent group onlyoffice >/dev/null && { DATA_OWNER="onlyoffice:onlyoffice"; usermod -aG onlyoffice ds; } || DATA_OWNER="ds:ds"
 		mkdir -p "$DIR/../Data" && chown -R "$DATA_OWNER" "$DIR/../Data" && chmod g+rwxs "$DIR/../Data"
@@ -363,14 +418,14 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 
 		# generate allfonts.js, thumbnail and cache_tag
 		if [ -z "$DS_DOCKER_INSTALLATION" ]; then
-			documentserver-generate-allfonts.sh true
-			documentserver-flush-cache.sh -r false
+			documentserver-generate-allfonts true
+			documentserver-flush-cache -r false
 		fi
 
 		# install/update plugins
 		if [ "$DS_PLUGIN_INSTALLATION" = "true" ]; then
 			echo -n Installing plugins, please wait...
-			documentserver-pluginsmanager.sh -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
+			documentserver-pluginsmanager -r false --update=\"$DIR/sdkjs-plugins/plugin-list-default.json\" >/dev/null
 			echo Done
 		fi
 
@@ -400,7 +455,7 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 				fi
 			done
 			
-			for SVC in ds-metrics ds-example ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`ds-adminpanel',`'); do
+			for SVC in ds-metrics ds-example; do
 				if [ -e /usr/lib/systemd/system/$SVC.service ]; then
 					if systemctl is-active --quiet "$SVC" || systemctl is-enabled --quiet "$SVC"; then
 						systemctl restart "$SVC"
@@ -408,7 +463,11 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 				fi
 			done
 
-			service nginx restart >/dev/null 2>&1
+			if [ -n "${OLD_LISTEN_ADDRESS:-}" ] && [ "$OLD_LISTEN_ADDRESS" != "$LISTEN_ADDRESS" ]; then
+				service nginx restart >/dev/null 2>&1
+			else
+				service nginx reload 2>/dev/null || service nginx start >/dev/null 2>&1
+			fi
 		fi
 		echo "Congratulations, the M4_COMPANY_NAME M4_PRODUCT_NAME has been installed successfully!"
 		echo "$JWT_MESSAGE"
@@ -418,8 +477,8 @@ ifelse(regexp(M4_PACKAGE_NAME,`documentserver$'),-1,`mkdir -p "$LOG_DIR/adminpan
 	;;
 	
 	triggered)
-		documentserver-generate-allfonts.sh true
-		documentserver-flush-cache.sh
+		documentserver-generate-allfonts true
+		documentserver-flush-cache
 	;;
 	
 	*)

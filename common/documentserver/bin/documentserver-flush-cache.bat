@@ -1,4 +1,6 @@
 @echo off
+setlocal
+
 set "SCRIPT_PATH=%~dp0"
 :parse_args
 IF "%1"=="" goto :done
@@ -38,6 +40,7 @@ echo set $cache_tag "%HASH%"; > "%SCRIPT_PATH%\..\nginx\conf\includes\ds-cache.c
 
 copy /y "%SCRIPT_PATH%\..\web-apps\apps\api\documents\api.js.tpl" "%SCRIPT_PATH%\..\web-apps\apps\api\documents\api.js"
 "%SCRIPT_PATH%\..\npm\replace.exe" "{{HASH_POSTFIX}}" "%HASH%" "%SCRIPT_PATH%\..\web-apps\apps\api\documents\api.js"
+del /f /q "%SCRIPT_PATH%\..\web-apps\apps\api\documents\api.js.gz" 2>nul
 
 rem Restart web-site and converter
 IF NOT "%RESTART_CONDITION%"=="false" (  

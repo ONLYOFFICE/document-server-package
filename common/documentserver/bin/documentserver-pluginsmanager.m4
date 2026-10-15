@@ -41,5 +41,5 @@ if [ "$RESTART_CONDITION" != "false" ]; then
 	elif pgrep -x ""supervisord"" >/dev/null; then
 		supervisorctl restart ds:docservice
 	fi
-	documentserver-flush-cache.sh
+	documentserver-flush-cache
 fi
